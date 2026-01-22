@@ -1,19 +1,19 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Toolbar } from "@mui/material";
 import GuestHeader from "../components/headers/guest.header";
 import { Outlet } from "react-router-dom";
+import Footer from "../components/footer/footer";
 
 const GuestLayout = () => {
     return (
         <>
-            <Box sx={{ backgroundColor: "black", color: "white" }}>
-                <Grid container >
-                    <Grid size={12}>
-                        <GuestHeader></GuestHeader>
-                    </Grid>
-                    <Grid size={12} >
-                        <Outlet />
-                    </Grid>
-                </Grid >
+            <Box>
+                <GuestHeader />
+
+                <Toolbar />
+
+                <Outlet />
+
+                <Footer />
             </Box>
         </>
     )

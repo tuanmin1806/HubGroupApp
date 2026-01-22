@@ -1,7 +1,11 @@
-import { Box, Button, createTheme, Divider, Grid, ThemeProvider, Typography } from "@mui/material";
+import { Box, createTheme, Grid, ThemeProvider } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import defaultOrganization from "../../assets/default_organization_card.jpg";
+import SearchBar from "../../components/searchs/search-bar.search";
+import SearchTabs from "../../components/searchs/search-tab.search";
+import SelectActionCard from "../../components/cards/select-action-card.card";
+import ArticleCard from "../../components/cards/article-card.card";
+import ProfessionCard from "../../components/cards/profession-card.card";
 
 const theme = createTheme({
     palette: {
@@ -26,9 +30,9 @@ const theme = createTheme({
     },
 });
 
+
 const HomePage = () => {
     const navigate = useNavigate();
-    // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     useEffect(() => {
         document.title = "Trang Chủ | HUB UNI";
@@ -36,157 +40,133 @@ const HomePage = () => {
 
     return (
         <>
-            <Grid container>
-                <Grid size={12}>
+            <ThemeProvider theme={theme}>
+                <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    sx={{
+                        bgcolor: '#ee6a28',
+                        py: 3
+                    }}
+                >
+                    <Box sx={{
+                        color: 'white',
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        mb: 2
+                    }}
+                    >
+                        Tra cứu thông tin tuyển sinh đại học nhanh chóng và chính xác
+                    </Box>
+
+                    <Box sx={{
+                        width: "100%",
+                        maxWidth: 1200,
+                    }}
+                    >
+                        <Box>
+                            <SearchBar />
+                        </Box>
+
+                        <Box sx={{
+                            mt: 2
+                        }}
+                        >
+                            <SearchTabs />
+                        </Box>
+                    </Box>
                 </Grid>
-            </Grid>
 
-            <Grid
-                container
-                sx={{
-                    mx: { xs: 2, md: 12 },
-                    my: { xs: 4, md: 9 },
-                }}
-                spacing={{ xs: 2, md: 10 }}
-            >
-                <ThemeProvider theme={theme}>
-                    <Grid size={{ xs: 12, md: 7 }} order={{ xs: 2, md: 1 }}>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: "bold",
-                                fontSize: { xs: "1.5rem", md: "2.125rem" },
-                            }}
-                        >
-                            Chi tiết tổ chức
-                        </Typography>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                mt: 1,
-                                fontWeight: "bold",
-                                fontSize: { xs: "1.5rem", md: "2.125rem" },
-                            }}
-                        >
-                            Chi tiết tổ chức
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                mt: 3,
-                                fontWeight: "medium",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                            }}
-                        >
-                            Chi tiết tổ chức
-                        </Typography>
-                        <Box sx={{ mt: 3 }}>
-                            {/* Slider: 2 slides for md (matches original), 1 for xs */}
-
-                        </Box>
-                        <Box
-                            sx={{ mt: 3 }}
-                            onClick={() => navigate("/restaurant")}
-                        >
-                            <Button
-                                variant="contained"
-                                sx={{ color: "#ffff", bgcolor: "#d02028" }}
-                            >
-                                Danh sách tổ chức
-                            </Button>
-                        </Box>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 5 }} order={{ xs: 1, md: 2 }}>
-                        {/* Image: height 550px for md (matches original), auto for xs */}
-                        <Box
-                            component="img"
-                            src={defaultOrganization}
-                            alt="Restaurant"
-                            sx={{
-                                borderRadius: "5%",
-                                width: "100%",
-                                height: { xs: "auto", md: "550px" },
-                                objectFit: "cover",
-                            }}
-                        />
-                    </Grid>
-                </ThemeProvider>
-            </Grid>
-
-            <Grid container sx={{ m: { xs: 2, md: 6 } }}>
-                <Grid size={12}>
-                    <Divider sx={{ width: "100%", bgcolor: "#ffff" }} />
+                <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    sx={{
+                        py: 3
+                    }}
+                >
+                    <Box sx={{
+                        color: '#ff5722',
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        mb: 2,
+                    }}
+                    >
+                        Tin tuyển sinh mới nhất
+                    </Box>
+                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                        <SelectActionCard />
+                    </Box>
                 </Grid>
-            </Grid>
 
-            <Grid
-                container
-                sx={{
-                    mx: { xs: 2, md: 12 },
-                    my: { xs: 4, md: 9 },
-                }}
-                spacing={{ xs: 2, md: 10 }}
-            >
-                <ThemeProvider theme={theme}>
-                    <Grid size={{ xs: 12, md: 5 }} order={{ xs: 1, md: 1 }}>
-                        {/* Image: height 550px for md (matches original), auto for xs */}
-                        <Box
-                            component="img"
-                            src={defaultOrganization}
-                            alt="Dish"
-                            sx={{
-                                borderRadius: "5%",
-                                width: "100%",
-                                height: { xs: "auto", md: "550px" },
-                                objectFit: "cover",
-                            }}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 7 }} order={{ xs: 2, md: 2 }}>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                fontWeight: "bold",
-                                fontSize: { xs: "1.5rem", md: "2.125rem" },
-                            }}
-                        >
-                            Chi tiết tổ chức
-                        </Typography>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                mt: 1,
-                                fontWeight: "bold",
-                                fontSize: { xs: "1.5rem", md: "2.125rem" },
-                            }}
-                        >
-                            Chi tiết tổ chức
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                mt: 3,
-                                fontWeight: "medium",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                            }}
-                        >
-                            Chi tiết tổ chức
-                        </Typography>
-                        <Box sx={{ mt: 3 }}>
-                            {/* Slider: 2 slides for md (matches original), 1 for xs */}
+                <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    sx={{
+                        py: 3
+                    }}
+                >
+                    <Box sx={{
+                        color: '#ff5722',
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        mb: 2,
+                    }}
+                    >
+                        TOP ngành tuyển sinh
+                    </Box>
+                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                        <SelectActionCard />
+                    </Box>
+                </Grid>
 
-                        </Box>
-                        <Box sx={{ mt: 3 }} onClick={() => navigate("/dish")}>
-                            <Button
-                                variant="contained"
-                                sx={{ color: "#ffff", bgcolor: "#d02028" }}
-                            >
-                                Danh sách tổ chức
-                            </Button>
-                        </Box>
-                    </Grid>
-                </ThemeProvider>
-            </Grid>
+                <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    sx={{
+                        py: 3
+                    }}
+                >
+                    <Box sx={{
+                        color: '#ff5722',
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        mb: 2,
+                    }}
+                    >
+                        Ngành nghề nổi bật
+                    </Box>
+                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                        <ProfessionCard />
+                    </Box>
+                </Grid>
+
+                <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    sx={{
+                        py: 3
+                    }}
+                >
+                    <Box sx={{
+                        color: '#ff5722',
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        mb: 2,
+                    }}
+                    >
+                        Bài viết
+                    </Box>
+                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                        <ArticleCard />
+                    </Box>
+                </Grid>
+
+            </ThemeProvider>
         </>
     );
 };

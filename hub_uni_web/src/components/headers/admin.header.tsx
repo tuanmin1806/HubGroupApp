@@ -1,16 +1,7 @@
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Person3Icon from "@mui/icons-material/Person3";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider, useMediaQuery, IconButton, Drawer, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
-import Link from "@mui/material/Link";
+import { CloseOutlined, MenuOutlined, Person3Outlined, TableBar } from "@mui/icons-material";
+import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, ThemeProvider, Toolbar, Typography, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TableBar } from "@mui/icons-material";
 
 const theme = createTheme({
     palette: {
@@ -23,7 +14,7 @@ const theme = createTheme({
     },
 });
 
-function GuestHeader() {
+function AdminHeader() {
     const navigate = useNavigate();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -60,7 +51,7 @@ function GuestHeader() {
                 }}
                 aria-label="close drawer"
             >
-                <CloseIcon />
+                <CloseOutlined />
             </IconButton>
 
             <Typography
@@ -74,7 +65,7 @@ function GuestHeader() {
                     letterSpacing: { xs: '.1rem', md: '.3rem' },
                 }}
             >
-                GUEST
+                HUB_UNI
             </Typography>
 
             <List>
@@ -185,7 +176,7 @@ function GuestHeader() {
                             onClick={toggleDrawer(true)}
                             sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
                         >
-                            <MenuIcon fontSize={isMobile ? "medium" : "large"} />
+                            <MenuOutlined fontSize={isMobile ? "medium" : "large"} />
                         </IconButton>
 
                         {/* Logo */}
@@ -216,7 +207,7 @@ function GuestHeader() {
                                 fontSize: { xs: "1rem", md: "1.25rem" },
                             }}
                         >
-                            GUEST
+                            ADMIN
                         </Typography>
 
                         {/* Navigation Links */}
@@ -272,7 +263,7 @@ function GuestHeader() {
                                 gap: { xs: 0.5, md: 1 },
                             }}
                         >
-                            <Person3Icon
+                            <Person3Outlined
                                 sx={{
                                     p: 0,
                                     fontSize: { xs: "1.25rem", md: "1.5rem" },
@@ -333,4 +324,4 @@ function GuestHeader() {
     );
 }
 
-export default GuestHeader;
+export default AdminHeader;
