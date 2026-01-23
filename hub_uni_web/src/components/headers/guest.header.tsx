@@ -27,8 +27,18 @@ function GuestHeader() {
     const navigate = useNavigate();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [openDrawer, setOpenDrawer] = useState(false);
-    const [openLogin, setOpenLogin] = useState(false);
-    const [openRegister, setOpenRegister] = useState(false);
+
+    const handleNavigateLogin = () => {
+        navigate("/dang-nhap");
+    }
+
+    const handleNavigateSignUp = () => {
+        navigate("/dang-ky");
+    }
+
+    const handleNavigateArticle = () => {
+        navigate("/danh-sach-bai-viet");
+    }
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpenDrawer(newOpen);
@@ -242,7 +252,7 @@ function GuestHeader() {
                                 color="inherit"
                                 variant="body2"
                                 underline="hover"
-                                onClick={() => navigate("/restaurant")}
+                                onClick={() => navigate("/")}
                             >
                                 Danh sách tổ chức
                             </Link>
@@ -258,9 +268,25 @@ function GuestHeader() {
                                 color="inherit"
                                 variant="body2"
                                 underline="hover"
-                                onClick={() => navigate("/dish")}
+                                onClick={() => navigate("/")}
                             >
                                 Danh sách tổ chức
+                            </Link>
+                            <Link
+                                sx={{
+                                    ml: { xs: 1, md: 3 },
+                                    textAlign: "center",
+                                    textTransform: "uppercase",
+                                    fontWeight: "bold",
+                                    fontSize: { xs: "0.75rem", md: "0.875rem" },
+                                }}
+                                component="button"
+                                color="inherit"
+                                variant="body2"
+                                underline="hover"
+                                onClick={() => handleNavigateArticle()}
+                            >
+                                Bài viết
                             </Link>
                         </Box>
 
@@ -289,7 +315,7 @@ function GuestHeader() {
                                 color="inherit"
                                 variant="body1"
                                 underline="hover"
-                                onClick={() => setOpenLogin(true)}
+                                onClick={() => handleNavigateLogin()}
                             >
                                 Đăng nhập
                             </Link>
@@ -313,7 +339,7 @@ function GuestHeader() {
                                 color="inherit"
                                 variant="body1"
                                 underline="hover"
-                                onClick={() => setOpenRegister(true)}
+                                onClick={() => handleNavigateSignUp()}
                             >
                                 Đăng ký
                             </Link>

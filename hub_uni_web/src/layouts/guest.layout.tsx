@@ -6,12 +6,19 @@ import Footer from "../components/footer/footer";
 const GuestLayout = () => {
     return (
         <>
-            <Box>
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
                 <GuestHeader />
-
                 <Toolbar />
 
-                <Outlet />
+                <Box sx={{ flexGrow: 1 }}>
+                    <Outlet />
+                </Box>
 
                 <Footer />
             </Box>

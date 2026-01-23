@@ -75,7 +75,7 @@ function SelectActionCard() {
               src={card.image}
               alt={card.title}
               sx={{
-                width: 120,
+                width: { xs: 96, sm: 120 },
                 height: '100%',
                 objectFit: 'contain',
               }}

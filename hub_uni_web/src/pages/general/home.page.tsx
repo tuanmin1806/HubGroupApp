@@ -34,6 +34,10 @@ const theme = createTheme({
 const HomePage = () => {
     const navigate = useNavigate();
 
+    const handleNavigate = (path: string) => {
+        navigate(path);
+    }
+
     useEffect(() => {
         document.title = "Trang Chủ | HUB UNI";
     }, [navigate]);
@@ -95,7 +99,13 @@ const HomePage = () => {
                     >
                         Tin tuyển sinh mới nhất
                     </Box>
-                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                    <Box
+                        onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
+                        sx={{
+                            width: '100%',
+                            maxWidth: 1200
+                        }}
+                    >
                         <SelectActionCard />
                     </Box>
                 </Grid>
@@ -117,7 +127,9 @@ const HomePage = () => {
                     >
                         TOP ngành tuyển sinh
                     </Box>
-                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                    <Box
+                        onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
+                        sx={{ width: '100%', maxWidth: 1200 }}>
                         <SelectActionCard />
                     </Box>
                 </Grid>
@@ -139,7 +151,9 @@ const HomePage = () => {
                     >
                         Ngành nghề nổi bật
                     </Box>
-                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                    <Box
+                        onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
+                        sx={{ width: '100%', maxWidth: 1200 }}>
                         <ProfessionCard />
                     </Box>
                 </Grid>
@@ -152,16 +166,19 @@ const HomePage = () => {
                         py: 3
                     }}
                 >
-                    <Box sx={{
-                        color: '#ff5722',
-                        fontSize: 28,
-                        fontWeight: 'bold',
-                        mb: 2,
-                    }}
+                    <Box
+                        sx={{
+                            color: '#ff5722',
+                            fontSize: 28,
+                            fontWeight: 'bold',
+                            mb: 2,
+                        }}
                     >
                         Bài viết
                     </Box>
-                    <Box sx={{ width: '100%', maxWidth: 1200 }}>
+                    <Box
+                        onClick={() => handleNavigate('/chi-tiet-bai-viet')}
+                        sx={{ width: '100%', maxWidth: 1200 }}>
                         <ArticleCard />
                     </Box>
                 </Grid>

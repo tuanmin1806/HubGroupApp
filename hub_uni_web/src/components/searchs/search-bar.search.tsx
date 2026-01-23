@@ -39,7 +39,10 @@ export default function SearchBar() {
             <Button 
                 variant="contained" 
                 startIcon={<SearchOutlined />}
-                sx={{borderRadius: 10 }}
+                sx={{
+                    borderRadius: 10,
+                    backgroundColor: '#f3522a',
+                }}
                 >
                 Tìm kiếm
             </Button>
