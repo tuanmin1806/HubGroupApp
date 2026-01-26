@@ -5,7 +5,7 @@ export default function ManageAccountPage() {
     return <>
         <Grid container spacing={2}>
             <Grid size="auto">
-
+                
             </Grid>
             <Grid size={6}>
                 <Paper sx={{ display: "flex", alignItems: "center" }}>

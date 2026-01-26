@@ -4,6 +4,7 @@ import RoleBasedLayout from "../layouts/role-based.layout";
 import AuthLayout from "../layouts/auth.layout";
 import Login from "../pages/general/signin.page";
 import Signup from "../pages/general/sign-up.page";
+import adminRoutes from "./admin.route";
 
 const router = createBrowserRouter(
     [
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
             element: (<RoleBasedLayout />),
             children: [
                 ...generalRoutes,
+                ...adminRoutes
             ]
         }
     ],

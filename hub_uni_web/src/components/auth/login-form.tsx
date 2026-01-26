@@ -1,14 +1,81 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, Link, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, IconButton, InputAdornment, Link, Stack, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SocialAuth from "./social-auth";
+import { requiredValidator, validate } from "../../app/services/validation.service";
+import { useLoginMutation } from "../../app/features/auth/auth.api";
+import { useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
+
+const initialState = {
+  username: "",
+  password: "",
+}
+
+const validators = {
+  username: [requiredValidator],
+  password: [requiredValidator],
+};
 const LoginForm = () => {
+  const [login] = useLoginMutation();
+  const [form, setForm] = useState(initialState);
+  const [errors, setErrors] = useState(initialState);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    navigate('/');
+  const handleChange =
+    (field: "username" | "password") =>
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setForm(prev => ({ ...prev, [field]: value }));
+        setErrors(prev => ({
+          ...prev,
+          [field]: validate(value, validators[field], form),
+        }));
+      };
+
+
+  const isFormValid = () => {
+    const allFilled = Object.keys(validators).every(
+      field => String(form[field as keyof typeof form]).trim() !== ""
+    );
+    const noErrors = !Object.values(errors).some(Boolean);
+    return allFilled && noErrors;
   };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const data = await login({
+        UserName: form.username,
+        Password: form.password,
+      }).unwrap();
+
+      switch (data.userResponse.role) {
+        case "ADMIN":
+          navigate("/admin");
+          break;
+        case "MANAGER":
+          navigate("/manager");
+          break;
+        case "STAFF":
+          navigate("/staff");
+          break;
+        case "SUPERVISOR":
+          navigate("/supervisor");
+          break;
+        default:
+          navigate("/");
+      }
+    } catch (error: any) {
+      if (error?.data?.code === 444) {
+        // mở reconfirm password dialog nếu cần
+        console.log("Need reconfirm password");
+      }
+    }
+  };
+
+
 
   return (
     <Stack
@@ -74,11 +141,14 @@ const LoginForm = () => {
               >
                 <TextField
                   fullWidth
-                  size="medium"
-                  id="email"
-                  type="email"
                   label="Email"
+                  type="email"
+                  value={form.username}
+                  onChange={handleChange("username")}
+                  error={!!errors.username}
+                  helperText={errors.username}
                 />
+
               </Grid>
               <Grid
                 sx={{
@@ -88,10 +158,28 @@ const LoginForm = () => {
               >
                 <TextField
                   fullWidth
-                  size="medium"
-                  id="password"
                   label="Password"
+                  value={form.password}
+                  onChange={handleChange("password")}
+                  error={!!errors.password}
+                  helperText={errors.password}
+                  type={showPassword ? "text" : "password"}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(v => !v)}
+                            onMouseDown={e => e.preventDefault()}
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                 />
+
               </Grid>
               <Grid
                 sx={{
@@ -126,7 +214,7 @@ const LoginForm = () => {
                 </Stack>
               </Grid>
               <Grid size={12}>
-                <Button fullWidth type="submit" size="large" variant="contained">
+                <Button fullWidth type="submit" disabled={!isFormValid()} size="large" variant="contained">
                   Log in
                 </Button>
               </Grid>
