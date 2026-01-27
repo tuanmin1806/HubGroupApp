@@ -19,7 +19,7 @@ const NAVIGATION: NavigationItem[] = [
     },
     {
         kind: "page",
-        segment: "admin",
+        segment: "account-management",
         title: "Quản lý tài khoản",
         children: [
             {

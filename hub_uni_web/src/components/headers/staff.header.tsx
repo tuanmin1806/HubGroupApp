@@ -1,11 +1,11 @@
+import { Person3, TableBar } from "@mui/icons-material";
 import { AppBar, Box, Container, Link, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
-import { Person3, TableBar } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
-function AdminHeader() {
+function StaffHeader() {
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -31,7 +31,7 @@ function AdminHeader() {
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <TableBar
-                            onClick={() => navigate("/admin")}
+                            onClick={() => navigate("/staff")}
                             sx={{
                                 cursor: "pointer",
                                 display: { xs: "none", md: "flex" },
@@ -42,7 +42,7 @@ function AdminHeader() {
                             variant="h6"
                             noWrap
                             component="a"
-                            href="/admin"
+                            href="/staff"
                             sx={{
                                 mr: 2,
                                 display: { xs: "none", md: "flex" },
@@ -53,7 +53,7 @@ function AdminHeader() {
                                 textDecoration: "none",
                             }}
                         >
-                            HUBUNI HỆ THỐNG QUẢN LÝ
+                            HUBUNI QUẢN LÝ BÀI ĐĂNG
                         </Typography>
                         <Box
                             sx={{
@@ -81,7 +81,7 @@ function AdminHeader() {
                                         variant="body1"
                                         underline="hover"
                                     >
-                                        QUẢN TRỊ | {user?.UserName}{" "}
+                                        NHÂN VIÊN | {user?.UserName}{" "}
                                     </Link>
                                 </Box>
                             </Tooltip>
@@ -122,4 +122,4 @@ function AdminHeader() {
         </>
     );
 }
-export default AdminHeader;
+export default StaffHeader;

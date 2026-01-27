@@ -1,10 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import generalRoutes from "./general.route";
-import RoleBasedLayout from "../layouts/role-based.layout";
 import AuthLayout from "../layouts/auth.layout";
 import Login from "../pages/general/signin.page";
 import Signup from "../pages/general/sign-up.page";
 import adminRoutes from "./admin.route";
+import staffRoutes from "./staff.route";
+import AdminLayout from "../layouts/admin.layout";
+import StaffLayout from "../layouts/staff.layout";
+import RoleBasedLayout from "../layouts/role-based.layout";
 
 const router = createBrowserRouter(
     [
@@ -22,13 +25,26 @@ const router = createBrowserRouter(
             ],
         },
         {
-            path: '/',
-            element: (<RoleBasedLayout />),
+            path: "/admin",
+            element: <AdminLayout />,
+            children: [
+                ...adminRoutes,
+            ],
+        },
+        {
+            path: "/staff",
+            element: <StaffLayout />,
+            children: [
+                ...staffRoutes,
+            ],
+        },
+        {
+            path: "/",
+            element: <RoleBasedLayout />,
             children: [
                 ...generalRoutes,
-                ...adminRoutes
-            ]
-        }
+            ],
+        },
     ],
     {
         future: {

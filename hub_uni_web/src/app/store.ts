@@ -2,18 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import baseApi from "./features/base.api";
 import authReducer, { restoreCredentials } from './features/auth/auth.slice';
 import snackbarReducer from './features/snackbar/snackbar.slice';
-import { getToken } from "./services/auth.service";
-import { authApi } from "./features/auth/auth.api";
+import { getUserInfo } from "./services/auth.service";
 
-const initializeAuth = async (store: any) => {
-    const token = getToken();
-    if (token) {
-        store.dispatch(restoreCredentials({ token }));
-        await store.dispatch(
-            authApi.endpoints.getUserProfile.initiate()
-        ).unwrap();
+const initializeAuth = (store: any) => {
+    const user = getUserInfo();
+    if (user?.Token) {
+        store.dispatch(restoreCredentials(user));
     }
 };
+
 
 const store = configureStore({
     reducer: {

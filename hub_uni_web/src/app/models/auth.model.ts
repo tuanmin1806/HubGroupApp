@@ -1,3 +1,7 @@
+import { Department } from "./department.model";
+import { Role } from "./role.model";
+import { SystemConfig } from "./system-config.model";
+
 export interface AuthRegisterRequestBody {
     firstName: string;
     lastName: string;
@@ -26,18 +30,18 @@ export interface AuthLoginRequestBody {
 }
 
 export interface AuthInfo {
-    userId: number,
-    firstName: string,
-    lastName: string,
-    email: string,
-    phoneNumber: string,
-    birthDate: string,
-    gender: string,
-    role: string,
-    status: boolean,
-}
-
-export interface AuthLoginResponse {
-    accessToken: string,
-    userResponse: AuthInfo
+    Id: string,
+    UserName: string,
+    Email: string,
+    FullName: string,
+    DateOfBirth: string,
+    PhoneNumber: string,
+    Gender: string,
+    AccountType: string,
+    Address: boolean,
+    Roles: Role[],
+    Departments: Department[],
+    PermissionKeys: string[],
+    Token: string,
+    SystemConfig: SystemConfig,
 }

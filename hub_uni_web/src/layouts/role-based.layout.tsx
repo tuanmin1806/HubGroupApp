@@ -1,19 +1,11 @@
 import { useSelector } from "react-redux";
-import AdminLayout from "./admin.layout";
-import { getToken } from "../app/services/auth.service";
 import GuestLayout from "./guest.layout";
-import { roles } from "../constants/role.constant";
-
+import { RootState } from "../app/store";
+import StudentLayout from "./student.layout";
 const RoleBasedLayout = () => {
-    const { user, isLoggedIn } = useSelector((state) => state.auth);
-    return (
-        <>
-            {!isLoggedIn && !getToken() && <GuestLayout></GuestLayout>}
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
-            {isLoggedIn && user?.role === roles.ADMIN && (
-                <AdminLayout></AdminLayout>
-            )}
-        </>
-    );
+    return isLoggedIn ? <StudentLayout /> : <GuestLayout />;
 };
+
 export default RoleBasedLayout;

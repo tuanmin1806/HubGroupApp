@@ -8,13 +8,13 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 
 const initialState = {
-  username: "",
-  password: "",
+  UserName: "",
+  Password: "",
 }
 
 const validators = {
-  username: [requiredValidator],
-  password: [requiredValidator],
+  UserName: [requiredValidator],
+  Password: [requiredValidator],
 };
 const LoginForm = () => {
   const [login] = useLoginMutation();
@@ -23,16 +23,14 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange =
-    (field: "username" | "password") =>
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = e.target;
-        setForm(prev => ({ ...prev, [field]: value }));
-        setErrors(prev => ({
-          ...prev,
-          [field]: validate(value, validators[field], form),
-        }));
-      };
+  const handleChange = (field) => (e) => {
+    const { value } = e.target;
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({
+      ...prev,
+      [field]: validate(value, validators[field] || [], form),
+    }));
+  };
 
 
   const isFormValid = () => {
@@ -46,35 +44,22 @@ const LoginForm = () => {
     e.preventDefault();
 
     try {
-      const data = await login({
-        UserName: form.username,
-        Password: form.password,
-      }).unwrap();
+      const data = await login(form).unwrap();
+      console.log("LOGIN DATA =", data);
 
-      switch (data.userResponse.role) {
-        case "ADMIN":
-          navigate("/admin");
-          break;
-        case "MANAGER":
-          navigate("/manager");
-          break;
-        case "STAFF":
-          navigate("/staff");
-          break;
-        case "SUPERVISOR":
-          navigate("/supervisor");
-          break;
-        default:
-          navigate("/");
+      const defaultPage = data?.Roles?.[0]?.DefaultPage;
+      console.log("Default page =", defaultPage);
+      if (defaultPage) {
+        navigate(defaultPage);
+      } else {
+        navigate("/");
       }
     } catch (error: any) {
       if (error?.data?.code === 444) {
-        // mở reconfirm password dialog nếu cần
         console.log("Need reconfirm password");
       }
     }
   };
-
 
 
   return (
@@ -141,12 +126,12 @@ const LoginForm = () => {
               >
                 <TextField
                   fullWidth
-                  label="Email"
-                  type="email"
-                  value={form.username}
-                  onChange={handleChange("username")}
-                  error={!!errors.username}
-                  helperText={errors.username}
+                  label="Tên đăng nhập"
+                  type="text"
+                  value={form.UserName}
+                  onChange={handleChange("UserName")}
+                  error={!!errors.UserName}
+                  helperText={errors.UserName}
                 />
 
               </Grid>
@@ -158,11 +143,11 @@ const LoginForm = () => {
               >
                 <TextField
                   fullWidth
-                  label="Password"
-                  value={form.password}
-                  onChange={handleChange("password")}
-                  error={!!errors.password}
-                  helperText={errors.password}
+                  label="Mật khẩu"
+                  value={form.Password}
+                  onChange={handleChange("Password")}
+                  error={!!errors.Password}
+                  helperText={errors.Password}
                   type={showPassword ? "text" : "password"}
                   slotProps={{
                     input: {

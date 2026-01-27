@@ -1,62 +1,30 @@
 import { ApiResponse } from "../../models/api.model";
-import { AuthChangePasswordRequestBody, AuthForgotPasswordRequestBody, AuthInfo, AuthLoginRequestBody, AuthLoginResponse, AuthReconfirmPasswordRequestBody, AuthRegisterRequestBody } from "../../models/auth.model";
-import { User } from "../../models/user.model";
-import { getToken, removeToken, saveToken } from "../../services/auth.service";
+import { AuthChangePasswordRequestBody, AuthForgotPasswordRequestBody, AuthInfo, AuthLoginRequestBody, AuthReconfirmPasswordRequestBody, AuthRegisterRequestBody } from "../../models/auth.model";
+import { removeToken, saveUserInfo } from "../../services/auth.service";
 import baseApi from "../base.api";
 import { TAG_TYPES } from "../tags";
 import { logout, setCredentials } from "./auth.slice";
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        // GET user-profile
-        getUserProfile: builder.query<AuthInfo, void>({
-            query: () => ({
-                url: `/users/my-profile`,
-                method: 'GET',
-            }),
-            transformResponse: (responseData: ApiResponse<AuthInfo>): AuthInfo => {
-                return responseData.data;
-            },
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                const { data } = await queryFulfilled;
-                const token = getToken();
-                if (token) {
-                    dispatch(setCredentials({ user: data, token }));
-                }
-            },
-            providesTags: [
-                TAG_TYPES.AUTH,
-            ]
-        }),
-
-        // UPDATE user-profile
-        updateUserProfile: builder.mutation<ApiResponse<null>, User>({
-            query: (body) => ({
-                url: `/users/my-profile`,
-                method: 'PUT',
-                body
-            }),
-            invalidatesTags: [TAG_TYPES.AUTH]
-        }),
-
         // LOGIN
-        login: builder.mutation<AuthLoginResponse, AuthLoginRequestBody>({
+        login: builder.mutation<AuthInfo, AuthLoginRequestBody>({
             query: (credentials) => ({
-                url: '/account/login',
-                method: 'POST',
+                url: "/account/login",
+                method: "POST",
                 body: credentials,
             }),
-            transformResponse: (responseData: ApiResponse<AuthLoginResponse>): AuthLoginResponse => {
-                return responseData.data;
-            },
+
             onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                const { data } = await queryFulfilled;
-                saveToken(data.accessToken);
-                dispatch(setCredentials({
-                    user: data.userResponse,
-                    token: data.accessToken,
-                }));
+                try {
+                    const { data } = await queryFulfilled;
+                    saveUserInfo(data);
+                    dispatch(setCredentials(data));
+                } catch (err) {
+                    console.error("Login failed", err);
+                }
             },
+
         }),
 
         // LOGOUT
@@ -116,12 +84,10 @@ export const authApi = baseApi.injectEndpoints({
     }),
 });
 export const {
-    useGetUserProfileQuery,
     useLoginMutation,
     useRegisterMutation,
     useLogoutMutation,
     useForgotPasswordMutation,
     useReconfirmPasswordMutation,
     useChangePasswordMutation,
-    useUpdateUserProfileMutation
 } = authApi;

@@ -1,12 +1,11 @@
 import { ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
-import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination } from "@mui/material";
-import AccountFilter from "../../components/filters/account.filter";
+import { Chip, Grid, IconButton, InputBase, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from "@mui/material";
 
-export default function ManageAccountPage() {
+export default function ManageArticlePage() {
     return <>
         <Grid container spacing={2}>
             <Grid size="auto">
-                <AccountFilter />
+                
             </Grid>
             <Grid size={6}>
                 <Paper sx={{ display: "flex", alignItems: "center" }}>
