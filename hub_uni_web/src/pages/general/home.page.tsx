@@ -100,7 +100,6 @@ const HomePage = () => {
                         Tin tuyển sinh mới nhất
                     </Box>
                     <Box
-                        onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
                         sx={{
                             width: '100%',
                             maxWidth: 1200

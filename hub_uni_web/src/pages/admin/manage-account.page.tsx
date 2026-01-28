@@ -1,9 +1,16 @@
-import { ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
-import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination } from "@mui/material";
+import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
+import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button } from "@mui/material";
 import AccountFilter from "../../components/filters/account.filter";
+import CreateUserDialog from "../../components/dialogs/admin/create-account.dialog";
+import { useState } from "react";
 
 export default function ManageAccountPage() {
+    const [openAddNewUserDialog, setOpenAddNewUserDialog] = useState(false);
     return <>
+        <CreateUserDialog
+            open={openAddNewUserDialog}
+            setOpen={setOpenAddNewUserDialog}
+        />
         <Grid container spacing={2}>
             <Grid size="auto">
                 <AccountFilter />
@@ -30,6 +37,16 @@ export default function ManageAccountPage() {
                         <Search />
                     </IconButton>
                 </Paper>
+            </Grid>
+            <Grid size="auto">
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<Add />}
+                    onClick={() => setOpenAddNewUserDialog(true)}
+                >
+                    Thêm tài khoản
+                </Button>
             </Grid>
             <Grid sx={{ ml: 'auto' }}>
 
