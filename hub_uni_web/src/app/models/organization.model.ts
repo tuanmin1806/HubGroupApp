@@ -23,13 +23,14 @@ export interface OrganizationResponse {
     Keywords: string;
     Province: string;
     Commune: string;
-    MainProfession: ProfessionResponse;
+    MainProfession: string;
     Professions: ProfessionResponse[];
     WebsiteUrl: string;
     IsTop: boolean;
     InternationalName: string;
     Status: string;
     Summary: string;
+    SeoUrl?: string;
 }
 
 export interface OrganizationFilterParams {

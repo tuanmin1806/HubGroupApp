@@ -2,11 +2,11 @@ import * as React from "react";
 import {
   Box,
   Card,
-  CardContent,
   Typography,
-  Button,
-  Popover,
+  IconButton,
+  Popover
 } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useNavigate } from "react-router-dom";
 import { OrganizationResponse } from "../../app/models/organization.model";
 
@@ -15,18 +15,17 @@ interface Props {
 }
 
 export default function OrganizationSelectActionCard({ organizations }: Props) {
+  const navigate = useNavigate();
+
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedOrg, setSelectedOrg] =
     React.useState<OrganizationResponse | null>(null);
-
-  const navigate = useNavigate();
 
   const handleOpen = (
     event: React.MouseEvent<HTMLElement>,
     org: OrganizationResponse
   ) => {
-    const cardElement = event.currentTarget.closest(".MuiCard-root");
-    setAnchorEl(cardElement as HTMLElement);
+    setAnchorEl(event.currentTarget);
     setSelectedOrg(org);
   };
 
@@ -39,66 +38,124 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
     <>
       <Box
         sx={{
-          width: "100%",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+          },
           gap: 2,
         }}
       >
+
         {organizations.map((org) => (
-          <Card key={org.Id}>
+          <Card
+            key={org.Id}
+            sx={{
+              display: "flex",
+              alignItems: "stretch",
+              p: 2,
+              borderRadius: 2,
+            }}
+          >
+            {/* LEFT: IMAGE */}
             <Box
               component="img"
               src={org.LogoFullUrl || "/default_organization_card.jpg"}
               alt={org.Name}
               sx={{
-                width: "100%",
-                height: 140,
+                width: 120,
+                height: 120,
                 objectFit: "contain",
+                mr: 2,
+                borderRadius: 1,
+                bgcolor: "#fafafa",
               }}
             />
 
-            <CardContent>
+            {/* RIGHT: CONTENT */}
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {/* NAME */}
               <Typography
-                variant="h6"
-                sx={{ cursor: "pointer" }}
-                onClick={() => navigate(`/to-chuc/${org.Id}`)}
+                variant="subtitle1"
+                fontWeight="bold"
+                sx={{ cursor: "pointer", width: "fit-content" }}
+                onMouseEnter={(e) => handleOpen(e, org)}
+                onMouseLeave={handleClose}
               >
                 {org.Name}
               </Typography>
 
-              <Typography variant="caption" color="text.secondary">
-                {org.Province}
+              {/* INTERNATIONAL NAME */}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+              >
+                {org.InternationalName}
               </Typography>
 
-              <Box mt={2}>
-                <Button
+              {/* BOTTOM ROW */}
+              <Box
+                sx={{
+                  mt: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                {/* MAIN PROFESSION */}
+                <Typography variant="body2" color="primary">
+                  {org.MainProfession}
+                </Typography>
+
+                {/* DETAIL ICON */}
+                <IconButton
                   size="small"
-                  variant="outlined"
-                  onClick={(e) => handleOpen(e, org)}
+                  onClick={() => navigate(`/to-chuc/${org.SeoUrl}`)}
                 >
-                  Xem chi tiết
-                </Button>
+                  <InfoOutlinedIcon />
+                </IconButton>
               </Box>
-            </CardContent>
+            </Box>
           </Card>
         ))}
       </Box>
 
+      {/* POPOVER */}
       <Popover
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
+        disableRestoreFocus
+        sx={{ pointerEvents: "none" }}
       >
         {selectedOrg && (
-          <Box sx={{ p: 2, maxWidth: 260 }}>
-            <Typography variant="subtitle1" gutterBottom>
+          <Box sx={{ p: 2, maxWidth: 320 }}>
+            <Typography fontWeight="bold" gutterBottom>
               {selectedOrg.Name}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+
+            <Typography variant="body2" sx={{ mb: 1 }}>
               {selectedOrg.Summary}
+            </Typography>
+
+            <Typography variant="body2">
+              <b>Ngành chính:</b> {selectedOrg.MainProfession}
+            </Typography>
+
+            <Typography variant="body2">
+              <b>Điện thoại:</b> {selectedOrg.PhoneNumber}
+            </Typography>
+
+            <Typography variant="body2">
+              <b>Địa chỉ:</b> {selectedOrg.Address}
+            </Typography>
+
+            <Typography variant="body2">
+              <b>Mã số thuế:</b> {selectedOrg.TaxCode}
             </Typography>
           </Box>
         )}

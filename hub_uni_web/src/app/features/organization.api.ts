@@ -32,9 +32,17 @@ const organizationApi = baseApi.injectEndpoints({
                 Total: responseData.Total,
             }),
         }),
+
+        getOrganizationBySeo: builder.query<OrganizationResponse, string>({
+            query: (seo) => ({
+                url: `organization/getbyseourl/${seo}`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
 export const {
     useOrganizationsFullTextSearchQuery,
+    useGetOrganizationBySeoQuery
 } = organizationApi;

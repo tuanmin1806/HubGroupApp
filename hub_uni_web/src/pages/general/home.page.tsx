@@ -44,6 +44,22 @@ const HomePage = () => {
         navigate(path);
     }
 
+    const handleSearch = (query: string, provinceId: string) => {
+        const params = new URLSearchParams();
+
+        if (query.trim()) {
+            params.append('search', query.trim());
+        }
+
+        if (provinceId) {
+            params.append('provinceId', provinceId);
+        }
+
+        if (params.toString()) {
+            navigate(`/tim-kiem-to-chuc?${params.toString()}`);
+        }
+    };
+
     const { data: organizationData } = useOrganizationsFullTextSearchQuery({ page: page, size: PAGE_SIZE, });
     const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
     const { data: professtionData } = useGetProfessionsByPageQuery({ page: page, size: PAGE_SIZE, });
@@ -88,7 +104,7 @@ const HomePage = () => {
                     }}
                     >
                         <Box>
-                            <SearchBar />
+                            <SearchBar onSearch={handleSearch} />
                         </Box>
 
                         <Box sx={{
