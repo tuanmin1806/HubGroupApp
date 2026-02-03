@@ -1,22 +1,29 @@
-import React from "react";
-import { ProfessionResponse } from "../../app/models/profession.model";
+import * as React from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Popover,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Card, CardContent, Popover, Typography } from "@mui/material";
+import { OrganizationResponse } from "../../app/models/organization.model";
 
 interface Props {
-  professions: ProfessionResponse[];
+  organizations: OrganizationResponse[];
 }
 
-export default function ProfesstionSelectActionCard({ professions }: Props) {
+export default function OrganizationSelectActionCard({ organizations }: Props) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedOrg, setSelectedOrg] =
-    React.useState<ProfessionResponse | null>(null);
+    React.useState<OrganizationResponse | null>(null);
 
   const navigate = useNavigate();
 
   const handleOpen = (
     event: React.MouseEvent<HTMLElement>,
-    org: ProfessionResponse
+    org: OrganizationResponse
   ) => {
     const cardElement = event.currentTarget.closest(".MuiCard-root");
     setAnchorEl(cardElement as HTMLElement);
@@ -38,11 +45,11 @@ export default function ProfesstionSelectActionCard({ professions }: Props) {
           gap: 2,
         }}
       >
-        {professions.map((org) => (
+        {organizations.map((org) => (
           <Card key={org.Id}>
             <Box
               component="img"
-              src={"/default_organization_card.jpg"}
+              src={org.LogoFullUrl || "/default_organization_card.jpg"}
               alt={org.Name}
               sx={{
                 width: "100%",
@@ -58,6 +65,10 @@ export default function ProfesstionSelectActionCard({ professions }: Props) {
                 onClick={() => navigate(`/to-chuc/${org.Id}`)}
               >
                 {org.Name}
+              </Typography>
+
+              <Typography variant="caption" color="text.secondary">
+                {org.Province}
               </Typography>
 
               <Box mt={2}>
@@ -87,7 +98,7 @@ export default function ProfesstionSelectActionCard({ professions }: Props) {
               {selectedOrg.Name}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {selectedOrg.Name}
+              {selectedOrg.Summary}
             </Typography>
           </Box>
         )}

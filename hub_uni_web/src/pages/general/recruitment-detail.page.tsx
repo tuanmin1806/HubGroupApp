@@ -1,7 +1,7 @@
 import { BookmarkBorder, Category, Groups, Info, LocationOn, MonetizationOn, Schedule, School, Send } from "@mui/icons-material";
 import { Box, Button, Card, CardContent, CardMedia, Divider, Grid, Stack, Typography } from "@mui/material";
 import defaultImage from "../../assets/default_organization_card.jpg";
-import SelectActionCard from "../../components/cards/select-action-card.card";
+import SelectActionCard from "../../components/cards/organization-card.card";
 
 const RecruitmentDetailPage = () => {
     return (
