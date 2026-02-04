@@ -1,9 +1,17 @@
 import { Avatar, Box, Button, Card, CardContent, CardMedia, Container, Divider, Grid, Stack, Typography } from "@mui/material";
-import DefaultImage from "../../assets/default_organization_card.jpg";
+import DefaultImage from "../../../assets/default_organization_card.jpg";
 import { BookmarkBorder, CalendarMonth, Person, Share, Visibility } from "@mui/icons-material";
-import ArticleCard from "../../components/cards/article-card.card";
+import ArticleCard from "../../../components/cards/article-card.card";
+import { useState } from "react";
+import { useGetArticlesByPageNoAuthenQuery } from "../../../app/features/article.api";
+import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
+import OrganizationPagination from "../../../components/pagination/organization-pagination";
 
 const ArticleDetailPage = () => {
+    const [page, setPage] = useState(DEFAULT_PAGE);
+    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
+    const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
+    const articles = articleData?.Items || [];
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
             <Grid container spacing={4}>
@@ -148,24 +156,26 @@ const ArticleDetailPage = () => {
                     </Stack>
                 </Grid>
             </Grid>
-            
-                <Box sx={{ mt: 6 }}>
-                    <Typography variant="h5" fontWeight={700} gutterBottom>
-                        Bài viết liên quan
-                    </Typography>
 
-                    <Grid container spacing={3}>
-                        {[1, 2, 3, 4, 5, 6].map((item) => (
-                            <Grid
-                                key={item}
-                                size={{ xs: 12, sm: 6, md: 4 }}
-                            >
-                                <ArticleCard />
-                            </Grid>
-
-                        ))}
-                    </Grid>
-                </Box>
+            <Grid spacing={3}>
+                <Grid
+                    size={{ xs: 12, sm: 6, md: 4 }}
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    {articles.map((article) => (
+                        <ArticleCard key={article.Id} article={article} />
+                    ))}
+                </Grid>
+                <OrganizationPagination
+                    page={page}
+                    totalPages={totalArticlePages}
+                    onPrev={() => setPage((p) => Math.max(1, p - 1))}
+                    onNext={() => setPage((p) => Math.min(totalArticlePages, p + 1))}
+                />
+            </Grid>
 
         </Container>
     );

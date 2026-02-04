@@ -15,7 +15,7 @@ import { TableBar } from "@mui/icons-material";
 const theme = createTheme({
     palette: {
         primary: {
-            main: "#f36730",
+            main: "#f8f8f8",
         },
         secondary: {
             main: "#ffff",
@@ -184,7 +184,10 @@ function GuestHeader() {
 
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="fixed">
+            <AppBar position="fixed" sx={{
+                color: '#464444',
+                backgroundColor: '#fff'
+            }}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         {/* Hamburger Menu for xs */}

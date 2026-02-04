@@ -11,6 +11,8 @@ import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
 import OrganizationPagination from "../../components/pagination/organization-pagination";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
 import { useGetProfessionsByPageQuery } from "../../app/features/professtion.api";
+import RecruitmentPostSelectActionCard from "../../components/cards/recruitment-post.card";
+import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
 
 const theme = createTheme({
     palette: {
@@ -63,14 +65,17 @@ const HomePage = () => {
     const { data: organizationData } = useOrganizationsFullTextSearchQuery({ page: page, size: PAGE_SIZE, });
     const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
     const { data: professtionData } = useGetProfessionsByPageQuery({ page: page, size: PAGE_SIZE, });
+    const { data: recruitmentPostData } = useGetRecruitmentPostsByPageQuery({ page: page, size: PAGE_SIZE, });
 
     const totalOrganizationPages = organizationData ? Math.ceil(organizationData.Total / PAGE_SIZE) : 1;
     const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
     const totalProfessionPages = professtionData ? Math.ceil(professtionData.Total / PAGE_SIZE) : 1;
+    const totalRecruitmentPostPages = recruitmentPostData ? Math.ceil(recruitmentPostData.Total / PAGE_SIZE) : 1;
 
     const organizationts = organizationData?.Items || [];
     const articles = articleData?.Items || [];
     const professtions = professtionData?.Items || [];
+    const recruitmentPosts = recruitmentPostData?.Items || [];
 
     useEffect(() => {
         document.title = "Trang Chủ | HUB UNI";
@@ -116,6 +121,7 @@ const HomePage = () => {
                     </Box>
                 </Grid>
 
+
                 <Grid
                     container
                     direction="column"
@@ -125,18 +131,55 @@ const HomePage = () => {
                     }}
                 >
                     <Box sx={{
-                        color: '#ff5722',
+                        width: "100%",
+                        maxWidth: 1200,
+                        color: "#ff5722",
                         fontSize: 28,
-                        fontWeight: 'bold',
+                        fontWeight: "bold",
                         mb: 2,
+                        textAlign: "left",
                     }}
+                    >
+                        Tin tuyển sinh
+                    </Box>
+                    <Box
+                        sx={{ width: '100%', maxWidth: 1200 }}>
+                        <RecruitmentPostSelectActionCard recruitmentPosts={recruitmentPosts} />
+                        <OrganizationPagination
+                            page={page}
+                            totalPages={totalRecruitmentPostPages}
+                            onPrev={() => setPage((p) => p - 1)}
+                            onNext={() => setPage((p) => p + 1)}
+                        />
+                    </Box>
+                </Grid>
+
+                <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    sx={{ py: 3 }}
+                >
+                    {/* Title */}
+                    <Box
+                        sx={{
+                            width: "100%",
+                            maxWidth: 1200,
+                            color: "#ff5722",
+                            fontSize: 28,
+                            fontWeight: "bold",
+                            mb: 2,
+                            textAlign: "left",
+                        }}
                     >
                         Tổ chức
                     </Box>
+
+                    {/* Content */}
                     <Box
                         sx={{
-                            width: '100%',
-                            maxWidth: 1200
+                            width: "100%",
+                            maxWidth: 1200,
                         }}
                     >
                         <OrganizationSelectActionCard organizations={organizationts} />
@@ -158,18 +201,21 @@ const HomePage = () => {
                     }}
                 >
                     <Box sx={{
-                        color: '#ff5722',
+                        width: "100%",
+                        maxWidth: 1200,
+                        color: "#ff5722",
                         fontSize: 28,
-                        fontWeight: 'bold',
+                        fontWeight: "bold",
                         mb: 2,
+                        textAlign: "left",
                     }}
                     >
-                        Ngành nghề
+                        Ngành nghề nổi bật
                     </Box>
                     <Box
                         onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
                         sx={{ width: '100%', maxWidth: 1200 }}>
-                        <OrganizationSelectActionCard organizations={organizationts} />
+                        <ProfessionCard professions={professtions} />
                         <OrganizationPagination
                             page={page}
                             totalPages={totalProfessionPages}
@@ -179,37 +225,16 @@ const HomePage = () => {
                     </Box>
                 </Grid>
 
-                <Grid
-                    container
-                    direction="column"
-                    alignItems="center"
-                    sx={{
-                        py: 3
-                    }}
-                >
-                    <Box sx={{
-                        color: '#ff5722',
-                        fontSize: 28,
-                        fontWeight: 'bold',
-                        mb: 2,
-                    }}
-                    >
-                        Ngành nghề nổi bật
-                    </Box>
-                    <Box
-                        onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
-                        sx={{ width: '100%', maxWidth: 1200 }}>
-                        <ProfessionCard professions={professtions} />
-                    </Box>
-                </Grid>
-
                 <Grid container direction="column" alignItems="center" sx={{ py: 3 }}>
                     <Box
                         sx={{
+                            width: "100%",
+                            maxWidth: 1200,
                             color: "#ff5722",
                             fontSize: 28,
                             fontWeight: "bold",
                             mb: 2,
+                            textAlign: "left",
                         }}
                     >
                         Bài viết

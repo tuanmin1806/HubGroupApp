@@ -1,36 +1,67 @@
 import { ProfessionResponse } from "./profession.model";
 
-export interface OrganizationResponse {
+export interface OrganizationDetailResponse {
     Id: string;
     Name: string;
+    EnglishName: string;
     ShortName: string;
-    OrganizationType: string;
-    ProfessionIds: string[];
-    MainProfessionId: string;
-    ProvinceId: string;
-    CommuneId: string;
-    LogoUrl: string;
-    LogoFullUrl: string;
+    InternationalName: string;
+    Seo: string;
+    SeoUrl: string;
     TaxCode: string;
     OrganizationTypeId: string;
+    OrganizationType: string;
+    ProfessionIds: string[];
+    Professions: ProfessionResponse[];
+    MainProfessionId: string;
+    MainProfession: ProfessionResponse;
+    ProvinceId: string;
+    Province: string;
+    CommuneId: string;
+    Commune: string;
     Address: string;
     PhoneNumber: string;
     Email: string;
-    LegalRepresentative: string;
+    ManagedBy: string;
+    LogoUrl: string;
+    LogoFullUrl: string;
     WallpaperUrl: string;
     WallpaperFullUrl: string;
-    ManagedBy: string;
+    FeaturedImageUrls: string[];
+    FeaturedImageFullUrls: string[];
     Keywords: string;
-    Province: string;
-    Commune: string;
-    MainProfession: string;
-    Professions: ProfessionResponse[];
-    WebsiteUrl: string;
     IsTop: boolean;
-    InternationalName: string;
-    Status: string;
     Summary: string;
+    WebsiteUrl: string;
+    FacebookUrl: string;
+    LinkedinUrl: string;
+    YoutubeUrl: string;
+    GoogleMapUrl: string;
+    TwitterUrl: string;
+    InstagramUrl: string;
+    Highlights: string[];
+    Code: string;
+    CreatedBy: string;
+    CreatedAt: string;
+    UpdatedAt: string;
+    UpdatedBy: string;
+    Status: string;
+}
+
+export interface OrganizationResponse {
+    Name: string;
     SeoUrl?: string;
+    TaxCode: string;
+    Province: string;
+    ProvinceSeo: string;
+    Commune: string;
+    CommuneSeo: string;
+    Address: string;
+    LogoFullUrl: string;
+    MainProfession: string;
+    Summary: string;
+    IsTop: boolean;
+    Highlights: string[];
 }
 
 export interface OrganizationFilterParams {

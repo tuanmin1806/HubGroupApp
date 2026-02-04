@@ -1,8 +1,16 @@
 import { Search } from "@mui/icons-material";
 import { Box, Chip, Grid, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import ArticleCard from "../../components/cards/article-card.card";
+import { useState } from "react";
+import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
+import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
+import OrganizationPagination from "../../components/pagination/organization-pagination";
 
 const ArticlePage = () => {
+    const [page, setPage] = useState(DEFAULT_PAGE);
+    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
+    const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
+    const articles = articleData?.Items || [];
     return (
         <Box
             sx={{
@@ -51,18 +59,23 @@ const ArticlePage = () => {
 
             {/* ARTICLE LIST */}
             <Grid spacing={3}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
                     <Grid
-                        key={item}
                         size={{ xs: 12, sm: 6, md: 4 }}
                         sx={{
                             display: "flex",
                             justifyContent: "center",
                         }}
                     >
-                        <ArticleCard />
+                        {articles.map((article) => (
+                            <ArticleCard key={article.Id} article={article} />
+                        ))}
                     </Grid>
-                ))}
+                <OrganizationPagination
+                    page={page}
+                    totalPages={totalArticlePages}
+                    onPrev={() => setPage((p) => Math.max(1, p - 1))}
+                    onNext={() => setPage((p) => Math.min(totalArticlePages, p + 1))}
+                />
             </Grid>
         </Box>
     );

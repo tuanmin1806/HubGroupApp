@@ -5,13 +5,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useOrganizationsFullTextSearchQuery } from "../../../app/features/organization.api";
 import OrganizationPagination from "../../../components/pagination/organization-pagination";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import { CalendarToday, LocationOn, School, Search, Visibility } from "@mui/icons-material";
+import { CalendarToday, LocationOn, School, Visibility } from "@mui/icons-material";
+import SearchBar from "../../../components/searchs/search-bar.search";
 
 const theme = createTheme({
     palette: {
         primary: {
-            main: "#007FFF",
-            dark: "#0066CC",
+            main: "#ec3b05",
+            dark: "#ec3b05",
         },
     },
     typography: {
@@ -69,10 +70,6 @@ const OrganizationSearchPage = () => {
         document.title = "Tìm kiếm Tổ chức | HUB UNI";
     }, []);
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters({ ...filters, nameSearch: e.target.value });
-    };
-
     const handleFilterChange = (field: keyof OrganizationFilterParams, value: string) => {
         setFilters({ ...filters, [field]: value });
         setPage(DEFAULT_PAGE);
@@ -102,38 +99,18 @@ const OrganizationSearchPage = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 4 }}>
-                <Box sx={{ maxWidth: 1400, margin: '0 auto', px: 3 }}>
+            <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 4, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ maxWidth: 1400, width: '100%', px: 3 }}>
                     {/* Search Bar */}
-                    <Box sx={{ mb: 4, bgcolor: 'white', p: 3, borderRadius: 2, boxShadow: 1 }}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <TextField
-                                fullWidth
-                                placeholder="Tìm kiếm tổ chức..."
-                                value={filters.nameSearch}
-                                onChange={handleSearchChange}
-                                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                InputProps={{
-                                    startAdornment: <Search sx={{ mr: 1, color: 'action.active' }} />,
-                                }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 2,
-                                    }
-                                }}
-                            />
-                            <Button
-                                variant="contained"
-                                onClick={handleSearch}
-                                sx={{
-                                    minWidth: 120,
-                                    borderRadius: 2,
-                                    textTransform: 'none',
-                                    fontSize: 16
-                                }}
-                            >
-                                Tìm kiếm
-                            </Button>
+                    <Box sx={{
+                        width: "100%",
+                        maxWidth: 1200,
+                        mb: 2,
+                        mx: 'auto'
+                    }}
+                    >
+                        <Box>
+                            <SearchBar onSearch={handleSearch} />
                         </Box>
                     </Box>
 

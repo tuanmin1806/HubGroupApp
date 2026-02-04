@@ -1,8 +1,8 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse } from "../models/organization.model";
+import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../models/recruitment-post.model";
 import baseApi from "./base.api";
 
-const buildQueryString = (params?: OrganizationFilterParams): string => {
+const buildQueryString = (params?: RecruitmentPostFilterParams): string => {
     if (!params) return "";
     return new URLSearchParams(
         Object.entries(params)
@@ -13,29 +13,29 @@ const buildQueryString = (params?: OrganizationFilterParams): string => {
     ).toString();
 };
 
-const organizationApi = baseApi.injectEndpoints({
+const recruitmentPostApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        organizationsFullTextSearch: builder.query<ApiPaginationResponse<OrganizationResponse[]>, OrganizationFilterParams>({
+        getRecruitmentPostsByPage: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, RecruitmentPostFilterParams>({
             query: (params) => {
                 const queryString = buildQueryString(params);
                 return {
-                    url: `organization/fulltextsearch?${queryString}`,
+                    url: `recruitmentpost/getbypagenoauthen?${queryString}`,
                     method: "GET",
                 };
             },
             transformResponse: (responseData: {
-                Items: OrganizationResponse[];
+                Items: RecruitmentPostResponse[];
                 Total: number;
-            }): ApiPaginationResponse<OrganizationResponse[]> => ({
+            }): ApiPaginationResponse<RecruitmentPostResponse[]> => ({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
         }),
 
-        getOrganizationBySeo: builder.query<OrganizationDetailResponse, string>({
+        getRecruitmentPostBySeo: builder.query<RecruitmentPostResponse, string>({
             query: (seo) => ({
-                url: `organization/getbyseourl/${seo}`,
+                url: `recruitmentpost/getbyseourl/${seo}`,
                 method: 'GET',
             }),
         }),
@@ -43,6 +43,6 @@ const organizationApi = baseApi.injectEndpoints({
 });
 
 export const {
-    useOrganizationsFullTextSearchQuery,
-    useGetOrganizationBySeoQuery
-} = organizationApi;
+    useGetRecruitmentPostsByPageQuery,
+    useGetRecruitmentPostBySeoQuery
+} = recruitmentPostApi;

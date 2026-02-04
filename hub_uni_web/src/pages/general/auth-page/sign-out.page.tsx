@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { RootState } from "../../app/store";
-import { clearAuth } from "../../app/services/auth.service";
-import { logout } from "../../app/features/auth/auth.slice";
+import { RootState } from "../../../app/store";
+import { logout } from "../../../app/features/auth/auth.slice";
+import { clearAuth } from "../../../app/services/auth.service";
 
 const SignOutPage = () => {
     const dispatch = useDispatch();

@@ -8,22 +8,23 @@ import {
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useNavigate } from "react-router-dom";
-import { OrganizationResponse } from "../../app/models/organization.model";
+import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
+import DefaultImage from "../../assets/default_organization_card.jpg"
 
 interface Props {
-  organizations: OrganizationResponse[];
+  recruitmentPosts: RecruitmentPostResponse[];
 }
 
-export default function OrganizationSelectActionCard({ organizations }: Props) {
+export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Props) {
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [selectedOrg, setSelectedOrg] =
-    React.useState<OrganizationResponse | null>(null);
+    React.useState<RecruitmentPostResponse | null>(null);
 
   const handleOpen = (
     event: React.MouseEvent<HTMLElement>,
-    org: OrganizationResponse
+    org: RecruitmentPostResponse
   ) => {
     setAnchorEl(event.currentTarget);
     setSelectedOrg(org);
@@ -48,9 +49,9 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
         }}
       >
 
-        {organizations.map((org) => (
+        {recruitmentPosts.map((rcp) => (
           <Card
-            key={org.SeoUrl}
+            key={rcp.Id}
             sx={{
               display: "flex",
               alignItems: "stretch",
@@ -61,8 +62,8 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
             {/* LEFT: IMAGE */}
             <Box
               component="img"
-              src={org.LogoFullUrl || "/default_organization_card.jpg"}
-              alt={org.Name}
+              src={DefaultImage}
+              alt={rcp.Name}
               sx={{
                 width: 120,
                 height: 120,
@@ -80,10 +81,10 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                 variant="subtitle1"
                 fontWeight="bold"
                 sx={{ cursor: "pointer", width: "fit-content" }}
-                onMouseEnter={(e) => handleOpen(e, org)}
+                onMouseEnter={(e) => handleOpen(e, rcp)}
                 onMouseLeave={handleClose}
               >
-                {org.Name}
+                {rcp.Name}
               </Typography>
 
               {/* INTERNATIONAL NAME */}
@@ -92,7 +93,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                 color="text.secondary"
                 sx={{ mb: 1 }}
               >
-                {org.TaxCode}
+                {rcp.RecruitmentToDate}
               </Typography>
 
               {/* BOTTOM ROW */}
@@ -106,13 +107,13 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               >
                 {/* MAIN PROFESSION */}
                 <Typography variant="body2" color="primary">
-                  {org.MainProfession}
+                  {rcp.Organization.Name}
                 </Typography>
 
                 {/* DETAIL ICON */}
                 <IconButton
                   size="small"
-                  onClick={() => navigate(`/to-chuc/${org.SeoUrl}`)}
+                  onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
                 >
                   <InfoOutlinedIcon />
                 </IconButton>
@@ -139,23 +140,23 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
             </Typography>
 
             <Typography variant="body2" sx={{ mb: 1 }}>
-              {selectedOrg.Summary}
+              {selectedOrg.Name}
             </Typography>
 
             <Typography variant="body2">
-              <b>Ngành chính:</b> {selectedOrg.MainProfession}
+              <b>Tổ chức:</b> {selectedOrg.Organization.Name}
             </Typography>
 
             <Typography variant="body2">
-              <b>Mã số thuế:</b> {selectedOrg.TaxCode}
+              <b>Số lượng tuyển:</b> {selectedOrg.Quantity}
             </Typography>
 
             <Typography variant="body2">
-              <b>Địa chỉ:</b> {selectedOrg.Address}
+              <b>Địa chỉ:</b> {selectedOrg.Province}
             </Typography>
 
             <Typography variant="body2">
-              <b>Mã số thuế:</b> {selectedOrg.TaxCode}
+              <b>Tuyển đến ngày:</b> {selectedOrg.RecruitmentToDate}
             </Typography>
           </Box>
         )}

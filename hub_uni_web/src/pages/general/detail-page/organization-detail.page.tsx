@@ -8,11 +8,11 @@ import MuiLink from "@mui/material/Link";
 const OrganizationDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
     const navigate = useNavigate();
-    
+
     const { data: organization, isLoading, error } =
-  useGetOrganizationBySeoQuery(seoUrl!, {
-    skip: !seoUrl,
-  });
+        useGetOrganizationBySeoQuery(seoUrl!, {
+            skip: !seoUrl,
+        });
 
 
     if (isLoading) {
@@ -27,8 +27,8 @@ const OrganizationDetailPage = () => {
         return (
             <Box sx={{ p: 4, textAlign: 'center' }}>
                 <Typography color="error">Không tìm thấy thông tin tổ chức</Typography>
-                <Button 
-                    variant="contained" 
+                <Button
+                    variant="contained"
                     sx={{ mt: 2 }}
                     onClick={() => navigate('/')}
                 >
@@ -57,11 +57,13 @@ const OrganizationDetailPage = () => {
             {organization.WallpaperFullUrl && (
                 <Box
                     sx={{
-                        width: '100%',
-                        height: { xs: 200, md: 300 },
+                        width: "100%",
+                        height: { xs: 220, md: 320 },
                         backgroundImage: `url(${organization.WallpaperFullUrl})`,
-                        backgroundSize: 'contain',
-                        backgroundPosition: 'center',
+                        backgroundSize: "contain",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                        borderRadius: { md: 2 },
                     }}
                 />
             )}
@@ -99,9 +101,9 @@ const OrganizationDetailPage = () => {
                                                 </Typography>
                                             )}
                                             {organization.IsTop && (
-                                                <Chip 
-                                                    label="Tổ chức nổi bật" 
-                                                    color="primary" 
+                                                <Chip
+                                                    label="Tổ chức nổi bật"
+                                                    color="primary"
                                                     size="small"
                                                     sx={{ mt: 1 }}
                                                 />
@@ -146,7 +148,7 @@ const OrganizationDetailPage = () => {
                                     <Typography color="text.secondary" lineHeight={1.7}>
                                         {organization.Summary || 'Chưa có thông tin giới thiệu'}
                                     </Typography>
-                                    
+
                                     <Box sx={{ mt: 3 }}>
                                         <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                                             <Button
@@ -201,7 +203,7 @@ const OrganizationDetailPage = () => {
                                                     label={profession.Name}
                                                     variant={profession.Id === organization.MainProfessionId ? "filled" : "outlined"}
                                                     color={profession.Id === organization.MainProfessionId ? "primary" : "default"}
-                                                    onClick={() => {/* Navigate to profession detail */}}
+                                                    onClick={() => {/* Navigate to profession detail */ }}
                                                 />
                                             ))}
                                         </Box>
@@ -248,7 +250,7 @@ const OrganizationDetailPage = () => {
                                         {organization.PhoneNumber && (
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <Phone fontSize="small" />
-                                                <MuiLink 
+                                                <MuiLink
                                                     href={`tel:${organization.PhoneNumber}`}
                                                     variant="body2"
                                                     underline="hover"
@@ -261,7 +263,7 @@ const OrganizationDetailPage = () => {
                                         {organization.Email && (
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <Email fontSize="small" />
-                                                <MuiLink 
+                                                <MuiLink
                                                     href={`mailto:${organization.Email}`}
                                                     variant="body2"
                                                     underline="hover"
@@ -274,7 +276,7 @@ const OrganizationDetailPage = () => {
                                         {organization.WebsiteUrl && (
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <Language fontSize="small" />
-                                                <MuiLink 
+                                                <MuiLink
                                                     href={organization.WebsiteUrl}
                                                     target="_blank"
                                                     variant="body2"
@@ -321,17 +323,6 @@ const OrganizationDetailPage = () => {
                                             </Box>
                                         )}
 
-                                        {organization.LegalRepresentative && (
-                                            <Box>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    Người đại diện:
-                                                </Typography>
-                                                <Typography variant="body2">
-                                                    {organization.LegalRepresentative}
-                                                </Typography>
-                                            </Box>
-                                        )}
-
                                         {organization.Province && organization.Commune && (
                                             <Box>
                                                 <Typography variant="caption" color="text.secondary">
@@ -347,7 +338,7 @@ const OrganizationDetailPage = () => {
                                             <Typography variant="caption" color="text.secondary">
                                                 Trạng thái:
                                             </Typography>
-                                            <Chip 
+                                            <Chip
                                                 label={organization.Status || 'Đang hoạt động'}
                                                 color={organization.Status === 'Active' ? 'success' : 'default'}
                                                 size="small"
@@ -390,7 +381,7 @@ const OrganizationDetailPage = () => {
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <School fontSize="small" color="primary" />
                                                 <Typography variant="body2">
-                                                    {organization.MainProfessionId}
+                                                    {organization.MainProfession.Name}
                                                 </Typography>
                                             </Stack>
                                         </Stack>

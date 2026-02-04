@@ -1,11 +1,11 @@
 import { HomePage } from "../pages/general";
-import RecruitmentDetailPage from "../pages/general/detail-page/recruitment-detail.page";
-import SignOutPage from "../pages/general/sign-out.page";
-import UnauthorizedPage from "../pages/general/unauthorized.page";
-import ArticleDetailPage from "../pages/general/article-detail.page";
+import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
 import ArticlePage from "../pages/general/article.page";
 import OrganizationSearchPage from "../pages/general/search-page/organization-search.page";
 import OrganizationDetailPage from "../pages/general/detail-page/organization-detail.page";
+import SignOutPage from "../pages/general/auth-page/sign-out.page";
+import ArticleDetailPage from "../pages/general/detail-page/article-detail.page";
+import RecruitmentPostDetailPage from "../pages/general/detail-page/recruitment-post-detail.page";
 
 const generalRoutes = [
     {
@@ -19,10 +19,6 @@ const generalRoutes = [
     {
         path: 'sign-out',
         element: <SignOutPage />
-    },
-    {
-        path: '/chi-tiet-tuyen-sinh',
-        element: <RecruitmentDetailPage />,
     },
     {
         path: '/chi-tiet-bai-viet',
@@ -39,6 +35,10 @@ const generalRoutes = [
     {
         path: '/to-chuc/:seoUrl',
         element: <OrganizationDetailPage />,
+    },
+    {
+        path: '/tin-tuyen-sinh/:seoUrl',
+        element: <RecruitmentPostDetailPage />,
     }
 ];
 

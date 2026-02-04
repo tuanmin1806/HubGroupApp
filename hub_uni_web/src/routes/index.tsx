@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import generalRoutes from "./general.route";
 import AuthLayout from "../layouts/auth.layout";
-import Login from "../pages/general/signin.page";
-import Signup from "../pages/general/sign-up.page";
 import adminRoutes from "./admin.route";
 import staffRoutes from "./staff.route";
 import AdminLayout from "../layouts/admin.layout";
 import StaffLayout from "../layouts/staff.layout";
 import RoleBasedLayout from "../layouts/role-based.layout";
+import Login from "../pages/general/auth-page/signin.page";
+import Signup from "../pages/general/auth-page/sign-up.page";
 
 const router = createBrowserRouter(
     [
