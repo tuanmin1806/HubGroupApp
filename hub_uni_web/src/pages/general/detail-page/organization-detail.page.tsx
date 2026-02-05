@@ -1,24 +1,54 @@
-import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email } from "@mui/icons-material";
-import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button } from "@mui/material";
+import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email, WorkOutline } from "@mui/icons-material";
+import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, Tabs, Tab, CircularProgress } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetOrganizationBySeoQuery } from "../../../app/features/organization.api";
+import { useGetRecruitmentPostsByOrganizationWithPageQuery } from "../../../app/features/recruitment-post.api";
 import OrganizationSelectActionCard from "../../../components/cards/organization-card.card";
 import MuiLink from "@mui/material/Link";
+import { useState } from "react";
+
+interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`organization-tabpanel-${index}`}
+            aria-labelledby={`organization-tab-${index}`}
+            {...other}
+        >
+            {value === index && <Box>{children}</Box>}
+        </div>
+    );
+}
 
 const OrganizationDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
     const navigate = useNavigate();
+    const [tabValue, setTabValue] = useState(0);
 
     const { data: organization, isLoading, error } =
         useGetOrganizationBySeoQuery(seoUrl!, {
             skip: !seoUrl,
         });
 
+    const { data: recruitmentPosts, isLoading: loadingPosts } =
+        useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, {
+            skip: !seoUrl,
+        });
 
     if (isLoading) {
         return (
             <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography>Đang tải thông tin...</Typography>
+                <CircularProgress />
+                <Typography sx={{ mt: 2 }}>Đang tải thông tin...</Typography>
             </Box>
         );
     }
@@ -49,6 +79,10 @@ const OrganizationDetailPage = () => {
             navigator.clipboard.writeText(window.location.href);
             alert('Đã copy link vào clipboard!');
         }
+    };
+
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
     };
 
     return (
@@ -138,54 +172,170 @@ const OrganizationDetailPage = () => {
                                 </CardContent>
                             </Card>
 
-                            {/* Summary/Description */}
+                            {/* Tabs Section */}
                             <Card>
-                                <CardContent>
-                                    <Typography variant="h6" fontWeight={600} gutterBottom>
-                                        Giới thiệu chung
-                                    </Typography>
-                                    <Divider sx={{ mb: 2 }} />
-                                    <Typography color="text.secondary" lineHeight={1.7}>
-                                        {organization.Summary || 'Chưa có thông tin giới thiệu'}
-                                    </Typography>
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                    <Tabs
+                                        value={tabValue}
+                                        onChange={handleTabChange}
+                                        sx={{
+                                            px: 2,
+                                            '& .MuiTab-root': {
+                                                textTransform: 'none',
+                                                fontWeight: 600,
+                                                fontSize: '1rem',
+                                            }
+                                        }}
+                                    >
+                                        <Tab
+                                            label="Giới thiệu"
+                                            icon={<Info />}
+                                            iconPosition="start"
+                                        />
+                                        <Tab
+                                            label={`Tin tuyển dụng (${recruitmentPosts?.Total || 0})`}
+                                            icon={<WorkOutline />}
+                                            iconPosition="start"
+                                        />
+                                    </Tabs>
+                                </Box>
 
-                                    <Box sx={{ mt: 3 }}>
-                                        <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                                            <Button
-                                                variant="contained"
-                                                size="medium"
-                                                startIcon={<Language />}
-                                                component="a"
-                                                href={organization.WebsiteUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                disabled={!organization.WebsiteUrl}
-                                                sx={{ textTransform: "none" }}
-                                            >
-                                                Truy cập website
-                                            </Button>
+                                {/* Tab 1: Giới thiệu */}
+                                <TabPanel value={tabValue} index={0}>
+                                    <CardContent>
+                                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                                            Giới thiệu chung
+                                        </Typography>
+                                        <Divider sx={{ mb: 2 }} />
+                                        <Typography color="text.secondary" lineHeight={1.7}>
+                                            {organization.Summary || 'Chưa có thông tin giới thiệu'}
+                                        </Typography>
 
-                                            <Button
-                                                variant="outlined"
-                                                size="medium"
-                                                startIcon={<BookmarkBorder />}
-                                                sx={{ textTransform: 'none' }}
-                                            >
-                                                Lưu tin
-                                            </Button>
+                                        <Box sx={{ mt: 3 }}>
+                                            <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                                                <Button
+                                                    variant="contained"
+                                                    size="medium"
+                                                    startIcon={<Language />}
+                                                    component="a"
+                                                    href={organization.WebsiteUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    disabled={!organization.WebsiteUrl}
+                                                    sx={{ textTransform: "none" }}
+                                                >
+                                                    Truy cập website
+                                                </Button>
 
-                                            <Button
-                                                variant="outlined"
-                                                size="medium"
-                                                startIcon={<Share />}
-                                                onClick={handleShare}
-                                                sx={{ textTransform: 'none' }}
-                                            >
-                                                Chia sẻ
-                                            </Button>
-                                        </Stack>
-                                    </Box>
-                                </CardContent>
+                                                <Button
+                                                    variant="outlined"
+                                                    size="medium"
+                                                    startIcon={<BookmarkBorder />}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    Lưu tin
+                                                </Button>
+
+                                                <Button
+                                                    variant="outlined"
+                                                    size="medium"
+                                                    startIcon={<Share />}
+                                                    onClick={handleShare}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    Chia sẻ
+                                                </Button>
+                                            </Stack>
+                                        </Box>
+                                    </CardContent>
+                                </TabPanel>
+
+                                {/* Tab 2: Tin tuyển dụng */}
+                                <TabPanel value={tabValue} index={1}>
+                                    <CardContent>
+                                        {loadingPosts ? (
+                                            <Box sx={{ textAlign: 'center', py: 4 }}>
+                                                <CircularProgress />
+                                            </Box>
+                                        ) : recruitmentPosts?.Items && recruitmentPosts.Items.length > 0 ? (
+                                            <Stack spacing={2}>
+                                                {recruitmentPosts.Items.map((post) => (
+                                                    <Card
+                                                        key={post.Id}
+                                                        variant="outlined"
+                                                        sx={{
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s',
+                                                            '&:hover': {
+                                                                boxShadow: 2,
+                                                                transform: 'translateX(4px)',
+                                                            }
+                                                        }}
+                                                        onClick={() => navigate(`/tin-tuyen-dung/${post.SeoUrl}`)}
+                                                    >
+                                                        <CardContent sx={{ py: 2 }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                                                                <WorkOutline
+                                                                    sx={{
+                                                                        color: 'primary.main',
+                                                                        fontSize: 24,
+                                                                        mt: 0.5,
+                                                                        flexShrink: 0
+                                                                    }}
+                                                                />
+                                                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                    <Typography
+                                                                        variant="body1"
+                                                                        fontWeight={600}
+                                                                        sx={{
+                                                                            mb: 0.5,
+                                                                            whiteSpace: 'normal',
+                                                                            wordBreak: 'break-word',
+                                                                        }}
+                                                                    >
+                                                                        {post.Name}
+                                                                    </Typography>
+
+                                                                    {post.Name && (
+                                                                        <Chip
+                                                                            label={post.Name}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{ mt: 1 }}
+                                                                        />
+                                                                    )}
+
+                                                                    {post.Description && (
+                                                                        <Typography
+                                                                            variant="body2"
+                                                                            color="text.secondary"
+                                                                            sx={{
+                                                                                mt: 1,
+                                                                                display: '-webkit-box',
+                                                                                WebkitLineClamp: 2,
+                                                                                WebkitBoxOrient: 'vertical',
+                                                                                overflow: 'hidden'
+                                                                            }}
+                                                                        >
+                                                                            {post.Description}
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>
+                                                            </Box>
+                                                        </CardContent>
+                                                    </Card>
+                                                ))}
+                                            </Stack>
+                                        ) : (
+                                            <Box sx={{ textAlign: 'center', py: 4 }}>
+                                                <WorkOutline sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                                                <Typography color="text.secondary">
+                                                    Chưa có tin tuyển dụng
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </CardContent>
+                                </TabPanel>
                             </Card>
 
                             {/* Professions/Programs */}
@@ -371,7 +521,7 @@ const OrganizationDetailPage = () => {
                             )}
 
                             {/* Main Profession */}
-                            {organization.MainProfessionId && (
+                            {organization.MainProfessionId && organization.MainProfession && (
                                 <Card>
                                     <CardContent>
                                         <Typography fontWeight={600} gutterBottom>

@@ -33,6 +33,20 @@ const recruitmentPostApi = baseApi.injectEndpoints({
             }),
         }),
 
+        getRecruitmentPostsByOrganizationWithPage: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, string>({
+            query: (organizationSeo) => ({
+                url: `recruitmentpost/getbyorganizationseo/${organizationSeo}`,
+                method: "GET",
+            }),
+            transformResponse: (responseData: {
+                Items: RecruitmentPostResponse[];
+                Total: number;
+            }): ApiPaginationResponse<RecruitmentPostResponse[]> => ({
+                Items: responseData.Items,
+                Total: responseData.Total,
+            }),
+        }),
+
         getRecruitmentPostBySeo: builder.query<RecruitmentPostResponse, string>({
             query: (seo) => ({
                 url: `recruitmentpost/getbyseourl/${seo}`,
@@ -44,5 +58,6 @@ const recruitmentPostApi = baseApi.injectEndpoints({
 
 export const {
     useGetRecruitmentPostsByPageQuery,
-    useGetRecruitmentPostBySeoQuery
+    useGetRecruitmentPostBySeoQuery,
+    useGetRecruitmentPostsByOrganizationWithPageQuery
 } = recruitmentPostApi;

@@ -1,95 +1,136 @@
-import * as React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import * as React from "react";
+import {
+    Tabs,
+    Tab,
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    CircularProgress,
+} from "@mui/material";
+import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
+import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
+function TabPanel({
+    children,
+    value,
+    index,
+}: {
+    children: React.ReactNode;
     value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
+    index: number;
+}) {
     return (
-        <div
+        <Box
             role="tabpanel"
             hidden={value !== index}
-            id={`vertical-tabpanel-${index}`}
-            aria-labelledby={`vertical-tab-${index}`}
-            {...other}
+            sx={{ flex: 1, height: "100%", overflow: "hidden" }}
         >
-            {value === index && (
-                <Box sx={{ p: 3 }}>
-                    <Typography>{children}</Typography>
-                </Box>
-            )}
-        </div>
+            {value === index && children}
+        </Box>
     );
 }
 
-function a11yProps(index: number) {
-    return {
-        id: `vertical-tab-${index}`,
-        'aria-controls': `vertical-tabpanel-${index}`,
-    };
-}
-
-export default function VerticalTabs() {
+export default function ProfessionRecruitmentTabs() {
     const [value, setValue] = React.useState(0);
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+    const { data: professions = [], isLoading: loadingProfession } =
+        useGetAllProfessionNoAuthenQuery();
+
+    const selectedProfessionId = professions[value]?.Id;
+
+    const {
+        data: postsResponse,
+        isLoading: loadingPosts,
+    } = useGetRecruitmentPostsByPageQuery(
+        { professionId: selectedProfessionId },
+        { skip: !selectedProfessionId }
+    );
+
+    const posts = React.useMemo(() => {
+        return postsResponse?.Items ?? [];
+    }, [postsResponse]);
 
     return (
         <Box
-            sx={{ 
-                flexGrow: 1, 
-                bgcolor: 'background.paper', 
-                display: 'flex', 
-                height: 224,
-                borderRadius: 2,
-             }}
+            sx={{
+                display: "flex",
+                height: 320,
+                bgcolor: "background.paper",
+                borderRadius: 3,
+                overflow: "hidden",
+            }}
         >
+            {/* LEFT: ngành nghề */}
             <Tabs
                 orientation="vertical"
                 variant="scrollable"
                 value={value}
-                onChange={handleChange}
-                aria-label="Vertical tabs example"
-                sx={{ borderRight: 1, borderColor: 'divider' }}
+                onChange={(_, newValue) => setValue(newValue)}
+                sx={{
+                    width: 260,
+                    borderRight: 1,
+                    borderColor: "divider",
+                }}
             >
-                <Tab label="Item One" {...a11yProps(0)} />
-                <Tab label="Item Two" {...a11yProps(1)} />
-                <Tab label="Item Three" {...a11yProps(2)} />
-                <Tab label="Item Four" {...a11yProps(3)} />
-                <Tab label="Item Five" {...a11yProps(4)} />
-                <Tab label="Item Six" {...a11yProps(5)} />
-                <Tab label="Item Seven" {...a11yProps(6)} />
+                {loadingProfession ? (
+                    <Box sx={{ p: 2 }}>
+                        <CircularProgress size={20} />
+                    </Box>
+                ) : (
+                    professions.map((p) => (
+                        <Tab
+                            key={p.Id}
+                            label={p.Name}
+                            sx={{
+                                alignItems: "flex-start",
+                                textAlign: "left",
+                                textTransform: "none",
+                                fontWeight: 500,
+                                minHeight: 48,
+                            }}
+                        />
+                    ))
+                )}
             </Tabs>
-            <TabPanel value={value} index={0}>
-                Item One
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                Item Two
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                Item Three
-            </TabPanel>
-            <TabPanel value={value} index={3}>
-                Item Four
-            </TabPanel>
-            <TabPanel value={value} index={4}>
-                Item Five
-            </TabPanel>
-            <TabPanel value={value} index={5}>
-                Item Six
-            </TabPanel>
-            <TabPanel value={value} index={6}>
-                Item Seven
+
+            {/* RIGHT: danh sách tin */}
+            <TabPanel value={value} index={value}>
+                <Box
+                    sx={{
+                        height: "100%",
+                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1,
+                        p: 2,
+                    }}
+                >
+                    {loadingPosts ? (
+                        <Box sx={{ textAlign: "center", mt: 2 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : posts.length === 0 ? (
+                        <Typography color="text.secondary">
+                            Chưa có tin tuyển sinh
+                        </Typography>
+                    ) : (
+                        posts.map((post) => (
+                            <Card
+                                key={post.Id}
+                                sx={{ flexShrink: 0 }}
+                            >
+                                <CardContent
+                                >
+                                    <Typography
+                                    >
+                                        {post.Name}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        ))
+                    )}
+                </Box>
             </TabPanel>
         </Box>
     );

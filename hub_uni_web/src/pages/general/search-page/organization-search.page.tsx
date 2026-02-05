@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useOrganizationsFullTextSearchQuery } from "../../../app/features/organization.api";
 import OrganizationPagination from "../../../components/pagination/organization-pagination";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import { CalendarToday, LocationOn, School, Visibility } from "@mui/icons-material";
+import { Apartment, Category, Code, FilterAltOff, LocationCity, LocationOn, Numbers, Place, School } from "@mui/icons-material";
 import SearchBar from "../../../components/searchs/search-bar.search";
 
 const theme = createTheme({
@@ -94,13 +94,13 @@ const OrganizationSearchPage = () => {
     };
 
     const handleViewDetail = (organizationId: string) => {
-        navigate(`/chi-tiet-to-chuc/${organizationId}`);
+        navigate(`/to-chuc/${organizationId}`);
     };
 
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 4, display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ maxWidth: 1400, width: '100%', px: 3 }}>
+                <Box sx={{ maxWidth: 1200, width: '100%', px: 3 }}>
                     {/* Search Bar */}
                     <Box sx={{
                         width: "100%",
@@ -116,20 +116,61 @@ const OrganizationSearchPage = () => {
 
                     <Box sx={{ display: 'flex', gap: 3, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                         {/* Left Sidebar - Filters */}
-                        <Box sx={{ width: { xs: '100%', md: '300px' }, flexShrink: 0 }}>
-                            <Card sx={{ borderRadius: 2, position: { md: 'sticky' }, top: 20 }}>
-                                <CardContent>
-                                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#ff5722' }}>
-                                        Lọc nâng cao
-                                    </Typography>
+                        <Box
+                            sx={{
+                                width: { xs: "100%", md: 280 },
+                                flexShrink: 0,
+                            }}
+                        >
+                            <Card
+                                sx={{
+                                    borderRadius: 3,
+                                    position: { md: "sticky" },
+                                    top: 24,
+                                    boxShadow: "0 12px 32px rgba(0,0,0,0.08)",
+                                }}
+                            >
+                                <CardContent >
+                                    {/* Header */}
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            mb: 2,
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="h6"
+                                            sx={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}
+                                        >
+                                            <Category color="primary" />
+                                            Lọc nâng cao
+                                        </Typography>
 
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                        <Button
+                                            size="small"
+                                            color="error"
+                                            startIcon={<FilterAltOff />}
+                                            onClick={handleClearFilters}
+                                            sx={{ textTransform: "none" }}
+                                        >
+                                            Xóa
+                                        </Button>
+                                    </Box>
+
+                                    {/* Filters */}
+                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                        {/* Loại tổ chức */}
                                         <FormControl fullWidth size="small">
                                             <InputLabel>Loại tổ chức</InputLabel>
                                             <Select
                                                 value={filters.organizationTypeId}
                                                 label="Loại tổ chức"
-                                                onChange={(e) => handleFilterChange('organizationTypeId', e.target.value)}
+                                                startAdornment={<Apartment sx={{ mr: 1, color: "text.secondary" }} />}
+                                                onChange={(e) =>
+                                                    handleFilterChange("organizationTypeId", e.target.value)
+                                                }
                                             >
                                                 <MenuItem value="">Tất cả</MenuItem>
                                                 <MenuItem value="1">Đại học</MenuItem>
@@ -138,12 +179,16 @@ const OrganizationSearchPage = () => {
                                             </Select>
                                         </FormControl>
 
+                                        {/* Ngành nghề */}
                                         <FormControl fullWidth size="small">
                                             <InputLabel>Ngành nghề</InputLabel>
                                             <Select
                                                 value={filters.professionId}
                                                 label="Ngành nghề"
-                                                onChange={(e) => handleFilterChange('professionId', e.target.value)}
+                                                startAdornment={<Category sx={{ mr: 1, color: "text.secondary" }} />}
+                                                onChange={(e) =>
+                                                    handleFilterChange("professionId", e.target.value)
+                                                }
                                             >
                                                 <MenuItem value="">Tất cả</MenuItem>
                                                 <MenuItem value="1">Công nghệ thông tin</MenuItem>
@@ -153,12 +198,18 @@ const OrganizationSearchPage = () => {
                                             </Select>
                                         </FormControl>
 
+                                        {/* Tỉnh / Thành */}
                                         <FormControl fullWidth size="small">
-                                            <InputLabel>Tỉnh/Thành phố</InputLabel>
+                                            <InputLabel>Tỉnh / Thành phố</InputLabel>
                                             <Select
                                                 value={filters.provinceId}
-                                                label="Tỉnh/Thành phố"
-                                                onChange={(e) => handleFilterChange('provinceId', e.target.value)}
+                                                label="Tỉnh / Thành phố"
+                                                startAdornment={
+                                                    <LocationCity sx={{ mr: 1, color: "text.secondary" }} />
+                                                }
+                                                onChange={(e) =>
+                                                    handleFilterChange("provinceId", e.target.value)
+                                                }
                                             >
                                                 <MenuItem value="">Tất cả</MenuItem>
                                                 <MenuItem value="1">Hà Nội</MenuItem>
@@ -168,13 +219,17 @@ const OrganizationSearchPage = () => {
                                             </Select>
                                         </FormControl>
 
+                                        {/* Quận / Huyện */}
                                         <FormControl fullWidth size="small">
-                                            <InputLabel>Quận/Huyện</InputLabel>
+                                            <InputLabel>Quận / Huyện</InputLabel>
                                             <Select
                                                 value={filters.communeId}
-                                                label="Quận/Huyện"
-                                                onChange={(e) => handleFilterChange('communeId', e.target.value)}
+                                                label="Quận / Huyện"
                                                 disabled={!filters.provinceId}
+                                                startAdornment={<Place sx={{ mr: 1, color: "text.secondary" }} />}
+                                                onChange={(e) =>
+                                                    handleFilterChange("communeId", e.target.value)
+                                                }
                                             >
                                                 <MenuItem value="">Tất cả</MenuItem>
                                                 <MenuItem value="1">Quận 1</MenuItem>
@@ -183,25 +238,19 @@ const OrganizationSearchPage = () => {
                                             </Select>
                                         </FormControl>
 
+                                        {/* Mã số thuế */}
                                         <TextField
                                             fullWidth
                                             size="small"
                                             label="Mã số thuế"
                                             value={filters.taxCode}
-                                            onChange={(e) => handleFilterChange('taxCode', e.target.value)}
-                                        />
-
-                                        <Button
-                                            variant="outlined"
-                                            onClick={handleClearFilters}
-                                            sx={{
-                                                mt: 1,
-                                                borderRadius: 2,
-                                                textTransform: 'none'
+                                            onChange={(e) => handleFilterChange("taxCode", e.target.value)}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <Numbers sx={{ mr: 1, color: "text.secondary" }} />
+                                                ),
                                             }}
-                                        >
-                                            Xóa bộ lọc
-                                        </Button>
+                                        />
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -209,12 +258,6 @@ const OrganizationSearchPage = () => {
 
                         {/* Right Side - Results */}
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Box sx={{ mb: 2 }}>
-                                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                                    Tìm thấy <strong>{organizationData?.Total || 0}</strong> tổ chức
-                                </Typography>
-                            </Box>
-
                             {isLoading ? (
                                 <Box sx={{ textAlign: 'center', py: 8 }}>
                                     <Typography>Đang tải...</Typography>
@@ -232,113 +275,91 @@ const OrganizationSearchPage = () => {
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     {organizations.map((org: any) => (
                                         <Card
-                                            key={org.Id}
+                                            key={org.SeoUrl}
                                             sx={{
-                                                borderRadius: 2,
-                                                transition: 'all 0.3s',
+                                                borderRadius: 3,
+                                                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                                transition: '0.25s',
                                                 '&:hover': {
-                                                    boxShadow: 4,
-                                                    transform: 'translateY(-2px)'
-                                                }
+                                                    transform: 'translateY(-4px)',
+                                                    boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
+                                                },
                                             }}
                                         >
-                                            <CardContent>
-                                                <Box sx={{ display: 'flex', gap: 2 }}>
-                                                    {/* Organization Image */}
+                                            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', position: 'relative' }}>
+
+                                                    {/* Logo */}
                                                     <Box
                                                         sx={{
-                                                            width: 120,
-                                                            height: 120,
+                                                            width: { xs: 72, md: 100 },
+                                                            height: { xs: 72, md: 100 },
                                                             borderRadius: 2,
                                                             overflow: 'hidden',
+                                                            bgcolor: '#f5f5f5',
                                                             flexShrink: 0,
-                                                            bgcolor: '#f0f0f0',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center'
                                                         }}
                                                     >
-                                                        {org.Logo || org.Image ? (
+                                                        {org.LogoFullUrl ? (
                                                             <img
-                                                                src={org.Logo || org.Image}
+                                                                src={org.LogoFullUrl}
                                                                 alt={org.Name}
-                                                                style={{
-                                                                    width: '100%',
-                                                                    height: '100%',
-                                                                    objectFit: 'cover'
-                                                                }}
+                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                             />
                                                         ) : (
-                                                            <School sx={{ fontSize: 48, color: '#ccc' }} />
+                                                            <School sx={{ fontSize: 48, color: '#ccc', m: 'auto' }} />
                                                         )}
                                                     </Box>
 
-                                                    {/* Organization Info */}
+                                                    {/* Content */}
                                                     <Box sx={{ flex: 1 }}>
-                                                        <Typography
-                                                            variant="h6"
-                                                            sx={{
-                                                                fontWeight: 'bold',
-                                                                color: '#007FFF',
-                                                                mb: 1,
-                                                                cursor: 'pointer',
-                                                                '&:hover': {
-                                                                    textDecoration: 'underline'
-                                                                }
-                                                            }}
-                                                            onClick={() => handleViewDetail(org.Id)}
-                                                        >
-                                                            {org.Name || 'Tên tổ chức'}
-                                                        </Typography>
+                                                        {/* Title + TOP */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <Typography
+                                                                variant="h6"
+                                                                sx={{
+                                                                    fontWeight: 700,
+                                                                    cursor: 'pointer',
+                                                                    '&:hover': { color: 'primary.main' },
+                                                                }}
+                                                                onClick={() => handleViewDetail(org.SeoUrl)}
+                                                            >
+                                                                {org.Name}
+                                                            </Typography>
 
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                            {org.IsTop && (
+                                                                <Chip
+                                                                    label="TOP"
+                                                                    color="primary"
+                                                                    size="small"
+                                                                    sx={{ fontWeight: 600 }}
+                                                                />
+                                                            )}
+                                                        </Box>
+
+                                                        {/* Ngành */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                                                             <School sx={{ fontSize: 18, color: 'text.secondary' }} />
                                                             <Typography variant="body2" color="text.secondary">
-                                                                {org.Profession || org.ProfessionName || 'Chưa cập nhật ngành nghề'}
+                                                                {org.MainProfession || 'Chưa cập nhật ngành nghề'}
                                                             </Typography>
                                                         </Box>
 
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                        {/* Địa chỉ */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                                                             <LocationOn sx={{ fontSize: 18, color: 'text.secondary' }} />
                                                             <Typography variant="body2" color="text.secondary">
-                                                                {org.Address || org.Province || 'Chưa cập nhật địa chỉ'}
+                                                                {`${org.Address}, ${org.Commune}, ${org.Province}`}
                                                             </Typography>
                                                         </Box>
 
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                <CalendarToday sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                                <Typography variant="caption" color="text.secondary">
-                                                                    {org.CreatedAt ? new Date(org.CreatedAt).toLocaleDateString('vi-VN') : 'N/A'}
-                                                                </Typography>
-                                                            </Box>
-
-                                                            <Button
-                                                                variant="contained"
-                                                                size="small"
-                                                                startIcon={<Visibility />}
-                                                                onClick={() => handleViewDetail(org.Id)}
-                                                                sx={{
-                                                                    textTransform: 'none',
-                                                                    borderRadius: 2
-                                                                }}
-                                                            >
-                                                                Xem chi tiết
-                                                            </Button>
+                                                        {/* MST */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                                                            <Code sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                {org.TaxCode || 'Chưa cập nhật MST'}
+                                                            </Typography>
                                                         </Box>
-
-                                                        {org.Tags && (
-                                                            <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                {org.Tags.map((tag: string, index: number) => (
-                                                                    <Chip
-                                                                        key={index}
-                                                                        label={tag}
-                                                                        size="small"
-                                                                        sx={{ borderRadius: 1 }}
-                                                                    />
-                                                                ))}
-                                                            </Box>
-                                                        )}
                                                     </Box>
                                                 </Box>
                                             </CardContent>

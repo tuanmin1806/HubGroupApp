@@ -1,18 +1,20 @@
-import { Box, createTheme, Grid, ThemeProvider } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Button, createTheme, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, ThemeProvider } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../../components/searchs/search-bar.search";
 import SearchTabs from "../../components/searchs/search-tab.search";
 import ArticleCard from "../../components/cards/article-card.card";
-import ProfessionCard from "../../components/cards/profession-card.card";
 import { useOrganizationsFullTextSearchQuery } from "../../app/features/organization.api";
 import OrganizationSelectActionCard from "../../components/cards/organization-card.card";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
 import OrganizationPagination from "../../components/pagination/organization-pagination";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
-import { useGetProfessionsByPageQuery } from "../../app/features/professtion.api";
 import RecruitmentPostSelectActionCard from "../../components/cards/recruitment-post.card";
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
+import Grid from "@mui/material/Grid";
+import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
+import { ArrowForward, ChevronLeft, ChevronRight, FilterAlt, LocationOn, School } from "@mui/icons-material";
+import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 
 const theme = createTheme({
     palette: {
@@ -41,10 +43,34 @@ const theme = createTheme({
 const HomePage = () => {
     const navigate = useNavigate();
     const [page, setPage] = useState(DEFAULT_PAGE);
+    const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
+    const { data: professions = [] } = useGetAllProfessionNoAuthenQuery();
+    type FilterType = "province" | "profession";
 
-    const handleNavigate = (path: string) => {
-        navigate(path);
-    }
+    const [filterType, setFilterType] = useState<FilterType>("province");
+
+    const provinceListRef = useRef<HTMLDivElement>(null);
+    const professionListRef = useRef<HTMLDivElement>(null);
+
+    const scrollProvince = (direction: "left" | "right") => {
+        if (!provinceListRef.current) return;
+
+        const scrollAmount = 300;
+        provinceListRef.current.scrollBy({
+            left: direction === "left" ? -scrollAmount : scrollAmount,
+            behavior: "smooth",
+        });
+    };
+
+    const scrollProfession = (direction: "left" | "right") => {
+        if (!provinceListRef.current) return;
+
+        const scrollAmount = 300;
+        provinceListRef.current.scrollBy({
+            left: direction === "left" ? -scrollAmount : scrollAmount,
+            behavior: "smooth",
+        });
+    };
 
     const handleSearch = (query: string, provinceId: string) => {
         const params = new URLSearchParams();
@@ -64,17 +90,13 @@ const HomePage = () => {
 
     const { data: organizationData } = useOrganizationsFullTextSearchQuery({ page: page, size: PAGE_SIZE, });
     const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
-    const { data: professtionData } = useGetProfessionsByPageQuery({ page: page, size: PAGE_SIZE, });
     const { data: recruitmentPostData } = useGetRecruitmentPostsByPageQuery({ page: page, size: PAGE_SIZE, });
 
     const totalOrganizationPages = organizationData ? Math.ceil(organizationData.Total / PAGE_SIZE) : 1;
-    const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
-    const totalProfessionPages = professtionData ? Math.ceil(professtionData.Total / PAGE_SIZE) : 1;
     const totalRecruitmentPostPages = recruitmentPostData ? Math.ceil(recruitmentPostData.Total / PAGE_SIZE) : 1;
 
     const organizationts = organizationData?.Items || [];
     const articles = articleData?.Items || [];
-    const professtions = professtionData?.Items || [];
     const recruitmentPosts = recruitmentPostData?.Items || [];
 
     useEffect(() => {
@@ -130,20 +152,193 @@ const HomePage = () => {
                         py: 3
                     }}
                 >
-                    <Box sx={{
-                        width: "100%",
-                        maxWidth: 1200,
-                        color: "#ff5722",
-                        fontSize: 28,
-                        fontWeight: "bold",
-                        mb: 2,
-                        textAlign: "left",
-                    }}
+                    <Box
+                        sx={{
+                            width: "100%",
+                            maxWidth: 1200,
+                            color: "#ff5722",
+                            fontSize: 28,
+                            fontWeight: "bold",
+                            mb: 2,
+                            textAlign: "left",
+                        }}
                     >
                         Tin tuyển sinh
                     </Box>
+                    <Box sx={{ width: "100%", maxWidth: 1200, mb: 2 }}>
+                        <Stack
+                            direction={{ xs: "column", md: "row" }}
+                            spacing={2}
+                            alignItems={{ xs: "stretch", md: "center" }}
+                        >
+                            <FormControl sx={{ minWidth: 260 }}>
+                                <InputLabel>
+                                    <FilterAlt />
+                                    Lọc
+                                </InputLabel>
+                                <Select
+                                    value={filterType}
+                                    label="Chọn kiểu lọc"
+                                    onChange={(e) => setFilterType(e.target.value as FilterType)}
+                                >
+                                    <MenuItem value="province">
+                                        <LocationOn fontSize="small" sx={{ mr: 1 }} />
+                                        Lọc theo tỉnh / thành phố
+                                    </MenuItem>
+                                    <MenuItem value="profession">
+                                        <School fontSize="small" sx={{ mr: 1 }} />
+                                        Lọc theo ngành nghề
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                            {filterType === "province" && (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                        width: "100%",
+                                        maxWidth: "100%",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    {/* Arrow Left */}
+                                    <IconButton onClick={() => scrollProvince("left")}>
+                                        <ChevronLeft />
+                                    </IconButton>
+
+                                    {/* Province list */}
+                                    <Box
+                                        ref={provinceListRef}
+                                        sx={{
+                                            display: "flex",
+                                            gap: 1,
+                                            overflowX: "auto",
+                                            scrollBehavior: "smooth",
+                                            "&::-webkit-scrollbar": {
+                                                display: "none",
+                                            },
+                                            msOverflowStyle: "none",
+                                            scrollbarWidth: "none",
+                                            flex: 1,
+                                        }}
+                                    >
+                                        {provinces.map((province) => (
+                                            <Box
+                                                key={province.Id}
+                                                sx={{
+                                                    px: 2,
+                                                    py: 1,
+                                                    border: "1px solid #ddd",
+                                                    borderRadius: 20,
+                                                    cursor: "pointer",
+                                                    fontSize: 14,
+                                                    whiteSpace: "nowrap",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 0.5,
+                                                    flexShrink: 0,
+                                                    "&:hover": {
+                                                        backgroundColor: "#ff5722",
+                                                        color: "white",
+                                                        borderColor: "#ff5722",
+                                                    },
+                                                }}
+                                                onClick={() => {
+                                                    console.log("Selected province:", province.Id);
+                                                }}
+                                            >
+                                                <LocationOn fontSize="small" />
+                                                {province.Name}
+                                            </Box>
+                                        ))}
+                                    </Box>
+
+                                    {/* Arrow Right */}
+                                    <IconButton onClick={() => scrollProvince("right")}>
+                                        <ChevronRight />
+                                    </IconButton>
+                                </Box>
+                            )}
+
+                            {filterType === "profession" && (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                        width: "100%",
+                                        maxWidth: "100%",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    {/* Arrow Left */}
+                                    <IconButton onClick={() => scrollProfession("left")}>
+                                        <ChevronLeft />
+                                    </IconButton>
+
+                                    {/* Profession list */}
+                                    <Box
+                                        ref={professionListRef}
+                                        sx={{
+                                            display: "flex",
+                                            gap: 1,
+                                            overflowX: "auto",
+                                            scrollBehavior: "smooth",
+                                            "&::-webkit-scrollbar": {
+                                                display: "none",
+                                            },
+                                            msOverflowStyle: "none",
+                                            scrollbarWidth: "none",
+                                            flex: 1,
+                                        }}
+                                    >
+                                        {professions.map((profession) => (
+                                            <Box
+                                                key={profession.Id}
+                                                sx={{
+                                                    px: 2,
+                                                    py: 1,
+                                                    border: "1px solid #ddd",
+                                                    borderRadius: 20,
+                                                    cursor: "pointer",
+                                                    fontSize: 14,
+                                                    whiteSpace: "nowrap",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 0.5,
+                                                    flexShrink: 0,
+                                                    "&:hover": {
+                                                        backgroundColor: "#ff5722",
+                                                        color: "white",
+                                                        borderColor: "#ff5722",
+                                                    },
+                                                }}
+                                                onClick={() => {
+                                                    console.log("Selected province:", profession.Id);
+                                                }}
+                                            >
+                                                <School fontSize="small" />
+                                                {profession.Name}
+                                            </Box>
+                                        ))}
+                                    </Box>
+
+                                    {/* Arrow Right */}
+                                    <IconButton onClick={() => scrollProfession("right")}>
+                                        <ChevronRight />
+                                    </IconButton>
+                                </Box>
+                            )}
+                        </Stack>
+                    </Box>
                     <Box
-                        sx={{ width: '100%', maxWidth: 1200 }}>
+                        sx={{
+                            width: "100%",
+                            maxWidth: 1200,
+                            mx: "auto",
+                            overflow: "hidden",
+                        }}>
                         <RecruitmentPostSelectActionCard recruitmentPosts={recruitmentPosts} />
                         <OrganizationPagination
                             page={page}
@@ -168,7 +363,7 @@ const HomePage = () => {
                             color: "#ff5722",
                             fontSize: 28,
                             fontWeight: "bold",
-                            mb: 2,
+                            mb: 1,
                             textAlign: "left",
                         }}
                     >
@@ -182,43 +377,83 @@ const HomePage = () => {
                             maxWidth: 1200,
                         }}
                     >
+
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                width: "100%",
+                                maxWidth: "100%",
+                                overflow: "hidden",
+                                mb: 2
+                            }}
+                        >
+                            {/* Profession list */}
+                            <Box
+                                ref={professionListRef}
+                                sx={{
+                                    display: "flex",
+                                    gap: 1,
+                                    overflowX: "auto",
+                                    scrollBehavior: "smooth",
+                                    flex: 1,
+                                    minWidth: 0,
+                                    "&::-webkit-scrollbar": { display: "none" },
+                                    msOverflowStyle: "none",
+                                    scrollbarWidth: "none",
+                                }}
+                            >
+                                {professions.map((profession) => (
+                                    <Box
+                                        key={profession.Id}
+                                        sx={{
+                                            px: 2,
+                                            py: 1,
+                                            border: "1px solid #ddd",
+                                            borderRadius: 20,
+                                            cursor: "pointer",
+                                            fontSize: 14,
+                                            whiteSpace: "nowrap",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 0.5,
+                                            flexShrink: 0,
+                                            transition: "all .2s",
+                                            "&:hover": {
+                                                backgroundColor: "#ff5722",
+                                                color: "white",
+                                                borderColor: "#ff5722",
+                                            },
+                                        }}
+                                        onClick={() => {
+                                            console.log("Selected profession:", profession.Id);
+                                        }}
+                                    >
+                                        <School fontSize="small" />
+                                        {profession.Name}
+                                    </Box>
+                                ))}
+                            </Box>
+                            {/* Arrow Left */}
+                            <IconButton sx={{
+                                border: "1px solid #ddd",
+                                borderRadius: 10,
+                            }} onClick={() => scrollProfession("left")}>
+                                <ChevronLeft />
+                            </IconButton>
+                            {/* Arrow Right */}
+                            <IconButton sx={{
+                                border: "1px solid #ddd",
+                                borderRadius: 10,
+                            }} onClick={() => scrollProfession("right")}>
+                                <ChevronRight />
+                            </IconButton>
+                        </Box>
                         <OrganizationSelectActionCard organizations={organizationts} />
                         <OrganizationPagination
                             page={page}
                             totalPages={totalOrganizationPages}
-                            onPrev={() => setPage((p) => p - 1)}
-                            onNext={() => setPage((p) => p + 1)}
-                        />
-                    </Box>
-                </Grid>
-
-                <Grid
-                    container
-                    direction="column"
-                    alignItems="center"
-                    sx={{
-                        py: 3
-                    }}
-                >
-                    <Box sx={{
-                        width: "100%",
-                        maxWidth: 1200,
-                        color: "#ff5722",
-                        fontSize: 28,
-                        fontWeight: "bold",
-                        mb: 2,
-                        textAlign: "left",
-                    }}
-                    >
-                        Ngành nghề nổi bật
-                    </Box>
-                    <Box
-                        onClick={() => handleNavigate('/chi-tiet-tuyen-sinh')}
-                        sx={{ width: '100%', maxWidth: 1200 }}>
-                        <ProfessionCard professions={professtions} />
-                        <OrganizationPagination
-                            page={page}
-                            totalPages={totalProfessionPages}
                             onPrev={() => setPage((p) => p - 1)}
                             onNext={() => setPage((p) => p + 1)}
                         />
@@ -230,14 +465,41 @@ const HomePage = () => {
                         sx={{
                             width: "100%",
                             maxWidth: 1200,
-                            color: "#ff5722",
-                            fontSize: 28,
-                            fontWeight: "bold",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                             mb: 2,
-                            textAlign: "left",
                         }}
                     >
-                        Bài viết
+                        {/* Title */}
+                        <Box
+                            sx={{
+                                color: "#ff5722",
+                                fontSize: 28,
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Bài viết
+                        </Box>
+
+                        {/* Button */}
+                        <Button
+                            variant="outlined"
+                            endIcon={<ArrowForward />}
+                            onClick={() => navigate("/danh-sach-bai-viet")}
+                            sx={{
+                                borderColor: "#ff5722",
+                                color: "#ff5722",
+                                fontWeight: 500,
+                                "&:hover": {
+                                    backgroundColor: "#ff5722",
+                                    color: "#fff",
+                                    borderColor: "#ff5722",
+                                },
+                            }}
+                        >
+                            Xem tất cả
+                        </Button>
                     </Box>
 
                     <Box
@@ -253,13 +515,6 @@ const HomePage = () => {
                             <ArticleCard key={article.Id} article={article} />
                         ))}
                     </Box>
-
-                    <OrganizationPagination
-                        page={page}
-                        totalPages={totalArticlePages}
-                        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-                        onNext={() => setPage((p) => Math.min(totalArticlePages, p + 1))}
-                    />
                 </Grid>
             </ThemeProvider>
         </>
