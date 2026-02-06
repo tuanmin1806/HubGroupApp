@@ -103,14 +103,14 @@ const OrganizationDetailPage = () => {
             )}
 
             <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: "auto" }}>
-                <Box sx={{ display: 'flex', gap: 3, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                     {/* LEFT COLUMN */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Stack spacing={3}>
+                        <Stack spacing={1}>
                             {/* Header Card */}
                             <Card>
                                 <CardContent>
-                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                                         {organization.LogoFullUrl && (
                                             <Box
                                                 component="img"
@@ -145,7 +145,7 @@ const OrganizationDetailPage = () => {
                                         </Box>
                                     </Box>
 
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2, mt: 2 }}>
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
                                         <Stack direction="row" spacing={1} alignItems="center">
                                             <LocationOn fontSize="small" color="primary" />
                                             <Typography variant="body2">
@@ -206,7 +206,7 @@ const OrganizationDetailPage = () => {
                                         <Typography variant="h6" fontWeight={600} gutterBottom>
                                             Giới thiệu chung
                                         </Typography>
-                                        <Divider sx={{ mb: 2 }} />
+                                        <Divider sx={{ mb: 1 }} />
                                         <Typography color="text.secondary" lineHeight={1.7}>
                                             {organization.Summary || 'Chưa có thông tin giới thiệu'}
                                         </Typography>
@@ -258,7 +258,7 @@ const OrganizationDetailPage = () => {
                                                 <CircularProgress />
                                             </Box>
                                         ) : recruitmentPosts?.Items && recruitmentPosts.Items.length > 0 ? (
-                                            <Stack spacing={2}>
+                                            <Stack spacing={1}>
                                                 {recruitmentPosts.Items.map((post) => (
                                                     <Card
                                                         key={post.Id}
@@ -376,7 +376,7 @@ const OrganizationDetailPage = () => {
 
                     {/* RIGHT SIDEBAR */}
                     <Box sx={{ width: { xs: '100%', md: '340px' }, flexShrink: 0 }}>
-                        <Stack spacing={3}>
+                        <Stack spacing={1}>
                             {/* Contact Information */}
                             <Card>
                                 <CardContent>
@@ -387,7 +387,7 @@ const OrganizationDetailPage = () => {
                                         </Typography>
                                     </Stack>
 
-                                    <Stack spacing={2}>
+                                    <Stack spacing={1}>
                                         {organization.Address && (
                                             <Stack direction="row" spacing={1} alignItems="flex-start">
                                                 <LocationOn fontSize="small" sx={{ mt: 0.5 }} />

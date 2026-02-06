@@ -6,7 +6,7 @@ import SearchTabs from "../../components/searchs/search-tab.search";
 import ArticleCard from "../../components/cards/article-card.card";
 import { useOrganizationsFullTextSearchQuery } from "../../app/features/organization.api";
 import OrganizationSelectActionCard from "../../components/cards/organization-card.card";
-import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
+import { BACKGROUND_COLOR, DEFAULT_PAGE, PAGE_SIZE, TEXT_COLOR } from "../../constants/common.constant";
 import OrganizationPagination from "../../components/pagination/organization-pagination";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
 import RecruitmentPostSelectActionCard from "../../components/cards/recruitment-post.card";
@@ -111,12 +111,12 @@ const HomePage = () => {
                     direction="column"
                     alignItems="center"
                     sx={{
-                        bgcolor: '#ee6a28',
+                        bgcolor: BACKGROUND_COLOR,
                         py: 3
                     }}
                 >
                     <Box sx={{
-                        color: 'white',
+                        color: TEXT_COLOR,
                         fontSize: 28,
                         fontWeight: 'bold',
                         mb: 2
@@ -156,14 +156,41 @@ const HomePage = () => {
                         sx={{
                             width: "100%",
                             maxWidth: 1200,
-                            color: "#ff5722",
-                            fontSize: 28,
-                            fontWeight: "bold",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                             mb: 2,
-                            textAlign: "left",
                         }}
                     >
-                        Tin tuyển sinh
+                        {/* Title */}
+                        <Box
+                            sx={{
+                                color: "#ff5722",
+                                fontSize: 28,
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Tin tuyển sinh
+                        </Box>
+
+                        {/* Button */}
+                        <Button
+                            variant="outlined"
+                            endIcon={<ArrowForward />}
+                            onClick={() => navigate("/tin-tuyen-sinh")}
+                            sx={{
+                                borderColor: "#ff5722",
+                                color: "#ff5722",
+                                fontWeight: 500,
+                                "&:hover": {
+                                    backgroundColor: "#ff5722",
+                                    color: "#fff",
+                                    borderColor: "#ff5722",
+                                },
+                            }}
+                        >
+                            Xem tất cả
+                        </Button>
                     </Box>
                     <Box sx={{ width: "100%", maxWidth: 1200, mb: 2 }}>
                         <Stack

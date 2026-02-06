@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
+import { TEXT_COLOR } from "../../constants/common.constant";
 
 function TabPanel({
     children,
@@ -58,7 +59,7 @@ export default function ProfessionRecruitmentTabs() {
                 height: 320,
                 bgcolor: "background.paper",
                 borderRadius: 3,
-                overflow: "hidden",
+                overflow: "hidden"
             }}
         >
             {/* LEFT: ngành nghề */}
@@ -71,6 +72,7 @@ export default function ProfessionRecruitmentTabs() {
                     width: 260,
                     borderRight: 1,
                     borderColor: "divider",
+                    color: TEXT_COLOR
                 }}
             >
                 {loadingProfession ? (
@@ -88,6 +90,7 @@ export default function ProfessionRecruitmentTabs() {
                                 textTransform: "none",
                                 fontWeight: 500,
                                 minHeight: 48,
+                                color: TEXT_COLOR
                             }}
                         />
                     ))
@@ -104,6 +107,7 @@ export default function ProfessionRecruitmentTabs() {
                         flexDirection: "column",
                         gap: 1,
                         p: 2,
+                        color: TEXT_COLOR
                     }}
                 >
                     {loadingPosts ? (

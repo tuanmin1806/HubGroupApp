@@ -6,6 +6,7 @@ import OrganizationDetailPage from "../pages/general/detail-page/organization-de
 import SignOutPage from "../pages/general/auth-page/sign-out.page";
 import ArticleDetailPage from "../pages/general/detail-page/article-detail.page";
 import RecruitmentPostDetailPage from "../pages/general/detail-page/recruitment-post-detail.page";
+import RecruitmentPostSearchPage from "../pages/general/search-page/recruitment-post-search.page";
 
 const generalRoutes = [
     {
@@ -39,7 +40,15 @@ const generalRoutes = [
     {
         path: '/tin-tuyen-sinh/:seoUrl',
         element: <RecruitmentPostDetailPage />,
-    }
+    },
+    {
+        path: "/chi-tiet-bai-viet/:seo",
+        element: <ArticleDetailPage />,
+    },
+    {
+        path: "/tin-tuyen-sinh",
+        element: <RecruitmentPostSearchPage />,
+    },
 ];
 
 export default generalRoutes;

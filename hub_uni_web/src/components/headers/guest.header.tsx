@@ -40,6 +40,14 @@ function GuestHeader() {
         navigate("/danh-sach-bai-viet");
     }
 
+    const handleNavigateOrganization = () => {
+        navigate("/tim-kiem-to-chuc");
+    }
+
+    const handleNavigateRecruitmentPost = () => {
+        navigate("/tin-tuyen-sinh");
+    }
+
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpenDrawer(newOpen);
     };
@@ -105,16 +113,12 @@ function GuestHeader() {
                         />
                     </ListItemButton>
                 </ListItem>
-
                 <ListItem disablePadding>
                     <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
+                        onClick={handleNavigateOrganization}
                     >
                         <ListItemText
-                            primary="Trang Chủ"
+                            primary="Tổ chức"
                             primaryTypographyProps={{
                                 fontSize: { xs: '0.875rem', md: '1rem' },
                                 fontWeight: 'bold',
@@ -126,13 +130,10 @@ function GuestHeader() {
 
                 <ListItem disablePadding>
                     <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
+                        onClick={handleNavigateRecruitmentPost}
                     >
                         <ListItemText
-                            primary="Trang Chủ"
+                            primary="Tin tuyển sinh"
                             primaryTypographyProps={{
                                 fontSize: { xs: '0.875rem', md: '1rem' },
                                 fontWeight: 'bold',
@@ -141,43 +142,6 @@ function GuestHeader() {
                         />
                     </ListItemButton>
                 </ListItem>
-
-                <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
-                    >
-                        <ListItemText
-                            primary="Trang Chủ"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
-                        />
-                    </ListItemButton>
-                </ListItem>
-
-                <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
-                    >
-                        <ListItemText
-                            primary="Trang Chủ"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
-                        />
-                    </ListItemButton>
-                </ListItem>
-
             </List>
         </Box>
     );
@@ -185,7 +149,7 @@ function GuestHeader() {
     return (
         <ThemeProvider theme={theme}>
             <AppBar position="fixed" sx={{
-                color: '#464444',
+                color: '#242424',
                 backgroundColor: '#fff'
             }}>
                 <Container maxWidth="xl">
@@ -255,9 +219,9 @@ function GuestHeader() {
                                 color="inherit"
                                 variant="body2"
                                 underline="hover"
-                                onClick={() => navigate("/")}
+                                onClick={handleNavigateOrganization}
                             >
-                                Danh sách tổ chức
+                                Tổ chức
                             </Link>
                             <Link
                                 sx={{
@@ -271,9 +235,9 @@ function GuestHeader() {
                                 color="inherit"
                                 variant="body2"
                                 underline="hover"
-                                onClick={() => navigate("/")}
+                                onClick={handleNavigateRecruitmentPost}
                             >
-                                Danh sách tổ chức
+                                Tin tuyển sinh
                             </Link>
                             <Link
                                 sx={{

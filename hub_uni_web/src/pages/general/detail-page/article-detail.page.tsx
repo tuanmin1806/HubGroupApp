@@ -1,184 +1,531 @@
-import { Avatar, Box, Button, Card, CardContent, CardMedia, Container, Divider, Grid, Stack, Typography } from "@mui/material";
-import DefaultImage from "../../../assets/default_organization_card.jpg";
-import { BookmarkBorder, CalendarMonth, Person, Share, Visibility } from "@mui/icons-material";
-import ArticleCard from "../../../components/cards/article-card.card";
-import { useState } from "react";
-import { useGetArticlesByPageNoAuthenQuery } from "../../../app/features/article.api";
-import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import OrganizationPagination from "../../../components/pagination/organization-pagination";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+    Box,
+    Container,
+    Typography,
+    Chip,
+    Stack,
+    Avatar,
+    Divider,
+    Paper,
+    Breadcrumbs,
+    Link,
+    Skeleton,
+    Grid,
+} from "@mui/material";
+import {
+    CalendarToday,
+    ArrowBack,
+    Share,
+    Bookmark,
+    NavigateNext,
+} from "@mui/icons-material";
+import { useGetArticleBySeoQuery } from "../../../app/features/article.api";
 
 const ArticleDetailPage = () => {
-    const [page, setPage] = useState(DEFAULT_PAGE);
-    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
-    const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
-    const articles = articleData?.Items || [];
+    const { seo } = useParams<{ seo: string }>();
+    const navigate = useNavigate();
+    const { data, isLoading, isError } = useGetArticleBySeoQuery(seo || "");
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("vi-VN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        });
+    };
+
+    const formatDateLong = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
+
+    if (isLoading) {
+        return (
+            <Container maxWidth="lg" sx={{ py: 4 }}>
+                <Skeleton variant="text" width="60%" height={60} />
+                <Skeleton variant="rectangular" height={400} sx={{ my: 3, borderRadius: 2 }} />
+                <Skeleton variant="text" width="100%" />
+                <Skeleton variant="text" width="100%" />
+                <Skeleton variant="text" width="80%" />
+            </Container>
+        );
+    }
+
+    if (isError || !data?.MainArticle) {
+        return (
+            <Container maxWidth="lg" sx={{ py: 8, textAlign: "center" }}>
+                <Typography variant="h4" color="error" gutterBottom>
+                    Không tìm thấy bài viết
+                </Typography>
+                <Typography color="text.secondary" mb={3}>
+                    Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+                </Typography>
+                <Chip
+                    icon={<ArrowBack />}
+                    label="Quay lại danh sách bài viết"
+                    onClick={() => navigate("/danh-sach-bai-viet")}
+                    color="primary"
+                    sx={{ cursor: "pointer" }}
+                />
+            </Container>
+        );
+    }
+
+    const { MainArticle, NewestArticles, SameCategoryArticles } = data;
+
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Grid container spacing={4}>
-                <Grid size={{ xs: 12, md: 8 }}>
-                    <Card>
-                        <CardMedia
-                            component="img"
-                            height="320"
-                            image={DefaultImage}
-                            alt="article cover"
-                        />
+        <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", py: 3 }}>
+            <Container maxWidth="lg">
+                {/* Breadcrumbs */}
+                <Breadcrumbs
+                    separator={<NavigateNext fontSize="small" />}
+                    sx={{ mb: 3, fontSize: "0.875rem" }}
+                >
+                    <Link
+                        underline="hover"
+                        color="inherit"
+                        onClick={() => navigate("/")}
+                        sx={{ cursor: "pointer", fontSize: "0.875rem" }}
+                    >
+                        Trang chủ
+                    </Link>
+                    <Link
+                        underline="hover"
+                        color="inherit"
+                        onClick={() => navigate("/danh-sach-bai-viet")}
+                        sx={{ cursor: "pointer", fontSize: "0.875rem" }}
+                    >
+                        Bài viết
+                    </Link>
+                    <Typography color="text.primary" noWrap sx={{ maxWidth: 200, fontSize: "0.875rem" }}>
+                        {MainArticle.Title}
+                    </Typography>
+                </Breadcrumbs>
 
-                        <CardContent>
-                            <Typography variant="h4" fontWeight={700} gutterBottom>
-                                Xu hướng ngành CNTT năm 2026
-                            </Typography>
-
-                            <Stack
-                                direction="row"
-                                spacing={2}
-                                alignItems="center"
-                                color="text.secondary"
-                                sx={{ mb: 2 }}
+                <Grid container spacing={3}>
+                    {/* Main Content */}
+                    <Grid size={{ xs: 12, md: 8 }}>
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                borderRadius: 2,
+                                overflow: "hidden",
+                                backgroundColor: "white",
+                                border: "1px solid",
+                                borderColor: "divider",
+                            }}
+                        >
+                            {/* Header Image */}
+                            <Box
+                                sx={{
+                                    height: { xs: 250, md: 350 },
+                                    backgroundColor: "#f5f5f5",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    overflow: "hidden",
+                                }}
                             >
-                                <Stack direction="row" spacing={0.5} alignItems="center">
-                                    <Person fontSize="small" />
-                                    <Typography variant="body2">Admin</Typography>
-                                </Stack>
+                                <Box
+                                    component="img"
+                                    src={MainArticle.AvatarFullUrl}
+                                    alt={MainArticle.Title}
+                                    sx={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "contain",
+                                    }}
+                                />
+                            </Box>
 
-                                <Stack direction="row" spacing={0.5} alignItems="center">
-                                    <CalendarMonth fontSize="small" />
-                                    <Typography variant="body2">12/01/2026</Typography>
-                                </Stack>
+                            {/* Article Content */}
+                            <Box sx={{ p: { xs: 2.5, md: 4 } }}>
+                                {/* Category */}
+                                {MainArticle.Categories?.[0] && (
+                                    <Chip
+                                        label={MainArticle.Categories[0].Name}
+                                        color="primary"
+                                        size="small"
+                                        sx={{ mb: 2, fontWeight: 600, height: 24, fontSize: "0.75rem" }}
+                                    />
+                                )}
 
-                                <Stack direction="row" spacing={0.5} alignItems="center">
-                                    <Visibility fontSize="small" />
-                                    <Typography variant="body2">1,234</Typography>
-                                </Stack>
-                            </Stack>
-
-                            <Divider sx={{ mb: 3 }} />
-
-                            <Typography lineHeight={1.8} paragraph>
-                                Công nghệ thông tin tiếp tục là lĩnh vực phát triển mạnh mẽ
-                                trong năm 2026 với sự bùng nổ của AI, Big Data và Cloud
-                                Computing...
-                            </Typography>
-
-                            <Typography lineHeight={1.8} paragraph>
-                                Sinh viên theo học ngành CNTT sẽ có nhiều cơ hội việc làm
-                                hấp dẫn với mức thu nhập cạnh tranh ngay sau khi ra trường.
-                            </Typography>
-
-                            <Stack direction="row" spacing={1} mt={4}>
-                                <Button
-                                    variant="contained"
-                                    startIcon={<Share />}
+                                {/* Title */}
+                                <Typography
+                                    variant="h4"
+                                    fontWeight={700}
+                                    gutterBottom
+                                    sx={{
+                                        fontSize: { xs: "1.5rem", md: "2rem" },
+                                        lineHeight: 1.3,
+                                        mb: 2,
+                                    }}
                                 >
-                                    Chia sẻ
-                                </Button>
-
-                                <Button
-                                    variant="outlined"
-                                    startIcon={<BookmarkBorder />}
-                                >
-                                    Lưu bài
-                                </Button>
-                            </Stack>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                {/* SIDEBAR */}
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Stack spacing={3}>
-                        <Card>
-                            <CardContent>
-                                <Stack spacing={2} alignItems="center">
-                                    <Avatar sx={{ width: 64, height: 64 }}>
-                                        <Person />
-                                    </Avatar>
-
-                                    <Box textAlign="center">
-                                        <Typography fontWeight={600}>
-                                            Nguyễn Văn A
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Biên tập viên
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent>
-                                <Typography fontWeight={600} gutterBottom>
-                                    Bài viết liên quan
+                                    {MainArticle.Title}
                                 </Typography>
 
-                                <Stack spacing={1}>
-                                    {["Ngành AI", "Kỹ sư dữ liệu", "Cloud Engineer"].map(
-                                        (item) => (
-                                            <Typography
-                                                key={item}
-                                                variant="body2"
+                                {/* Meta Info */}
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    alignItems="center"
+                                    flexWrap="wrap"
+                                    sx={{ mb: 3, pb: 2, borderBottom: "1px solid #e0e0e0" }}
+                                >
+                                    {/* Author */}
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>
+                                            {MainArticle.CreatedBy.charAt(0).toUpperCase()}
+                                        </Avatar>
+                                        <Typography variant="body2" fontWeight={500}>
+                                            {MainArticle.CreatedBy}
+                                        </Typography>
+                                    </Stack>
+
+                                    {/* Divider */}
+                                    <Box sx={{ width: 4, height: 4, borderRadius: "50%", bgcolor: "text.secondary" }} />
+
+                                    {/* Date */}
+                                    <Stack direction="row" spacing={0.5} alignItems="center">
+                                        <CalendarToday sx={{ fontSize: 16, color: "text.secondary" }} />
+                                        <Typography variant="body2" color="text.secondary">
+                                            {formatDateLong(MainArticle.CreatedAt)}
+                                        </Typography>
+                                    </Stack>
+
+                                    {/* Action Buttons */}
+                                    <Stack direction="row" spacing={1} sx={{ ml: "auto" }}>
+                                        <Chip
+                                            icon={<Share sx={{ fontSize: 16 }} />}
+                                            label="Chia sẻ"
+                                            size="small"
+                                            variant="outlined"
+                                            onClick={() => {
+                                                if (navigator.share) {
+                                                    navigator.share({
+                                                        title: MainArticle.Title,
+                                                        text: MainArticle.Summary,
+                                                        url: window.location.href,
+                                                    });
+                                                }
+                                            }}
+                                            sx={{
+                                                cursor: "pointer",
+                                                height: 28,
+                                                fontSize: "0.75rem",
+                                            }}
+                                        />
+                                        <Chip
+                                            icon={<Bookmark sx={{ fontSize: 16 }} />}
+                                            label="Lưu"
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ height: 28, fontSize: "0.75rem" }}
+                                        />
+                                    </Stack>
+                                </Stack>
+
+                                {/* Summary */}
+                                <Box
+                                    sx={{
+                                        mb: 3,
+                                        p: 2,
+                                        backgroundColor: "#f8f9fa",
+                                        borderLeft: "3px solid",
+                                        borderColor: "primary.main",
+                                        borderRadius: 1,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
+                                            fontStyle: "italic",
+                                            color: "text.secondary",
+                                            fontSize: "0.95rem",
+                                            lineHeight: 1.6,
+                                        }}
+                                    >
+                                        {MainArticle.Summary}
+                                    </Typography>
+                                </Box>
+
+                                {/* Main Content HTML */}
+                                <Box
+                                    sx={{
+                                        "& p": {
+                                            fontSize: "1rem",
+                                            lineHeight: 1.8,
+                                            mb: 1.5,
+                                            color: "text.primary",
+                                        },
+                                        "& h1, & h2, & h3, & h4, & h5, & h6": {
+                                            fontWeight: 700,
+                                            mt: 3,
+                                            mb: 1.5,
+                                            lineHeight: 1.4,
+                                        },
+                                        "& h1": { fontSize: "1.75rem" },
+                                        "& h2": { fontSize: "1.5rem" },
+                                        "& h3": { fontSize: "1.25rem" },
+                                        "& ul, & ol": {
+                                            pl: 3,
+                                            mb: 2,
+                                        },
+                                        "& li": {
+                                            fontSize: "1rem",
+                                            lineHeight: 1.8,
+                                            mb: 0.5,
+                                        },
+                                        "& img": {
+                                            maxWidth: "100%",
+                                            height: "auto",
+                                            borderRadius: 1,
+                                            my: 2,
+                                        },
+                                        "& a": {
+                                            color: "primary.main",
+                                            textDecoration: "none",
+                                            "&:hover": {
+                                                textDecoration: "underline",
+                                            },
+                                        },
+                                    }}
+                                    dangerouslySetInnerHTML={{ __html: MainArticle.Content }}
+                                />
+
+                                {/* Keywords */}
+                                {MainArticle.Keywords && (
+                                    <Box sx={{ mt: 4, pt: 3, borderTop: "1px solid #e0e0e0" }}>
+                                        <Typography variant="body2" fontWeight={600} color="text.secondary" gutterBottom>
+                                            Từ khóa:
+                                        </Typography>
+                                        <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                                            {MainArticle.Keywords.split(",").map((keyword, index) => (
+                                                <Chip
+                                                    key={index}
+                                                    label={keyword.trim()}
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ height: 24, fontSize: "0.75rem" }}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Box>
+                                )}
+
+                                {/* Back Button */}
+                                <Box sx={{ mt: 4 }}>
+                                    <Chip
+                                        icon={<ArrowBack sx={{ fontSize: 16 }} />}
+                                        label="Quay lại danh sách"
+                                        onClick={() => navigate("/danh-sach-bai-viet")}
+                                        sx={{
+                                            cursor: "pointer",
+                                            height: 32,
+                                            fontSize: "0.875rem",
+                                        }}
+                                    />
+                                </Box>
+                            </Box>
+                        </Paper>
+                    </Grid>
+
+                    {/* Sidebar */}
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Stack spacing={3}>
+                            {/* Newest Articles */}
+                            {NewestArticles && NewestArticles.length > 0 && (
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 2.5,
+                                        borderRadius: 2,
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                    }}
+                                >
+                                    <Typography variant="h6" fontWeight={700} gutterBottom sx={{ fontSize: "1.1rem" }}>
+                                        Bài viết mới nhất
+                                    </Typography>
+                                    <Divider sx={{ mb: 2 }} />
+                                    <Stack spacing={2}>
+                                        {NewestArticles.slice(0, 5).map((article) => (
+                                            <Box
+                                                key={article.Id}
+                                                onClick={() => {
+                                                    navigate(`/chi-tiet-bai-viet/${article.Seo}`);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
                                                 sx={{
                                                     cursor: "pointer",
+                                                    transition: "all 0.2s ease",
                                                     "&:hover": {
-                                                        color: "primary.main",
+                                                        "& .article-title": {
+                                                            color: "primary.main",
+                                                        },
+                                                        "& img": {
+                                                            transform: "scale(1.05)",
+                                                        },
                                                     },
                                                 }}
                                             >
-                                                • {item}
-                                            </Typography>
-                                        )
-                                    )}
-                                </Stack>
-                            </CardContent>
-                        </Card>
+                                                <Stack direction="row" spacing={1.5}>
+                                                    <Box
+                                                        sx={{
+                                                            width: 70,
+                                                            height: 70,
+                                                            borderRadius: 1.5,
+                                                            overflow: "hidden",
+                                                            flexShrink: 0,
+                                                            backgroundColor: "#f5f5f5",
+                                                        }}
+                                                    >
+                                                        <Box
+                                                            component="img"
+                                                            src={article.AvatarFullUrl}
+                                                            alt={article.Title}
+                                                            sx={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                transition: "transform 0.3s",
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                        <Typography
+                                                            className="article-title"
+                                                            variant="body2"
+                                                            fontWeight={600}
+                                                            sx={{
+                                                                display: "-webkit-box",
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: "vertical",
+                                                                overflow: "hidden",
+                                                                mb: 0.5,
+                                                                fontSize: "0.875rem",
+                                                                lineHeight: 1.4,
+                                                                transition: "color 0.2s ease",
+                                                            }}
+                                                        >
+                                                            {article.Title}
+                                                        </Typography>
+                                                        <Stack direction="row" spacing={0.5} alignItems="center">
+                                                            <CalendarToday sx={{ fontSize: 12, color: "text.secondary" }} />
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                                                                {formatDate(article.CreatedAt)}
+                                                            </Typography>
+                                                        </Stack>
+                                                    </Box>
+                                                </Stack>
+                                            </Box>
+                                        ))}
+                                    </Stack>
+                                </Paper>
+                            )}
 
-                        {/* TAGS */}
-                        <Card>
-                            <CardContent>
-                                <Typography fontWeight={600} gutterBottom>
-                                    Danh mục
-                                </Typography>
-
-                                <Stack direction="row" spacing={1} flexWrap="wrap">
-                                    {["CNTT", "AI", "Tuyển sinh"].map((tag) => (
-                                        <Button
-                                            key={tag}
-                                            size="small"
-                                            variant="outlined"
-                                        >
-                                            {tag}
-                                        </Button>
-                                    ))}
-                                </Stack>
-                            </CardContent>
-                        </Card>
-                    </Stack>
+                            {/* Same Category Articles */}
+                            {SameCategoryArticles && SameCategoryArticles.length > 0 && (
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 2.5,
+                                        borderRadius: 2,
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                    }}
+                                >
+                                    <Typography variant="h6" fontWeight={700} gutterBottom sx={{ fontSize: "1.1rem" }}>
+                                        Bài viết cùng danh mục
+                                    </Typography>
+                                    <Divider sx={{ mb: 2 }} />
+                                    <Stack spacing={2}>
+                                        {SameCategoryArticles.slice(0, 5).map((article) => (
+                                            <Box
+                                                key={article.Id}
+                                                onClick={() => {
+                                                    navigate(`/chi-tiet-bai-viet/${article.Seo}`);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                                sx={{
+                                                    cursor: "pointer",
+                                                    transition: "all 0.2s ease",
+                                                    "&:hover": {
+                                                        "& .article-title": {
+                                                            color: "primary.main",
+                                                        },
+                                                        "& img": {
+                                                            transform: "scale(1.05)",
+                                                        },
+                                                    },
+                                                }}
+                                            >
+                                                <Stack direction="row" spacing={1.5}>
+                                                    <Box
+                                                        sx={{
+                                                            width: 70,
+                                                            height: 70,
+                                                            borderRadius: 1.5,
+                                                            overflow: "hidden",
+                                                            flexShrink: 0,
+                                                            backgroundColor: "#f5f5f5",
+                                                        }}
+                                                    >
+                                                        <Box
+                                                            component="img"
+                                                            src={article.AvatarFullUrl}
+                                                            alt={article.Title}
+                                                            sx={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                                transition: "transform 0.3s",
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                        <Typography
+                                                            className="article-title"
+                                                            variant="body2"
+                                                            fontWeight={600}
+                                                            sx={{
+                                                                display: "-webkit-box",
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: "vertical",
+                                                                overflow: "hidden",
+                                                                mb: 0.5,
+                                                                fontSize: "0.875rem",
+                                                                lineHeight: 1.4,
+                                                                transition: "color 0.2s ease",
+                                                            }}
+                                                        >
+                                                            {article.Title}
+                                                        </Typography>
+                                                        <Stack direction="row" spacing={0.5} alignItems="center">
+                                                            <CalendarToday sx={{ fontSize: 12, color: "text.secondary" }} />
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                                                                {formatDate(article.CreatedAt)}
+                                                            </Typography>
+                                                        </Stack>
+                                                    </Box>
+                                                </Stack>
+                                            </Box>
+                                        ))}
+                                    </Stack>
+                                </Paper>
+                            )}
+                        </Stack>
+                    </Grid>
                 </Grid>
-            </Grid>
-
-            <Grid spacing={3}>
-                <Grid
-                    size={{ xs: 12, sm: 6, md: 4 }}
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                    }}
-                >
-                    {articles.map((article) => (
-                        <ArticleCard key={article.Id} article={article} />
-                    ))}
-                </Grid>
-                <OrganizationPagination
-                    page={page}
-                    totalPages={totalArticlePages}
-                    onPrev={() => setPage((p) => Math.max(1, p - 1))}
-                    onNext={() => setPage((p) => Math.min(totalArticlePages, p + 1))}
-                />
-            </Grid>
-
-        </Container>
+            </Container>
+        </Box>
     );
-}
+};
 
 export default ArticleDetailPage;

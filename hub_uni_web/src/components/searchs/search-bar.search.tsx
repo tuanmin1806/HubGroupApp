@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
+import { TEXT_COLOR } from "../../constants/common.constant";
 
 interface SearchBarProps {
     onSearch?: (query: string, provinceId: string) => void;
@@ -41,6 +42,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                 gap: 1,
                 borderRadius: 10,
                 boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                color: TEXT_COLOR
             }}
         >
             {/* Input tìm kiếm */}

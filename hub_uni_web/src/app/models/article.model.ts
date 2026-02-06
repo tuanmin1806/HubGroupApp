@@ -11,6 +11,14 @@ export interface ArticleResponse {
     AvatarFullUrl: string;
     CategoryIds: string[];
     Categories: CategoryResponse[]
+    CreatedAt: string;
+    CreatedBy: string;
+}
+
+export interface ArticleDetailResponse {
+    MainArticle: ArticleResponse;
+    NewestArticles: ArticleResponse[];
+    SameCategoryArticles: ArticleResponse[];
 }
 
 export interface ArticleFilterParams {

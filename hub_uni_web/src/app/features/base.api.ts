@@ -2,7 +2,6 @@ import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError,
 import { getToken, removeToken } from '../services/auth.service';
 import { logout } from './auth/auth.slice';
 import { RootState } from '../store';
-import { ApiResponse } from '../models/api.model';
 import { showSnackbar } from './snackbar/snackbar.slice';
 import { TAG_TYPES } from './tags';
 
@@ -29,21 +28,18 @@ const baseQueryWithAuth: BaseQueryFn<
     FetchBaseQueryMeta
 > = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);
-    const typedData = result.data as ApiResponse<any> | undefined;
     if (
         result.meta?.response?.status
         && result.meta.response.status >= 200
         && result.meta.response.status < 300
-        && typedData?.code !== 200
     ) {
-        const message = typedData?.message || 'Tiện ích thành công';
+        const message = 'Tiện ích thành công';
         api.dispatch(showSnackbar({ message, severity: 'success' }));
     }
 
     if (result.error) {
         const status = result.error.status;
-        const errorData = result.error.data as ApiResponse<any> | undefined;
-        const errorMessage = errorData?.message || 'Đã có lỗi xảy ra';
+        const errorMessage = 'Đã có lỗi xảy ra';
         if (status === 401 && getToken()) {
             if (result.error && result.error.status === 401) {
                 api.dispatch(logout());

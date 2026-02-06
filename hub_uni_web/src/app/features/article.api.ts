@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { ArticleFilterParams, ArticleResponse } from "../models/article.model";
+import { ArticleDetailResponse, ArticleFilterParams, ArticleResponse } from "../models/article.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: ArticleFilterParams): string => {
@@ -32,9 +32,17 @@ const articleApi = baseApi.injectEndpoints({
                 Total: responseData.Total,
             }),
         }),
+
+        getArticleBySeo: builder.query<ArticleDetailResponse, string>({
+            query: (seo) => ({
+                url: `article/getbyseourl/${seo}`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
 export const {
-    useGetArticlesByPageNoAuthenQuery
+    useGetArticlesByPageNoAuthenQuery,
+    useGetArticleBySeoQuery
 } = articleApi;
