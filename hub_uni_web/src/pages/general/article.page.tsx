@@ -1,25 +1,39 @@
-import { Search } from "@mui/icons-material";
+import { Search, ChevronLeft, ChevronRight, Category } from "@mui/icons-material";
 import ArticleCard from "../../components/cards/article-card.card";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
+import { useGetAllCategoryQuery } from "../../app/features/category.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
 import OrganizationPagination from "../../components/pagination/organization-pagination";
-import { Box, Chip, InputAdornment, Stack, TextField, Typography, Container } from "@mui/material";
+import { Box, IconButton, InputAdornment, Stack, TextField, Typography, Container } from "@mui/material";
 
 const ArticlePage = () => {
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [searchValue, setSearchValue] = useState("");
 
+    const categoryListRef = useRef<HTMLDivElement>(null);
+
+    const { data: categories = [] } = useGetAllCategoryQuery();
     const { data: articleData } = useGetArticlesByPageNoAuthenQuery({
         page: page,
         size: PAGE_SIZE,
+        searchValue,
     });
 
     const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
     const articles = articleData?.Items || [];
 
-    const categories = ["Tất cả", "Tuyển sinh", "Ngành học", "Hướng nghiệp"];
+    const scrollCategory = (direction: "left" | "right") => {
+        if (!categoryListRef.current) return;
+
+        const scrollAmount = 300;
+        categoryListRef.current.scrollBy({
+            left: direction === "left" ? -scrollAmount : scrollAmount,
+            behavior: "smooth",
+        });
+    };
 
     return (
         <Box
@@ -35,8 +49,8 @@ const ArticlePage = () => {
                     mb={4}
                     sx={{
                         textAlign: "center",
-                        py: 3,
-                        background: "linear-gradient(135deg, #ff5722 0%, #ff5722 100%)",
+                        py: 2,
+                        background: "linear-gradient(135deg, #e08d73 0%, #f85a29 50%)",
                         borderRadius: 2,
                         color: "white",
                     }}
@@ -60,58 +74,152 @@ const ArticlePage = () => {
                     </Typography>
                 </Box>
 
-                {/* SEARCH + FILTER */}
+                {/* SEARCH + CATEGORY FILTER */}
                 <Stack
                     direction={{ xs: "column", md: "row" }}
                     spacing={2}
                     mb={3}
-                    alignItems={{ md: "center" }}
-                    justifyContent="space-between"
+                    alignItems={{ xs: "stretch", md: "center" }}
                 >
+                    {/* SEARCH */}
                     <TextField
                         size="small"
-                        sx={{
-                            flex: 1,
-                            maxWidth: { md: 450 },
-                            backgroundColor: "white",
-                            borderRadius: 2,
-                            "& .MuiOutlinedInput-root": {
-                                borderRadius: 2,
-                            }
-                        }}
                         placeholder="Tìm kiếm bài viết..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                setPage(1); // reset page
+                                setSearchValue(searchQuery.trim());
+                            }
+                        }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <Search sx={{ fontSize: 20 }} />
+                                    <Search
+                                        sx={{ cursor: "pointer" }}
+                                        onClick={() => {
+                                            setPage(1);
+                                            setSearchValue(searchQuery.trim());
+                                        }}
+                                    />
                                 </InputAdornment>
                             ),
                         }}
                     />
 
-                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                        {categories.map((category) => (
-                            <Chip
-                                key={category}
-                                label={category}
-                                size="small"
-                                color={selectedCategory === category ? "primary" : "default"}
-                                onClick={() => setSelectedCategory(category)}
+                    {/* CATEGORY FILTER */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            flex: 1,
+                            overflow: "hidden",
+                        }}
+                    >
+                        {/* Arrow Left */}
+                        <IconButton
+                            onClick={() => scrollCategory("left")}
+                            sx={{
+                                border: "1px solid #ddd",
+                                borderRadius: 10,
+                                bgcolor: "white",
+                            }}
+                        >
+                            <ChevronLeft />
+                        </IconButton>
+
+                        {/* Category list */}
+                        <Box
+                            ref={categoryListRef}
+                            sx={{
+                                display: "flex",
+                                gap: 1,
+                                overflowX: "auto",
+                                scrollBehavior: "smooth",
+                                "&::-webkit-scrollbar": {
+                                    display: "none",
+                                },
+                                msOverflowStyle: "none",
+                                scrollbarWidth: "none",
+                                flex: 1,
+                            }}
+                        >
+                            {/* Tất cả option */}
+                            <Box
                                 sx={{
-                                    fontWeight: selectedCategory === category ? 600 : 500,
-                                    fontSize: "0.8rem",
-                                    height: 28,
-                                    transition: "all 0.2s ease",
+                                    px: 2,
+                                    py: 1,
+                                    border: "1px solid #ddd",
+                                    borderRadius: 20,
+                                    cursor: "pointer",
+                                    fontSize: 14,
+                                    whiteSpace: "nowrap",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                    flexShrink: 0,
+                                    bgcolor: selectedCategory === null ? "#ff5722" : "white",
+                                    color: selectedCategory === null ? "white" : "inherit",
+                                    borderColor: selectedCategory === null ? "#ff5722" : "#ddd",
+                                    transition: "all 0.2s",
                                     "&:hover": {
-                                        transform: "translateY(-1px)",
-                                        boxShadow: 1,
-                                    }
+                                        backgroundColor: "#ff5722",
+                                        color: "white",
+                                        borderColor: "#ff5722",
+                                    },
                                 }}
-                            />
-                        ))}
-                    </Stack>
+                                onClick={() => setSelectedCategory(null)}
+                            >
+                                Tất cả
+                            </Box>
+
+                            {/* Categories from API */}
+                            {categories.map((category) => (
+                                <Box
+                                    key={category.Id}
+                                    sx={{
+                                        px: 2,
+                                        py: 1,
+                                        border: "1px solid #ddd",
+                                        borderRadius: 20,
+                                        cursor: "pointer",
+                                        fontSize: 14,
+                                        whiteSpace: "nowrap",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 0.5,
+                                        flexShrink: 0,
+                                        bgcolor: selectedCategory === category.Id ? "#ff5722" : "white",
+                                        color: selectedCategory === category.Id ? "white" : "inherit",
+                                        borderColor: selectedCategory === category.Id ? "#ff5722" : "#ddd",
+                                        transition: "all 0.2s",
+                                        "&:hover": {
+                                            backgroundColor: "#ff5722",
+                                            color: "white",
+                                            borderColor: "#ff5722",
+                                        },
+                                    }}
+                                    onClick={() => setSelectedCategory(category.Id)}
+                                >
+                                    {category.Name}
+                                </Box>
+                            ))}
+                        </Box>
+
+                        {/* Arrow Right */}
+                        <IconButton
+                            onClick={() => scrollCategory("right")}
+                            sx={{
+                                border: "1px solid #ddd",
+                                borderRadius: 10,
+                                bgcolor: "white",
+                            }}
+                        >
+                            <ChevronRight />
+                        </IconButton>
+                    </Box>
                 </Stack>
 
                 {/* ARTICLE COUNT */}

@@ -1,28 +1,33 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetRecruitmentPostBySeoQuery } from "../../../app/features/recruitment-post.api";
-import { 
-    LocationOn, 
-    Category, 
-    BookmarkBorder, 
-    Share, 
+import { useGetRecruitmentPostBySeoQuery, useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
+import {
+    LocationOn,
+    Category,
+    BookmarkBorder,
+    Share,
     AccessTime,
     Work,
     AttachMoney,
     School,
     Cake,
-    Wc
+    Wc,
+    Business,
+    CheckCircle
 } from "@mui/icons-material";
-import { 
-    Box, 
-    Typography, 
-    Button, 
-    Stack, 
-    Card, 
-    CardContent, 
-    Chip, 
-    Divider
+import {
+    Box,
+    Typography,
+    Button,
+    Stack,
+    Card,
+    CardContent,
+    Chip,
+    Divider,
+    Container,
+    Avatar,
+    Grid,
+    Paper
 } from "@mui/material";
-import OrganizationSelectActionCard from "../../../components/cards/organization-card.card";
 
 const RecruitmentPostDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
@@ -33,26 +38,43 @@ const RecruitmentPostDetailPage = () => {
             skip: !seoUrl,
         });
 
+    // Lấy các tin tuyển dụng cùng ngành
+    const { data: relatedPosts, isLoading: isLoadingRelated } =
+        useGetRecruitmentPostsByPageQuery({
+            page: 1,
+            size: 6,
+        });
+
     if (isLoading) {
         return (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography>Đang tải thông tin...</Typography>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '60vh'
+            }}>
+                <Typography variant="h6" color="text.secondary">
+                    Đang tải thông tin...
+                </Typography>
             </Box>
         );
     }
 
     if (error || !recruitmentPost) {
         return (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="error">Không tìm thấy thông tin tin tuyển dụng</Typography>
+            <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
+                <Typography variant="h5" color="error" gutterBottom>
+                    Không tìm thấy thông tin tin tuyển sinh
+                </Typography>
                 <Button
                     variant="contained"
-                    sx={{ mt: 2 }}
+                    size="large"
+                    sx={{ mt: 3 }}
                     onClick={() => navigate('/')}
                 >
                     Quay về trang chủ
                 </Button>
-            </Box>
+            </Container>
         );
     }
 
@@ -77,8 +99,9 @@ const RecruitmentPostDetailPage = () => {
     const getExperienceLabel = (exp: string) => {
         const labels: Record<string, string> = {
             'LessThan1Year': 'Dưới 1 năm',
-            '1-3Years': '1-3 năm',
-            '3-5Years': '3-5 năm',
+            'From1To2Years': '1-2 năm',
+            'From2To3Years': '2-3 năm',
+            'From3To5Years': '3-5 năm',
             'MoreThan5Years': 'Trên 5 năm'
         };
         return labels[exp] || exp;
@@ -87,7 +110,7 @@ const RecruitmentPostDetailPage = () => {
     const getEducationLabel = (edu: string) => {
         const labels: Record<string, string> = {
             'PrimarySchool': 'Tiểu học',
-            'SecondarySchool': 'Trung học cơ sở',
+            'MiddleSchool': 'Trung học cơ sở',
             'HighSchool': 'Trung học phổ thông',
             'College': 'Cao đẳng',
             'University': 'Đại học',
@@ -107,259 +130,571 @@ const RecruitmentPostDetailPage = () => {
     };
 
     return (
-        <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', pb: 4 }}>
-            <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: "auto" }}>
-                <Stack spacing={3}>
-                    {/* Header Card */}
-                    <Card elevation={2}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-                                <Box sx={{ flex: 1, minWidth: 250 }}>
-                                    <Typography variant="h4" fontWeight={700} color="primary.main" gutterBottom>
-                                        {recruitmentPost.Name}
-                                    </Typography>
-                                    
-                                    <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap', gap: 1 }}>
-                                        {recruitmentPost.IsTop && (
-                                            <Chip
-                                                label="Tin tuyển dụng nổi bật"
-                                                color="error"
-                                                size="small"
-                                            />
-                                        )}
-                                        <Chip
-                                            label={recruitmentPost.Status}
-                                            color="success"
-                                            size="small"
-                                        />
-                                    </Stack>
-                                </Box>
-
-                                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                                    <Button
-                                        variant="outlined"
-                                        size="medium"
-                                        startIcon={<BookmarkBorder />}
-                                        sx={{ textTransform: 'none' }}
-                                    >
-                                        Lưu tin
-                                    </Button>
-
-                                    <Button
-                                        variant="outlined"
-                                        size="medium"
-                                        startIcon={<Share />}
-                                        onClick={handleShare}
-                                        sx={{ textTransform: 'none' }}
-                                    >
-                                        Chia sẻ
-                                    </Button>
-                                </Stack>
-                            </Box>
-
-                            <Box sx={{ 
-                                display: 'grid', 
-                                gridTemplateColumns: { 
-                                    xs: '1fr', 
-                                    sm: 'repeat(2, 1fr)', 
-                                    md: 'repeat(4, 1fr)' 
-                                }, 
-                                gap: 2 
-                            }}>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <LocationOn fontSize="small" color="primary" />
-                                    <Typography variant="body2">
-                                        {recruitmentPost.Province || 'Chưa cập nhật'}
-                                    </Typography>
-                                </Stack>
-
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <Work fontSize="small" color="primary" />
-                                    <Typography variant="body2">
-                                        SL: {recruitmentPost.Quantity} người
-                                    </Typography>
-                                </Stack>
-
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <AttachMoney fontSize="small" color="primary" />
-                                    <Typography variant="body2">
-                                        {recruitmentPost.Currency}
-                                    </Typography>
-                                </Stack>
-
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <AccessTime fontSize="small" color="primary" />
-                                    <Typography variant="body2">
-                                        Hạn: {formatDate(recruitmentPost.RecruitmentToDate)}
-                                    </Typography>
-                                </Stack>
-                            </Box>
-                        </CardContent>
-                    </Card>
-
-                    {/* Organization Info */}
-                    {recruitmentPost.Organization && (
-                        <Card elevation={2}>
-                            <CardContent sx={{ p: 3 }}>
-                                <Typography variant="h6" fontWeight={600} gutterBottom>
-                                    Thông tin tổ chức
-                                </Typography>
-                                <Divider sx={{ mb: 2 }} />
-                                
-                                <Stack spacing={2}>
-                                    <Typography variant="subtitle1" fontWeight={600}>
-                                        {recruitmentPost.Organization.Name}
-                                    </Typography>
-                                    
-                                    <Box sx={{ 
-                                        display: 'grid', 
-                                        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, 
-                                        gap: 2 
-                                    }}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Mã số thuế: {recruitmentPost.Organization.TaxCode}
-                                        </Typography>
-                                        
-                                        <Typography variant="body2" color="text.secondary">
-                                            Địa chỉ: {recruitmentPost.Organization.Address}
-                                        </Typography>
-                                    </Box>
-                                    
-                                    {recruitmentPost.Organization.Summary && (
-                                        <Typography variant="body2">
-                                            {recruitmentPost.Organization.Summary}
-                                        </Typography>
-                                    )}
-                                </Stack>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Job Description */}
-                    <Card elevation={2}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" fontWeight={600} gutterBottom>
-                                Mô tả công việc
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            <Box 
-                                dangerouslySetInnerHTML={{ __html: recruitmentPost.Description }}
+        <Box sx={{ bgcolor: '#f5f7fa', minHeight: '100vh', pb: 3 }}>
+            {/* Hero Section */}
+            <Box sx={{
+                bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #fc7248 50%, #ff9800 100%)',
+                py: 4,
+                mb: 1,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}>
+                <Container maxWidth="lg">
+                    <Stack spacing={2}>
+                        <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                            {recruitmentPost.IsTop && (
+                                <Chip
+                                    icon={<CheckCircle sx={{ fontSize: 16 }} />}
+                                    label="Tin tuyển sinh nổi bật"
+                                    sx={{
+                                        bgcolor: 'rgba(255,255,255,0.25)',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        backdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(255,255,255,0.3)',
+                                        '& .MuiChip-icon': {
+                                            color: '#4a8abe'
+                                        }
+                                    }}
+                                />
+                            )}
+                            <Chip
+                                label={recruitmentPost.Status === 'Activated' ? 'Đang tuyển' : recruitmentPost.Status}
                                 sx={{
-                                    '& p': { mb: 1 },
-                                    '& ul, & ol': { pl: 3 },
+                                    bgcolor: 'rgba(47, 153, 51, 0.9)',
+                                    color: 'white',
+                                    fontWeight: 600
                                 }}
                             />
-                        </CardContent>
-                    </Card>
+                        </Stack>
 
-                    {/* Requirements */}
-                    {recruitmentPost.Requirement && (
-                        <Card elevation={2}>
-                            <CardContent sx={{ p: 3 }}>
-                                <Typography variant="h6" fontWeight={600} gutterBottom>
-                                    Yêu cầu ứng viên
+                        <Typography
+                            variant="h3"
+                            fontWeight={700}
+                            color="white"
+                            sx={{
+                                fontSize: { xs: '1.25rem', md: '2rem' },
+                                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }}
+                        >
+                            {recruitmentPost.Name}
+                        </Typography>
+
+                        {/* Quick Info with Salary */}
+                        <Stack
+                            direction={{ xs: 'column', sm: 'row' }}
+                            spacing={2}
+                            flexWrap="wrap"
+                            sx={{ mt: 2 }}
+                        >
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <LocationOn sx={{ color: 'white', fontSize: 20 }} />
+                                <Typography variant="body1" color="white" fontWeight={500}>
+                                    {recruitmentPost.Province || 'Chưa cập nhật'}
                                 </Typography>
-                                <Divider sx={{ mb: 2 }} />
-                                
-                                <Box sx={{ 
-                                    display: 'grid', 
-                                    gridTemplateColumns: { 
-                                        xs: '1fr', 
-                                        sm: 'repeat(2, 1fr)', 
-                                        md: 'repeat(4, 1fr)' 
-                                    }, 
-                                    gap: 3 
-                                }}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Cake fontSize="small" color="action" />
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary" display="block">
-                                                Độ tuổi
-                                            </Typography>
-                                            <Typography variant="body2" fontWeight={500}>
-                                                {recruitmentPost.Requirement.FromAge} - {recruitmentPost.Requirement.ToAge} tuổi
-                                            </Typography>
-                                        </Box>
-                                    </Stack>
+                            </Stack>
 
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Wc fontSize="small" color="action" />
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary" display="block">
-                                                Giới tính
-                                            </Typography>
-                                            <Typography variant="body2" fontWeight={500}>
-                                                {getGenderLabel(recruitmentPost.Requirement.Gender)}
-                                            </Typography>
-                                        </Box>
-                                    </Stack>
-
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Work fontSize="small" color="action" />
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary" display="block">
-                                                Kinh nghiệm
-                                            </Typography>
-                                            <Typography variant="body2" fontWeight={500}>
-                                                {getExperienceLabel(recruitmentPost.Requirement.Experience)}
-                                            </Typography>
-                                        </Box>
-                                    </Stack>
-
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <School fontSize="small" color="action" />
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary" display="block">
-                                                Trình độ
-                                            </Typography>
-                                            <Typography variant="body2" fontWeight={500}>
-                                                {getEducationLabel(recruitmentPost.Requirement.EducationLevel)}
-                                            </Typography>
-                                        </Box>
-                                    </Stack>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Professions */}
-                    {recruitmentPost.Professions && recruitmentPost.Professions.length > 0 && (
-                        <Card elevation={2}>
-                            <CardContent sx={{ p: 3 }}>
-                                <Typography variant="h6" fontWeight={600} gutterBottom>
-                                    Ngành nghề liên quan ({recruitmentPost.Professions.length})
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <Work sx={{ color: 'white', fontSize: 20 }} />
+                                <Typography variant="body1" color="white" fontWeight={500}>
+                                    {recruitmentPost.Quantity} vị trí
                                 </Typography>
-                                <Divider sx={{ mb: 2 }} />
-                                
-                                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                                    {recruitmentPost.Professions.map((profession) => (
-                                        <Chip
-                                            key={profession.Id}
-                                            label={profession.Name}
-                                            variant="outlined"
-                                            color="primary"
-                                            icon={<Category />}
-                                        />
-                                    ))}
-                                </Stack>
-                            </CardContent>
-                        </Card>
-                    )}
+                            </Stack>
 
-                    {/* Related Organizations */}
-                    <Card elevation={2}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" fontWeight={600} gutterBottom>
-                                Tổ chức liên quan
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            <OrganizationSelectActionCard 
-                                organizations={recruitmentPost.Organization ? [recruitmentPost.Organization] : []} 
-                            />
-                        </CardContent>
-                    </Card>
-                </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <AttachMoney sx={{ color: 'white', fontSize: 20 }} />
+                                <Typography variant="body1" color="white" fontWeight={500}>
+                                    {(recruitmentPost.Currency)}
+                                </Typography>
+                            </Stack>
+
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <AccessTime sx={{ color: 'white', fontSize: 20 }} />
+                                <Typography variant="body1" color="white" fontWeight={500}>
+                                    Hạn nộp: {formatDate(recruitmentPost.RecruitmentToDate)}
+                                </Typography>
+                            </Stack>
+                        </Stack>
+                    </Stack>
+                </Container>
             </Box>
+
+            <Container maxWidth="lg">
+                <Grid container spacing={1}>
+                    {/* Main Content */}
+                    <Grid size={{ xs: 12, md: 8 }}>
+                        <Stack spacing={3}>
+                            {/* Job Description */}
+                            <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid #e0e0e0' }}>
+                                <CardContent sx={{ p: 3 }}>
+                                    <Typography variant="h5" fontWeight={700} gutterBottom color="primary.main">
+                                        Mô tả chi tiết
+                                    </Typography>
+                                    <Divider sx={{ mb: 3 }} />
+
+                                    <Box
+                                        dangerouslySetInnerHTML={{ __html: recruitmentPost.Description }}
+                                        sx={{
+                                            '& p': { mb: 2, lineHeight: 1.8, color: 'text.secondary' },
+                                            '& ul, & ol': { pl: 3, mb: 2 },
+                                            '& li': { mb: 1, lineHeight: 1.8 },
+                                            '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 }
+                                        }}
+                                    />
+
+                                    {/* ACTION BUTTONS */}
+                                    <Divider sx={{ my: 4 }} />
+
+                                    <Stack
+                                        direction={{ xs: 'column', sm: 'row' }}
+                                        spacing={2}
+                                        justifyContent="left"
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            size="large"
+                                            sx={{
+                                                bgcolor: '#ff5722',
+                                                fontWeight: 600,
+                                                px: 4,
+                                                '&:hover': {
+                                                    bgcolor: '#e64a19',
+                                                    transform: 'translateY(-2px)',
+                                                },
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                        >
+                                            Ứng tuyển ngay
+                                        </Button>
+
+                                        <Button
+                                            variant="outlined"
+                                            size="large"
+                                            startIcon={<BookmarkBorder />}
+                                            sx={{
+                                                borderColor: '#ff5722',
+                                                color: '#ff5722',
+                                                fontWeight: 600,
+                                                px: 3,
+                                                '&:hover': {
+                                                    bgcolor: '#ff5722',
+                                                    color: 'white'
+                                                }
+                                            }}
+                                        >
+                                            Lưu tin
+                                        </Button>
+
+                                        <Button
+                                            variant="outlined"
+                                            size="large"
+                                            startIcon={<Share />}
+                                            onClick={handleShare}
+                                            sx={{
+                                                borderColor: '#ff5722',
+                                                color: '#ff5722',
+                                                fontWeight: 600,
+                                                px: 3,
+                                                '&:hover': {
+                                                    bgcolor: '#ff5722',
+                                                    color: 'white'
+                                                }
+                                            }}
+                                        >
+                                            Chia sẻ
+                                        </Button>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        </Stack>
+                    </Grid>
+
+                    {/* Sidebar */}
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Box
+                            sx={{
+                                position: 'sticky',
+                            }}
+                        >
+                            <Stack spacing={1}>
+                                {/* Organization Info */}
+                                {recruitmentPost.Organization && (
+                                    <Card
+                                        elevation={0}
+                                        sx={{
+                                            borderRadius: 2,
+                                            border: '1px solid #e0e0e0'
+                                        }}
+                                    >
+                                        <CardContent sx={{ p: 2 }}>
+                                            <Stack spacing={1}>
+                                                <Box sx={{ textAlign: 'center' }}>
+                                                    <Avatar
+                                                        src={recruitmentPost.Organization.LogoFullUrl || undefined}
+                                                        sx={{
+                                                            width: 80,
+                                                            height: 80,
+                                                            mx: 'auto',
+                                                            mb: 1,
+                                                            bgcolor: '#ff5722',
+                                                            fontSize: '2rem',
+                                                            fontWeight: 700
+                                                        }}
+                                                    >
+                                                        {recruitmentPost.Organization.Name.charAt(0)}
+                                                    </Avatar>
+                                                    <Typography variant="h6" fontWeight={700} gutterBottom>
+                                                        {recruitmentPost.Organization.Name}
+                                                    </Typography>
+                                                </Box>
+
+                                                <Divider />
+
+                                                <Stack spacing={2}>
+                                                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                                                        <Business sx={{ color: 'text.secondary', fontSize: 20, mt: 0.3 }} />
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" display="block">
+                                                                Mã số thuế
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={500}>
+                                                                {recruitmentPost.Organization.TaxCode}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+
+                                                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                                                        <LocationOn sx={{ color: 'text.secondary', fontSize: 20, mt: 0.3 }} />
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" display="block">
+                                                                Địa chỉ
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={500}>
+                                                                {recruitmentPost.Organization.Address}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+
+                                                    {recruitmentPost.Organization.Summary && (
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                                                                Giới thiệu
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 5,
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis'
+                                                                }}
+                                                            >
+                                                                {recruitmentPost.Organization.Summary}
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                </Stack>
+
+                                                <Button
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    sx={{
+                                                        mt: 2,
+                                                        borderColor: '#ff5722',
+                                                        color: '#ff5722',
+                                                        fontWeight: 600,
+                                                        '&:hover': {
+                                                            borderColor: '#ff5722',
+                                                            bgcolor: '#ff5722',
+                                                            color: 'white'
+                                                        }
+                                                    }}
+                                                >
+                                                    Xem trang tổ chức
+                                                </Button>
+                                            </Stack>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {/* Requirements */}
+                                {recruitmentPost.Requirement && (
+                                    <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid #e0e0e0' }}>
+                                        <CardContent sx={{ p: 1 }}>
+                                            <Typography variant="h6" fontWeight={700} gutterBottom color="primary.main">
+                                                Yêu cầu ứng viên
+                                            </Typography>
+                                            <Divider sx={{ mb: 2 }} />
+
+                                            <Stack spacing={2}>
+                                                <Paper
+                                                    elevation={0}
+                                                    sx={{
+                                                        p: 2,
+                                                        bgcolor: '#f8f9fa',
+                                                        borderRadius: 2,
+                                                        border: '1px solid #e9ecef'
+                                                    }}
+                                                >
+                                                    <Stack direction="row" spacing={1.5} alignItems="center">
+                                                        <Avatar sx={{ bgcolor: '#ff5722', width: 40, height: 40 }}>
+                                                            <Cake sx={{ fontSize: 20 }} />
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                                                                Độ tuổi
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={600} color="text.primary">
+                                                                {recruitmentPost.Requirement.FromAge} - {recruitmentPost.Requirement.ToAge} tuổi
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+                                                </Paper>
+
+                                                <Paper
+                                                    elevation={0}
+                                                    sx={{
+                                                        p: 2,
+                                                        bgcolor: '#f8f9fa',
+                                                        borderRadius: 2,
+                                                        border: '1px solid #e9ecef'
+                                                    }}
+                                                >
+                                                    <Stack direction="row" spacing={1.5} alignItems="center">
+                                                        <Avatar sx={{ bgcolor: '#2196f3', width: 40, height: 40 }}>
+                                                            <Wc sx={{ fontSize: 20 }} />
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                                                                Giới tính
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={600} color="text.primary">
+                                                                {getGenderLabel(recruitmentPost.Requirement.Gender)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+                                                </Paper>
+
+                                                <Paper
+                                                    elevation={0}
+                                                    sx={{
+                                                        p: 2,
+                                                        bgcolor: '#f8f9fa',
+                                                        borderRadius: 2,
+                                                        border: '1px solid #e9ecef'
+                                                    }}
+                                                >
+                                                    <Stack direction="row" spacing={1.5} alignItems="center">
+                                                        <Avatar sx={{ bgcolor: '#4caf50', width: 40, height: 40 }}>
+                                                            <Work sx={{ fontSize: 20 }} />
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                                                                Kinh nghiệm
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={600} color="text.primary">
+                                                                {getExperienceLabel(recruitmentPost.Requirement.Experience)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+                                                </Paper>
+
+                                                <Paper
+                                                    elevation={0}
+                                                    sx={{
+                                                        p: 2,
+                                                        bgcolor: '#f8f9fa',
+                                                        borderRadius: 2,
+                                                        border: '1px solid #e9ecef'
+                                                    }}
+                                                >
+                                                    <Stack direction="row" spacing={1.5} alignItems="center">
+                                                        <Avatar sx={{ bgcolor: '#9c27b0', width: 40, height: 40 }}>
+                                                            <School sx={{ fontSize: 20 }} />
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                                                                Trình độ học vấn
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={600} color="text.primary">
+                                                                {getEducationLabel(recruitmentPost.Requirement.EducationLevel)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+                                                </Paper>
+                                            </Stack>
+                                        </CardContent>
+                                    </Card>
+                                )}
+                            </Stack>
+                        </Box>
+                    </Grid>
+                </Grid>
+
+                {/* Related Jobs Section */}
+                {relatedPosts && relatedPosts.Items && relatedPosts.Items.length > 0 && (
+                    <Box sx={{ mt: 6 }}>
+                        <Typography variant="h5" fontWeight={700} gutterBottom color="primary.main">
+                            Tin tuyển sinh khác
+                        </Typography>
+
+                        <Stack spacing={1}>
+                            {relatedPosts.Items
+                                .filter(post => post.Id !== recruitmentPost.Id)
+                                .slice(0, 6)
+                                .map((post) => (
+                                    <Card
+                                        key={post.Id}
+                                        elevation={0}
+                                        sx={{
+                                            borderRadius: 2,
+                                            border: '1px solid #e0e0e0',
+                                            transition: 'all 0.3s ease',
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                                transform: 'translateX(4px)',
+                                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                                borderColor: '#ff5722'
+                                            }
+                                        }}
+                                        onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                                    >
+                                        <CardContent sx={{
+                                            p: 0,
+                                            '&:last-child': {
+                                                pb: 0
+                                            }
+                                        }}>
+                                            <Grid container>
+                                                {/* Left Side - Organization Logo */}
+                                                <Grid
+                                                    size={{ xs: 12, sm: 3, md: 2 }}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        bgcolor: '#f8f9fa',
+                                                        borderRight: { xs: 'none', sm: '1px solid #e0e0e0' },
+                                                        borderBottom: { xs: '1px solid #e0e0e0', sm: 'none' }
+                                                    }}
+                                                >
+                                                    <Avatar
+                                                        src={post.Organization?.LogoFullUrl || undefined}
+                                                        sx={{
+                                                            width: { xs: 60, sm: 70 },
+                                                            height: { xs: 60, sm: 70 },
+                                                            bgcolor: '#ff5722',
+                                                            fontSize: '1.5rem',
+                                                            fontWeight: 700
+                                                        }}
+                                                    >
+                                                        {post.Organization?.Name?.charAt(0) || 'C'}
+                                                    </Avatar>
+                                                </Grid>
+
+                                                {/* Right Side - Job Information */}
+                                                <Grid size={{ xs: 12, sm: 9, md: 10 }}>
+                                                    <Box sx={{ p: 1 }}>
+                                                        <Stack spacing={2}>
+                                                            {/* Title and Organization */}
+                                                            <Box>
+                                                                <Typography
+                                                                    variant="h6"
+                                                                    fontWeight={700}
+                                                                    sx={{
+                                                                        display: '-webkit-box',
+                                                                        WebkitLineClamp: 2,
+                                                                        WebkitBoxOrient: 'vertical',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        color: 'text.primary',
+                                                                        '&:hover': {
+                                                                            color: '#ff5722'
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {post.Name}
+                                                                </Typography>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    color="text.secondary"
+                                                                    sx={{
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                >
+                                                                    {post.Organization?.Name}
+                                                                </Typography>
+                                                            </Box>
+
+                                                            {/* Job Details in Row */}
+                                                            <Stack
+                                                                direction={{ xs: 'column', sm: 'row' }}
+                                                                spacing={{ xs: 1.5, sm: 3 }}
+                                                                flexWrap="wrap"
+                                                            >
+                                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                                    <AttachMoney sx={{ color: '#4caf50', fontSize: 20 }} />
+                                                                    <Typography variant="body2" fontWeight={600} color="#4caf50">
+                                                                        {post.Currency}
+                                                                    </Typography>
+                                                                </Stack>
+
+                                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                                    <LocationOn sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        {post.Province || 'Chưa cập nhật'}
+                                                                    </Typography>
+                                                                </Stack>
+
+                                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                                    <Work sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        {post.Quantity} vị trí
+                                                                    </Typography>
+                                                                </Stack>
+
+                                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                                    <AccessTime sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        {formatDate(post.RecruitmentToDate)}
+                                                                    </Typography>
+                                                                </Stack>
+                                                            </Stack>
+
+                                                            {/* Professions Tags */}
+                                                            {post.Professions && post.Professions.length > 0 && (
+                                                                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                                                                    {post.Professions.slice(0, 3).map((profession) => (
+                                                                        <Chip
+                                                                            key={profession.Id}
+                                                                            label={profession.Name}
+                                                                            size="small"
+                                                                            sx={{
+                                                                                bgcolor: '#fff3e0',
+                                                                                color: '#ff5722',
+                                                                                border: '1px solid #ffe0b2',
+                                                                                fontWeight: 500,
+                                                                                fontSize: '0.75rem'
+                                                                            }}
+                                                                        />
+                                                                    ))}
+                                                                </Stack>
+                                                            )}
+                                                        </Stack>
+                                                    </Box>
+                                                </Grid>
+                                            </Grid>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                        </Stack>
+                    </Box>
+                )}
+            </Container>
         </Box>
     );
 }

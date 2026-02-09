@@ -4,12 +4,15 @@ import {
   Card,
   Typography,
   IconButton,
-  Popover
+  Popover,
+  Button,
+  Stack
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import DefaultImage from "../../assets/default_organization_card.jpg"
+import { BookmarkBorder, Send } from "@mui/icons-material";
 
 interface Props {
   recruitmentPosts: RecruitmentPostResponse[];
@@ -33,6 +36,11 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
   const handleClose = () => {
     setAnchorEl(null);
     setSelectedOrg(null);
+  };
+
+  const handleGoDetail = (seoUrl: string) => {
+    navigate(`/tin-tuyen-sinh/${seoUrl}`);
+    handleClose();
   };
 
   return (
@@ -131,7 +139,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
         disableRestoreFocus
-        sx={{ pointerEvents: "none" }}
+        sx={{ pointerEvents: "none"}}
       >
         {selectedOrg && (
           <Box sx={{ p: 2, maxWidth: 320 }}>
@@ -158,7 +166,43 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
             <Typography variant="body2">
               <b>Tuyển đến ngày:</b> {selectedOrg.RecruitmentToDate}
             </Typography>
+            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                size="small"
+                startIcon={<Send />}
+                sx={{
+                  bgcolor: "#ff5722",
+                  fontWeight: 600,
+                  "&:hover": { bgcolor: "#e64a19" }
+                }}
+                onClick={() => handleGoDetail(selectedOrg.SeoUrl)}
+              >
+                Ứng tuyển
+              </Button>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                size="small"
+                startIcon={<BookmarkBorder />}
+                sx={{
+                  borderColor: "#ff5722",
+                  color: "#ff5722",
+                  fontWeight: 600,
+                  "&:hover": {
+                    bgcolor: "#ff5722",
+                    color: "#fff"
+                  }
+                }}
+                onClick={() => handleGoDetail(selectedOrg.SeoUrl)}
+              >
+                Yêu thích
+              </Button>
+            </Stack>
           </Box>
+
         )}
       </Popover>
     </>

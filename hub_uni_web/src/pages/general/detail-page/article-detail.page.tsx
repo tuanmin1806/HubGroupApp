@@ -108,7 +108,7 @@ const ArticleDetailPage = () => {
                     </Typography>
                 </Breadcrumbs>
 
-                <Grid container spacing={3}>
+                <Grid container spacing={1}>
                     {/* Main Content */}
                     <Grid size={{ xs: 12, md: 8 }}>
                         <Paper
@@ -338,7 +338,7 @@ const ArticleDetailPage = () => {
 
                     {/* Sidebar */}
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Stack spacing={3}>
+                        <Stack spacing={1}>
                             {/* Newest Articles */}
                             {NewestArticles && NewestArticles.length > 0 && (
                                 <Paper

@@ -21,7 +21,7 @@ const OrganizationPagination = ({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 2,
-                mt: 3,
+                mt: 1,
             }}
         >
             <IconButton

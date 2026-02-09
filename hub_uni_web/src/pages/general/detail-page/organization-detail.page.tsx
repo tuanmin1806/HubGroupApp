@@ -89,20 +89,24 @@ const OrganizationDetailPage = () => {
         <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh' }}>
             {/* Wallpaper/Banner */}
             {organization.WallpaperFullUrl && (
-                <Box
-                    sx={{
-                        width: "100%",
-                        height: { xs: 220, md: 320 },
-                        backgroundImage: `url(${organization.WallpaperFullUrl})`,
-                        backgroundSize: "contain",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                        borderRadius: { md: 2 },
-                    }}
-                />
+                 <Box sx={{ p: { xs: 1, md: 1 }, maxWidth: 1200, mx: "auto" }}>
+                    <Box
+                        sx={{
+                            maxWidth: 1200,
+                            mx: 'auto',
+                            height: { xs: 200, md: 300 },
+                            backgroundImage: `url(${organization.WallpaperFullUrl})`,
+                            backgroundSize: 'contain',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                            borderRadius: 2,
+                            boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
+                        }}
+                    />
+                </Box>
             )}
 
-            <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: "auto" }}>
+            <Box sx={{ p: { xs: 1, md: 1 }, maxWidth: 1200, mx: "auto" }}>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                     {/* LEFT COLUMN */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -498,27 +502,6 @@ const OrganizationDetailPage = () => {
                                     </Stack>
                                 </CardContent>
                             </Card>
-
-                            {/* Keywords/Tags */}
-                            {organization.Keywords && (
-                                <Card>
-                                    <CardContent>
-                                        <Typography fontWeight={600} gutterBottom>
-                                            Từ khóa liên quan
-                                        </Typography>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
-                                            {organization.Keywords.split(',').map((keyword, index) => (
-                                                <Chip
-                                                    key={index}
-                                                    label={keyword.trim()}
-                                                    size="small"
-                                                    variant="outlined"
-                                                />
-                                            ))}
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            )}
 
                             {/* Main Profession */}
                             {organization.MainProfessionId && organization.MainProfession && (
