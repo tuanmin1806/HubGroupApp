@@ -8,7 +8,6 @@ import {
   Button,
   Stack
 } from "@mui/material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import DefaultImage from "../../assets/default_organization_card.jpg"
@@ -79,7 +78,9 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 mr: 2,
                 borderRadius: 1,
                 bgcolor: "#fafafa",
+                cursor: "pointer"
               }}
+              onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
             />
 
             {/* RIGHT: CONTENT */}
@@ -91,6 +92,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 sx={{ cursor: "pointer", width: "fit-content" }}
                 onMouseEnter={(e) => handleOpen(e, rcp)}
                 onMouseLeave={handleClose}
+                onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
               >
                 {rcp.Name}
               </Typography>
@@ -117,14 +119,6 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 <Typography variant="body2" color="primary">
                   {rcp.Organization.Name}
                 </Typography>
-
-                {/* DETAIL ICON */}
-                <IconButton
-                  size="small"
-                  onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
-                >
-                  <InfoOutlinedIcon />
-                </IconButton>
               </Box>
             </Box>
           </Card>
