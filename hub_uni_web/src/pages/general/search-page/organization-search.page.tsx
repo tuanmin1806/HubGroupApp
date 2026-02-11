@@ -1,12 +1,16 @@
 import { ThemeProvider } from "@emotion/react";
-import { createTheme, Box, TextField, Button, Card, CardContent, Typography, FormControl, InputLabel, Select, MenuItem, Chip } from "@mui/material";
+import { createTheme, Box, TextField, Button, Card, CardContent, Typography, FormControl, Chip, CircularProgress, FormLabel, RadioGroup, FormControlLabel, Radio, Divider, Stack, Paper } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useOrganizationsFullTextSearchQuery } from "../../../app/features/organization.api";
 import OrganizationPagination from "../../../components/pagination/organization-pagination";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import { Apartment, Category, Code, FilterAltOff, LocationCity, LocationOn, Numbers, Place, School } from "@mui/icons-material";
+import { Apartment, Category, Code, LocationCity, LocationOn, Numbers, Place, School, Clear, FilterList } from "@mui/icons-material";
 import SearchBar from "../../../components/searchs/search-bar.search";
+import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
+import { useGetOrganizationTypesByPageQuery } from "../../../app/features/organization-type.api";
+import { useOrganizationsFullTextSearchQuery } from "../../../app/features/organization.api";
+import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
+import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
 
 const theme = createTheme({
     palette: {
@@ -39,6 +43,8 @@ export interface OrganizationFilterParams {
     taxCode?: string;
 }
 
+const FILTER_PAGE_SIZE = 10;
+
 const OrganizationSearchPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -57,21 +63,57 @@ const OrganizationSearchPage = () => {
         size: PAGE_SIZE,
     });
 
-    const { data: organizationData, isLoading } = useOrganizationsFullTextSearchQuery({
-        ...filters,
-        page: page,
-        size: PAGE_SIZE,
-    });
+    const [orgTypePage, setOrgTypePage] = useState(1);
+    const [professionPage, setProfessionPage] = useState(1);
+    const [selectedProvinceSeo, setSelectedProvinceSeo] = useState('');
+
+    const [showAllOrgTypes, setShowAllOrgTypes] = useState(false);
+    const [showAllProfessions, setShowAllProfessions] = useState(false);
+    const [showAllProvinces, setShowAllProvinces] = useState(false);
+    const [showAllCommunes, setShowAllCommunes] = useState(false);
+
+    const { data: organizationData, isLoading } = useOrganizationsFullTextSearchQuery({ ...filters, page: page, size: PAGE_SIZE, });
+    const { data: orgTypesData, isLoading: isLoadingOrgTypes } = useGetOrganizationTypesByPageQuery({ page: orgTypePage, size: FILTER_PAGE_SIZE, });
+    const { data: professionsData, isLoading: isLoadingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: FILTER_PAGE_SIZE, });
+    const { data: provinces, isLoading: isLoadingProvinces } = useGetAllProvinceNoAuthenQuery();
+    const { data: communes, isLoading: isLoadingCommunes } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo });
 
     const totalPages = organizationData ? Math.ceil(organizationData.Total / PAGE_SIZE) : 1;
     const organizations = organizationData?.Items || [];
 
+    const [allOrgTypes, setAllOrgTypes] = useState<any[]>([]);
+    const [allProfessions, setAllProfessions] = useState<any[]>([]);
+
+    useEffect(() => { document.title = "Tìm kiếm Tổ chức | HUB UNI"; }, []);
+
     useEffect(() => {
-        document.title = "Tìm kiếm Tổ chức | HUB UNI";
-    }, []);
+        if (orgTypesData?.Items) {
+            setAllOrgTypes(prev => {
+                const existingIds = new Set(prev.map(item => item.Id));
+                const newItems = orgTypesData.Items.filter(item => !existingIds.has(item.Id));
+                return [...prev, ...newItems];
+            });
+        }
+    }, [orgTypesData]);
+
+    useEffect(() => {
+        if (professionsData?.Items) {
+            setAllProfessions(prev => {
+                const existingIds = new Set(prev.map(item => item.Id));
+                const newItems = professionsData.Items.filter(item => !existingIds.has(item.Id));
+                return [...prev, ...newItems];
+            });
+        }
+    }, [professionsData]);
 
     const handleFilterChange = (field: keyof OrganizationFilterParams, value: string) => {
-        setFilters({ ...filters, [field]: value });
+        if (field === 'provinceId' && value !== filters.provinceId) {
+            const province = provinces?.find(p => p.Id === value);
+            setSelectedProvinceSeo(province?.Seo || '');
+            setFilters({ ...filters, [field]: value, communeId: '' });
+        } else {
+            setFilters({ ...filters, [field]: value });
+        }
         setPage(DEFAULT_PAGE);
     };
 
@@ -90,181 +132,381 @@ const OrganizationSearchPage = () => {
             page: DEFAULT_PAGE,
             size: PAGE_SIZE,
         });
+        setSelectedProvinceSeo('');
         setPage(DEFAULT_PAGE);
     };
 
-    const handleViewDetail = (organizationId: string) => {
-        navigate(`/to-chuc/${organizationId}`);
-    };
+    const handleViewDetail = (organizationId: string) => { navigate(`/to-chuc/${organizationId}`); };
+    const handleLoadMoreOrgTypes = () => { setOrgTypePage(prev => prev + 1); };
+    const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
+
+    const hasMoreOrgTypes = orgTypesData && (allOrgTypes.length < orgTypesData.Total);
+    const hasMoreProfessions = professionsData && (allProfessions.length < professionsData.Total);
+    const hasActiveFilters = Boolean(filters.organizationTypeId || filters.professionId || filters.provinceId || filters.communeId || filters.taxCode);
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 4, display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ maxWidth: 1200, width: '100%', px: 3 }}>
+            <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 2, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ maxWidth: 1200, width: '100%', px: { xs: 2, md: 3 } }}>
                     {/* Search Bar */}
                     <Box sx={{
                         width: "100%",
                         maxWidth: 1200,
                         mb: 2,
                         mx: 'auto'
-                    }}
-                    >
-                        <Box>
-                            <SearchBar onSearch={handleSearch} />
-                        </Box>
+                    }}>
+                        <SearchBar onSearch={handleSearch} />
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 3, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                    <Box sx={{ display: 'flex', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                         {/* Left Sidebar - Filters */}
                         <Box
                             sx={{
-                                width: { xs: "100%", md: 280 },
+                                width: { xs: "100%", md: 300 },
                                 flexShrink: 0,
                             }}
                         >
-                            <Card
+                            <Paper
+                                elevation={0}
                                 sx={{
-                                    borderRadius: 3,
+                                    p: 2.5,
+                                    borderRadius: 2,
+                                    border: "1px solid",
+                                    borderColor: "divider",
                                     position: { md: "sticky" },
                                     top: 24,
-                                    boxShadow: "0 12px 32px rgba(0,0,0,0.08)",
                                 }}
                             >
-                                <CardContent >
-                                    {/* Header */}
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "space-between",
-                                            mb: 2,
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="h6"
-                                            sx={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}
-                                        >
-                                            <Category color="primary" />
-                                            Lọc nâng cao
+                                {/* Header */}
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <FilterList sx={{ fontSize: 20 }} />
+                                        <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
+                                            Bộ lọc
                                         </Typography>
-
+                                    </Stack>
+                                    {hasActiveFilters && (
                                         <Button
                                             size="small"
-                                            color="error"
-                                            startIcon={<FilterAltOff />}
+                                            startIcon={<Clear sx={{ fontSize: 16 }} />}
                                             onClick={handleClearFilters}
-                                            sx={{ textTransform: "none" }}
+                                            sx={{ fontSize: "0.75rem", minWidth: 0, px: 1 }}
                                         >
                                             Xóa
                                         </Button>
-                                    </Box>
+                                    )}
+                                </Stack>
 
-                                    {/* Filters */}
-                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                                        {/* Loại tổ chức */}
-                                        <FormControl fullWidth size="small">
-                                            <InputLabel>Loại tổ chức</InputLabel>
-                                            <Select
+                                <Divider sx={{ mb: 2 }} />
+
+                                {/* Loại tổ chức */}
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                    <FormLabel
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.9rem",
+                                            color: "text.primary",
+                                            mb: 1,
+                                        }}
+                                    >
+                                        <Apartment sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Loại tổ chức
+                                    </FormLabel>
+                                    <Box sx={{ maxHeight: showAllOrgTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                                        {isLoadingOrgTypes && allOrgTypes.length === 0 ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                                            </Box>
+                                        ) : (
+                                            <RadioGroup
                                                 value={filters.organizationTypeId}
-                                                label="Loại tổ chức"
-                                                startAdornment={<Apartment sx={{ mr: 1, color: "text.secondary" }} />}
-                                                onChange={(e) =>
-                                                    handleFilterChange("organizationTypeId", e.target.value)
-                                                }
+                                                onChange={(e) => handleFilterChange("organizationTypeId", e.target.value)}
                                             >
-                                                <MenuItem value="">Tất cả</MenuItem>
-                                                <MenuItem value="1">Đại học</MenuItem>
-                                                <MenuItem value="2">Cao đẳng</MenuItem>
-                                                <MenuItem value="3">Trung cấp</MenuItem>
-                                            </Select>
-                                        </FormControl>
-
-                                        {/* Ngành nghề */}
-                                        <FormControl fullWidth size="small">
-                                            <InputLabel>Ngành nghề</InputLabel>
-                                            <Select
-                                                value={filters.professionId}
-                                                label="Ngành nghề"
-                                                startAdornment={<Category sx={{ mr: 1, color: "text.secondary" }} />}
-                                                onChange={(e) =>
-                                                    handleFilterChange("professionId", e.target.value)
-                                                }
+                                                <FormControlLabel
+                                                    value=""
+                                                    control={<Radio size="small" />}
+                                                    label={<Typography variant="body2">Tất cả</Typography>}
+                                                />
+                                                {(showAllOrgTypes ? allOrgTypes : allOrgTypes.slice(0, 5)).map((type) => (
+                                                    <FormControlLabel
+                                                        key={type.Id}
+                                                        value={type.Id}
+                                                        control={<Radio size="small" />}
+                                                        label={<Typography variant="body2">{type.Name}</Typography>}
+                                                    />
+                                                ))}
+                                            </RadioGroup>
+                                        )}
+                                        {hasMoreOrgTypes && !showAllOrgTypes && allOrgTypes.length >= 5 && (
+                                            <Button
+                                                size="small"
+                                                onClick={handleLoadMoreOrgTypes}
+                                                disabled={isLoadingOrgTypes}
+                                                sx={{
+                                                    mt: 1,
+                                                    fontSize: "0.75rem",
+                                                    textTransform: "none",
+                                                    color: "primary.main"
+                                                }}
                                             >
-                                                <MenuItem value="">Tất cả</MenuItem>
-                                                <MenuItem value="1">Công nghệ thông tin</MenuItem>
-                                                <MenuItem value="2">Kinh tế</MenuItem>
-                                                <MenuItem value="3">Y khoa</MenuItem>
-                                                <MenuItem value="4">Kỹ thuật</MenuItem>
-                                            </Select>
-                                        </FormControl>
-
-                                        {/* Tỉnh / Thành */}
-                                        <FormControl fullWidth size="small">
-                                            <InputLabel>Tỉnh / Thành phố</InputLabel>
-                                            <Select
-                                                value={filters.provinceId}
-                                                label="Tỉnh / Thành phố"
-                                                startAdornment={
-                                                    <LocationCity sx={{ mr: 1, color: "text.secondary" }} />
-                                                }
-                                                onChange={(e) =>
-                                                    handleFilterChange("provinceId", e.target.value)
-                                                }
+                                                {isLoadingOrgTypes ? <CircularProgress size={16} /> : "Xem thêm"}
+                                            </Button>
+                                        )}
+                                        {allOrgTypes.length > 5 && (
+                                            <Button
+                                                size="small"
+                                                onClick={() => setShowAllOrgTypes(!showAllOrgTypes)}
+                                                sx={{
+                                                    mt: 1,
+                                                    fontSize: "0.75rem",
+                                                    textTransform: "none",
+                                                    color: "primary.main"
+                                                }}
                                             >
-                                                <MenuItem value="">Tất cả</MenuItem>
-                                                <MenuItem value="1">Hà Nội</MenuItem>
-                                                <MenuItem value="2">TP. Hồ Chí Minh</MenuItem>
-                                                <MenuItem value="3">Đà Nẵng</MenuItem>
-                                                <MenuItem value="4">Hải Phòng</MenuItem>
-                                            </Select>
-                                        </FormControl>
-
-                                        {/* Quận / Huyện */}
-                                        <FormControl fullWidth size="small">
-                                            <InputLabel>Quận / Huyện</InputLabel>
-                                            <Select
-                                                value={filters.communeId}
-                                                label="Quận / Huyện"
-                                                disabled={!filters.provinceId}
-                                                startAdornment={<Place sx={{ mr: 1, color: "text.secondary" }} />}
-                                                onChange={(e) =>
-                                                    handleFilterChange("communeId", e.target.value)
-                                                }
-                                            >
-                                                <MenuItem value="">Tất cả</MenuItem>
-                                                <MenuItem value="1">Quận 1</MenuItem>
-                                                <MenuItem value="2">Quận 2</MenuItem>
-                                                <MenuItem value="3">Quận 3</MenuItem>
-                                            </Select>
-                                        </FormControl>
-
-                                        {/* Mã số thuế */}
-                                        <TextField
-                                            fullWidth
-                                            size="small"
-                                            label="Mã số thuế"
-                                            value={filters.taxCode}
-                                            onChange={(e) => handleFilterChange("taxCode", e.target.value)}
-                                            InputProps={{
-                                                startAdornment: (
-                                                    <Numbers sx={{ mr: 1, color: "text.secondary" }} />
-                                                ),
-                                            }}
-                                        />
+                                                {showAllOrgTypes ? "Thu gọn" : "Xem thêm"}
+                                            </Button>
+                                        )}
                                     </Box>
-                                </CardContent>
-                            </Card>
+                                </FormControl>
+
+                                <Divider sx={{ mb: 2 }} />
+
+                                {/* Ngành nghề */}
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                    <FormLabel
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.9rem",
+                                            color: "text.primary",
+                                            mb: 1,
+                                        }}
+                                    >
+                                        <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Ngành nghề
+                                    </FormLabel>
+                                    <Box sx={{ maxHeight: showAllProfessions ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                                        {isLoadingProfessions && allProfessions.length === 0 ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                                            </Box>
+                                        ) : (
+                                            <RadioGroup
+                                                value={filters.professionId}
+                                                onChange={(e) => handleFilterChange("professionId", e.target.value)}
+                                            >
+                                                <FormControlLabel
+                                                    value=""
+                                                    control={<Radio size="small" />}
+                                                    label={<Typography variant="body2">Tất cả</Typography>}
+                                                />
+                                                {(showAllProfessions ? allProfessions : allProfessions.slice(0, 5)).map((profession) => (
+                                                    <FormControlLabel
+                                                        key={profession.Id}
+                                                        value={profession.Id}
+                                                        control={<Radio size="small" />}
+                                                        label={<Typography variant="body2">{profession.Name}</Typography>}
+                                                    />
+                                                ))}
+                                            </RadioGroup>
+                                        )}
+                                        {hasMoreProfessions && !showAllProfessions && allProfessions.length >= 5 && (
+                                            <Button
+                                                size="small"
+                                                onClick={handleLoadMoreProfessions}
+                                                disabled={isLoadingProfessions}
+                                                sx={{
+                                                    mt: 1,
+                                                    fontSize: "0.75rem",
+                                                    textTransform: "none",
+                                                    color: "primary.main"
+                                                }}
+                                            >
+                                                {isLoadingProfessions ? <CircularProgress size={16} /> : "Xem thêm"}
+                                            </Button>
+                                        )}
+                                        {allProfessions.length > 5 && (
+                                            <Button
+                                                size="small"
+                                                onClick={() => setShowAllProfessions(!showAllProfessions)}
+                                                sx={{
+                                                    mt: 1,
+                                                    fontSize: "0.75rem",
+                                                    textTransform: "none",
+                                                    color: "primary.main"
+                                                }}
+                                            >
+                                                {showAllProfessions ? "Thu gọn" : "Xem thêm"}
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </FormControl>
+
+                                <Divider sx={{ mb: 2 }} />
+
+                                {/* Tỉnh / Thành phố */}
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                    <FormLabel
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.9rem",
+                                            color: "text.primary",
+                                            mb: 1,
+                                        }}
+                                    >
+                                        <LocationCity sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Tỉnh / Thành phố
+                                    </FormLabel>
+                                    <Box sx={{ maxHeight: showAllProvinces ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                                        {isLoadingProvinces ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                                            </Box>
+                                        ) : (
+                                            <RadioGroup
+                                                value={filters.provinceId}
+                                                onChange={(e) => handleFilterChange("provinceId", e.target.value)}
+                                            >
+                                                <FormControlLabel
+                                                    value=""
+                                                    control={<Radio size="small" />}
+                                                    label={<Typography variant="body2">Tất cả</Typography>}
+                                                />
+                                                {(showAllProvinces ? provinces : provinces?.slice(0, 5))?.map((province) => (
+                                                    <FormControlLabel
+                                                        key={province.Id}
+                                                        value={province.Id}
+                                                        control={<Radio size="small" />}
+                                                        label={<Typography variant="body2">{province.Name}</Typography>}
+                                                    />
+                                                ))}
+                                            </RadioGroup>
+                                        )}
+                                        {provinces && provinces.length > 5 && (
+                                            <Button
+                                                size="small"
+                                                onClick={() => setShowAllProvinces(!showAllProvinces)}
+                                                sx={{
+                                                    mt: 1,
+                                                    fontSize: "0.75rem",
+                                                    textTransform: "none",
+                                                    color: "primary.main"
+                                                }}
+                                            >
+                                                {showAllProvinces ? "Thu gọn" : "Xem thêm"}
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </FormControl>
+
+                                <Divider sx={{ mb: 2 }} />
+
+                                {/* Quận / Huyện */}
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                    <FormLabel
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.9rem",
+                                            color: "text.primary",
+                                            mb: 1,
+                                        }}
+                                    >
+                                        <Place sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Quận / Huyện
+                                    </FormLabel>
+                                    <Box sx={{ maxHeight: showAllCommunes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                                        {!filters.provinceId ? (
+                                            <Typography variant="body2" color="text.secondary" sx={{ py: 1, fontStyle: 'italic' }}>
+                                                Vui lòng chọn Tỉnh/Thành phố trước
+                                            </Typography>
+                                        ) : isLoadingCommunes ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                                            </Box>
+                                        ) : (
+                                            <>
+                                                <RadioGroup
+                                                    value={filters.communeId}
+                                                    onChange={(e) => handleFilterChange("communeId", e.target.value)}
+                                                >
+                                                    <FormControlLabel
+                                                        value=""
+                                                        control={<Radio size="small" />}
+                                                        label={<Typography variant="body2">Tất cả</Typography>}
+                                                    />
+                                                    {(showAllCommunes ? communes : communes?.slice(0, 5))?.map((commune) => (
+                                                        <FormControlLabel
+                                                            key={commune.Id}
+                                                            value={commune.Id}
+                                                            control={<Radio size="small" />}
+                                                            label={<Typography variant="body2">{commune.Name}</Typography>}
+                                                        />
+                                                    ))}
+                                                </RadioGroup>
+                                                {communes && communes.length > 5 && (
+                                                    <Button
+                                                        size="small"
+                                                        onClick={() => setShowAllCommunes(!showAllCommunes)}
+                                                        sx={{
+                                                            mt: 1,
+                                                            fontSize: "0.75rem",
+                                                            textTransform: "none",
+                                                            color: "primary.main"
+                                                        }}
+                                                    >
+                                                        {showAllCommunes ? "Thu gọn" : "Xem thêm"}
+                                                    </Button>
+                                                )}
+                                            </>
+                                        )}
+                                    </Box>
+                                </FormControl>
+
+                                <Divider sx={{ mb: 2 }} />
+
+                                {/* Mã số thuế */}
+                                <FormControl fullWidth>
+                                    <FormLabel
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "0.9rem",
+                                            color: "text.primary",
+                                            mb: 1,
+                                        }}
+                                    >
+                                        <Numbers sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Mã số thuế
+                                    </FormLabel>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder="Nhập mã số thuế"
+                                        value={filters.taxCode}
+                                        onChange={(e) => handleFilterChange("taxCode", e.target.value)}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                fontSize: '0.875rem'
+                                            }
+                                        }}
+                                    />
+                                </FormControl>
+                            </Paper>
                         </Box>
 
                         {/* Right Side - Results */}
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             {isLoading ? (
                                 <Box sx={{ textAlign: 'center', py: 8 }}>
-                                    <Typography>Đang tải...</Typography>
+                                    <CircularProgress size={48} />
+                                    <Typography sx={{ mt: 2 }}>Đang tải...</Typography>
                                 </Box>
                             ) : organizations.length === 0 ? (
-                                <Card sx={{ p: 6, textAlign: 'center', borderRadius: 2 }}>
-                                    <Typography variant="h6" color="text.secondary">
+                                <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3, boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}>
+                                    <School sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                                    <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 600 }}>
                                         Không tìm thấy tổ chức nào
                                     </Typography>
                                     <Typography color="text.secondary" sx={{ mt: 1 }}>
@@ -273,31 +515,49 @@ const OrganizationSearchPage = () => {
                                 </Card>
                             ) : (
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    {/* Results count */}
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        px: 1
+                                    }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Tìm thấy <strong>{organizationData?.Total || 0}</strong> tổ chức
+                                        </Typography>
+                                    </Box>
+
                                     {organizations.map((org: any) => (
                                         <Card
                                             key={org.SeoUrl}
                                             sx={{
                                                 borderRadius: 3,
                                                 boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                                transition: '0.25s',
+                                                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                cursor: 'pointer',
                                                 '&:hover': {
                                                     transform: 'translateY(-4px)',
                                                     boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
                                                 },
                                             }}
+                                            onClick={() => handleViewDetail(org.SeoUrl)}
                                         >
-                                            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', position: 'relative' }}>
-
+                                            <CardContent sx={{ p: { xs: 1, md: 2 } }}>
+                                                <Box sx={{ display: 'flex', gap: { xs: 1, md: 2 }, alignItems: 'flex-start' }}>
                                                     {/* Logo */}
                                                     <Box
                                                         sx={{
-                                                            width: { xs: 72, md: 100 },
-                                                            height: { xs: 72, md: 100 },
+                                                            width: { xs: 64, sm: 80, md: 100 },
+                                                            height: { xs: 64, sm: 80, md: 100 },
                                                             borderRadius: 2,
                                                             overflow: 'hidden',
-                                                            bgcolor: '#f5f5f5',
+                                                            bgcolor: '#f8f9fa',
                                                             flexShrink: 0,
+                                                            border: '1px solid',
+                                                            borderColor: 'divider',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
                                                         }}
                                                     >
                                                         {org.LogoFullUrl ? (
@@ -307,22 +567,27 @@ const OrganizationSearchPage = () => {
                                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                             />
                                                         ) : (
-                                                            <School sx={{ fontSize: 48, color: '#ccc', m: 'auto' }} />
+                                                            <School sx={{ fontSize: { xs: 32, md: 48 }, color: '#ccc' }} />
                                                         )}
                                                     </Box>
 
                                                     {/* Content */}
-                                                    <Box sx={{ flex: 1 }}>
+                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
                                                         {/* Title + TOP */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                                                             <Typography
                                                                 variant="h6"
                                                                 sx={{
                                                                     fontWeight: 700,
-                                                                    cursor: 'pointer',
+                                                                    fontSize: { xs: '1rem', md: '1.25rem' },
                                                                     '&:hover': { color: 'primary.main' },
+                                                                    transition: 'color 0.2s',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 2,
+                                                                    WebkitBoxOrient: 'vertical',
                                                                 }}
-                                                                onClick={() => handleViewDetail(org.SeoUrl)}
                                                             >
                                                                 {org.Name}
                                                             </Typography>
@@ -332,30 +597,54 @@ const OrganizationSearchPage = () => {
                                                                     label="TOP"
                                                                     color="primary"
                                                                     size="small"
-                                                                    sx={{ fontWeight: 600 }}
+                                                                    sx={{
+                                                                        fontWeight: 700,
+                                                                        fontSize: '0.75rem',
+                                                                        height: 24
+                                                                    }}
                                                                 />
                                                             )}
                                                         </Box>
 
                                                         {/* Ngành */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                            <School sx={{ fontSize: 18, color: 'text.secondary' }} />
-                                                            <Typography variant="body2" color="text.secondary">
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 1 }}>
+                                                            <School sx={{ fontSize: 18, color: 'text.secondary', mt: 0.2, flexShrink: 0 }} />
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 1,
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                }}
+                                                            >
                                                                 {org.MainProfession || 'Chưa cập nhật ngành nghề'}
                                                             </Typography>
                                                         </Box>
 
                                                         {/* Địa chỉ */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                            <LocationOn sx={{ fontSize: 18, color: 'text.secondary' }} />
-                                                            <Typography variant="body2" color="text.secondary">
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.5 }}>
+                                                            <LocationOn sx={{ fontSize: 18, color: 'text.secondary', mt: 0.2, flexShrink: 0 }} />
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 2,
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                }}
+                                                            >
                                                                 {`${org.Address}, ${org.Commune}, ${org.Province}`}
                                                             </Typography>
                                                         </Box>
 
                                                         {/* MST */}
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                            <Code sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                            <Code sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />
                                                             <Typography variant="body2" color="text.secondary">
                                                                 {org.TaxCode || 'Chưa cập nhật MST'}
                                                             </Typography>

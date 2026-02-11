@@ -583,10 +583,8 @@ const RecruitmentPostDetailPage = () => {
                                                     <Avatar
                                                         src={post.Organization?.LogoFullUrl || undefined}
                                                         sx={{
-                                                            width: { xs: 60, sm: 70 },
-                                                            height: { xs: 60, sm: 70 },
-                                                            bgcolor: '#ff5722',
-                                                            fontSize: '1.5rem',
+                                                            width: { xs: 80, sm: 90 },
+                                                            height: { xs: 80, sm: 90 },
                                                             fontWeight: 700
                                                         }}
                                                     >
