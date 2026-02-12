@@ -3,15 +3,14 @@ import {
   Box,
   Card,
   Typography,
-  IconButton,
-  Popover,
   Button,
-  Stack
+  Tooltip
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import DefaultImage from "../../assets/default_organization_card.jpg"
-import { BookmarkBorder, Send } from "@mui/icons-material";
+import { Send, Visibility } from "@mui/icons-material";
+import { BACK_GROUND_BUTTON_COLOR } from "../../constants/common.constant";
 
 interface Props {
   recruitmentPosts: RecruitmentPostResponse[];
@@ -69,12 +68,12 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
             {/* LEFT: IMAGE */}
             <Box
               component="img"
-              src={DefaultImage}
+              src={rcp.Organization.LogoFullUrl}
               alt={rcp.Name}
               sx={{
                 width: 120,
                 height: 120,
-                objectFit: "contain",
+                objectFit: "cover",
                 mr: 2,
                 borderRadius: 1,
                 bgcolor: "#fafafa",
@@ -85,25 +84,94 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
 
             {/* RIGHT: CONTENT */}
             <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-              {/* NAME */}
-              <Typography
-                variant="subtitle1"
-                fontWeight="bold"
-                sx={{ cursor: "pointer", width: "fit-content" }}
-                onMouseEnter={(e) => handleOpen(e, rcp)}
-                onMouseLeave={handleClose}
-                onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
-              >
-                {rcp.Name}
-              </Typography>
+              <Tooltip
+                title={
+                  <Box sx={{
+                    p: 1, width: 350,
+                    maxHeight: 450,
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                  }}>
+                    <Typography fontWeight="bold" gutterBottom>
+                      {rcp.Name}
+                    </Typography>
+                    <Typography variant="body2">
+                      <b>Tổ chức:</b> {rcp.Organization.Name}
+                    </Typography>
 
-              {/* INTERNATIONAL NAME */}
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 1 }}
+                    <Typography variant="body2">
+                      <b>Số lượng tuyển:</b> {rcp.Quantity}
+                    </Typography>
+
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                      <b>Địa chỉ:</b> {rcp.Province}
+                    </Typography>
+
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                      <b>Hạn:</b> {rcp.RecruitmentToDate}
+                    </Typography>
+                    <Box sx={{display: 'flex', flexDirection: 'row', gap: 1}}>
+                      <Button
+                        variant="contained"
+                        startIcon={<Visibility />}
+                        size="small"
+                        fullWidth
+                        sx={{backgroundColor: '#ff5722'}}
+                        onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
+                      >
+                        Xem chi tiết
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<Send />}
+                        size="small"
+                        fullWidth
+                        sx={{backgroundColor: '#ff5722'}}
+                        onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
+                      >
+                        Ứng tuyển ngay
+                      </Button>
+                    </Box>
+                  </Box>
+                }
+                arrow
+                placement="bottom-start"
+                enterDelay={300}
+                leaveDelay={200}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, 8],
+                        },
+                      },
+                    ],
+                  },
+                  tooltip: {
+                    sx: {
+                      bgcolor: "background.paper",
+                      color: "text.primary",
+                      boxShadow: 3,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      maxWidth: "none",
+                    },
+                  },
+                }}
               >
-                {rcp.RecruitmentToDate}
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  sx={{ cursor: "pointer", width: "fit-content" }}
+                >
+                  {rcp.Name}
+                </Typography>
+              </Tooltip>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <b>Số lượng tuyển: </b>{rcp.Quantity}
               </Typography>
 
               {/* BOTTOM ROW */}
@@ -115,90 +183,14 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                   justifyContent: "space-between",
                 }}
               >
-                {/* MAIN PROFESSION */}
                 <Typography variant="body2" color="primary">
-                  {rcp.Organization.Name}
+                  {rcp.RecruitmentToDate}
                 </Typography>
               </Box>
             </Box>
           </Card>
         ))}
       </Box>
-
-      {/* POPOVER */}
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-        disableRestoreFocus
-        sx={{ pointerEvents: "none"}}
-      >
-        {selectedOrg && (
-          <Box sx={{ p: 2, maxWidth: 320 }}>
-            <Typography fontWeight="bold" gutterBottom>
-              {selectedOrg.Name}
-            </Typography>
-
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              {selectedOrg.Name}
-            </Typography>
-
-            <Typography variant="body2">
-              <b>Tổ chức:</b> {selectedOrg.Organization.Name}
-            </Typography>
-
-            <Typography variant="body2">
-              <b>Số lượng tuyển:</b> {selectedOrg.Quantity}
-            </Typography>
-
-            <Typography variant="body2">
-              <b>Địa chỉ:</b> {selectedOrg.Province}
-            </Typography>
-
-            <Typography variant="body2">
-              <b>Tuyển đến ngày:</b> {selectedOrg.RecruitmentToDate}
-            </Typography>
-            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                size="small"
-                startIcon={<Send />}
-                sx={{
-                  bgcolor: "#ff5722",
-                  fontWeight: 600,
-                  "&:hover": { bgcolor: "#e64a19" }
-                }}
-                onClick={() => handleGoDetail(selectedOrg.SeoUrl)}
-              >
-                Ứng tuyển
-              </Button>
-
-              <Button
-                fullWidth
-                variant="outlined"
-                size="small"
-                startIcon={<BookmarkBorder />}
-                sx={{
-                  borderColor: "#ff5722",
-                  color: "#ff5722",
-                  fontWeight: 600,
-                  "&:hover": {
-                    bgcolor: "#ff5722",
-                    color: "#fff"
-                  }
-                }}
-                onClick={() => handleGoDetail(selectedOrg.SeoUrl)}
-              >
-                Yêu thích
-              </Button>
-            </Stack>
-          </Box>
-
-        )}
-      </Popover>
     </>
   );
 }

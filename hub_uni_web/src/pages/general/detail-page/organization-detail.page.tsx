@@ -34,15 +34,8 @@ const OrganizationDetailPage = () => {
     const navigate = useNavigate();
     const [tabValue, setTabValue] = useState(0);
 
-    const { data: organization, isLoading, error } =
-        useGetOrganizationBySeoQuery(seoUrl!, {
-            skip: !seoUrl,
-        });
-
-    const { data: recruitmentPosts, isLoading: loadingPosts } =
-        useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, {
-            skip: !seoUrl,
-        });
+    const { data: organization, isLoading, error } = useGetOrganizationBySeoQuery(seoUrl!, { skip: !seoUrl,});
+    const { data: recruitmentPosts, isLoading: loadingPosts } = useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, { skip: !seoUrl,});
 
     if (isLoading) {
         return (
@@ -89,7 +82,7 @@ const OrganizationDetailPage = () => {
         <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh' }}>
             {/* Wallpaper/Banner */}
             {organization.WallpaperFullUrl && (
-                 <Box sx={{ p: { xs: 1, md: 1 }, maxWidth: 1200, mx: "auto" }}>
+                <Box sx={{ p: { xs: 1, md: 1 }, maxWidth: 1200, mx: "auto" }}>
                     <Box
                         sx={{
                             maxWidth: 1200,
@@ -133,23 +126,25 @@ const OrganizationDetailPage = () => {
                                             <Typography variant="h5" fontWeight={600} gutterBottom>
                                                 {organization.Name}
                                             </Typography>
-                                            {organization.InternationalName && (
-                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                    {organization.InternationalName}
-                                                </Typography>
-                                            )}
                                             {organization.IsTop && (
                                                 <Chip
                                                     label="Tổ chức nổi bật"
                                                     color="primary"
                                                     size="small"
-                                                    sx={{ mt: 1 }}
                                                 />
                                             )}
                                         </Box>
                                     </Box>
 
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+                                    {organization.Summary && (
+                                        <Box sx={{ mt: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                            <Typography variant="body2" color="text.secondary" lineHeight={1}>
+                                                {organization.Summary}
+                                            </Typography>
+                                        </Box>
+                                    )}
+
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2, mt: 2 }}>
                                         <Stack direction="row" spacing={1} alignItems="center">
                                             <LocationOn fontSize="small" color="primary" />
                                             <Typography variant="body2">
@@ -182,12 +177,19 @@ const OrganizationDetailPage = () => {
                                     <Tabs
                                         value={tabValue}
                                         onChange={handleTabChange}
+                                        TabIndicatorProps={{
+                                            style: { display: 'none' }
+                                        }}
                                         sx={{
                                             px: 2,
                                             '& .MuiTab-root': {
                                                 textTransform: 'none',
                                                 fontWeight: 600,
                                                 fontSize: '1rem',
+                                                '&.Mui-selected': {
+                                                    backgroundColor: 'action.selected',
+                                                    color: 'primary.main'
+                                                }
                                             }
                                         }}
                                     >
@@ -197,23 +199,62 @@ const OrganizationDetailPage = () => {
                                             iconPosition="start"
                                         />
                                         <Tab
-                                            label={`Tin tuyển dụng (${recruitmentPosts?.Total || 0})`}
+                                            label={`Tin tuyển sinh (${recruitmentPosts?.Total || 0})`}
                                             icon={<WorkOutline />}
                                             iconPosition="start"
                                         />
                                     </Tabs>
                                 </Box>
 
-                                {/* Tab 1: Giới thiệu */}
                                 <TabPanel value={tabValue} index={0}>
                                     <CardContent>
                                         <Typography variant="h6" fontWeight={600} gutterBottom>
-                                            Giới thiệu chung
+                                            Giới thiệu chi tiết
                                         </Typography>
-                                        <Divider sx={{ mb: 1 }} />
-                                        <Typography color="text.secondary" lineHeight={1.7}>
-                                            {organization.Summary || 'Chưa có thông tin giới thiệu'}
-                                        </Typography>
+                                        <Divider sx={{ mb: 2 }} />
+
+                                        {organization.Description ? (
+                                            <Box
+                                                sx={{
+                                                    '& img': {
+                                                        maxWidth: '100%',
+                                                        height: 'auto',
+                                                        borderRadius: 1,
+                                                        my: 2
+                                                    },
+                                                    '& h1, & h2, & h3, & h4, & h5, & h6': {
+                                                        mt: 3,
+                                                        mb: 2,
+                                                        fontWeight: 600
+                                                    },
+                                                    '& p': {
+                                                        mb: 2,
+                                                        lineHeight: 1.7
+                                                    },
+                                                    '& table': {
+                                                        width: '100%',
+                                                        borderCollapse: 'collapse',
+                                                        my: 2
+                                                    },
+                                                    '& td, & th': {
+                                                        border: '1px solid #ddd',
+                                                        p: 1
+                                                    },
+                                                    '& a': {
+                                                        color: 'primary.main',
+                                                        textDecoration: 'none',
+                                                        '&:hover': {
+                                                            textDecoration: 'underline'
+                                                        }
+                                                    }
+                                                }}
+                                                dangerouslySetInnerHTML={{ __html: organization.Description }}
+                                            />
+                                        ) : (
+                                            <Typography color="text.secondary">
+                                                Chưa có thông tin giới thiệu chi tiết
+                                            </Typography>
+                                        )}
 
                                         <Box sx={{ mt: 3 }}>
                                             <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
@@ -254,7 +295,6 @@ const OrganizationDetailPage = () => {
                                     </CardContent>
                                 </TabPanel>
 
-                                {/* Tab 2: Tin tuyển dụng */}
                                 <TabPanel value={tabValue} index={1}>
                                     <CardContent>
                                         {loadingPosts ? (
@@ -275,7 +315,7 @@ const OrganizationDetailPage = () => {
                                                                 transform: 'translateX(4px)',
                                                             }
                                                         }}
-                                                        onClick={() => navigate(`/tin-tuyen-dung/${post.SeoUrl}`)}
+                                                        onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
                                                     >
                                                         <CardContent sx={{ py: 2 }}>
                                                             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
@@ -334,7 +374,7 @@ const OrganizationDetailPage = () => {
                                             <Box sx={{ textAlign: 'center', py: 4 }}>
                                                 <WorkOutline sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
                                                 <Typography color="text.secondary">
-                                                    Chưa có tin tuyển dụng
+                                                    Chưa có tin tuyển sinh
                                                 </Typography>
                                             </Box>
                                         )}

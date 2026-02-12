@@ -46,6 +46,7 @@ export interface OrganizationDetailResponse {
     UpdatedAt: string;
     UpdatedBy: string;
     Status: string;
+    Description: string;
 }
 
 export interface OrganizationResponse {
@@ -58,7 +59,8 @@ export interface OrganizationResponse {
     CommuneSeo: string;
     Address: string;
     LogoFullUrl: string;
-    MainProfession: string;
+    MainProfession: ProfessionResponse;
+    Professions: ProfessionResponse[]
     Summary: string;
     IsTop: boolean;
     Highlights: string[];

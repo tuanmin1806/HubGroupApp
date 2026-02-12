@@ -33,6 +33,23 @@ const organizationApi = baseApi.injectEndpoints({
             }),
         }),
 
+        organizationsGetByPageNoAuthen: builder.query<ApiPaginationResponse<OrganizationResponse[]>, OrganizationFilterParams>({
+            query: (params) => {
+                const queryString = buildQueryString(params);
+                return {
+                    url: `organization/getbypagenoauthen?${queryString}`,
+                    method: "GET",
+                };
+            },
+            transformResponse: (responseData: {
+                Items: OrganizationResponse[];
+                Total: number;
+            }): ApiPaginationResponse<OrganizationResponse[]> => ({
+                Items: responseData.Items,
+                Total: responseData.Total,
+            }),
+        }),
+
         getOrganizationBySeo: builder.query<OrganizationDetailResponse, string>({
             query: (seo) => ({
                 url: `organization/getbyseourl/${seo}`,
@@ -44,5 +61,6 @@ const organizationApi = baseApi.injectEndpoints({
 
 export const {
     useOrganizationsFullTextSearchQuery,
+    useOrganizationsGetByPageNoAuthenQuery,
     useGetOrganizationBySeoQuery
 } = organizationApi;

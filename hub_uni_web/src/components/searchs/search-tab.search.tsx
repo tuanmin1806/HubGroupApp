@@ -7,10 +7,13 @@ import {
     Card,
     CardContent,
     CircularProgress,
+    Stack,
 } from "@mui/material";
 import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
 import { TEXT_COLOR } from "../../constants/common.constant";
+import { WorkOutline } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 function TabPanel({
     children,
@@ -34,7 +37,7 @@ function TabPanel({
 
 export default function ProfessionRecruitmentTabs() {
     const [value, setValue] = React.useState(0);
-
+    const navigate = useNavigate();
     const { data: professions = [], isLoading: loadingProfession } =
         useGetAllProfessionNoAuthenQuery();
 
@@ -69,10 +72,25 @@ export default function ProfessionRecruitmentTabs() {
                 value={value}
                 onChange={(_, newValue) => setValue(newValue)}
                 sx={{
-                    width: 260,
-                    borderRight: 1,
+                    width: 240,
                     borderColor: "divider",
-                    color: TEXT_COLOR
+
+                    "& .MuiTab-root": {
+                        minHeight: 36,
+                        paddingY: 0.5,
+                        paddingX: 1.5,
+                        fontSize: 14,
+                        fontWeight: 500,
+                        textTransform: "none",
+                        alignItems: "flex-start",
+                        textAlign: "left",
+                        color: TEXT_COLOR,
+
+                        "&.Mui-selected": {
+                            backgroundColor: "action.selected",
+                            color: "primary.main"
+                        }
+                    }
                 }}
             >
                 {loadingProfession ? (
@@ -84,13 +102,13 @@ export default function ProfessionRecruitmentTabs() {
                         <Tab
                             key={p.Id}
                             label={p.Name}
+                            disableRipple
                             sx={{
                                 alignItems: "flex-start",
                                 textAlign: "left",
                                 textTransform: "none",
                                 fontWeight: 500,
                                 minHeight: 48,
-                                color: TEXT_COLOR
                             }}
                         />
                     ))
@@ -106,8 +124,7 @@ export default function ProfessionRecruitmentTabs() {
                         display: "flex",
                         flexDirection: "column",
                         gap: 1,
-                        p: 2,
-                        color: TEXT_COLOR
+                        p: 1,
                     }}
                 >
                     {loadingPosts ? (
@@ -115,21 +132,48 @@ export default function ProfessionRecruitmentTabs() {
                             <CircularProgress />
                         </Box>
                     ) : posts.length === 0 ? (
-                        <Typography color="text.secondary">
+                        <Typography sx={{ color: "text.secondary" }}>
                             Chưa có tin tuyển sinh
                         </Typography>
                     ) : (
                         posts.map((post) => (
                             <Card
                                 key={post.Id}
-                                sx={{ flexShrink: 0 }}
+                                onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                                sx={{
+                                    flexShrink: 0,
+                                    cursor: "pointer",
+                                    borderRadius: 2,
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                        backgroundColor: "action.hover",
+                                        borderColor: "primary.main"
+                                    }
+                                }}
                             >
                                 <CardContent
+                                    sx={{
+                                        py: 1,
+                                        px: 1,
+                                        "&:last-child": { pb: 1 },
+                                        alignItems: 'center'
+                                    }}
                                 >
-                                    <Typography
-                                    >
-                                        {post.Name}
-                                    </Typography>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <WorkOutline
+                                            sx={{ fontSize: 18, color: "primary.main" }}
+                                        />
+                                        <Typography
+                                            sx={{
+                                                color: TEXT_COLOR,
+                                                fontSize: 14,
+                                                fontWeight: 500,
+                                                lineHeight: 1.4
+                                            }}
+                                        >
+                                            {post.Name}
+                                        </Typography>
+                                    </Stack>
                                 </CardContent>
                             </Card>
                         ))

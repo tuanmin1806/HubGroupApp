@@ -8,9 +8,10 @@ import { Apartment, Category, Code, LocationCity, LocationOn, Numbers, Place, Sc
 import SearchBar from "../../../components/searchs/search-bar.search";
 import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
 import { useGetOrganizationTypesByPageQuery } from "../../../app/features/organization-type.api";
-import { useOrganizationsFullTextSearchQuery } from "../../../app/features/organization.api";
+import { useOrganizationsFullTextSearchQuery, useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
+import { OrganizationResponse } from "../../../app/models/organization.model";
 
 const theme = createTheme({
     palette: {
@@ -72,7 +73,7 @@ const OrganizationSearchPage = () => {
     const [showAllProvinces, setShowAllProvinces] = useState(false);
     const [showAllCommunes, setShowAllCommunes] = useState(false);
 
-    const { data: organizationData, isLoading } = useOrganizationsFullTextSearchQuery({ ...filters, page: page, size: PAGE_SIZE, });
+    const { data: organizationData, isLoading } = useOrganizationsGetByPageNoAuthenQuery({ ...filters, page: page, size: PAGE_SIZE, });
     const { data: orgTypesData, isLoading: isLoadingOrgTypes } = useGetOrganizationTypesByPageQuery({ page: orgTypePage, size: FILTER_PAGE_SIZE, });
     const { data: professionsData, isLoading: isLoadingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: FILTER_PAGE_SIZE, });
     const { data: provinces, isLoading: isLoadingProvinces } = useGetAllProvinceNoAuthenQuery();
@@ -527,7 +528,7 @@ const OrganizationSearchPage = () => {
                                         </Typography>
                                     </Box>
 
-                                    {organizations.map((org: any) => (
+                                    {organizations.map((org: OrganizationResponse) => (
                                         <Card
                                             key={org.SeoUrl}
                                             sx={{
@@ -540,7 +541,7 @@ const OrganizationSearchPage = () => {
                                                     boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
                                                 },
                                             }}
-                                            onClick={() => handleViewDetail(org.SeoUrl)}
+                                            onClick={() => handleViewDetail(org.SeoUrl || '')}
                                         >
                                             <CardContent sx={{ p: { xs: 1, md: 2 } }}>
                                                 <Box sx={{ display: 'flex', gap: { xs: 1, md: 2 }, alignItems: 'flex-start' }}>
@@ -620,7 +621,7 @@ const OrganizationSearchPage = () => {
                                                                     WebkitBoxOrient: 'vertical',
                                                                 }}
                                                             >
-                                                                {org.MainProfession || 'Chưa cập nhật ngành nghề'}
+                                                                {org.MainProfession?.Name || 'Chưa cập nhật ngành nghề'}
                                                             </Typography>
                                                         </Box>
 
