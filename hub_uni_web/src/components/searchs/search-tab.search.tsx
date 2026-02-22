@@ -12,7 +12,7 @@ import {
 import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
 import { TEXT_COLOR } from "../../constants/common.constant";
-import { WorkOutline } from "@mui/icons-material";
+import { Camera, Campaign, WorkOutline } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 function TabPanel({
@@ -59,9 +59,9 @@ export default function ProfessionRecruitmentTabs() {
         <Box
             sx={{
                 display: "flex",
-                height: 320,
+                height: 260,
                 bgcolor: "background.paper",
-                borderRadius: 3,
+                borderRadius: 1,
                 overflow: "hidden"
             }}
         >
@@ -160,7 +160,7 @@ export default function ProfessionRecruitmentTabs() {
                                     }}
                                 >
                                     <Stack direction="row" spacing={1} alignItems="center">
-                                        <WorkOutline
+                                        <Campaign
                                             sx={{ fontSize: 18, color: "primary.main" }}
                                         />
                                         <Typography
