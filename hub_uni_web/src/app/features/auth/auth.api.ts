@@ -1,5 +1,5 @@
 import { ApiResponse } from "../../models/api.model";
-import { AuthChangePasswordRequestBody, AuthForgotPasswordRequestBody, AuthInfo, AuthLoginRequestBody, AuthReconfirmPasswordRequestBody, AuthRegisterRequestBody } from "../../models/auth.model";
+import { AuthChangePasswordRequestBody, AuthForgotPasswordRequestBody, AuthInfo, AuthLoginRequestBody, AuthReconfirmPasswordRequestBody, AuthRegisterRequestBody, RecruiterRegisterRequestBody, StudentRegisterRequestBody } from "../../models/auth.model";
 import { removeToken, saveUserInfo } from "../../services/auth.service";
 import baseApi from "../base.api";
 import { TAG_TYPES } from "../tags";
@@ -11,6 +11,25 @@ export const authApi = baseApi.injectEndpoints({
         login: builder.mutation<AuthInfo, AuthLoginRequestBody>({
             query: (credentials) => ({
                 url: "/account/login",
+                method: "POST",
+                body: credentials,
+            }),
+
+            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+                try {
+                    const { data } = await queryFulfilled;
+                    saveUserInfo(data);
+                    dispatch(setCredentials(data));
+                } catch (err) {
+                    console.error("Login failed", err);
+                }
+            },
+
+        }),
+
+        customerLogin: builder.mutation<AuthInfo, AuthLoginRequestBody>({
+            query: (credentials) => ({
+                url: "/customer/login",
                 method: "POST",
                 body: credentials,
             }),
@@ -52,6 +71,22 @@ export const authApi = baseApi.injectEndpoints({
             }),
         }),
 
+        studentRegister: builder.mutation<ApiResponse<void>, StudentRegisterRequestBody>({
+            query: (body) => ({
+                url: '/customer/studentregister',
+                method: 'POST',
+                body
+            }),
+        }),
+
+        recruiterRegister: builder.mutation<ApiResponse<void>, RecruiterRegisterRequestBody>({
+            query: (body) => ({
+                url: '/customer/recruiterregister',
+                method: 'POST',
+                body
+            }),
+        }),
+
         // FORGOT_PASSWORD
         forgotPassword: builder.mutation<ApiResponse<void>, AuthForgotPasswordRequestBody>({
             query: (body) => ({
@@ -85,7 +120,10 @@ export const authApi = baseApi.injectEndpoints({
 });
 export const {
     useLoginMutation,
+    useCustomerLoginMutation,
     useRegisterMutation,
+    useStudentRegisterMutation,
+    useRecruiterRegisterMutation,
     useLogoutMutation,
     useForgotPasswordMutation,
     useReconfirmPasswordMutation,

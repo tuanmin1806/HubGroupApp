@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetRecruitmentPostBySeoQuery, useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
 import {
     LocationOn,
-    Category,
     BookmarkBorder,
     Share,
     AccessTime,
@@ -28,10 +27,15 @@ import {
     Grid,
     Paper
 } from "@mui/material";
+import { useState } from "react";
+import ApplyConfirmDialog from "../../../components/dialogs/general/apply-confirm-dialog.dialog";
+import { useAuthGuard } from "../../../hooks/useAuthGuard";
 
 const RecruitmentPostDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
     const navigate = useNavigate();
+    const checkAuth = useAuthGuard();
+    const [applyDialogOpen, setApplyDialogOpen] = useState(false);
 
     const { data: recruitmentPost, isLoading, error } =
         useGetRecruitmentPostBySeoQuery(seoUrl!, {
@@ -89,6 +93,11 @@ const RecruitmentPostDetailPage = () => {
             navigator.clipboard.writeText(window.location.href);
             alert('Đã copy link vào clipboard!');
         }
+    };
+
+    const handleApplyClick = () => {
+        if (!checkAuth()) return;
+        setApplyDialogOpen(true);
     };
 
     const formatDate = (dateString: string) => {
@@ -253,6 +262,7 @@ const RecruitmentPostDetailPage = () => {
                                         <Button
                                             variant="contained"
                                             size="large"
+                                            onClick={handleApplyClick}
                                             sx={{
                                                 bgcolor: '#ff5722',
                                                 fontWeight: 600,
@@ -693,7 +703,17 @@ const RecruitmentPostDetailPage = () => {
                     </Box>
                 )}
             </Container>
+            <ApplyConfirmDialog
+                open={applyDialogOpen}
+                onClose={() => setApplyDialogOpen(false)}
+                onSuccess={() => { }}
+                organizationName={recruitmentPost.Organization?.Name || "Công ty"}
+                organizationLogo={recruitmentPost.Organization?.LogoFullUrl}
+                jobTitle={recruitmentPost.Name}
+                recruitmentPostId={recruitmentPost.Id}
+            />
         </Box>
+
     );
 }
 

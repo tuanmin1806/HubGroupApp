@@ -10,6 +10,43 @@ export interface AuthRegisterRequestBody {
     confirmNewPassword: string;
 }
 
+export interface StudentRegisterRequestBody {
+    UserName: string;
+    Password: string;
+    FullName: string;
+    Gender: string;
+    Email: string;
+    PhoneNumber: string;
+    AccountType: "Student";
+    AccountStatus: "Activated";
+    ProfileInfo: {
+        Age: number;
+        Gender: string;
+        Experience: string;
+        EducationLevel: string;
+    };
+}
+
+export interface RecruiterRegisterRequestBody {
+    CustomerModel: {
+        UserName: string;
+        Password: string;
+        FullName: string;
+        Gender: string;
+        Email: string;
+        PhoneNumber: string;
+    };
+    OrganizationModel: {
+        Name: string;
+        TaxCode: string;
+        Address: string;
+        PhoneNumber: string;
+        Email: string;
+        WebsiteUrl?: string;
+        Summary?: string;
+    };
+}
+
 export interface AuthForgotPasswordRequestBody {
     email: string;
 }

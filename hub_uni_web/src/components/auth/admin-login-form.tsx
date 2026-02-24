@@ -1,6 +1,5 @@
 import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, IconButton, InputAdornment, Link, Stack, TextField, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import SocialAuth from "./social-auth";
+import { useLocation, useNavigate } from "react-router-dom";
 import { requiredValidator, validate } from "../../app/services/validation.service";
 import { useLoginMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
@@ -22,6 +21,8 @@ const LoginForm = () => {
   const [errors, setErrors] = useState(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from;
 
   const handleChange = (field) => (e) => {
     const { value } = e.target;
@@ -45,22 +46,23 @@ const LoginForm = () => {
 
     try {
       const data = await login(form).unwrap();
-      console.log("LOGIN DATA =", data);
 
       const defaultPage = data?.Roles?.[0]?.DefaultPage;
-      console.log("Default page =", defaultPage);
-      if (defaultPage) {
-        navigate(defaultPage);
+
+      if (from) {
+        navigate(from, { replace: true });
+      } else if (defaultPage) {
+        navigate(defaultPage, { replace: true });
       } else {
-        navigate("/");
+        navigate("/", { replace: true });
       }
+
     } catch (error: any) {
       if (error?.data?.code === 444) {
         console.log("Need reconfirm password");
       }
     }
   };
-
 
   return (
     <Stack
@@ -93,26 +95,19 @@ const LoginForm = () => {
               alignItems: { xs: 'flex-start', sm: 'flex-end' },
             }}
           >
-            <Typography variant="h4">Log in</Typography>
+            <Typography variant="h4">Đăng nhập</Typography>
             <Typography
               variant="subtitle2"
               sx={{
                 color: 'text.secondary',
               }}
             >
-              Don&apos;t have an account?
-              <Link href='/' sx={{ ml: 1 }}>
-                Sign up
+              Chưa có tài khoản?
+              <Link href='/dang-ky' sx={{ ml: 1 }}>
+                Đăng ký
               </Link>
             </Typography>
           </Stack>
-        </Grid>
-
-        <Grid size={12}>
-          <SocialAuth />
-        </Grid>
-        <Grid size={12}>
-          <Divider sx={{ color: 'text.secondary' }}>or use email</Divider>
         </Grid>
 
         <Grid size={12}>
@@ -168,7 +163,7 @@ const LoginForm = () => {
               </Grid>
               <Grid
                 sx={{
-                  mb: 6,
+                  mb: 3,
                 }}
                 size={12}
               >
@@ -179,37 +174,21 @@ const LoginForm = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <FormControlLabel
-                    control={<Checkbox name="checked" color="primary" size="small" />}
-                    label={
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          color: 'text.secondary',
-                        }}
-                      >
-                        Remember this device
-                      </Typography>
-                    }
-                  />
 
                   <Link href="#!" variant="subtitle2">
-                    Forgot Password?
+                    Quên mật khẩu?
                   </Link>
                 </Stack>
               </Grid>
               <Grid size={12}>
                 <Button fullWidth type="submit" disabled={!isFormValid()} size="large" variant="contained">
-                  Log in
+                  Đăng nhập
                 </Button>
               </Grid>
             </Grid>
           </Box>
         </Grid>
       </Grid>
-      <Link href="#!" variant="subtitle2">
-        Trouble signing in?
-      </Link>
     </Stack>
   );
 };
