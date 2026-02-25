@@ -77,7 +77,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                   </Typography>
 
                   <Typography variant="body2">
-                    <b>Ngành chính:</b> {org.MainProfession}
+                    <b>Ngành chính:</b> {org.MainProfession?.Name}
                   </Typography>
 
                   <Typography variant="body2">
@@ -151,7 +151,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               }}
             >
               <Typography variant="body2" color="primary">
-                {org.MainProfession}
+                {org.MainProfession?.Name}
               </Typography>
             </Box>
           </Box>
