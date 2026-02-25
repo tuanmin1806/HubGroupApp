@@ -13,18 +13,27 @@ import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api"
 import { TEXT_COLOR } from "../../constants/common.constant";
 
 interface SearchBarProps {
-    onSearch?: (query: string, provinceId: string) => void;
+    onSearch?: (query: string, provinceSeo: string) => void;
+    initialQuery?: string;
+    initialProvinceSeo?: string;
 }
 
-export default function SearchBar({ onSearch }: SearchBarProps) {
-    const [province, setProvince] = React.useState("");
-    const [searchValue, setSearchValue] = React.useState("");
+export default function SearchBar({ onSearch, initialQuery = "", initialProvinceSeo = "" }: SearchBarProps) {
+    const [provinceSeo, setProvinceSeo] = React.useState(initialProvinceSeo);
+    const [searchValue, setSearchValue] = React.useState(initialQuery);
 
-    const { data: provinces = [], isLoading } =
-        useGetAllProvinceNoAuthenQuery();
+    const { data: provinces = [], isLoading } = useGetAllProvinceNoAuthenQuery();
+
+    React.useEffect(() => {
+        setSearchValue(initialQuery);
+    }, [initialQuery]);
+
+    React.useEffect(() => {
+        setProvinceSeo(initialProvinceSeo);
+    }, [initialProvinceSeo]);
 
     const handleSearch = () => {
-        onSearch?.(searchValue.trim(), province);
+        onSearch?.(searchValue.trim(), provinceSeo);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -42,10 +51,9 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                 gap: 1,
                 borderRadius: 10,
                 boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                color: TEXT_COLOR
+                color: TEXT_COLOR,
             }}
         >
-            {/* Input tìm kiếm */}
             <InputBase
                 sx={{ flex: 1, ml: 1 }}
                 placeholder="Nhập tên tổ chức, ngành nghề, mã số thuế..."
@@ -54,34 +62,24 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                 onKeyDown={handleKeyPress}
             />
 
-            {/* Select tỉnh thành */}
             <FormControl size="small" sx={{ minWidth: 220 }}>
                 <Select
                     displayEmpty
-                    value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                    startAdornment={
-                        <LocationOn sx={{ mr: 1, color: "text.secondary" }} />
-                    }
+                    value={provinceSeo}
+                    onChange={(e) => setProvinceSeo(e.target.value)}
+                    startAdornment={<LocationOn sx={{ mr: 1, color: "text.secondary" }} />}
                     sx={{
                         height: 40,
                         borderRadius: 6,
-                        "& .MuiOutlinedInput-notchedOutline": {
-                            border: "none",
-                        },
+                        "& .MuiOutlinedInput-notchedOutline": { border: "none" },
                     }}
                     MenuProps={{
-                        PaperProps: {
-                            sx: {
-                                maxHeight: 280, // ⭐ giới hạn chiều cao dropdown
-                            },
-                        },
+                        PaperProps: { sx: { maxHeight: 280 } },
                     }}
                 >
                     <MenuItem value="">
                         <em>Tất cả tỉnh / thành</em>
                     </MenuItem>
-
                     {isLoading ? (
                         <MenuItem disabled>
                             <CircularProgress size={18} sx={{ mr: 1 }} />
@@ -89,7 +87,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                         </MenuItem>
                     ) : (
                         provinces.map((p) => (
-                            <MenuItem key={p.Id} value={p.Id}>
+                            <MenuItem key={p.Id} value={p.Seo}>
                                 {p.Name}
                             </MenuItem>
                         ))
@@ -97,7 +95,6 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                 </Select>
             </FormControl>
 
-            {/* Button search */}
             <Button
                 variant="contained"
                 startIcon={<SearchOutlined />}
@@ -108,9 +105,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                     backgroundColor: "#f3522a",
                     textTransform: "none",
                     fontWeight: 600,
-                    "&:hover": {
-                        backgroundColor: "#d43f1a",
-                    },
+                    "&:hover": { backgroundColor: "#d43f1a" },
                 }}
             >
                 Tìm kiếm

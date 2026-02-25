@@ -275,20 +275,20 @@ const RecruitmentPostSearchPage = () => {
                                                 cursor: "pointer",
                                                 transition: "all 0.2s ease",
                                                 "&:hover": {
-                                                    borderColor: "primary.main",
+                                                    borderColor: post.IsTop ? "#faa11b" : "divider",
                                                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                                                     transform: "translateY(-2px)",
                                                 },
                                             }}
                                         >
-                                            <Stack spacing={2}>
-                                                {/* Header */}
-                                                <Stack direction="row" spacing={2} alignItems="flex-start">
+                                            <Stack spacing={1.25}>
+                                                {/* Header row */}
+                                                <Stack direction="row" spacing={1.5} alignItems="flex-start">
                                                     {/* Logo */}
                                                     <Box
                                                         sx={{
-                                                            width: 60,
-                                                            height: 60,
+                                                            width: { xs: 52, sm: 60 },
+                                                            height: { xs: 52, sm: 60 },
                                                             borderRadius: 1.5,
                                                             backgroundColor: "#f5f5f5",
                                                             display: "flex",
@@ -305,90 +305,104 @@ const RecruitmentPostSearchPage = () => {
                                                                 component="img"
                                                                 src={post.Organization.LogoFullUrl}
                                                                 alt={post.Organization.Name}
-                                                                sx={{
-                                                                    width: "100%",
-                                                                    height: "100%",
-                                                                    objectFit: "contain",
-                                                                }}
+                                                                sx={{ width: "100%", height: "100%", objectFit: "contain" }}
                                                             />
                                                         ) : (
-                                                            <Business sx={{ fontSize: 30, color: "text.secondary" }} />
+                                                            <Business sx={{ fontSize: 26, color: "text.secondary" }} />
                                                         )}
                                                     </Box>
 
-                                                    {/* Content */}
+                                                    {/* Main info */}
                                                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                        <Typography
-                                                            variant="h6"
-                                                            fontWeight={700}
-                                                            sx={{
-                                                                fontSize: "1.1rem",
-                                                                mb: 0.5,
-                                                                display: "-webkit-box",
-                                                                WebkitLineClamp: 2,
-                                                                WebkitBoxOrient: "vertical",
-                                                                overflow: "hidden",
-                                                            }}
-                                                        >
-                                                            {post.Name}
-                                                        </Typography>
+                                                        {/* Title + badge */}
+                                                        <Stack direction="row" alignItems="flex-start" gap={1} flexWrap="wrap">
+                                                            <Typography
+                                                                variant="subtitle1"
+                                                                fontWeight={700}
+                                                                sx={{
+                                                                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                                                                    lineHeight: 1.35,
+                                                                    flex: 1,
+                                                                    minWidth: 0,
+                                                                    display: "-webkit-box",
+                                                                    WebkitLineClamp: 2,
+                                                                    WebkitBoxOrient: "vertical",
+                                                                    overflow: "hidden",
+                                                                }}
+                                                            >
+                                                                {post.Name}
+                                                            </Typography>
 
+                                                            {post.IsTop && (
+                                                                <Chip
+                                                                    label="Nổi bật"
+                                                                    size="small"
+                                                                    sx={{
+                                                                        height: 20,
+                                                                        fontSize: "0.62rem",
+                                                                        fontWeight: 700,
+                                                                        flexShrink: 0,
+                                                                        alignSelf: "flex-start",
+                                                                        bgcolor: "#f3522a",
+                                                                        color: "#ffffff",
+                                                                        border: "none",
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </Stack>
+
+                                                        {/* Org name */}
                                                         <Typography
                                                             variant="body2"
                                                             color="text.secondary"
-                                                            fontWeight={600}
-                                                            sx={{ mb: 1 }}
+                                                            fontWeight={500}
+                                                            sx={{
+                                                                fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                                                                mt: 0.25,
+                                                                overflow: "hidden",
+                                                                textOverflow: "ellipsis",
+                                                                whiteSpace: "nowrap",
+                                                            }}
                                                         >
                                                             {post.Organization.Name}
                                                         </Typography>
 
-                                                        <Stack direction="row" spacing={2} flexWrap="wrap" gap={1}>
-                                                            {/* Location */}
-                                                            <Stack direction="row" spacing={0.5} alignItems="center">
-                                                                <LocationOn sx={{ fontSize: 16, color: "text.secondary" }} />
-                                                                <Typography variant="caption" color="text.secondary">
+                                                        {/* Meta row: location, quantity, deadline */}
+                                                        <Stack
+                                                            direction="row"
+                                                            flexWrap="wrap"
+                                                            gap={{ xs: 0.75, sm: 1.5 }}
+                                                            mt={0.5}
+                                                        >
+                                                            <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                <LocationOn sx={{ fontSize: 14, color: "text.disabled" }} />
+                                                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
                                                                     {post.Province}
                                                                 </Typography>
                                                             </Stack>
 
-                                                            {/* Quantity */}
-                                                            <Stack direction="row" spacing={0.5} alignItems="center">
-                                                                <WorkOutline sx={{ fontSize: 16, color: "text.secondary" }} />
-                                                                <Typography variant="caption" color="text.secondary">
+                                                            <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                <WorkOutline sx={{ fontSize: 14, color: "text.disabled" }} />
+                                                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
                                                                     {post.Quantity} vị trí
                                                                 </Typography>
                                                             </Stack>
 
-                                                            {/* Deadline */}
                                                             {post.RecruitmentToDate && (
-                                                                <Stack direction="row" spacing={0.5} alignItems="center">
-                                                                    <CalendarToday sx={{ fontSize: 16, color: "text.secondary" }} />
-                                                                    <Typography variant="caption" color="text.secondary">
+                                                                <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                    <CalendarToday sx={{ fontSize: 14, color: "text.disabled" }} />
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
                                                                         Hạn: {formatDate(post.RecruitmentToDate)}
                                                                     </Typography>
                                                                 </Stack>
                                                             )}
                                                         </Stack>
                                                     </Box>
-
-                                                    {/* Top Badge */}
-                                                    {post.IsTop && (
-                                                        <Chip
-                                                            label="Nổi bật"
-                                                            size="small"
-                                                            color="error"
-                                                            sx={{
-                                                                height: 24,
-                                                                fontSize: "0.7rem",
-                                                                fontWeight: 600,
-                                                            }}
-                                                        />
-                                                    )}
                                                 </Stack>
 
                                                 {/* Professions */}
                                                 {post.Professions && post.Professions.length > 0 && (
-                                                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5}>
+                                                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
                                                         {post.Professions.slice(0, 3).map((profession) => (
                                                             <Chip
                                                                 key={profession.Id}
@@ -396,10 +410,11 @@ const RecruitmentPostSearchPage = () => {
                                                                 size="small"
                                                                 variant="outlined"
                                                                 sx={{
-                                                                    height: 24,
-                                                                    fontSize: "0.7rem",
-                                                                    borderColor: "primary.main",
+                                                                    height: 20,
+                                                                    fontSize: "0.65rem",
+                                                                    borderColor: "primary.light",
                                                                     color: "primary.main",
+                                                                    "& .MuiChip-label": { px: 0.75 },
                                                                 }}
                                                             />
                                                         ))}
@@ -408,47 +423,52 @@ const RecruitmentPostSearchPage = () => {
                                                                 label={`+${post.Professions.length - 3}`}
                                                                 size="small"
                                                                 variant="outlined"
-                                                                sx={{ height: 24, fontSize: "0.7rem" }}
+                                                                sx={{ height: 20, fontSize: "0.65rem", "& .MuiChip-label": { px: 0.75 } }}
                                                             />
                                                         )}
                                                     </Stack>
                                                 )}
 
-                                                {/* Requirements Summary */}
+                                                {/* Footer: requirements + actions */}
                                                 <Stack
                                                     direction="row"
                                                     alignItems="center"
                                                     justifyContent="space-between"
-                                                    gap={2}
                                                     flexWrap={{ xs: "wrap", sm: "nowrap" }}
+                                                    gap={1}
                                                 >
+                                                    {/* Requirements */}
                                                     {post.Requirement && (
-                                                        <Stack direction="row" spacing={2} flexWrap="wrap" gap={1}>
+                                                        <Stack direction="row" flexWrap="wrap" gap={{ xs: 0.5, sm: 1.5 }}>
                                                             {post.Requirement.Gender && (
-                                                                <Typography variant="caption" color="text.secondary">
-                                                                    Giới tính: {post.Requirement.Gender === "Male" ? "Nam" : post.Requirement.Gender === "Female" ? "Nữ" : "Không yêu cầu"}
+                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
+                                                                    Giới tính:{" "}
+                                                                    {post.Requirement.Gender === "Male"
+                                                                        ? "Nam"
+                                                                        : post.Requirement.Gender === "Female"
+                                                                            ? "Nữ"
+                                                                            : "Không yêu cầu"}
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.FromAge && post.Requirement.ToAge && (
-                                                                <Typography variant="caption" color="text.secondary">
-                                                                    Tuổi: {post.Requirement.FromAge} - {post.Requirement.ToAge}
+                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
+                                                                    Tuổi: {post.Requirement.FromAge}–{post.Requirement.ToAge}
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.Experience && (
-                                                                <Typography variant="caption" color="text.secondary">
-                                                                    Kinh nghiệm: {post.Requirement.Experience}
+                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
+                                                                    KN: {post.Requirement.Experience}
                                                                 </Typography>
                                                             )}
                                                         </Stack>
                                                     )}
+
+                                                    {/* Actions */}
                                                     <Stack
                                                         direction="row"
-                                                        spacing={1}
+                                                        spacing={0.75}
                                                         flexShrink={0}
-                                                        sx={{
-                                                            width: { xs: "100%", sm: "auto" },
-                                                            justifyContent: { xs: "flex-end", sm: "flex-end" },
-                                                        }}
+                                                        sx={{ ml: "auto" }}
                                                     >
                                                         <Button
                                                             variant="contained"
@@ -457,22 +477,33 @@ const RecruitmentPostSearchPage = () => {
                                                                 e.stopPropagation();
                                                                 navigate(`/tin-tuyen-sinh/${post.SeoUrl}`);
                                                             }}
-                                                            sx={{ backgroundColor: BACK_GROUND_BUTTON_COLOR, borderRadius: 1, fontSize: 12 }}
+                                                            sx={{
+                                                                backgroundColor: BACK_GROUND_BUTTON_COLOR,
+                                                                borderRadius: 1.5,
+                                                                fontSize: "0.72rem",
+                                                                px: 1.5,
+                                                                height: 30,
+                                                                textTransform: "none",
+                                                                fontWeight: 600,
+                                                            }}
                                                         >
                                                             Ứng tuyển
                                                         </Button>
                                                         <IconButton
-                                                            sx={{
-                                                                border: 1
-                                                            }}
                                                             size="small"
                                                             color="primary"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                // handle favorite
+                                                            }}
+                                                            sx={{
+                                                                border: "1px solid",
+                                                                borderColor: "primary.light",
+                                                                borderRadius: 1.5,
+                                                                width: 30,
+                                                                height: 30,
                                                             }}
                                                         >
-                                                            <FavoriteBorder fontSize="small" />
+                                                            <FavoriteBorder sx={{ fontSize: 16 }} />
                                                         </IconButton>
                                                     </Stack>
                                                 </Stack>

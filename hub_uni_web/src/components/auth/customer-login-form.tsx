@@ -103,7 +103,7 @@ const CustomerLoginForm = () => {
               }}
             >
               Chưa có tài khoản?
-              <Link href='/' sx={{ ml: 1 }}>
+              <Link href='/dang-ky' sx={{ ml: 1 }}>
                 Đăng ký
               </Link>
             </Typography>

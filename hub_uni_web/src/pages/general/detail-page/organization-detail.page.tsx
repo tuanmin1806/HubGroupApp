@@ -1,4 +1,4 @@
-import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email, WorkOutline } from "@mui/icons-material";
+import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email, WorkOutline, PeopleAlt, CalendarToday } from "@mui/icons-material";
 import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, Tabs, Tab, CircularProgress } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetOrganizationBySeoQuery } from "../../../app/features/organization.api";
@@ -6,6 +6,7 @@ import { useGetRecruitmentPostsByOrganizationWithPageQuery } from "../../../app/
 import OrganizationSelectActionCard from "../../../components/cards/organization-card.card";
 import MuiLink from "@mui/material/Link";
 import { useState } from "react";
+import { formatDate } from "../../../utils/date.utils";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -34,8 +35,8 @@ const OrganizationDetailPage = () => {
     const navigate = useNavigate();
     const [tabValue, setTabValue] = useState(0);
 
-    const { data: organization, isLoading, error } = useGetOrganizationBySeoQuery(seoUrl!, { skip: !seoUrl,});
-    const { data: recruitmentPosts, isLoading: loadingPosts } = useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, { skip: !seoUrl,});
+    const { data: organization, isLoading, error } = useGetOrganizationBySeoQuery(seoUrl!, { skip: !seoUrl, });
+    const { data: recruitmentPosts, isLoading: loadingPosts } = useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, { skip: !seoUrl, });
 
     if (isLoading) {
         return (
@@ -177,30 +178,32 @@ const OrganizationDetailPage = () => {
                                     <Tabs
                                         value={tabValue}
                                         onChange={handleTabChange}
-                                        TabIndicatorProps={{
-                                            style: { display: 'none' }
-                                        }}
                                         sx={{
-                                            px: 2,
+                                            minHeight: 50,
                                             '& .MuiTab-root': {
                                                 textTransform: 'none',
                                                 fontWeight: 600,
                                                 fontSize: '1rem',
+                                                minHeight: 50,
+                                                py: 0,
+                                                gap: 0.5,
                                                 '&.Mui-selected': {
-                                                    backgroundColor: 'action.selected',
-                                                    color: 'primary.main'
-                                                }
-                                            }
+                                                    color: 'primary.main',
+                                                },
+                                            },
+                                            '& .MuiTab-iconWrapper': {
+                                                fontSize: 18,
+                                            },
                                         }}
                                     >
                                         <Tab
                                             label="Giới thiệu"
-                                            icon={<Info />}
+                                            icon={<Info sx={{ fontSize: 18 }} />}
                                             iconPosition="start"
                                         />
                                         <Tab
                                             label={`Tin tuyển sinh (${recruitmentPosts?.Total || 0})`}
-                                            icon={<WorkOutline />}
+                                            icon={<WorkOutline sx={{ fontSize: 18 }} />}
                                             iconPosition="start"
                                         />
                                     </Tabs>
@@ -302,7 +305,7 @@ const OrganizationDetailPage = () => {
                                                 <CircularProgress />
                                             </Box>
                                         ) : recruitmentPosts?.Items && recruitmentPosts.Items.length > 0 ? (
-                                            <Stack spacing={1}>
+                                            <Stack spacing={1.5}>
                                                 {recruitmentPosts.Items.map((post) => (
                                                     <Card
                                                         key={post.Id}
@@ -310,60 +313,114 @@ const OrganizationDetailPage = () => {
                                                         sx={{
                                                             cursor: 'pointer',
                                                             transition: 'all 0.2s',
+                                                            position: 'relative',
                                                             '&:hover': {
-                                                                boxShadow: 2,
-                                                                transform: 'translateX(4px)',
-                                                            }
+                                                                transform: 'translateY(-2px)',
+                                                            },
                                                         }}
                                                         onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
                                                     >
-                                                        <CardContent sx={{ py: 2 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                                                                <WorkOutline
-                                                                    sx={{
-                                                                        color: 'primary.main',
-                                                                        fontSize: 24,
-                                                                        mt: 0.5,
-                                                                        flexShrink: 0
-                                                                    }}
-                                                                />
-                                                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                        {/* IsTop badge */}
+                                                        {post.IsTop && (
+                                                            <Box sx={{
+                                                                position: 'absolute', top: 8, right: 8,
+                                                                bgcolor: '#f3522a', color: '#fafafa',
+                                                                fontSize: "0.7rem", fontWeight: 500,
+                                                                px: 0.75, py: 0.25, borderRadius: 0.75,
+                                                                letterSpacing: 0.4, lineHeight: 1.5, zIndex: 1,
+                                                            }}>
+                                                                Nổi bật
+                                                            </Box>
+                                                        )}
+
+                                                        <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                                                                {/* Content */}
+                                                                <Box sx={{ flex: 1, minWidth: 0, pr: post.IsTop ? 6 : 0 }}>
+                                                                    {/* Title */}
                                                                     <Typography
                                                                         variant="body1"
                                                                         fontWeight={600}
                                                                         sx={{
-                                                                            mb: 0.5,
-                                                                            whiteSpace: 'normal',
-                                                                            wordBreak: 'break-word',
+                                                                            fontSize: { xs: '0.875rem', sm: '0.95rem' },
+                                                                            lineHeight: 1.35,
+                                                                            WebkitLineClamp: 2,
+                                                                            WebkitBoxOrient: 'vertical',
+                                                                            overflow: 'hidden',
+                                                                            mb: 0.75,
+                                                                            '&:hover': { color: 'primary.main' },
+                                                                            transition: 'color 0.2s',
                                                                         }}
                                                                     >
                                                                         {post.Name}
                                                                     </Typography>
 
-                                                                    {post.Name && (
-                                                                        <Chip
-                                                                            label={post.Name}
-                                                                            size="small"
-                                                                            variant="outlined"
-                                                                            sx={{ mt: 1 }}
-                                                                        />
+                                                                    {/* Professions chips */}
+                                                                    {post.Professions && post.Professions.length > 0 && (
+                                                                        <Stack direction="row" flexWrap="wrap" gap={0.5} mb={0.75}>
+                                                                            {post.Professions.slice(0, 3).map((p) => (
+                                                                                <Chip
+                                                                                    key={p.Id}
+                                                                                    label={p.Name}
+                                                                                    size="small"
+                                                                                    variant="outlined"
+                                                                                    sx={{
+                                                                                        height: 20,
+                                                                                        fontSize: '0.65rem',
+                                                                                        borderColor: 'primary.light',
+                                                                                        color: 'primary.main',
+                                                                                        '& .MuiChip-label': { px: 0.75 },
+                                                                                    }}
+                                                                                />
+                                                                            ))}
+                                                                            {post.Professions.length > 3 && (
+                                                                                <Chip
+                                                                                    label={`+${post.Professions.length - 3}`}
+                                                                                    size="small"
+                                                                                    variant="outlined"
+                                                                                    sx={{ height: 20, fontSize: '0.65rem', '& .MuiChip-label': { px: 0.75 } }}
+                                                                                />
+                                                                            )}
+                                                                        </Stack>
                                                                     )}
 
-                                                                    {post.Description && (
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            color="text.secondary"
-                                                                            sx={{
-                                                                                mt: 1,
-                                                                                display: '-webkit-box',
-                                                                                WebkitLineClamp: 2,
-                                                                                WebkitBoxOrient: 'vertical',
-                                                                                overflow: 'hidden'
-                                                                            }}
-                                                                        >
-                                                                            {post.Description}
-                                                                        </Typography>
-                                                                    )}
+                                                                    {/* Meta: quantity + deadline */}
+                                                                    <Stack
+                                                                        direction="row"
+                                                                        flexWrap="wrap"
+                                                                        alignItems="center"
+                                                                        gap={{ xs: 0.75, sm: 1.5 }}
+                                                                    >
+                                                                        {/* Số lượng */}
+                                                                        <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                            <PeopleAlt sx={{ fontSize: 14, color: 'primary.main' }} />
+                                                                            <Typography variant="caption" sx={{ fontSize: '0.72rem' }}>
+                                                                                {post.Quantity} chỉ tiêu
+                                                                            </Typography>
+                                                                        </Stack>
+
+                                                                        {/* Tỉnh */}
+                                                                        {post.Province && (
+                                                                            <>
+                                                                                <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                                    <LocationOn sx={{ fontSize: 14, color: 'primary.main' }} />
+                                                                                    <Typography variant="caption" sx={{ fontSize: '0.72rem' }}>
+                                                                                        {post.Province}
+                                                                                    </Typography>
+                                                                                </Stack>
+                                                                            </>
+                                                                        )}
+
+                                                                        {/* Hạn nộp */}
+                                                                        {post.RecruitmentToDate && (
+                                                                            <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                                <CalendarToday sx={{ fontSize: 13, color: 'primary.main' }} />
+                                                                                <Typography variant="caption" sx={{ fontSize: '0.72rem' }}>
+                                                                                    {formatDate(post.RecruitmentToDate)}
+                                                                                </Typography>
+                                                                            </Stack>
+                                                                        )}
+                                                                    </Stack>
                                                                 </Box>
                                                             </Box>
                                                         </CardContent>
@@ -548,7 +605,7 @@ const OrganizationDetailPage = () => {
                                 <Card>
                                     <CardContent>
                                         <Typography fontWeight={600} gutterBottom>
-                                            Ngành đào tạo chính
+                                            Ngành đào tạo thế mạnh
                                         </Typography>
                                         <Stack spacing={1} mt={1}>
                                             <Stack direction="row" spacing={1} alignItems="center">

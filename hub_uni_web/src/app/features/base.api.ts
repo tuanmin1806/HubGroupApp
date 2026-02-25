@@ -33,7 +33,7 @@ const baseQueryWithAuth: BaseQueryFn<
         && result.meta.response.status >= 200
         && result.meta.response.status < 300
     ) {
-        const message = 'Tiện ích thành công';
+        const message = 'Tải dữ liệu thành công';
         api.dispatch(showSnackbar({ message, severity: 'success' }));
     }
 

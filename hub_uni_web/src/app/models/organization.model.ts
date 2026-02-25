@@ -60,7 +60,8 @@ export interface OrganizationResponse {
     Address: string;
     LogoFullUrl: string;
     MainProfession: ProfessionResponse;
-    Professions: ProfessionResponse[]
+    Professions: ProfessionResponse[];
+    OrganizationType: string;
     Summary: string;
     IsTop: boolean;
     Highlights: string[];

@@ -1,4 +1,5 @@
 import { Department } from "./department.model";
+import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } from "./enums.model";
 import { Role } from "./role.model";
 import { SystemConfig } from "./system-config.model";
 
@@ -14,16 +15,16 @@ export interface StudentRegisterRequestBody {
     UserName: string;
     Password: string;
     FullName: string;
-    Gender: string;
+    Gender: Gender;
     Email: string;
     PhoneNumber: string;
-    AccountType: "Student";
-    AccountStatus: "Activated";
+    AccountType: AccountType.Student;
+    AccountStatus: AccountStatus.Activated;
     ProfileInfo: {
         Age: number;
-        Gender: string;
-        Experience: string;
-        EducationLevel: string;
+        Gender: Gender;
+        Experience: JobExperience;
+        EducationLevel: EducationLevel;
     };
 }
 
@@ -32,15 +33,33 @@ export interface RecruiterRegisterRequestBody {
         UserName: string;
         Password: string;
         FullName: string;
-        Gender: string;
+        Gender: Gender;
         Email: string;
         PhoneNumber: string;
+        AccountStatus: AccountStatus.Activated;
     };
     OrganizationModel: {
         Name: string;
+        InternationalName: string;
         TaxCode: string;
         Address: string;
         PhoneNumber: string;
+        IssueDate: string;
+        OrganizationTypeId: string;
+        ProfessionIds: string[];
+        MainProfessionId: string;
+        ProvinceId: string;
+        CommuneId: string;
+        ManagedBy: string;
+        LogoUrl: string;
+        WallpaperUrl: string;
+        Description: string;
+        FacebookUrl: string;
+        LinkedinUrl: string;
+        YoutubeUrl: string;
+        GoogleMapUrl: string;
+        TwitterUrl: string;
+        InstagramUrl: string;
         Email: string;
         WebsiteUrl?: string;
         Summary?: string;

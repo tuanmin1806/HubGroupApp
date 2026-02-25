@@ -1,58 +1,156 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography, MenuItem, Grid, Alert, CircularProgress, Divider, Paper } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useStudentRegisterMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
+import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
 
 const initialState = {
     UserName: "",
     Password: "",
+    ConfirmPassword: "",
     FullName: "",
-    Gender: "Male",
+    Gender: Gender.Male,
     Email: "",
     PhoneNumber: "",
-    Age: 18,
-    Experience: "LessThan1Year",
-    EducationLevel: "HighSchool",
+    Age: "" as string | number,
+    Experience: JobExperience.LessThan1Year,
+    EducationLevel: EducationLevel.Undefined,
 };
 
 const StudentSignupForm = () => {
     const [registerStudent] = useStudentRegisterMutation();
+
     const [form, setForm] = useState(initialState);
+    const [error, setError] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const set = (field: string, value: any) => setForm((prev) => ({ ...prev, [field]: value }));
 
-        await registerStudent({
-            UserName: form.UserName,
-            Password: form.Password,
-            FullName: form.FullName,
-            Gender: form.Gender,
-            Email: form.Email,
-            PhoneNumber: form.PhoneNumber,
-            AccountType: "Student",
-            AccountStatus: "Activated",
-            ProfileInfo: {
-                Age: form.Age,
-                Gender: form.Gender,
-                Experience: form.Experience,
-                EducationLevel: form.EducationLevel,
-            },
-        });
+    const validate = (): string => {
+        if (!form.UserName.trim()) return "Vui lòng nhập tên đăng nhập";
+        if (!form.Password) return "Vui lòng nhập mật khẩu";
+        if (form.Password !== form.ConfirmPassword) return "Mật khẩu xác nhận không khớp";
+        if (!form.FullName.trim()) return "Vui lòng nhập họ và tên";
+        if (!form.Email.trim()) return "Vui lòng nhập email";
+        return "";
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const err = validate();
+        if (err) { setError(err); return; }
+        setError("");
+        setSubmitting(true);
+        try {
+            await registerStudent({
+                UserName: form.UserName,
+                Password: form.Password,
+                FullName: form.FullName,
+                Gender: form.Gender,
+                Email: form.Email,
+                PhoneNumber: form.PhoneNumber,
+                AccountType: AccountType.Student,
+                AccountStatus: AccountStatus.Activated,
+                ProfileInfo: {
+                    Age: Number(form.Age) || 0,
+                    Gender: form.Gender,
+                    Experience: form.Experience,
+                    EducationLevel: form.EducationLevel,
+                },
+            }).unwrap();
+            setSubmitSuccess(true);
+        } catch {
+            setError("Đăng ký thất bại. Vui lòng thử lại.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (submitSuccess) {
+        return (
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "50vh", gap: 2, px: 2 }}>
+                <CheckCircleIcon sx={{ fontSize: 72, color: "success.main" }} />
+                <Typography variant="h5" fontWeight={700}>Đăng ký thành công!</Typography>
+                <Typography color="text.secondary" textAlign="center">Tài khoản của bạn đang chờ phê duyệt.</Typography>
+            </Box>
+        );
+    }
+
     return (
-        <Box component="form" onSubmit={handleSubmit}>
-            <Stack spacing={2}>
-                <Typography variant="h6">Thông tin đăng nhập</Typography>
-                <TextField label="Tên đăng nhập" value={form.UserName} onChange={(e) => setForm({...form, UserName: e.target.value})} fullWidth />
-                <TextField label="Mật khẩu" type="password" value={form.Password} onChange={(e) => setForm({...form, Password: e.target.value})} fullWidth />
-                <TextField label="Họ và tên" value={form.FullName} onChange={(e) => setForm({...form, FullName: e.target.value})} fullWidth />
-                <TextField label="Email" value={form.Email} onChange={(e) => setForm({...form, Email: e.target.value})} fullWidth />
-                <TextField label="Số điện thoại" value={form.PhoneNumber} onChange={(e) => setForm({...form, PhoneNumber: e.target.value})} fullWidth />
-                <TextField label="Tuổi" type="number" value={form.Age} onChange={(e) => setForm({...form, Age: parseInt(e.target.value) || 0})} fullWidth />
-                <Button type="submit" variant="contained" size="large">
-                    Đăng ký học sinh
-                </Button>
-            </Stack>
+        <Box sx={{ maxWidth: 600, mx: "auto", px: { xs: 1, sm: 1 }, py: { xs: 1, sm: 1 } }}>
+            <Typography variant="h5" fontWeight={700} textAlign="center" mb={0.5}> Đăng ký thông tin </Typography>
+            <Typography variant="body2" color="text.secondary" textAlign="center" mb={1}> Vui lòng điền đầy đủ thông tin để tạo tài khoản </Typography>
+
+            {error && (<Alert severity="error" sx={{ mb: 1 }} onClose={() => setError("")}>{error}</Alert>)}
+
+            <Paper elevation={0} sx={{ p: { xs: 1, sm: 1 } }}>
+                <Box component="form" onSubmit={handleSubmit} onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}>
+                    <Stack spacing={2}>
+                        <Box>
+                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={0.5}> Thông tin tài khoản </Typography>
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12 }}> <TextField label="Tên đăng nhập *" size="small" fullWidth value={form.UserName} onChange={(e) => set("UserName", e.target.value)} /> </Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label="Mật khẩu *" type="password" size="small" fullWidth value={form.Password} onChange={(e) => set("Password", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label="Xác nhận mật khẩu *" type="password" size="small" fullWidth value={form.ConfirmPassword} onChange={(e) => set("ConfirmPassword", e.target.value)} error={!!form.ConfirmPassword && form.Password !== form.ConfirmPassword} helperText={form.ConfirmPassword && form.Password !== form.ConfirmPassword ? "Mật khẩu không khớp" : ""} /></Grid>
+                            </Grid>
+                        </Box>
+
+                        <Divider />
+
+                        <Box>
+                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={0.5}> Thông tin cá nhân </Typography>
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12 }}> <TextField label="Họ và tên *" size="small" fullWidth value={form.FullName} onChange={(e) => set("FullName", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Email *" type="email" size="small" fullWidth value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Số điện thoại" size="small" fullWidth value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField select label="Giới tính" size="small" fullWidth value={form.Gender} onChange={(e) => set("Gender", e.target.value)}>
+                                    <MenuItem value={Gender.Male}>Nam</MenuItem>
+                                    <MenuItem value={Gender.Female}>Nữ</MenuItem>
+                                    <MenuItem value={Gender.Other}>Khác</MenuItem>
+                                </TextField>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Tuổi" type="number" size="small" fullWidth value={form.Age} onChange={(e) => set("Age", e.target.value)} /></Grid>
+                            </Grid>
+                        </Box>
+
+                        <Divider />
+
+                        <Box>
+                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={1.5}> Học vấn & Kinh nghiệm </Typography>
+                            <Grid container spacing={1}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField select label="Trình độ học vấn" size="small" fullWidth value={form.EducationLevel} onChange={(e) => set("EducationLevel", e.target.value)}>
+                                        <MenuItem value={EducationLevel.Undefined}>Không xác định</MenuItem>
+                                        <MenuItem value={EducationLevel.HighSchool}>Trung học phổ thông</MenuItem>
+                                        <MenuItem value={EducationLevel.College}>Cao đẳng</MenuItem>
+                                        <MenuItem value={EducationLevel.University}>Đại học</MenuItem>
+                                        <MenuItem value={EducationLevel.Postgraduate}>Sau đại học</MenuItem>
+                                    </TextField>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField select label="Kinh nghiệm" size="small" fullWidth value={form.Experience} onChange={(e) => set("Experience", e.target.value)}>
+                                        <MenuItem value={JobExperience.Undefined}>Không xác định</MenuItem>
+                                        <MenuItem value={JobExperience.LessThan1Year}>Dưới 1 năm</MenuItem>
+                                    </TextField>
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            size="small"
+                            fullWidth
+                            disabled={submitting}
+                            startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
+                            sx={{ mt: 1, py: 1 }}
+                        >
+                            {submitting ? "Đang xử lý..." : "Đăng ký học sinh"}
+                        </Button>
+                    </Stack>
+                </Box>
+            </Paper>
         </Box>
     );
 };

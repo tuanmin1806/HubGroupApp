@@ -410,6 +410,7 @@ const RecruitmentPostDetailPage = () => {
                                                 <Button
                                                     variant="outlined"
                                                     fullWidth
+                                                    onClick={() => navigate(`/to-chuc/${recruitmentPost.Organization.SeoUrl}`)}
                                                     sx={{
                                                         mt: 2,
                                                         borderColor: '#ff5722',

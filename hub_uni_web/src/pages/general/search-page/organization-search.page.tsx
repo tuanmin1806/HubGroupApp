@@ -51,6 +51,7 @@ const OrganizationSearchPage = () => {
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     const initialSearch = searchParams.get('search') || '';
+    const initialProvinceSeo = searchParams.get('provinceSeo') || '';
 
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filters, setFilters] = useState<OrganizationFilterParams>({
@@ -66,7 +67,7 @@ const OrganizationSearchPage = () => {
 
     const [orgTypePage, setOrgTypePage] = useState(1);
     const [professionPage, setProfessionPage] = useState(1);
-    const [selectedProvinceSeo, setSelectedProvinceSeo] = useState('');
+    const [selectedProvinceSeo, setSelectedProvinceSeo] = useState(initialProvinceSeo);
 
     const [showAllOrgTypes, setShowAllOrgTypes] = useState(false);
     const [showAllProfessions, setShowAllProfessions] = useState(false);
@@ -107,6 +108,15 @@ const OrganizationSearchPage = () => {
         }
     }, [professionsData]);
 
+    useEffect(() => {
+        if (initialProvinceSeo && provinces && provinces.length > 0 && !filters.provinceId) {
+            const province = provinces.find(p => p.Seo === initialProvinceSeo);
+            if (province) {
+                setFilters(prev => ({ ...prev, provinceId: province.Id }));
+            }
+        }
+    }, [provinces]);
+
     const handleFilterChange = (field: keyof OrganizationFilterParams, value: string) => {
         if (field === 'provinceId' && value !== filters.provinceId) {
             const province = provinces?.find(p => p.Id === value);
@@ -118,7 +128,19 @@ const OrganizationSearchPage = () => {
         setPage(DEFAULT_PAGE);
     };
 
-    const handleSearch = () => {
+    const handleSearch = (query?: string, provinceSeo?: string) => {
+        if (query !== undefined) {
+            setFilters(prev => ({ ...prev, nameSearch: query }));
+        }
+        if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
+            setSelectedProvinceSeo(provinceSeo);
+            const province = provinces?.find(p => p.Seo === provinceSeo);
+            setFilters(prev => ({
+                ...prev,
+                provinceId: province?.Id || '',
+                communeId: '',
+            }));
+        }
         setPage(DEFAULT_PAGE);
     };
 
@@ -156,7 +178,11 @@ const OrganizationSearchPage = () => {
                         mb: 2,
                         mx: 'auto'
                     }}>
-                        <SearchBar onSearch={handleSearch} />
+                        <SearchBar
+                            onSearch={handleSearch}
+                            initialQuery={filters.nameSearch}
+                            initialProvinceSeo={selectedProvinceSeo}
+                        />
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
@@ -543,13 +569,14 @@ const OrganizationSearchPage = () => {
                                             }}
                                             onClick={() => handleViewDetail(org.SeoUrl || '')}
                                         >
-                                            <CardContent sx={{ p: { xs: 1, md: 2 } }}>
-                                                <Box sx={{ display: 'flex', gap: { xs: 1, md: 2 }, alignItems: 'flex-start' }}>
+                                            <CardContent sx={{ p: { xs: 1, md: 1.5 }, '&:last-child': { pb: { xs: 1.5, md: 2 } } }}>
+                                                <Box sx={{ display: 'flex', gap: { xs: 1.5, md: 2 }, alignItems: 'stretch' }}>
+
                                                     {/* Logo */}
                                                     <Box
                                                         sx={{
-                                                            width: { xs: 64, sm: 80, md: 100 },
-                                                            height: { xs: 64, sm: 80, md: 100 },
+                                                            width: { xs: 68, sm: 84, md: 96 },
+                                                            height: { xs: 68, sm: 84, md: 96 },
                                                             borderRadius: 2,
                                                             overflow: 'hidden',
                                                             bgcolor: '#f8f9fa',
@@ -559,6 +586,7 @@ const OrganizationSearchPage = () => {
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
+                                                            alignSelf: 'flex-start',
                                                         }}
                                                     >
                                                         {org.LogoFullUrl ? (
@@ -568,19 +596,21 @@ const OrganizationSearchPage = () => {
                                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                             />
                                                         ) : (
-                                                            <School sx={{ fontSize: { xs: 32, md: 48 }, color: '#ccc' }} />
+                                                            <School sx={{ fontSize: { xs: 30, md: 44 }, color: '#ccc' }} />
                                                         )}
                                                     </Box>
 
                                                     {/* Content */}
-                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                        {/* Title + TOP */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                                    <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.4 }}>
+
+                                                        {/* Row 1: Tên + TOP badge */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }}>
                                                             <Typography
-                                                                variant="h6"
+                                                                variant="subtitle1"
                                                                 sx={{
                                                                     fontWeight: 700,
-                                                                    fontSize: { xs: '1rem', md: '1.25rem' },
+                                                                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                                                                    lineHeight: 1.35,
                                                                     '&:hover': { color: 'primary.main' },
                                                                     transition: 'color 0.2s',
                                                                     overflow: 'hidden',
@@ -588,6 +618,8 @@ const OrganizationSearchPage = () => {
                                                                     display: '-webkit-box',
                                                                     WebkitLineClamp: 2,
                                                                     WebkitBoxOrient: 'vertical',
+                                                                    flex: 1,
+                                                                    minWidth: 0,
                                                                 }}
                                                             >
                                                                 {org.Name}
@@ -600,56 +632,101 @@ const OrganizationSearchPage = () => {
                                                                     size="small"
                                                                     sx={{
                                                                         fontWeight: 700,
-                                                                        fontSize: '0.75rem',
-                                                                        height: 24
+                                                                        fontSize: '0.65rem',
+                                                                        height: 20,
+                                                                        flexShrink: 0,
+                                                                        alignSelf: 'flex-start',
+                                                                        mt: 0.1,
                                                                     }}
                                                                 />
                                                             )}
                                                         </Box>
 
-                                                        {/* Ngành */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 1 }}>
-                                                            <School sx={{ fontSize: 18, color: 'text.secondary', mt: 0.2, flexShrink: 0 }} />
+                                                        {/* Row 2: Loại tổ chức */}
+                                                        {org.OrganizationType && (
+                                                            <Box>
+                                                                <Chip
+                                                                    label={org.OrganizationType}
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    sx={{
+                                                                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                                                                        height: 20,
+                                                                        borderColor: 'primary.light',
+                                                                        color: 'primary.main',
+                                                                        fontWeight: 500,
+                                                                        maxWidth: '100%',
+                                                                        '& .MuiChip-label': {
+                                                                            px: 0.75,
+                                                                            overflow: 'hidden',
+                                                                            textOverflow: 'ellipsis',
+                                                                            whiteSpace: 'nowrap',
+                                                                        },
+                                                                    }}
+                                                                />
+                                                            </Box>
+                                                        )}
+
+                                                        <Box sx={{ mt: 0.25 }} />
+
+                                                        {/* Row 3: Ngành nghề */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                            <School sx={{ fontSize: 15, color: 'text.disabled', flexShrink: 0 }} />
                                                             <Typography
                                                                 variant="body2"
                                                                 color="text.secondary"
                                                                 sx={{
+                                                                    fontSize: { xs: '0.75rem', md: '0.8rem' },
                                                                     overflow: 'hidden',
                                                                     textOverflow: 'ellipsis',
-                                                                    display: '-webkit-box',
-                                                                    WebkitLineClamp: 1,
-                                                                    WebkitBoxOrient: 'vertical',
+                                                                    whiteSpace: 'nowrap',
+                                                                    flex: 1,
+                                                                    minWidth: 0,
                                                                 }}
                                                             >
                                                                 {org.MainProfession?.Name || 'Chưa cập nhật ngành nghề'}
                                                             </Typography>
                                                         </Box>
 
-                                                        {/* Địa chỉ */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.5 }}>
-                                                            <LocationOn sx={{ fontSize: 18, color: 'text.secondary', mt: 0.2, flexShrink: 0 }} />
+                                                        {/* Row 4: Địa chỉ */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75 }}>
+                                                            <LocationOn sx={{ fontSize: 15, color: 'text.disabled', mt: 0.15, flexShrink: 0 }} />
                                                             <Typography
                                                                 variant="body2"
                                                                 color="text.secondary"
                                                                 sx={{
+                                                                    fontSize: { xs: '0.75rem', md: '0.8rem' },
                                                                     overflow: 'hidden',
                                                                     textOverflow: 'ellipsis',
                                                                     display: '-webkit-box',
                                                                     WebkitLineClamp: 2,
                                                                     WebkitBoxOrient: 'vertical',
+                                                                    lineHeight: 1.4,
                                                                 }}
                                                             >
-                                                                {`${org.Address}, ${org.Commune}, ${org.Province}`}
+                                                                {[org.Address, org.Commune, org.Province].filter(Boolean).join(', ')}
                                                             </Typography>
                                                         </Box>
 
-                                                        {/* MST */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                            <Code sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />
-                                                            <Typography variant="body2" color="text.secondary">
+                                                        {/* Row 5: MST */}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                            <Code sx={{ fontSize: 15, color: 'text.disabled', flexShrink: 0 }} />
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.disabled"
+                                                                sx={{
+                                                                    fontSize: { xs: '0.72rem', md: '0.78rem' },
+                                                                    fontFamily: 'monospace',
+                                                                    letterSpacing: 0.3,
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'nowrap',
+                                                                }}
+                                                            >
                                                                 {org.TaxCode || 'Chưa cập nhật MST'}
                                                             </Typography>
                                                         </Box>
+
                                                     </Box>
                                                 </Box>
                                             </CardContent>

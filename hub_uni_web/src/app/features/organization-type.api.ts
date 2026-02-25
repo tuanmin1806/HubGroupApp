@@ -32,9 +32,20 @@ const organizationTypeApi = baseApi.injectEndpoints({
                 Total: responseData.Total,
             }),
         }),
+
+        getAllOrganizationTypesNoAuthen: builder.query<OrganizationType[], void>({
+            query: () => ({
+                url: `organizationtype/getall`,
+                method: "GET",
+            }),
+            transformResponse: (response: OrganizationType[]): OrganizationType[] => {
+                return response;
+            },
+        }),
     }),
 });
 
 export const {
     useGetOrganizationTypesByPageQuery,
+    useGetAllOrganizationTypesNoAuthenQuery
 } = organizationTypeApi;

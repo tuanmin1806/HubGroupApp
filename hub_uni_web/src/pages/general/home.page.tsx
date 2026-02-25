@@ -35,20 +35,11 @@ const theme = createTheme({
 const HomePage = () => {
     const navigate = useNavigate();
 
-    const handleSearch = (query: string, provinceId: string) => {
+    const handleSearch = (query: string, provinceSeo: string) => {
         const params = new URLSearchParams();
-
-        if (query.trim()) {
-            params.append('search', query.trim());
-        }
-
-        if (provinceId) {
-            params.append('provinceId', provinceId);
-        }
-
-        if (params.toString()) {
-            navigate(`/tim-kiem-to-chuc?${params.toString()}`);
-        }
+        if (query.trim()) params.append('search', query.trim());
+        if (provinceSeo) params.append('provinceSeo', provinceSeo);
+        if (params.toString()) navigate(`/tim-kiem-to-chuc?${params.toString()}`);
     };
 
     useEffect(() => {

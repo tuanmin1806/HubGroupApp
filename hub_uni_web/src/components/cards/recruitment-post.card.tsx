@@ -4,13 +4,13 @@ import {
   Card,
   Typography,
   Button,
-  Tooltip
+  Tooltip,
+  Stack
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
-import DefaultImage from "../../assets/default_organization_card.jpg"
-import { Send, Visibility } from "@mui/icons-material";
-import { BACK_GROUND_BUTTON_COLOR } from "../../constants/common.constant";
+import { Send, Visibility, PeopleAlt, CalendarToday, LocationOn } from "@mui/icons-material";
+import { formatDate } from "../../utils/date.utils";
 
 interface Props {
   recruitmentPosts: RecruitmentPostResponse[];
@@ -18,28 +18,6 @@ interface Props {
 
 export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Props) {
   const navigate = useNavigate();
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [selectedOrg, setSelectedOrg] =
-    React.useState<RecruitmentPostResponse | null>(null);
-
-  const handleOpen = (
-    event: React.MouseEvent<HTMLElement>,
-    org: RecruitmentPostResponse
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedOrg(org);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setSelectedOrg(null);
-  };
-
-  const handleGoDetail = (seoUrl: string) => {
-    navigate(`/tin-tuyen-sinh/${seoUrl}`);
-    handleClose();
-  };
 
   return (
     <>
@@ -54,7 +32,6 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
           gap: 2,
         }}
       >
-
         {recruitmentPosts.map((rcp) => (
           <Card
             key={rcp.Id}
@@ -63,8 +40,29 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
               alignItems: "stretch",
               p: 2,
               borderRadius: 2,
+              position: "relative",
             }}
           >
+            {/* IsTop badge */}
+            {rcp.IsTop && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  bgcolor: "#f3522a",
+                  color: "#fafafa",
+                  fontSize: "0.7rem",
+                  fontWeight: 500,
+                  px: 0.75,
+                  py: 0.25,
+                  borderRadius: 1,
+                }}
+              >
+                Nổi bật
+              </Box>
+            )}
+
             {/* LEFT: IMAGE */}
             <Box
               component="img"
@@ -77,46 +75,46 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 mr: 2,
                 borderRadius: 1,
                 bgcolor: "#fafafa",
-                cursor: "pointer"
+                cursor: "pointer",
+                flexShrink: 0,
               }}
               onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
             />
 
             {/* RIGHT: CONTENT */}
-            <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <Box sx={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 0.5 }}>
+
+              {/* Title tooltip */}
               <Tooltip
                 title={
-                  <Box sx={{
-                    p: 1, width: 350,
-                    maxHeight: 450,
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                  }}>
+                  <Box sx={{ p: 1, width: 350, maxHeight: 450, overflowY: "auto", overflowX: "hidden" }}>
                     <Typography fontWeight="bold" gutterBottom>
                       {rcp.Name}
                     </Typography>
-                    <Typography variant="body2">
-                      <b>Tổ chức:</b> {rcp.Organization.Name}
-                    </Typography>
+                    <Typography variant="body2"><b>Tổ chức:</b> {rcp.Organization.Name}</Typography>
 
-                    <Typography variant="body2">
-                      <b>Số lượng tuyển:</b> {rcp.Quantity}
-                    </Typography>
+                    <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5}>
+                      <PeopleAlt sx={{ fontSize: 14, color: "text.secondary" }} />
+                      <Typography variant="body2">{rcp.Quantity} chỉ tiêu</Typography>
+                    </Stack>
 
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                      <b>Địa chỉ:</b> {rcp.Province}
-                    </Typography>
+                    <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5}>
+                      <LocationOn sx={{ fontSize: 14, color: "text.secondary" }} />
+                      <Typography variant="body2">{rcp.Province}</Typography>
+                    </Stack>
 
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                      <b>Hạn:</b> {rcp.RecruitmentToDate}
-                    </Typography>
-                    <Box sx={{display: 'flex', flexDirection: 'row', gap: 1}}>
+                    <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5} mb={2}>
+                      <CalendarToday sx={{ fontSize: 13, color: "text.secondary" }} />
+                      <Typography variant="body2">{formatDate(rcp.RecruitmentToDate)}</Typography>
+                    </Stack>
+
+                    <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
                       <Button
                         variant="contained"
                         startIcon={<Visibility />}
                         size="small"
                         fullWidth
-                        sx={{backgroundColor: '#ff5722'}}
+                        sx={{ backgroundColor: "#ff5722" }}
                         onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
                       >
                         Xem chi tiết
@@ -126,7 +124,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                         startIcon={<Send />}
                         size="small"
                         fullWidth
-                        sx={{backgroundColor: '#ff5722'}}
+                        sx={{ backgroundColor: "#ff5722" }}
                         onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
                       >
                         Ứng tuyển ngay
@@ -140,14 +138,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 leaveDelay={200}
                 slotProps={{
                   popper: {
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, 8],
-                        },
-                      },
-                    ],
+                    modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
                   },
                   tooltip: {
                     sx: {
@@ -164,29 +155,36 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 <Typography
                   variant="subtitle1"
                   fontWeight="bold"
-                  sx={{ cursor: "pointer", width: "fit-content" }}
+                  sx={{
+                    cursor: "pointer",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    pr: rcp.IsTop ? 6 : 0,
+                  }}
                 >
                   {rcp.Name}
                 </Typography>
               </Tooltip>
 
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                <b>Số lượng tuyển: </b>{rcp.Quantity}
-              </Typography>
-
-              {/* BOTTOM ROW */}
-              <Box
-                sx={{
-                  mt: "auto",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography variant="body2" color="primary">
-                  {rcp.RecruitmentToDate}
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <PeopleAlt sx={{ fontSize: 14, color: "text.disabled" }} />
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.8rem" }}>
+                  {rcp.Quantity} chỉ tiêu
                 </Typography>
+              </Stack>
+
+              <Box sx={{ mt: "auto" }}>
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                  <CalendarToday sx={{ fontSize: 13, color: "primary.main" }} />
+                  <Typography variant="body2" color="primary" sx={{ fontSize: "0.8rem" }}>
+                    {formatDate(rcp.RecruitmentToDate)}
+                  </Typography>
+                </Stack>
               </Box>
+
             </Box>
           </Card>
         ))}

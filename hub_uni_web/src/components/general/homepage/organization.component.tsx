@@ -1,12 +1,13 @@
-import { ArrowForward, School, ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { Box, Button, IconButton } from "@mui/material";
+import { ArrowForward, School, ChevronLeft, ChevronRight, FilterAlt, Work, PeopleAlt } from "@mui/icons-material";
+import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack } from "@mui/material";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import OrganizationSelectActionCard from "../../cards/organization-card.card";
 import OrganizationPagination from "../../pagination/organization-pagination";
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { useGetAllProfessionNoAuthenQuery } from "../../../app/features/profession.api";
-import { useOrganizationsFullTextSearchQuery } from "../../../app/features/organization.api";
+import { useOrganizationsFullTextSearchQuery, useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
+import { useGetAllOrganizationTypesNoAuthenQuery } from "../../../app/features/organization-type.api";
 
 const sectionWrapperSx = {
     width: "100%",
@@ -21,17 +22,37 @@ const sectionWrapperSx = {
 
 const OrganizationComponent = () => {
     const navigate = useNavigate();
+    type FilterType = "organizationType" | "profession";
     const [page, setPage] = useState(DEFAULT_PAGE);
+    const [filterType, setFilterType] = useState<FilterType>("profession");
     const [orgProfessionId, setOrgProfessionId] = useState<string>("");
-    const professionListRef = useRef<HTMLDivElement>(null);
+    const [orgOrganizationTypeId, setOrgOrganizationTypeId] = useState<string>("");
+    const [selectedOrganizationTypeId, setSelectedOrganizationTypeId] = useState<string>("");
+    const [selectedProfessionId, setSelectedProfessionId] = useState<string>("");
     const { data: professions = [] } = useGetAllProfessionNoAuthenQuery();
-    const { data: organizationData } = useOrganizationsFullTextSearchQuery({
+    const { data: organizationTypes = [] } = useGetAllOrganizationTypesNoAuthenQuery();
+    const { data: organizationData } = useOrganizationsGetByPageNoAuthenQuery({
         page: page,
         size: PAGE_SIZE,
         professionId: orgProfessionId || undefined,
+        organizationTypeId: orgOrganizationTypeId || undefined
     });
     const organizationts = organizationData?.Items || [];
     const totalOrganizationPages = organizationData ? Math.ceil(organizationData.Total / PAGE_SIZE) : 1;
+
+    // Handle organization type selection
+    const handleOrganizationTypeSelect = (organizationTypeId: string) => {
+        setSelectedOrganizationTypeId(organizationTypeId);
+        setPage(DEFAULT_PAGE);
+    };
+
+    // Handle profession selection
+    const handleProfessionSelect = (professionId: string) => {
+        setSelectedProfessionId(professionId);
+        setPage(DEFAULT_PAGE);
+    };
+    const organizationTypeListRef = useRef<HTMLDivElement>(null);
+    const professionListRef = useRef<HTMLDivElement>(null);
     const scrollProfession = (direction: "left" | "right") => {
         if (!professionListRef.current) return;
 
@@ -40,6 +61,23 @@ const OrganizationComponent = () => {
             left: direction === "left" ? -scrollAmount : scrollAmount,
             behavior: "smooth",
         });
+    };
+
+    const scrollOrganizationType = (direction: "left" | "right") => {
+        if (!organizationTypeListRef.current) return;
+
+        const scrollAmount = 300;
+        organizationTypeListRef.current.scrollBy({
+            left: direction === "left" ? -scrollAmount : scrollAmount,
+            behavior: "smooth",
+        });
+    };
+
+    const handleFilterTypeChange = (newFilterType: FilterType) => {
+        setFilterType(newFilterType);
+        setSelectedOrganizationTypeId("");
+        setSelectedProfessionId("");
+        setPage(DEFAULT_PAGE);
     };
     return (
         <Box sx={sectionWrapperSx}>
@@ -74,120 +112,175 @@ const OrganizationComponent = () => {
 
             {/* Filter ngang */}
             <Box sx={{ mb: 3 }}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        width: "100%",
-                        maxWidth: "100%",
-                        overflow: "hidden",
-                        mb: 2
-                    }}
-                >
-                    {/* Profession list */}
-                    <Box
-                        ref={professionListRef}
-                        sx={{
-                            display: "flex",
-                            gap: 1,
-                            overflowX: "auto",
-                            scrollBehavior: "smooth",
-                            flex: 1,
-                            "&::-webkit-scrollbar": { display: "none" },
-                            msOverflowStyle: "none",
-                            scrollbarWidth: "none",
-                        }}
+                <Box sx={{ width: "100%", maxWidth: 1200, mb: 2 }}>
+                    <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        spacing={2}
+                        alignItems={{ xs: "stretch", md: "center" }}
                     >
-                        {professions.map((profession) => {
-                            const active = orgProfessionId === profession.Id;
+                        <FormControl sx={{ minWidth: 260 }}>
+                            <InputLabel>
+                                <FilterAlt />
+                                Lọc
+                            </InputLabel>
+                            <Select
+                                value={filterType}
+                                label="Chọn kiểu lọc"
+                                onChange={(e) => handleFilterTypeChange(e.target.value as FilterType)}
+                            >
+                                <MenuItem value="profession">
+                                    <Work fontSize="small" sx={{ mr: 1 }} />
+                                    Lọc theo ngành nghề
+                                </MenuItem>
+                                <MenuItem value="organizationType">
+                                    <PeopleAlt fontSize="small" sx={{ mr: 1 }} />
+                                    Lọc theo loại tổ chức
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
 
-                            return (
+                        {filterType === "profession" && (
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    width: "100%",
+                                    maxWidth: "100%",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                {/* Arrow Left */}
+                                <IconButton onClick={() => scrollProfession("left")}>
+                                    <ChevronLeft />
+                                </IconButton>
+
                                 <Box
-                                    key={profession.Id}
-                                    onClick={() => {
-                                        setOrgProfessionId(profession.Id);
-                                        setPage(DEFAULT_PAGE);
-                                    }}
+                                    ref={professionListRef}
                                     sx={{
-                                        px: 2,
-                                        py: 1,
-                                        border: "1px solid",
-                                        borderColor: active ? "#ff5722" : "#ddd",
-                                        borderRadius: 20,
-                                        cursor: "pointer",
-                                        fontSize: 14,
-                                        whiteSpace: "nowrap",
                                         display: "flex",
-                                        alignItems: "center",
-                                        gap: 0.5,
-                                        flexShrink: 0,
-                                        backgroundColor: active ? "#ff5722" : "transparent",
-                                        color: active ? "white" : "inherit",
-                                        transition: "all .2s",
-                                        "&:hover": {
-                                            backgroundColor: "#ff5722",
-                                            color: "white",
-                                            borderColor: "#ff5722",
+                                        gap: 1,
+                                        overflowX: "auto",
+                                        scrollBehavior: "smooth",
+                                        "&::-webkit-scrollbar": {
+                                            display: "none",
                                         },
+                                        msOverflowStyle: "none",
+                                        scrollbarWidth: "none",
+                                        flex: 1,
                                     }}
                                 >
-                                    <School fontSize="small" />
-                                    {profession.Name}
+                                    {professions.map((profession) => (
+                                        <Box
+                                            key={profession.Id}
+                                            sx={{
+                                                px: 2,
+                                                py: 1,
+                                                border: "1px solid #ddd",
+                                                borderRadius: 20,
+                                                cursor: "pointer",
+                                                fontSize: 14,
+                                                whiteSpace: "nowrap",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 0.5,
+                                                flexShrink: 0,
+                                                backgroundColor: selectedProfessionId === profession.Id ? "#ff5722" : "transparent",
+                                                color: selectedProfessionId === profession.Id ? "white" : "inherit",
+                                                borderColor: selectedProfessionId === profession.Id ? "#ff5722" : "#ddd",
+                                                "&:hover": {
+                                                    backgroundColor: "#ff5722",
+                                                    color: "white",
+                                                    borderColor: "#ff5722",
+                                                },
+                                            }}
+                                            onClick={() => handleProfessionSelect(profession.Id)}
+                                        >
+                                            <Work fontSize="small" />
+                                            {profession.Name}
+                                        </Box>
+                                    ))}
                                 </Box>
-                            );
-                        })}
-                    </Box>
-                    {/* Arrow Left */}
-                    <IconButton sx={{
-                        border: "1px solid #ddd",
-                        borderRadius: 10,
-                    }} onClick={() => scrollProfession("left")}>
-                        <ChevronLeft />
-                    </IconButton>
-                    {/* Arrow Right */}
-                    <IconButton sx={{
-                        border: "1px solid #ddd",
-                        borderRadius: 10,
-                    }} onClick={() => scrollProfession("right")}>
-                        <ChevronRight />
-                    </IconButton>
-                </Box>
-                {/* Active filter */}
-                {orgProfessionId && (
-                    <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                        <Box sx={{ fontSize: 14, color: 'text.secondary' }}>
-                            Đang lọc:
-                        </Box>
-                        <Box
-                            sx={{
-                                px: 2,
-                                py: 0.5,
-                                bgcolor: "#ff5722",
-                                color: "white",
-                                borderRadius: 20,
-                                fontSize: 13,
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 0.5,
-                            }}
-                        >
-                            <School fontSize="small" />
-                            {professions.find(p => p.Id === orgProfessionId)?.Name}
-                        </Box>
 
-                        <Button
-                            size="small"
-                            onClick={() => {
-                                setOrgProfessionId("");
-                                setPage(DEFAULT_PAGE);
-                            }}
-                            sx={{ fontSize: 12, textTransform: "none", color: "#ff5722" }}
-                        >
-                            Xóa bộ lọc
-                        </Button>
-                    </Box>
-                )}
+                                {/* Arrow Right */}
+                                <IconButton onClick={() => scrollProfession("right")}>
+                                    <ChevronRight />
+                                </IconButton>
+                            </Box>
+                        )}
+
+                        {filterType === "organizationType" && (
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    width: "100%",
+                                    maxWidth: "100%",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                {/* Arrow Left */}
+                                <IconButton onClick={() => scrollOrganizationType("left")}>
+                                    <ChevronLeft />
+                                </IconButton>
+
+                                {/* Organization type list */}
+                                <Box
+                                    ref={organizationTypeListRef}
+                                    sx={{
+                                        display: "flex",
+                                        gap: 1,
+                                        overflowX: "auto",
+                                        scrollBehavior: "smooth",
+                                        "&::-webkit-scrollbar": {
+                                            display: "none",
+                                        },
+                                        msOverflowStyle: "none",
+                                        scrollbarWidth: "none",
+                                        flex: 1,
+                                    }}
+                                >
+                                    {organizationTypes.map((organizationType) => (
+                                        <Box
+                                            key={organizationType.Id}
+                                            sx={{
+                                                px: 2,
+                                                py: 1,
+                                                border: "1px solid #ddd",
+                                                borderRadius: 20,
+                                                cursor: "pointer",
+                                                fontSize: 14,
+                                                whiteSpace: "nowrap",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 0.5,
+                                                flexShrink: 0,
+                                                backgroundColor: selectedOrganizationTypeId === organizationType.Id ? "#ff5722" : "transparent",
+                                                color: selectedOrganizationTypeId === organizationType.Id ? "white" : "inherit",
+                                                borderColor: selectedOrganizationTypeId === organizationType.Id ? "#ff5722" : "#ddd",
+                                                "&:hover": {
+                                                    backgroundColor: "#ff5722",
+                                                    color: "white",
+                                                    borderColor: "#ff5722",
+                                                },
+                                            }}
+                                            onClick={() => handleOrganizationTypeSelect(organizationType.Id)}
+                                        >
+                                            <PeopleAlt fontSize="small" />
+                                            {organizationType.Name}
+                                        </Box>
+                                    ))}
+                                </Box>
+
+                                {/* Arrow Right */}
+                                <IconButton onClick={() => scrollOrganizationType("right")}>
+                                    <ChevronRight />
+                                </IconButton>
+                            </Box>
+                        )}
+                    </Stack>
+                </Box>
             </Box>
 
             <OrganizationSelectActionCard organizations={organizationts} />

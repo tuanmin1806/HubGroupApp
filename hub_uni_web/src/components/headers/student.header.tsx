@@ -1,4 +1,6 @@
-import { Close, MenuOutlined, Person3, TableBar } from "@mui/icons-material";
+import { Close, TableBar } from "@mui/icons-material";
+import Person3Icon from "@mui/icons-material/Person3";
+import MenuIcon from "@mui/icons-material/Menu";
 import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography, useMediaQuery, Menu } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +40,21 @@ function StudentHeader() {
 
     const handleNavigateArticle = () => {
         navigate("/danh-sach-bai-viet");
+    }
+    const handleNavigateLogin = () => {
+        navigate("/dang-nhap");
+    }
+
+    const handleNavigateSignUp = () => {
+        navigate("/dang-ky");
+    }
+
+    const handleNavigateOrganization = () => {
+        navigate("/tim-kiem-to-chuc");
+    }
+
+    const handleNavigateRecruitmentPost = () => {
+        navigate("/tin-tuyen-sinh");
     }
 
     const toggleDrawer = (newOpen: boolean) => () => {
@@ -84,7 +101,7 @@ function StudentHeader() {
                     letterSpacing: { xs: '.1rem', md: '.3rem' },
                 }}
             >
-                GUEST
+                STUDENT
             </Typography>
 
             <List>
@@ -105,16 +122,12 @@ function StudentHeader() {
                         />
                     </ListItemButton>
                 </ListItem>
-
                 <ListItem disablePadding>
                     <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
+                        onClick={handleNavigateOrganization}
                     >
                         <ListItemText
-                            primary="Trang Chủ"
+                            primary="Tổ chức"
                             primaryTypographyProps={{
                                 fontSize: { xs: '0.875rem', md: '1rem' },
                                 fontWeight: 'bold',
@@ -126,13 +139,10 @@ function StudentHeader() {
 
                 <ListItem disablePadding>
                     <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
+                        onClick={handleNavigateRecruitmentPost}
                     >
                         <ListItemText
-                            primary="Trang Chủ"
+                            primary="Tin tuyển sinh"
                             primaryTypographyProps={{
                                 fontSize: { xs: '0.875rem', md: '1rem' },
                                 fontWeight: 'bold',
@@ -141,43 +151,6 @@ function StudentHeader() {
                         />
                     </ListItemButton>
                 </ListItem>
-
-                <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
-                    >
-                        <ListItemText
-                            primary="Trang Chủ"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
-                        />
-                    </ListItemButton>
-                </ListItem>
-
-                <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
-                    >
-                        <ListItemText
-                            primary="Trang Chủ"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
-                        />
-                    </ListItemButton>
-                </ListItem>
-
             </List>
         </Box>
     );
@@ -195,7 +168,7 @@ function StudentHeader() {
                             onClick={toggleDrawer(true)}
                             sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
                         >
-                            <MenuOutlined fontSize={isMobile ? "medium" : "large"} />
+                            <MenuIcon fontSize={isMobile ? "medium" : "large"} />
                         </IconButton>
 
                         {/* Logo */}
@@ -252,9 +225,9 @@ function StudentHeader() {
                                 color="inherit"
                                 variant="body2"
                                 underline="hover"
-                                onClick={() => navigate("/")}
+                                onClick={handleNavigateOrganization}
                             >
-                                Danh sách tổ chức
+                                Tổ chức
                             </Link>
                             <Link
                                 sx={{
@@ -268,9 +241,9 @@ function StudentHeader() {
                                 color="inherit"
                                 variant="body2"
                                 underline="hover"
-                                onClick={() => navigate("/")}
+                                onClick={handleNavigateRecruitmentPost}
                             >
-                                Danh sách tổ chức
+                                Tin tuyển sinh
                             </Link>
                             <Link
                                 sx={{
@@ -291,61 +264,58 @@ function StudentHeader() {
                         </Box>
 
                         {/* Auth Links */}
-                        <Box sx={{ flexGrow: 0 }}>
-                            <Tooltip title="cài đặt">
-                                <Box
-                                    sx={{ display: "flex" }}
-                                    style={{ cursor: "pointer" }}
-                                    onClick={handleOpenUserMenu}
-                                >
-                                    <Person3 sx={{ p: 0, fontSize: { xs: 'medium', md: 'large' } }} />
-                                    <Link
-                                        sx={{
-                                            ml: 1,
-                                            textAlign: "center",
-                                            fontWeight: "bold",
-                                            fontSize: { xs: '0.875rem', md: '1rem' },
-                                        }}
-                                        component="button"
-                                        color="inherit"
-                                        variant="body1"
-                                        underline="hover"
-                                    >
-                                        {user?.UserName}{" "}
-                                    </Link>
-                                </Box>
-                            </Tooltip>
-                            <Menu
-                                sx={{ mt: "45px" }}
-                                id="menu-appbar"
-                                anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: { xs: 0.5, md: 1 },
+                            }}
+                        >
+                            <Person3Icon
+                                sx={{
+                                    p: 0,
+                                    fontSize: { xs: "1.25rem", md: "1.5rem" },
                                 }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
+                            />
+                            <Link
+                                sx={{
+                                    ml: 1,
+                                    textAlign: "center",
+                                    fontWeight: "bold",
+                                    fontSize: { xs: "0.75rem", md: "1rem" },
                                 }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
+                                component="button"
+                                color="inherit"
+                                variant="body1"
+                                underline="hover"
+                                onClick={() => handleNavigateLogin()}
                             >
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography
-                                        sx={{ textAlign: "center" }}
-                                        onClick={() =>
-                                            setOpenProfileDialog(true)
-                                        }
-                                    >
-                                        Thông tin tài khoản
-                                    </Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleSignOut}>
-                                    <Typography sx={{ textAlign: "center" }}>
-                                        Đăng xuất
-                                    </Typography>
-                                </MenuItem>
-                            </Menu>
+                                Đăng nhập
+                            </Link>
+                            <Typography
+                                sx={{
+                                    ml: 1,
+                                    textAlign: "center",
+                                    fontSize: { xs: "0.75rem", md: "1rem" },
+                                }}
+                            >
+                                /
+                            </Typography>
+                            <Link
+                                sx={{
+                                    ml: 1,
+                                    textAlign: "center",
+                                    fontWeight: "bold",
+                                    fontSize: { xs: "0.75rem", md: "1rem" },
+                                }}
+                                component="button"
+                                color="inherit"
+                                variant="body1"
+                                underline="hover"
+                                onClick={() => handleNavigateSignUp()}
+                            >
+                                Đăng ký
+                            </Link>
                         </Box>
                     </Toolbar>
                 </Container>
