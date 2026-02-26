@@ -94,6 +94,7 @@ export class ConvertService {
         [AccountType.Director]: 'Giám đốc',
         [AccountType.Admin]: 'Quản trị viên',
         [AccountType.SuperAdmin]: 'SuperAdmin',
+        [AccountType.Student]: 'Học sinh'
     };
 
     private static STUDENT_STATUS_MAP: Record<StudentStatus, string> = {
