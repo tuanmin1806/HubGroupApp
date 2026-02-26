@@ -1,4 +1,4 @@
-import { ArrowForward, School, ChevronLeft, ChevronRight, FilterAlt, Work, PeopleAlt } from "@mui/icons-material";
+import { ArrowForward, School, ChevronLeft, ChevronRight, FilterAlt, Work, PeopleAlt, House } from "@mui/icons-material";
 import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack } from "@mui/material";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import OrganizationSelectActionCard from "../../cards/organization-card.card";
@@ -25,8 +25,6 @@ const OrganizationComponent = () => {
     type FilterType = "organizationType" | "profession";
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filterType, setFilterType] = useState<FilterType>("profession");
-    const [orgProfessionId, setOrgProfessionId] = useState<string>("");
-    const [orgOrganizationTypeId, setOrgOrganizationTypeId] = useState<string>("");
     const [selectedOrganizationTypeId, setSelectedOrganizationTypeId] = useState<string>("");
     const [selectedProfessionId, setSelectedProfessionId] = useState<string>("");
     const { data: professions = [] } = useGetAllProfessionNoAuthenQuery();
@@ -34,8 +32,8 @@ const OrganizationComponent = () => {
     const { data: organizationData } = useOrganizationsGetByPageNoAuthenQuery({
         page: page,
         size: PAGE_SIZE,
-        professionId: orgProfessionId || undefined,
-        organizationTypeId: orgOrganizationTypeId || undefined
+        professionId: selectedProfessionId || undefined,
+        organizationTypeId: selectedOrganizationTypeId || undefined
     });
     const organizationts = organizationData?.Items || [];
     const totalOrganizationPages = organizationData ? Math.ceil(organizationData.Total / PAGE_SIZE) : 1;
@@ -282,6 +280,66 @@ const OrganizationComponent = () => {
                     </Stack>
                 </Box>
             </Box>
+
+            {/* Active Filters Display */}
+            {(selectedOrganizationTypeId || selectedProfessionId) && (
+                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                    <Box sx={{ fontSize: 14, color: 'text.secondary' }}>
+                        Đang lọc:
+                    </Box>
+                    {selectedOrganizationTypeId && (
+                        <Box
+                            sx={{
+                                px: 2,
+                                py: 0.5,
+                                bgcolor: '#ff5722',
+                                color: 'white',
+                                borderRadius: 20,
+                                fontSize: 13,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5
+                            }}
+                        >
+                            <House fontSize="small" />
+                            {organizationTypes.find(p => p.Id === selectedOrganizationTypeId)?.Name}
+                        </Box>
+                    )}
+                    {selectedProfessionId && (
+                        <Box
+                            sx={{
+                                px: 2,
+                                py: 0.5,
+                                bgcolor: '#ff5722',
+                                color: 'white',
+                                borderRadius: 20,
+                                fontSize: 13,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5
+                            }}
+                        >
+                            <School fontSize="small" />
+                            {professions.find(p => p.Id === selectedProfessionId)?.Name}
+                        </Box>
+                    )}
+                    <Button
+                        size="small"
+                        onClick={() => {
+                            setSelectedOrganizationTypeId("");
+                            setSelectedProfessionId("");
+                            setPage(DEFAULT_PAGE);
+                        }}
+                        sx={{
+                            fontSize: 12,
+                            textTransform: 'none',
+                            color: '#ff5722'
+                        }}
+                    >
+                        Xóa bộ lọc
+                    </Button>
+                </Box>
+            )}
 
             <OrganizationSelectActionCard organizations={organizationts} />
 

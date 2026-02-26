@@ -11,7 +11,8 @@ import {
     Cake,
     Wc,
     Business,
-    CheckCircle
+    CheckCircle,
+    PeopleAlt
 } from "@mui/icons-material";
 import {
     Box,
@@ -204,9 +205,9 @@ const RecruitmentPostDetailPage = () => {
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <Work sx={{ color: 'white', fontSize: 20 }} />
+                                <PeopleAlt sx={{ color: 'white', fontSize: 20 }} />
                                 <Typography variant="body1" color="white" fontWeight={500}>
-                                    {recruitmentPost.Quantity} vị trí
+                                    {recruitmentPost.Quantity} chỉ tiêu
                                 </Typography>
                             </Stack>
 
@@ -660,9 +661,9 @@ const RecruitmentPostDetailPage = () => {
                                                                 </Stack>
 
                                                                 <Stack direction="row" spacing={1} alignItems="center">
-                                                                    <Work sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                                                    <PeopleAlt sx={{ color: 'text.secondary', fontSize: 20 }} />
                                                                     <Typography variant="body2" color="text.secondary">
-                                                                        {post.Quantity} vị trí
+                                                                        {post.Quantity} chỉ tiêu
                                                                     </Typography>
                                                                 </Stack>
 

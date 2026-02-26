@@ -219,9 +219,6 @@ export default function CreateUserDialog({ open, setOpen }) {
                                     <FormLabel>Chi tiết</FormLabel>
                                 </FormControl>
                             </Grid>
-                            <Grid size={12}>
-                                <RichTextEditorComponent />
-                            </Grid>
                             <Grid size={4}>
                                 <FormControl fullWidth size="small">
                                     <Select

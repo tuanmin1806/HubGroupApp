@@ -25,6 +25,13 @@ import {
     FilterList,
     Clear,
     FavoriteBorder,
+    PeopleAlt,
+    Wc,
+    Male,
+    Transgender,
+    Cake,
+    Work,
+    Female,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useGetAllProfessionNoAuthenQuery } from "../../../app/features/profession.api";
@@ -128,10 +135,11 @@ const RecruitmentPostSearchPage = () => {
                                 </Stack>
                                 {hasActiveFilters && (
                                     <Button
+                                        variant="text"
                                         size="small"
                                         startIcon={<Clear sx={{ fontSize: 16 }} />}
                                         onClick={handleClearFilters}
-                                        sx={{ fontSize: "0.75rem", minWidth: 0, px: 1 }}
+                                        sx={{ fontSize: "0.75rem", minWidth: 0, px: 1, py: 0.25}}
                                     >
                                         Xóa
                                     </Button>
@@ -167,7 +175,7 @@ const RecruitmentPostSearchPage = () => {
                                             control={<Radio size="small" />}
                                             label={<Typography variant="body2">Tất cả</Typography>}
                                         />
-                                        {provinces.slice(0, 8).map((province) => (
+                                        {provinces.map((province) => (
                                             <FormControlLabel
                                                 key={province.Id}
                                                 value={province.Id}
@@ -208,7 +216,7 @@ const RecruitmentPostSearchPage = () => {
                                             control={<Radio size="small" />}
                                             label={<Typography variant="body2">Tất cả</Typography>}
                                         />
-                                        {professions.slice(0, 8).map((profession) => (
+                                        {professions.map((profession) => (
                                             <FormControlLabel
                                                 key={profession.Id}
                                                 value={profession.Id}
@@ -382,9 +390,9 @@ const RecruitmentPostSearchPage = () => {
                                                             </Stack>
 
                                                             <Stack direction="row" spacing={0.4} alignItems="center">
-                                                                <WorkOutline sx={{ fontSize: 14, color: "text.disabled" }} />
+                                                                <PeopleAlt sx={{ fontSize: 14, color: "text.disabled" }} />
                                                                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
-                                                                    {post.Quantity} vị trí
+                                                                    {post.Quantity} Chỉ tiêu
                                                                 </Typography>
                                                             </Stack>
 
@@ -441,23 +449,19 @@ const RecruitmentPostSearchPage = () => {
                                                     {post.Requirement && (
                                                         <Stack direction="row" flexWrap="wrap" gap={{ xs: 0.5, sm: 1.5 }}>
                                                             {post.Requirement.Gender && (
-                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
-                                                                    Giới tính:{" "}
-                                                                    {post.Requirement.Gender === "Male"
-                                                                        ? "Nam"
-                                                                        : post.Requirement.Gender === "Female"
-                                                                            ? "Nữ"
-                                                                            : "Không yêu cầu"}
+                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                    {post.Requirement.Gender === "Male" ? (<Male sx={{ fontSize: "0.9rem" }} />) : post.Requirement.Gender === "Female" ? (<Female sx={{ fontSize: "0.9rem" }} />) : (<Transgender sx={{ fontSize: "0.9rem" }} />)}
+                                                                    {post.Requirement.Gender === "Male" ? "Nam" : post.Requirement.Gender === "Female" ? "Nữ" : "Không yêu cầu"}
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.FromAge && post.Requirement.ToAge && (
-                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
-                                                                    Tuổi: {post.Requirement.FromAge}–{post.Requirement.ToAge}
+                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                    <Cake sx={{ fontSize: "0.9rem" }} /> {post.Requirement.FromAge}–{post.Requirement.ToAge}
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.Experience && (
-                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
-                                                                    KN: {post.Requirement.Experience}
+                                                                <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                    <Work sx={{ fontSize: "0.9rem" }} /> {post.Requirement.Experience}
                                                                 </Typography>
                                                             )}
                                                         </Stack>

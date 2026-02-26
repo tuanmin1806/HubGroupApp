@@ -41,7 +41,7 @@ export interface OrganizationFilterParams {
     professionId?: string;
     provinceId?: string;
     communeId?: string;
-    taxCode?: string;
+    taxSearch?: string;
 }
 
 const FILTER_PAGE_SIZE = 10;
@@ -60,7 +60,7 @@ const OrganizationSearchPage = () => {
         professionId: '',
         provinceId: '',
         communeId: '',
-        taxCode: '',
+        taxSearch: '',
         page: DEFAULT_PAGE,
         size: PAGE_SIZE,
     });
@@ -151,7 +151,7 @@ const OrganizationSearchPage = () => {
             professionId: '',
             provinceId: '',
             communeId: '',
-            taxCode: '',
+            taxSearch: '',
             page: DEFAULT_PAGE,
             size: PAGE_SIZE,
         });
@@ -165,7 +165,7 @@ const OrganizationSearchPage = () => {
 
     const hasMoreOrgTypes = orgTypesData && (allOrgTypes.length < orgTypesData.Total);
     const hasMoreProfessions = professionsData && (allProfessions.length < professionsData.Total);
-    const hasActiveFilters = Boolean(filters.organizationTypeId || filters.professionId || filters.provinceId || filters.communeId || filters.taxCode);
+    const hasActiveFilters = Boolean(filters.organizationTypeId || filters.professionId || filters.provinceId || filters.communeId || filters.taxSearch);
 
     return (
         <ThemeProvider theme={theme}>
@@ -511,8 +511,8 @@ const OrganizationSearchPage = () => {
                                         fullWidth
                                         size="small"
                                         placeholder="Nhập mã số thuế"
-                                        value={filters.taxCode}
-                                        onChange={(e) => handleFilterChange("taxCode", e.target.value)}
+                                        value={filters.taxSearch}
+                                        onChange={(e) => handleFilterChange("taxSearch", e.target.value)}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
                                                 fontSize: '0.875rem'
@@ -603,7 +603,6 @@ const OrganizationSearchPage = () => {
                                                     {/* Content */}
                                                     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.4 }}>
 
-                                                        {/* Row 1: Tên + TOP badge */}
                                                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }}>
                                                             <Typography
                                                                 variant="subtitle1"
@@ -642,7 +641,6 @@ const OrganizationSearchPage = () => {
                                                             )}
                                                         </Box>
 
-                                                        {/* Row 2: Loại tổ chức */}
                                                         {org.OrganizationType && (
                                                             <Box>
                                                                 <Chip
@@ -669,7 +667,6 @@ const OrganizationSearchPage = () => {
 
                                                         <Box sx={{ mt: 0.25 }} />
 
-                                                        {/* Row 3: Ngành nghề */}
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                                                             <School sx={{ fontSize: 15, color: 'text.disabled', flexShrink: 0 }} />
                                                             <Typography
@@ -688,7 +685,6 @@ const OrganizationSearchPage = () => {
                                                             </Typography>
                                                         </Box>
 
-                                                        {/* Row 4: Địa chỉ */}
                                                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75 }}>
                                                             <LocationOn sx={{ fontSize: 15, color: 'text.disabled', mt: 0.15, flexShrink: 0 }} />
                                                             <Typography
@@ -707,26 +703,6 @@ const OrganizationSearchPage = () => {
                                                                 {[org.Address, org.Commune, org.Province].filter(Boolean).join(', ')}
                                                             </Typography>
                                                         </Box>
-
-                                                        {/* Row 5: MST */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                                                            <Code sx={{ fontSize: 15, color: 'text.disabled', flexShrink: 0 }} />
-                                                            <Typography
-                                                                variant="body2"
-                                                                color="text.disabled"
-                                                                sx={{
-                                                                    fontSize: { xs: '0.72rem', md: '0.78rem' },
-                                                                    fontFamily: 'monospace',
-                                                                    letterSpacing: 0.3,
-                                                                    overflow: 'hidden',
-                                                                    textOverflow: 'ellipsis',
-                                                                    whiteSpace: 'nowrap',
-                                                                }}
-                                                            >
-                                                                {org.TaxCode || 'Chưa cập nhật MST'}
-                                                            </Typography>
-                                                        </Box>
-
                                                     </Box>
                                                 </Box>
                                             </CardContent>
