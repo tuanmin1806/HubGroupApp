@@ -3,7 +3,18 @@ import { Button, FormControl, Grid, InputLabel, Menu, MenuItem, Select } from "@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const AccountFilter = () => {
+interface FilterValues {
+    gender?: string;
+    status?: string;
+    orderBy?: string;
+    orderDirection?: string;
+}
+
+interface AccountFilterProps {
+    onApply: (filters: FilterValues) => void;
+}
+
+const AccountFilter = ({ onApply }: AccountFilterProps) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -32,10 +43,9 @@ const AccountFilter = () => {
     );
 
     const handleApplyFilter = useCallback(() => {
-        const searchParams = new URLSearchParams();
-        navigate({ search: searchParams.toString() });
+        onApply(filters);
         handleClose();
-    }, [filters, navigate, handleClose]);
+    }, [filters, onApply, handleClose]);
 
     const handleClearFilter = useCallback(() => {
         setFilters((prev) => ({
