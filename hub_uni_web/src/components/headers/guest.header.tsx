@@ -103,7 +103,7 @@ function GuestHeader() {
                         onClick={handleNavigateOrganization}
                     >
                         <ListItemText
-                            primary="Tra cứu trường"
+                            primary="Danh sách trường"
                         />
                     </ListItemButton>
                 </ListItem>
@@ -181,7 +181,7 @@ function GuestHeader() {
                                 underline="hover"
                                 onClick={handleNavigateOrganization}
                             >
-                                Tra cứu trường
+                                Danh sách trường
                             </Link>
                             <Link
                                 sx={{
