@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
+import hub_logo from "../../assets/hub_logo.png";
 
 const theme = createTheme({
     palette: {
@@ -127,7 +128,7 @@ function StudentHeader() {
                         onClick={handleNavigateOrganization}
                     >
                         <ListItemText
-                            primary="Tổ chức"
+                            primary="Danh sách trường"
                             primaryTypographyProps={{
                                 fontSize: { xs: '0.875rem', md: '1rem' },
                                 fontWeight: 'bold',
@@ -142,12 +143,7 @@ function StudentHeader() {
                         onClick={handleNavigateRecruitmentPost}
                     >
                         <ListItemText
-                            primary="Tin tuyển sinh"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
+                            primary="Chương trình tuyển sinh"
                         />
                     </ListItemButton>
                 </ListItem>
@@ -172,36 +168,20 @@ function StudentHeader() {
                         </IconButton>
 
                         {/* Logo */}
-                        <TableBar
+                        <Box
+                            component="img"
+                            src={hub_logo}
+                            alt="logo"
                             onClick={() => navigate("/")}
                             sx={{
                                 cursor: "pointer",
                                 display: { xs: "flex", md: "flex" },
                                 mr: { xs: 1, md: 1 },
-                                fontSize: { xs: "1.5rem", md: "2rem" },
+                                height: { xs: "1.5rem", md: "2rem" },
+                                width: "auto",
+                                objectFit: "contain",
                             }}
                         />
-                        {/* Title */}
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            component="a"
-                            href="#!"
-                            onClick={() => navigate("/")}
-                            sx={{
-                                mr: 2,
-                                display: { xs: "flex", md: "flex" },
-                                fontFamily: "monospace",
-                                fontWeight: 700,
-                                letterSpacing: { xs: ".1rem", md: ".3rem" },
-                                color: "inherit",
-                                textDecoration: "none",
-                                fontSize: { xs: "1rem", md: "1.25rem" },
-                            }}
-                        >
-                            GUEST
-                        </Typography>
-
                         {/* Navigation Links */}
                         <Box
                             sx={{
@@ -227,7 +207,7 @@ function StudentHeader() {
                                 underline="hover"
                                 onClick={handleNavigateOrganization}
                             >
-                                Tổ chức
+                                Danh sách trường
                             </Link>
                             <Link
                                 sx={{
@@ -243,7 +223,7 @@ function StudentHeader() {
                                 underline="hover"
                                 onClick={handleNavigateRecruitmentPost}
                             >
-                                Tin tuyển sinh
+                                Chương trình tuyển sinh
                             </Link>
                             <Link
                                 sx={{

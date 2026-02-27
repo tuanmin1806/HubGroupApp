@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../models/recruitment-post.model";
+import { CreateRecruitmentPostRequest, RecruitmentPostFilterParams, RecruitmentPostResponse } from "../models/recruitment-post.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: RecruitmentPostFilterParams): string => {
@@ -33,6 +33,23 @@ const recruitmentPostApi = baseApi.injectEndpoints({
             }),
         }),
 
+        getRecruitmentPostsByCurrentCustomer: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, RecruitmentPostFilterParams>({
+            query: (params) => {
+                const queryString = buildQueryString(params);
+                return {
+                    url: `recruitmentpost/getbycurrentcustomer?${queryString}`,
+                    method: "GET",
+                };
+            },
+            transformResponse: (responseData: {
+                Items: RecruitmentPostResponse[];
+                Total: number;
+            }): ApiPaginationResponse<RecruitmentPostResponse[]> => ({
+                Items: responseData.Items,
+                Total: responseData.Total,
+            }),
+        }),
+
         getRecruitmentPostsByOrganizationWithPage: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, string>({
             query: (organizationSeo) => ({
                 url: `recruitmentpost/getbyorganizationseo/${organizationSeo}`,
@@ -53,11 +70,21 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        createRecruitmentPost: builder.mutation<void, CreateRecruitmentPostRequest>({
+            query: (body) => ({
+                url: "recruitmentpost/add",
+                method: "POST",
+                body,
+            }),
+        }),
     }),
 });
 
 export const {
     useGetRecruitmentPostsByPageQuery,
     useGetRecruitmentPostBySeoQuery,
+    useGetRecruitmentPostsByCurrentCustomerQuery,
+    useCreateRecruitmentPostMutation,
     useGetRecruitmentPostsByOrganizationWithPageQuery
 } = recruitmentPostApi;

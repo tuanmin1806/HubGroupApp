@@ -31,6 +31,7 @@ import {
 import { useState } from "react";
 import ApplyConfirmDialog from "../../../components/dialogs/general/apply-confirm-dialog.dialog";
 import { useAuthGuard } from "../../../hooks/useAuthGuard";
+import { formatDate } from "../../../utils/date.utils";
 
 const RecruitmentPostDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
@@ -101,11 +102,6 @@ const RecruitmentPostDetailPage = () => {
         setApplyDialogOpen(true);
     };
 
-    const formatDate = (dateString: string) => {
-        if (!dateString || dateString === "0001-01-01") return "Không giới hạn";
-        return new Date(dateString).toLocaleDateString('vi-VN');
-    };
-
     const getExperienceLabel = (exp: string) => {
         const labels: Record<string, string> = {
             'LessThan1Year': 'Dưới 1 năm',
@@ -142,15 +138,27 @@ const RecruitmentPostDetailPage = () => {
     return (
         <Box sx={{ bgcolor: '#f5f7fa', minHeight: '100vh', pb: 3 }}>
             {/* Hero Section */}
-            <Box sx={{
-                bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                background: 'linear-gradient(135deg, #fc7248 50%, #ff9800 100%)',
-                py: 4,
-                mb: 1,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-            }}>
-                <Container maxWidth="lg">
-                    <Stack spacing={2}>
+            <Box
+                sx={{
+                    background: 'linear-gradient(135deg, rgba(247,148,0,0.95) 0%, rgba(252,167,40,0.85) 40%, rgb(255,183,116) 100%)',
+                    py: { xs: 3, md: 5 },
+                    mb: 1,
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}
+            >
+                {/* Stripes trái */}
+                <Box sx={{ position: 'absolute', top: '-100%', left: '-25%', width: '55%', height: '350%', background: 'rgba(49, 19, 19, 0.06)', transform: 'rotate(-45deg)', pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', top: '-100%', left: '-10%', width: '30%', height: '350%', background: 'rgba(255,255,255,0.10)', transform: 'rotate(-45deg)', pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', top: '-100%', left: '5%', width: '15%', height: '350%', background: 'rgba(255,255,255,0.13)', transform: 'rotate(-45deg)', pointerEvents: 'none' }} />
+                {/* Stripes phải */}
+                <Box sx={{ position: 'absolute', top: '-100%', right: '-25%', width: '55%', height: '350%', background: 'rgba(133, 125, 125, 0.06)', transform: 'rotate(-45deg)', pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', top: '-100%', right: '-10%', width: '30%', height: '350%', background: 'rgba(226, 212, 212, 0.06)', transform: 'rotate(-45deg)', pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', top: '-100%', right: '5%', width: '15%', height: '350%', background: 'rgba(235, 224, 224, 0.13)', transform: 'rotate(-45deg)', pointerEvents: 'none' }} />
+
+                <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+                    <Stack spacing={2.5}>
+                        {/* Chips */}
                         <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                             {recruitmentPost.IsTop && (
                                 <Chip
@@ -161,70 +169,96 @@ const RecruitmentPostDetailPage = () => {
                                         color: 'white',
                                         fontWeight: 600,
                                         backdropFilter: 'blur(10px)',
-                                        border: '1px solid rgba(255,255,255,0.3)',
-                                        '& .MuiChip-icon': {
-                                            color: '#4a8abe'
-                                        }
+                                        border: '1px solid rgba(255,255,255,0.4)',
+                                        '& .MuiChip-icon': { color: 'white' }
                                     }}
                                 />
                             )}
                             <Chip
                                 label={recruitmentPost.Status === 'Activated' ? 'Đang tuyển' : recruitmentPost.Status}
-                                sx={{
-                                    bgcolor: 'rgba(47, 153, 51, 0.9)',
-                                    color: 'white',
-                                    fontWeight: 600
-                                }}
+                                sx={{ bgcolor: 'rgba(47,153,51,0.9)', color: 'white', fontWeight: 600 }}
                             />
                         </Stack>
 
+                        {/* Title */}
                         <Typography
                             variant="h3"
                             fontWeight={700}
                             color="white"
                             sx={{
-                                fontSize: { xs: '1.25rem', md: '2rem' },
-                                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                fontSize: { xs: '1.4rem', sm: '1.75rem', md: '2.25rem' },
+                                textShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                                lineHeight: 1.3,
                             }}
                         >
                             {recruitmentPost.Name}
                         </Typography>
 
-                        {/* Quick Info with Salary */}
+                        {/* Info pills */}
                         <Stack
-                            direction={{ xs: 'column', sm: 'row' }}
-                            spacing={2}
+                            direction="row"
                             flexWrap="wrap"
-                            sx={{ mt: 2 }}
+                            gap={1.5}
+                            sx={{ mt: 1 }}
                         >
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <LocationOn sx={{ color: 'white', fontSize: 20 }} />
-                                <Typography variant="body1" color="white" fontWeight={500}>
-                                    {recruitmentPost.Province || 'Chưa cập nhật'}
-                                </Typography>
-                            </Stack>
-
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <PeopleAlt sx={{ color: 'white', fontSize: 20 }} />
-                                <Typography variant="body1" color="white" fontWeight={500}>
-                                    {recruitmentPost.Quantity} chỉ tiêu
-                                </Typography>
-                            </Stack>
-
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <AttachMoney sx={{ color: 'white', fontSize: 20 }} />
-                                <Typography variant="body1" color="white" fontWeight={500}>
-                                    {(recruitmentPost.Currency)}
-                                </Typography>
-                            </Stack>
-
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <AccessTime sx={{ color: 'white', fontSize: 20 }} />
-                                <Typography variant="body1" color="white" fontWeight={500}>
-                                    Hạn nộp: {formatDate(recruitmentPost.RecruitmentToDate)}
-                                </Typography>
-                            </Stack>
+                            {[
+                                { icon: <LocationOn sx={{ fontSize: 16 }} />, label: recruitmentPost.Province || 'Chưa cập nhật' },
+                                { icon: <PeopleAlt sx={{ fontSize: 16 }} />, label: `${recruitmentPost.Quantity} chỉ tiêu` },
+                                { icon: <AccessTime sx={{ fontSize: 16 }} />, label: `Hạn nộp: ${formatDate(recruitmentPost.RecruitmentToDate)}` },
+                            ].map((item, i) => (
+                                <Box
+                                    key={i}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.75,
+                                        bgcolor: 'rgba(255,255,255,0.2)',
+                                        backdropFilter: 'blur(8px)',
+                                        border: '1px solid rgba(255,255,255,0.35)',
+                                        borderRadius: 10,
+                                        px: 1,
+                                        py: 0.5,
+                                        color: 'white',
+                                    }}
+                                >
+                                    {item.icon}
+                                    <Typography variant="body2" fontWeight={500} color="white">
+                                        {item.label}
+                                    </Typography>
+                                </Box>
+                            ))}
                         </Stack>
+
+                        {/* Salary highlight */}
+                        <Box
+                            sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                bgcolor: 'rgba(255,255,255,0.15)',
+                                border: '1px solid rgba(255,255,255,0.35)',
+                                borderRadius: 2,
+                                px: 1,
+                                py: 0.5,
+                                width: 'fit-content',
+                            }}
+                        >
+                            <AttachMoney sx={{ color: 'white', fontSize: 32 }} />
+                            <Box>
+                                <Typography variant="caption" color="rgba(255,255,255,0.8)" fontWeight={500}>
+                                    Học phí
+                                </Typography>
+                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                    <Typography variant="h6" fontWeight={700} color="white">
+                                        {recruitmentPost.Cost?.toLocaleString('vi-VN')} {recruitmentPost.Currency}
+                                    </Typography>
+                                    <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                                    <Typography variant="body2" color="rgba(255,255,255,0.9)" fontWeight={500}>
+                                        ≈ ${recruitmentPost.CostUsd?.toLocaleString('en-US')} USD
+                                    </Typography>
+                                </Stack>
+                            </Box>
+                        </Box>
                     </Stack>
                 </Container>
             </Box>

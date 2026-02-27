@@ -8,7 +8,7 @@ import { Apartment, Category, Code, LocationCity, LocationOn, Numbers, Place, Sc
 import SearchBar from "../../../components/searchs/search-bar.search";
 import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
 import { useGetOrganizationTypesByPageQuery } from "../../../app/features/organization-type.api";
-import { useOrganizationsFullTextSearchQuery, useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
+import { useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
 import { OrganizationResponse } from "../../../app/models/organization.model";

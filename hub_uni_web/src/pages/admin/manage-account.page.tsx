@@ -1,18 +1,14 @@
 import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
-import {
-    Grid, IconButton, InputBase, Paper, Table, TableContainer,
-    TableHead, TableRow, TableCell, TableBody, Chip, Tooltip,
-    TablePagination, Button, CircularProgress, Box, Typography
-} from "@mui/material";
+import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography} from "@mui/material";
 import AccountFilter from "../../components/filters/account.filter";
 import CreateUserDialog from "../../components/dialogs/admin/create-account.dialog";
 import { useState, useCallback } from "react";
 import { AccountStatus, Gender } from "../../app/models/enums.model";
 import { CustomerFilterParams, CustomerResponse } from "../../app/models/customer.model";
 import { useGetCustomerByOrganizationWithPageQuery } from "../../app/features/customer.api";
+import { PAGE_SIZE } from "../../constants/common.constant";
 
 const ORGANIZATION_ID = "your-organization-id";
-const DEFAULT_PAGE_SIZE = 10;
 
 const getGenderLabel = (gender: Gender): string => {
     const map: Record<Gender, string> = {
@@ -41,7 +37,7 @@ export default function ManageAccountPage() {
     const [inputValue, setInputValue] = useState("");
     const [filterParams, setFilterParams] = useState<Omit<CustomerFilterParams, "page" | "size" | "organizationId" | "keyword">>({});
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
+    const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZE);
 
     const queryParams: CustomerFilterParams = {
         organizationId: ORGANIZATION_ID,

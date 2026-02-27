@@ -43,14 +43,14 @@ export default function SearchBar({ onSearch, initialQuery = "", initialProvince
     return (
         <Paper
             sx={{
-                p: 1,
+                p: 0.8,
                 display: "flex",
                 alignItems: "center",
                 width: "100%",
                 maxWidth: 1200,
                 gap: 1,
-                borderRadius: 10,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                borderRadius: 8,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                 color: TEXT_COLOR,
             }}
         >
@@ -69,7 +69,7 @@ export default function SearchBar({ onSearch, initialQuery = "", initialProvince
                     onChange={(e) => setProvinceSeo(e.target.value)}
                     startAdornment={<LocationOn sx={{ mr: 1, color: "text.secondary" }} />}
                     sx={{
-                        height: 40,
+                        height: 10,
                         borderRadius: 6,
                         "& .MuiOutlinedInput-notchedOutline": { border: "none" },
                     }}

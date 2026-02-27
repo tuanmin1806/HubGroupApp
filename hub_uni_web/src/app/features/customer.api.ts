@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { CustomerFilterParams, CustomerResponse } from "../models/customer.model";
+import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse } from "../models/customer.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: CustomerFilterParams): string => {
@@ -30,6 +30,14 @@ const customerApi = baseApi.injectEndpoints({
             }): ApiPaginationResponse<CustomerResponse[]> => ({
                 Items: responseData.Items,
                 Total: responseData.Total,
+            }),
+        }),
+
+        createCollabAccount: builder.mutation<void, CreateCustomerRequest>({
+            query: (body) => ({
+                url: "customer/addcollab",
+                method: "POST",
+                body,
             }),
         }),
     }),

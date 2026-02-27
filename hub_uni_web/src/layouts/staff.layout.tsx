@@ -12,45 +12,26 @@ const NAVIGATION: NavigationItem[] = [
         title: "Tiện ích chính",
     },
     {
-        segment: "staff",
+        segment: "/staff",
         title: "Trang chủ",
         icon: <Dashboard />,
     },
     {
-        segment: "staff/manage-order",
         title: "Quản lý bài đăng",
         icon: <RamenDining />,
         children: [
             {
-                segment: "in-progress",
-                title: "Quản lý bài đăng",
+                segment: "manage-recruitment-post",
+                title: "Danh sách bài đăng",
                 icon: <MenuBook />,
             },
             {
-                segment: "history",
-                title: "Quản lý bài đăng",
+                segment: "create-recruitment-post",
+                title: "Tạo bài đăng mới",
                 icon: <ManageSearch />,
             },
         ],
     },
-    {
-        segment: "staff/manage-reservation",
-        title: "Quản lý bài đăng",
-        icon: <TableRestaurant />,
-        children: [
-            {
-                segment: "pending",
-                title: "Quản lý bài đăng",
-                icon: <HourglassTop />,
-            },
-            {
-                segment: "completed",
-                title: "Quản lý bài đăng",
-                icon: <FactCheck />,
-            },
-        ],
-    },
-
 ];
 
 const theme = createTheme({
@@ -77,7 +58,7 @@ export default function StaffLayout() {
     }, [location.pathname]);
 
     const handleNavigation = (path) => {
-        navigate(path);
+        navigate(`/staff/${path}`);
     };
 
     const router = {

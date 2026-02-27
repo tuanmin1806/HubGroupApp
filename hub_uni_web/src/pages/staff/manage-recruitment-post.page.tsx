@@ -1,0 +1,174 @@
+import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
+import {
+    Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow,
+    TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography
+} from "@mui/material";
+import { useState, useCallback } from "react";
+import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
+import { PAGE_SIZE } from "../../constants/common.constant";
+import { useGetRecruitmentPostsByCurrentCustomerQuery } from "../../app/features/recruitment-post.api";
+
+const getStatusChip = (status: string) => {
+    const config: Record<string, { label: string; color: "success" | "warning" | "error" | "default" }> = {
+        Active: { label: "Đang tuyển", color: "success" },
+        Inactive: { label: "Ngừng tuyển", color: "error" },
+        Pending: { label: "Chờ duyệt", color: "warning" },
+    };
+    const { label, color } = config[status] ?? { label: status, color: "default" };
+    return <Chip label={label} size="small" variant="outlined" color={color} />;
+};
+
+export default function ManageRecruitmentPostPage() {
+    const [searchValue, setSearchValue] = useState("");
+    const [inputValue, setInputValue] = useState("");
+    const [filterParams, setFilterParams] = useState<Omit<RecruitmentPostFilterParams, "page" | "size" | "searchValue">>({});
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZE);
+
+    const queryParams: RecruitmentPostFilterParams = {
+        page: page + 1,
+        size: rowsPerPage,
+        searchValue: searchValue || undefined,
+        ...filterParams,
+    };
+
+    const { data, isLoading, isError } = useGetRecruitmentPostsByCurrentCustomerQuery(queryParams);
+
+    const handleSearch = useCallback(() => {
+        setSearchValue(inputValue);
+        setPage(0);
+    }, [inputValue]);
+
+    const handleClearSearch = useCallback(() => {
+        setInputValue("");
+        setSearchValue("");
+        setPage(0);
+    }, []);
+
+    const handlePageChange = useCallback((_: unknown, newPage: number) => {
+        setPage(newPage);
+    }, []);
+
+    const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    }, []);
+
+    const renderTableContent = () => {
+        if (isLoading) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={8} align="center">
+                        <Box sx={{ py: 4 }}><CircularProgress size={32} /></Box>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+        if (isError) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={8} align="center">
+                        <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+        if (!data?.Items?.length) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={8} align="center">
+                        <Typography sx={{ py: 4 }}>Không có dữ liệu.</Typography>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+        return data.Items.map((post: RecruitmentPostResponse) => (
+            <TableRow
+                key={post.Id}
+                hover
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+                <TableCell component="th" scope="row">{post.Name}</TableCell>
+                <TableCell>{post.Organization?.Name ?? "—"}</TableCell>
+                <TableCell>{post.Province ?? "—"}</TableCell>
+                <TableCell>
+                    {post.Professions?.map(p => (
+                        <Chip key={p.Id} label={p.Name} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+                    )) ?? "—"}
+                </TableCell>
+                <TableCell>{post.Quantity}</TableCell>
+                <TableCell>{post.RecruitmentToDate}</TableCell>
+                <TableCell>{getStatusChip(post.Status)}</TableCell>
+                <TableCell align="center">
+                    <Tooltip title="Xem chi tiết">
+                        <IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton>
+                    </Tooltip>
+                    <Tooltip title="Cập nhật">
+                        <IconButton size="small" color="primary"><Edit fontSize="small" /></IconButton>
+                    </Tooltip>
+                    <Tooltip title="Thay đổi trạng thái">
+                        <IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton>
+                    </Tooltip>
+                </TableCell>
+            </TableRow>
+        ));
+    };
+
+    return (
+        <>
+            <Grid container spacing={2}>
+                <Grid size={6}>
+                    <Paper sx={{ display: "flex", alignItems: "center" }}>
+                        <InputBase
+                            sx={{ ml: 1, flex: 1 }}
+                            placeholder="Tìm kiếm bài đăng tuyển dụng"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                        />
+                        <IconButton onClick={handleClearSearch} sx={{ p: "10px" }} aria-label="clear">
+                            <Clear />
+                        </IconButton>
+                        <IconButton onClick={handleSearch} sx={{ p: "10px" }} aria-label="search">
+                            <Search />
+                        </IconButton>
+                    </Paper>
+                </Grid>
+                <Grid size="auto">
+                    <Button variant="contained" color="primary" startIcon={<Add />}>
+                        Thêm bài đăng
+                    </Button>
+                </Grid>
+                <Grid size={12}>
+                    <TableContainer component={Paper} elevation={1}>
+                        <Table sx={{ minWidth: 650 }} size="small" aria-label="recruitment post table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Tên bài đăng</TableCell>
+                                    <TableCell>Tổ chức</TableCell>
+                                    <TableCell>Tỉnh/Thành phố</TableCell>
+                                    <TableCell>Nghề nghiệp</TableCell>
+                                    <TableCell>Số lượng</TableCell>
+                                    <TableCell>Hạn tuyển</TableCell>
+                                    <TableCell>Trạng thái</TableCell>
+                                    <TableCell align="center">Tiện ích</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>{renderTableContent()}</TableBody>
+                        </Table>
+                        <TablePagination
+                            component="div"
+                            count={data?.Total ?? 0}
+                            page={page}
+                            onPageChange={handlePageChange}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleRowsPerPageChange}
+                            rowsPerPageOptions={[5, 10, 25, 50]}
+                            labelRowsPerPage="Số hàng:"
+                        />
+                    </TableContainer>
+                </Grid>
+            </Grid>
+        </>
+    );
+}

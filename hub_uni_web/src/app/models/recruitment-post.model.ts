@@ -2,8 +2,8 @@ import { OrganizationResponse } from "./organization.model";
 import { ProfessionResponse } from "./profession.model";
 
 export interface Requirement {
-    FromAge: number;
-    ToAge: number;
+    FromAge: number | undefined;
+    ToAge: number | undefined;
     Gender: string;
     Experience: string;
     EducationLevel: string;
@@ -16,6 +16,8 @@ export interface RecruitmentPostResponse {
     OrganizationId: string;
     ProfessionIds: string[];
     Quantity: number;
+    Cost: number;
+    CostUsd: number;
     Description: string;
     ProvinceId: string;
     Currency: string;
@@ -26,6 +28,20 @@ export interface RecruitmentPostResponse {
     Province: string;
     Professions: ProfessionResponse[];
     SeoUrl: string;
+}
+
+export interface CreateRecruitmentPostRequest {
+    Status: string;
+    Name: string;
+    ProfessionIds: string[];
+    Quantity: number;
+    Description: string;
+    ProvinceId: string;
+    Currency: string;
+    Requirement: Requirement;
+    RecruitmentToDate: string;
+    IsTop: boolean;
+    Highlights: string[];
 }
 
 export interface RecruitmentPostFilterParams {

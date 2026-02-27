@@ -54,33 +54,78 @@ const HomePage = () => {
                     direction="column"
                     alignItems="center"
                     sx={{
-                        bgcolor: BACKGROUND_COLOR,
-                        py: 3
+                        background: `linear-gradient(180deg, rgba(247, 148, 0, 0.95) 0%, rgba(252, 167, 40, 0.85) 40%, rgb(255, 183, 116) 100%)`,
+                        py: 3,
+                        position: "relative",
+                        overflow: "hidden",
                     }}
                 >
                     <Box sx={{
-                        color: TEXT_COLOR,
-                        fontSize: 28,
-                        fontWeight: 'bold',
-                        mb: 2
-                    }}
-                    >
+                        position: "absolute",
+                        top: "-100%", left: "-25%",
+                        width: "55%", height: "350%",
+                        background: "rgba(248, 59, 59, 0.06)",
+                        transform: "rotate(-45deg)",
+                        pointerEvents: "none",
+                    }} />
+                    <Box sx={{
+                        position: "absolute",
+                        top: "-100%", left: "-10%",
+                        width: "30%", height: "350%",
+                        background: "rgba(255,255,255,0.10)",
+                        transform: "rotate(-45deg)",
+                        pointerEvents: "none",
+                    }} />
+                    <Box sx={{
+                        position: "absolute",
+                        top: "-100%", left: "5%",
+                        width: "15%", height: "350%",
+                        background: "rgba(255,255,255,0.13)",
+                        transform: "rotate(-45deg)",
+                        pointerEvents: "none",
+                    }} />
+                   
+                    <Box sx={{
+                        position: "absolute",
+                        top: "-100%", right: "-25%",
+                        width: "55%", height: "350%",
+                        background: "rgba(243, 69, 69, 0.06)",
+                        transform: "rotate(-45deg)",
+                        pointerEvents: "none",
+                    }} />
+                    <Box sx={{
+                        position: "absolute",
+                        top: "-100%", right: "-10%",
+                        width: "30%", height: "350%",
+                        background: "rgba(255,255,255,0.10)",
+                        transform: "rotate(-45deg)",
+                        pointerEvents: "none",
+                    }} />
+                    <Box sx={{
+                        position: "absolute",
+                        top: "-100%", right: "5%",
+                        width: "15%", height: "350%",
+                        background: "rgba(255,255,255,0.13)",
+                        transform: "rotate(-45deg)",
+                        pointerEvents: "none",
+                    }} />
+
+                    {/* Nội dung */}
+                    <Box sx={{
+                        position: "relative", zIndex: 1,
+                        color: 'white', fontSize: 28, fontWeight: 'bold', mb: 2
+                    }}>
                         Tra cứu thông tin tuyển sinh đại học nhanh chóng và chính xác
                     </Box>
 
                     <Box sx={{
-                        width: "100%",
-                        maxWidth: 1200,
-                    }}
-                    >
+                        position: "relative", zIndex: 1,
+                        width: "100%", maxWidth: 1200,
+                    }}>
                         <Box>
                             <SearchBar onSearch={handleSearch} />
                         </Box>
-
-                        <Box sx={{
-                            mt: 2
-                        }}
-                        >
+                        <Box sx={{ mt: 1.5 }}>
                             <SearchTabs />
                         </Box>
                     </Box>

@@ -1,185 +1,199 @@
 import * as React from "react";
 import {
-    Tabs,
-    Tab,
-    Box,
-    Typography,
-    Card,
-    CardContent,
-    CircularProgress,
-    Stack,
+    Box, Typography, Card, CardContent,
+    CircularProgress, Stack, Avatar, Chip,
 } from "@mui/material";
 import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
-import { TEXT_COLOR } from "../../constants/common.constant";
-import { Camera, Campaign, WorkOutline } from "@mui/icons-material";
+import { LocationOn, AccessTime, PeopleAlt, AttachMoney, NavigateNext } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-function TabPanel({
-    children,
-    value,
-    index,
-}: {
-    children: React.ReactNode;
-    value: number;
-    index: number;
-}) {
-    return (
-        <Box
-            role="tabpanel"
-            hidden={value !== index}
-            sx={{ flex: 1, height: "100%", overflow: "hidden" }}
-        >
-            {value === index && children}
-        </Box>
-    );
-}
+const formatDate = (dateString: string) => {
+    if (!dateString || dateString.startsWith("0001")) return "—";
+    return new Date(dateString).toLocaleDateString("vi-VN");
+};
 
 export default function ProfessionRecruitmentTabs() {
-    const [value, setValue] = React.useState(0);
+    const [selected, setSelected] = React.useState(0);
     const navigate = useNavigate();
-    const { data: professions = [], isLoading: loadingProfession } =
-        useGetAllProfessionNoAuthenQuery();
 
-    const selectedProfessionId = professions[value]?.Id;
+    const { data: professions = [], isLoading: loadingProfession } = useGetAllProfessionNoAuthenQuery();
+    const selectedProfessionId = professions[selected]?.Id;
 
-    const {
-        data: postsResponse,
-        isLoading: loadingPosts,
-    } = useGetRecruitmentPostsByPageQuery(
+    const { data: postsResponse, isLoading: loadingPosts } = useGetRecruitmentPostsByPageQuery(
         { professionId: selectedProfessionId },
         { skip: !selectedProfessionId }
     );
 
-    const posts = React.useMemo(() => {
-        return postsResponse?.Items ?? [];
-    }, [postsResponse]);
+    const posts = React.useMemo(() => postsResponse?.Items ?? [], [postsResponse]);
 
     return (
         <Box
             sx={{
                 display: "flex",
-                height: 260,
+                height: 320,
                 bgcolor: "background.paper",
-                borderRadius: 1,
-                overflow: "hidden"
+                borderRadius: 1.5,
+                overflow: "hidden",
+                border: "1px solid #e8e8e8",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
             }}
         >
-            {/* LEFT: ngành nghề */}
-            <Tabs
-                orientation="vertical"
-                variant="scrollable"
-                value={value}
-                onChange={(_, newValue) => setValue(newValue)}
+            <Box
                 sx={{
-                    width: 240,
-                    borderColor: "divider",
-
-                    "& .MuiTab-root": {
-                        minHeight: 36,
-                        paddingY: 0.5,
-                        paddingX: 1.5,
-                        fontSize: 14,
-                        fontWeight: 500,
-                        textTransform: "none",
-                        alignItems: "flex-start",
-                        textAlign: "left",
-                        color: TEXT_COLOR,
-
-                        "&.Mui-selected": {
-                            backgroundColor: "action.selected",
-                            color: "primary.main"
-                        }
-                    }
+                    width: { xs: 160, sm: 240 },
+                    flexShrink: 0,
+                    borderRight: "1px solid #e8e8e8",
+                    bgcolor: "#fafafa",
+                    overflowY: "auto",
+                    "&::-webkit-scrollbar": { display: "none" },
                 }}
             >
                 {loadingProfession ? (
-                    <Box sx={{ p: 2 }}>
-                        <CircularProgress size={20} />
+                    <Box sx={{ display: "flex", justifyContent: "center", pt: 2 }}>
+                        <CircularProgress size={16} />
                     </Box>
                 ) : (
-                    professions.map((p) => (
-                        <Tab
+                    professions.map((p, i) => (
+                        <Box
                             key={p.Id}
-                            label={p.Name}
-                            disableRipple
+                            onClick={() => setSelected(i)}
                             sx={{
-                                alignItems: "flex-start",
-                                textAlign: "left",
-                                textTransform: "none",
-                                fontWeight: 500,
-                                minHeight: 48,
+                                px: { xs: 1, sm: 1.5 },
+                                py: 1.25,
+                                fontSize: { xs: 12, sm: 13 },
+                                fontWeight: selected === i ? 700 : 500,
+                                color: selected === i ? "#faa11b" : "text.secondary",
+                                bgcolor: selected === i ? "#fff8e1" : "transparent",
+                                borderLeft: "3px solid",
+                                borderLeftColor: selected === i ? "#faa11b" : "transparent",
+                                cursor: "pointer",
+                                transition: "all 0.15s",
+                                lineHeight: 1.4,
+                                "&:hover": {
+                                    bgcolor: "#fff8e1",
+                                    color: "#faa11b",
+                                },
                             }}
-                        />
+                        >
+                            {p.Name}
+                        </Box>
                     ))
                 )}
-            </Tabs>
+            </Box>
 
-            {/* RIGHT: danh sách tin */}
-            <TabPanel value={value} index={value}>
-                <Box
-                    sx={{
-                        height: "100%",
-                        overflowY: "auto",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 1,
-                        p: 1,
-                    }}
-                >
-                    {loadingPosts ? (
-                        <Box sx={{ textAlign: "center", mt: 2 }}>
-                            <CircularProgress />
-                        </Box>
-                    ) : posts.length === 0 ? (
-                        <Typography sx={{ color: "text.secondary" }}>
+            <Box
+                sx={{
+                    flex: 1,
+                    overflowY: "auto",
+                    p: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.75,
+                    "&::-webkit-scrollbar": { width: 3 },
+                    "&::-webkit-scrollbar-thumb": { bgcolor: "#e0e0e0", borderRadius: 4 },
+                }}
+            >
+                {loadingPosts ? (
+                    <Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}>
+                        <CircularProgress size={20} sx={{ color: "#faa11b" }} />
+                    </Box>
+                ) : posts.length === 0 ? (
+                    <Box sx={{ textAlign: "center", pt: 4 }}>
+                        <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
                             Chưa có tin tuyển sinh
                         </Typography>
-                    ) : (
-                        posts.map((post) => (
-                            <Card
-                                key={post.Id}
-                                onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                    </Box>
+                ) : (
+                    posts.map((post) => (
+                        <Box
+                            key={post.Id}
+                            onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                p: 1,
+                                borderRadius: 1.5,
+                                border: "1px solid #f0f0f0",
+                                cursor: "pointer",
+                                transition: "all 0.15s",
+                                "&:hover": {
+                                    borderColor: "#faa11b",
+                                    bgcolor: "#fffbf2",
+                                    transform: "translateX(2px)",
+                                },
+                            }}
+                        >
+                            {/* Logo */}
+                            <Avatar
+                                src={post.Organization?.LogoFullUrl || undefined}
                                 sx={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: 1,
                                     flexShrink: 0,
-                                    cursor: "pointer",
-                                    borderRadius: 2,
-                                    boxShadow: "none",
-                                    "&:hover": {
-                                        backgroundColor: "action.hover",
-                                        borderColor: "primary.main"
-                                    }
+                                    border: "1px solid #f0f0f0",
+                                    fontSize: 14,
                                 }}
                             >
-                                <CardContent
-                                    sx={{
-                                        py: 1,
-                                        px: 1,
-                                        "&:last-child": { pb: 1 },
-                                        alignItems: 'center'
-                                    }}
-                                >
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Campaign
-                                            sx={{ fontSize: 18, color: "primary.main" }}
-                                        />
-                                        <Typography
-                                            sx={{
-                                                color: TEXT_COLOR,
-                                                fontSize: 14,
-                                                fontWeight: 500,
-                                                lineHeight: 1.4
-                                            }}
-                                        >
-                                            {post.Name}
+                                {post.Organization?.Name?.charAt(0)}
+                            </Avatar>
+
+                            {/* Info */}
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Stack direction="row" alignItems="center" spacing={0.5} mb={0.25}>
+                                    {post.IsTop && (
+                                        <Box component="span" sx={{
+                                            bgcolor: "#faa11b", color: "white",
+                                            fontSize: 9, fontWeight: 700,
+                                            px: 0.5, borderRadius: 0.5,
+                                            lineHeight: 1.6, flexShrink: 0,
+                                        }}>
+                                            HOT
+                                        </Box>
+                                    )}
+                                    <Typography sx={{
+                                        fontSize: 14, fontWeight: 600,
+                                        overflow: "hidden", textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap", flex: 1,
+                                    }}>
+                                        {post.Name}
+                                    </Typography>
+                                </Stack>
+
+                                <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
+                                    <Stack direction="row" spacing={0.3} alignItems="center">
+                                        <LocationOn sx={{ fontSize: 11, color: "#faa11b" }} />
+                                        <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
+                                            {post.Province || "—"}
                                         </Typography>
                                     </Stack>
-                                </CardContent>
-                            </Card>
-                        ))
-                    )}
-                </Box>
-            </TabPanel>
+                                    <Stack direction="row" spacing={0.3} alignItems="center">
+                                        <PeopleAlt sx={{ fontSize: 11, color: "#faa11b" }} />
+                                        <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
+                                            {post.Quantity}
+                                        </Typography>
+                                    </Stack>
+                                    <Stack direction="row" spacing={0.3} alignItems="center">
+                                        <AccessTime sx={{ fontSize: 11, color: "text.disabled" }} />
+                                        <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
+                                            {formatDate(post.RecruitmentToDate)}
+                                        </Typography>
+                                    </Stack>
+                                    {post.Cost > 0 && (
+                                        <Typography sx={{ fontSize: 10, color: "#4caf50", fontWeight: 600 }}>
+                                            {post.Cost.toLocaleString()} {post.Currency}
+                                        </Typography>
+                                    )}
+                                </Stack>
+                            </Box>
+
+                            <NavigateNext sx={{ fontSize: 16, color: "text.disabled", flexShrink: 0 }} />
+                        </Box>
+                    ))
+                )}
+            </Box>
         </Box>
     );
 }

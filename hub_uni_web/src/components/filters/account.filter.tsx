@@ -6,8 +6,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 interface FilterValues {
     gender?: string;
     status?: string;
-    orderBy?: string;
-    orderDirection?: string;
 }
 
 interface AccountFilterProps {
@@ -52,17 +50,11 @@ const AccountFilter = ({ onApply }: AccountFilterProps) => {
             ...prev,
             gender: undefined,
             status: undefined,
-            orderBy: undefined,
-            orderDirection: undefined,
-            offset: 0,
         }));
 
         const searchParams = new URLSearchParams(location.search);
         searchParams.delete('gender');
         searchParams.delete('status');
-        searchParams.delete('orderBy');
-        searchParams.delete('orderDirection');
-        searchParams.set('offset', '0');
 
         navigate({ search: searchParams.toString() });
         handleClose();
@@ -90,26 +82,6 @@ const AccountFilter = ({ onApply }: AccountFilterProps) => {
         </Grid>
     );
 
-    const renderOrderDirectionSelect = () => (
-        <Grid size={6}>
-            <FormControl fullWidth size="small">
-                <InputLabel>Hướng sắp xếp</InputLabel>
-                <Select
-                    value={"ASC"}
-                    label="Hướng sắp xếp"
-                    onChange={handleFilterChange("orderDirection")}
-                >
-                    <MenuItem value="ASC">
-                        Tăng dần
-                    </MenuItem>
-                    <MenuItem value="DESC">
-                        Giảm dần
-                    </MenuItem>
-                </Select>
-            </FormControl>
-        </Grid>
-    );
-
     return (
         <div>
             <Button
@@ -125,7 +97,6 @@ const AccountFilter = ({ onApply }: AccountFilterProps) => {
                 anchorEl={anchorEl}
                 open={isMenuOpen}
                 onClose={handleClose}
-                PaperProps={{ sx: { width: 400, maxWidth: "100%" } }}
             >
                 <Grid container spacing={2} sx={{ p: 2 }}>
                     {renderSelect("Giới tính", "gender", [
@@ -137,7 +108,6 @@ const AccountFilter = ({ onApply }: AccountFilterProps) => {
                         { key: "Kích hoạt", value: "active" },
                         { key: "Khóa", value: "locked" },
                     ])}
-                    {renderOrderDirectionSelect()}
                     <Grid size={6}>
                         <Button
                             variant="contained"

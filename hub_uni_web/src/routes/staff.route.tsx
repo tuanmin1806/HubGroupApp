@@ -1,11 +1,19 @@
-import ManageArticlePage from "../pages/staff/manage-article.page"
+import CreateRecruitmentPostPage from "../pages/staff/create-recruitment-post.page"
+import ManageRecruitmentPostPage from "../pages/staff/manage-recruitment-post.page"
+import StaffDashboardPage from "../pages/staff/staff-dashboard.page"
 
 const staffRoutes = [
     {
-        path: '/staff',
-        element: (
-            <ManageArticlePage />
-        ),
+        index: true,
+        element: <StaffDashboardPage />,
+    },
+    {
+        path: "manage-recruitment-post",
+        element: <ManageRecruitmentPostPage />,
+    },
+    {
+        path: "create-recruitment-post",
+        element: <CreateRecruitmentPostPage />,
     },
 ]
 
