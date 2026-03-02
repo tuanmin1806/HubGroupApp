@@ -21,8 +21,11 @@ export interface StudentRegisterRequestBody {
     AccountType: AccountType.Student;
     AccountStatus: AccountStatus.Activated;
     ProfileInfo: {
-        Age: number;
+        DateOfBirth: string;
         Gender: Gender;
+        ProvinceId: string;
+        CommuneId: string;
+        Address: string;
         Experience: JobExperience;
         EducationLevel: EducationLevel;
     };
@@ -51,15 +54,15 @@ export interface RecruiterRegisterRequestBody {
         ProvinceId: string;
         CommuneId: string;
         ManagedBy: string;
-        LogoUrl: string;
-        WallpaperUrl: string;
-        Description: string;
-        FacebookUrl: string;
-        LinkedinUrl: string;
-        YoutubeUrl: string;
-        GoogleMapUrl: string;
-        TwitterUrl: string;
-        InstagramUrl: string;
+        LogoUrl?: string;
+        WallpaperUrl?: string;
+        Description?: string;
+        FacebookUrl?: string;
+        LinkedinUrl?: string;
+        YoutubeUrl?: string;
+        GoogleMapUrl?: string;
+        TwitterUrl?: string;
+        InstagramUrl?: string;
         Email: string;
         WebsiteUrl?: string;
         Summary?: string;

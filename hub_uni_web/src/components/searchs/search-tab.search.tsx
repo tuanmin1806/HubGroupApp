@@ -7,11 +7,8 @@ import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
 import { LocationOn, AccessTime, PeopleAlt, AttachMoney, NavigateNext } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
-const formatDate = (dateString: string) => {
-    if (!dateString || dateString.startsWith("0001")) return "—";
-    return new Date(dateString).toLocaleDateString("vi-VN");
-};
+import { formatDate } from "../../utils/date.utils";
+import { getRecruitmentStatus } from "../../utils/recruitment-post.utils";
 
 export default function ProfessionRecruitmentTabs() {
     const [selected, setSelected] = React.useState(0);
@@ -108,7 +105,7 @@ export default function ProfessionRecruitmentTabs() {
                     posts.map((post) => (
                         <Box
                             key={post.Id}
-                            onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                            onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`)}
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
@@ -176,8 +173,8 @@ export default function ProfessionRecruitmentTabs() {
                                         </Typography>
                                     </Stack>
                                     <Stack direction="row" spacing={0.3} alignItems="center">
-                                        <AccessTime sx={{ fontSize: 11, color: "text.disabled" }} />
-                                        <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
+                                        <AccessTime sx={{ fontSize: 11, color: getRecruitmentStatus(post.RecruitmentToDate).color }} />
+                                        <Typography sx={{ fontSize: 10, color: getRecruitmentStatus(post.RecruitmentToDate).color, }}>
                                             {formatDate(post.RecruitmentToDate)}
                                         </Typography>
                                     </Stack>

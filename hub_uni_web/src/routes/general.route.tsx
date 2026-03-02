@@ -26,27 +26,27 @@ const generalRoutes = [
         element: <ArticleDetailPage />,
     },
     {
-        path: '/danh-sach-bai-viet',
+        path: '/bai-viet',
         element: <ArticlePage />,
     },
     {
-        path: '/tim-kiem-to-chuc',
+        path: '/tim-kiem-truong',
         element: <OrganizationSearchPage />,
     },
     {
-        path: '/to-chuc/:seoUrl',
+        path: '/chi-tiet-truong/:seoUrl',
         element: <OrganizationDetailPage />,
     },
     {
-        path: '/tin-tuyen-sinh/:seoUrl',
+        path: '/chuong-trinh-tuyen-sinh/:seoUrl',
         element: <RecruitmentPostDetailPage />,
     },
     {
-        path: "/chi-tiet-bai-viet/:seo",
+        path: "/bai-viet/:seo",
         element: <ArticleDetailPage />,
     },
     {
-        path: "/tin-tuyen-sinh",
+        path: "/chuong-trinh-tuyen-sinh",
         element: <RecruitmentPostSearchPage />,
     },
 ];

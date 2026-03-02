@@ -1,36 +1,11 @@
 import { Box, Card, Typography, Button, Tooltip, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
-import { Send, Visibility, PeopleAlt, CalendarToday, LocationOn } from "@mui/icons-material";
+import { Send, Visibility, PeopleAlt, CalendarToday, LocationOn, AccessTime } from "@mui/icons-material";
 import { formatDate } from "../../utils/date.utils";
+import { getRecruitmentStatus } from "../../utils/recruitment-post.utils";
 
 interface Props { recruitmentPosts: RecruitmentPostResponse[]; }
-
-const getRecruitmentStatus = (date?: string | null) => {
-  if (!date) return { label: "Gửi lý lịch", color: "text.secondary" };
-
-  const parsed = new Date(date);
-
-  if (isNaN(parsed.getTime()) || parsed.getFullYear() === 1) {
-    return { label: "Gửi lý lịch", color: "text.secondary" };
-  }
-
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  parsed.setHours(0, 0, 0, 0);
-
-  if (parsed < now) {
-    return {
-      label: `${formatDate(date)}`,
-      color: "error.main",
-    };
-  }
-
-  return {
-    label: `${formatDate(date)}`,
-    color: "success.main",
-  };
-};
 
 export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Props) {
   const navigate = useNavigate();
@@ -94,7 +69,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 cursor: "pointer",
                 flexShrink: 0,
               }}
-              onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
+              onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${rcp.SeoUrl}`)}
             />
 
             {/* RIGHT: CONTENT */}
@@ -129,7 +104,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                         size="small"
                         fullWidth
                         sx={{ backgroundColor: "#ff5722" }}
-                        onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
+                        onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${rcp.SeoUrl}`)}
                       >
                         Xem chi tiết
                       </Button>
@@ -139,7 +114,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                         size="small"
                         fullWidth
                         sx={{ backgroundColor: "#ff5722" }}
-                        onClick={() => navigate(`/tin-tuyen-sinh/${rcp.SeoUrl}`)}
+                        onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${rcp.SeoUrl}`)}
                       >
                         Ứng tuyển ngay
                       </Button>
@@ -190,7 +165,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
 
               <Box sx={{ mt: "auto" }}>
                 <Stack direction="row" spacing={0.5} alignItems="center">
-                  <CalendarToday sx={{ fontSize: 13, color: getRecruitmentStatus(rcp.RecruitmentToDate).color }} />
+                  <AccessTime sx={{ fontSize: 13, color: getRecruitmentStatus(rcp.RecruitmentToDate).color }} />
                   <Typography
                     variant="body2"
                     sx={{

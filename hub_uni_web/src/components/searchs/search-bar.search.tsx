@@ -56,7 +56,7 @@ export default function SearchBar({ onSearch, initialQuery = "", initialProvince
         >
             <InputBase
                 sx={{ flex: 1, ml: 1 }}
-                placeholder="Nhập tên tổ chức, ngành nghề, mã số thuế..."
+                placeholder="Nhập từ khóa tìm kiếm..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onKeyDown={handleKeyPress}

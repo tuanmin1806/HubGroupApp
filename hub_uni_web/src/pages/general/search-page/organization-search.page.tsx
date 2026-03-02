@@ -86,7 +86,7 @@ const OrganizationSearchPage = () => {
     const [allOrgTypes, setAllOrgTypes] = useState<any[]>([]);
     const [allProfessions, setAllProfessions] = useState<any[]>([]);
 
-    useEffect(() => { document.title = "Tìm kiếm Tổ chức | HUB UNI"; }, []);
+    useEffect(() => { document.title = "Tìm kiếm trường | HUB UNI"; }, []);
 
     useEffect(() => {
         if (orgTypesData?.Items) {
@@ -159,7 +159,7 @@ const OrganizationSearchPage = () => {
         setPage(DEFAULT_PAGE);
     };
 
-    const handleViewDetail = (organizationId: string) => { navigate(`/to-chuc/${organizationId}`); };
+    const handleViewDetail = (organizationId: string) => { navigate(`/chi-tiet-truong/${organizationId}`); };
     const handleLoadMoreOrgTypes = () => { setOrgTypePage(prev => prev + 1); };
     const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
 
@@ -226,7 +226,7 @@ const OrganizationSearchPage = () => {
 
                                 <Divider sx={{ mb: 2 }} />
 
-                                {/* Loại tổ chức */}
+                                {/* Loại hình*/}
                                 <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
                                     <FormLabel
                                         sx={{
@@ -237,7 +237,7 @@ const OrganizationSearchPage = () => {
                                         }}
                                     >
                                         <Apartment sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Loại tổ chức
+                                        Loại hình
                                     </FormLabel>
                                     <Box sx={{ maxHeight: showAllOrgTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
                                         {isLoadingOrgTypes && allOrgTypes.length === 0 ? (
@@ -534,7 +534,7 @@ const OrganizationSearchPage = () => {
                                 <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3, boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}>
                                     <School sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
                                     <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                        Không tìm thấy tổ chức nào
+                                        Không tìm thấy trường nào
                                     </Typography>
                                     <Typography color="text.secondary" sx={{ mt: 1 }}>
                                         Vui lòng thử điều chỉnh bộ lọc của bạn
@@ -550,7 +550,7 @@ const OrganizationSearchPage = () => {
                                         px: 1
                                     }}>
                                         <Typography variant="body2" color="text.secondary">
-                                            Tìm thấy <strong>{organizationData?.Total || 0}</strong> tổ chức
+                                            Tìm thấy <strong>{organizationData?.Total || 0}</strong> trường phù hợp
                                         </Typography>
                                     </Box>
 

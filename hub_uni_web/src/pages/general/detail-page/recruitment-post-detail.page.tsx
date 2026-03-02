@@ -445,7 +445,7 @@ const RecruitmentPostDetailPage = () => {
                                                 <Button
                                                     variant="outlined"
                                                     fullWidth
-                                                    onClick={() => navigate(`/to-chuc/${recruitmentPost.Organization.SeoUrl}`)}
+                                                    onClick={() => navigate(`/chi-tiet-truong/${recruitmentPost.Organization.SeoUrl}`)}
                                                     sx={{
                                                         mt: 2,
                                                         borderColor: '#ff5722',
@@ -605,7 +605,7 @@ const RecruitmentPostDetailPage = () => {
                                                 borderColor: '#ff5722'
                                             }
                                         }}
-                                        onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                                        onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`)}
                                     >
                                         <CardContent sx={{
                                             p: 0,

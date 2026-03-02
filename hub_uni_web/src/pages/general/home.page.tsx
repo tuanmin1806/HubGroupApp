@@ -39,7 +39,7 @@ const HomePage = () => {
         const params = new URLSearchParams();
         if (query.trim()) params.append('search', query.trim());
         if (provinceSeo) params.append('provinceSeo', provinceSeo);
-        if (params.toString()) navigate(`/tim-kiem-to-chuc?${params.toString()}`);
+        if (params.toString()) navigate(`/tim-kiem-truong?${params.toString()}`);
     };
 
     useEffect(() => {

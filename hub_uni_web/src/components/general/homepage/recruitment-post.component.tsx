@@ -94,13 +94,13 @@ const RecruitmentPostComponent = () => {
                 }}
             >
                 <Box sx={{ color: "#ff5722", fontSize: 26, fontWeight: 700 }}>
-                    Tin tuyển sinh
+                    Chương trình tuyển sinh
                 </Box>
 
                 <Button
                     variant="outlined"
                     endIcon={<ArrowForward />}
-                    onClick={() => navigate("/tin-tuyen-sinh")}
+                    onClick={() => navigate("/chuong-trinh-tuyen-sinh")}
                     sx={{
                         borderColor: "#ff5722",
                         color: "#ff5722",

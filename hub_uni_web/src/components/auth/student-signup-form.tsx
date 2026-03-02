@@ -3,6 +3,10 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useStudentRegisterMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
 import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
+import { string } from "prop-types";
+import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
+import { Province } from "../../app/models/province.model";
+import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
 
 const initialState = {
     UserName: "",
@@ -12,9 +16,12 @@ const initialState = {
     Gender: Gender.Male,
     Email: "",
     PhoneNumber: "",
-    Age: "" as string | number,
+    DateOfBirth: "",
     Experience: JobExperience.LessThan1Year,
     EducationLevel: EducationLevel.Undefined,
+    ProvinceId: "",
+    CommuneId: "",
+    Address: ""
 };
 
 const StudentSignupForm = () => {
@@ -25,6 +32,11 @@ const StudentSignupForm = () => {
     const [submitting, setSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
 
+    const [selectedProvinceSeo, setSelectedProvinceSeo] = useState("");
+
+    const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
+    const { data: communes = [] } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo, });
+
     const set = (field: string, value: any) => setForm((prev) => ({ ...prev, [field]: value }));
 
     const validate = (): string => {
@@ -34,6 +46,13 @@ const StudentSignupForm = () => {
         if (!form.FullName.trim()) return "Vui lòng nhập họ và tên";
         if (!form.Email.trim()) return "Vui lòng nhập email";
         return "";
+    };
+
+    const handleProvinceChange = (provinceId: string) => {
+        const province = provinces.find((p: Province) => p.Id === provinceId);
+        set("ProvinceId", provinceId);
+        set("CommuneId", "");
+        setSelectedProvinceSeo(province?.Seo ?? "");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -53,8 +72,11 @@ const StudentSignupForm = () => {
                 AccountType: AccountType.Student,
                 AccountStatus: AccountStatus.Activated,
                 ProfileInfo: {
-                    Age: Number(form.Age) || 0,
+                    DateOfBirth: form.DateOfBirth,
                     Gender: form.Gender,
+                    ProvinceId: form.ProvinceId,
+                    CommuneId: form.CommuneId,
+                    Address: form.Address,
                     Experience: form.Experience,
                     EducationLevel: form.EducationLevel,
                 },
@@ -88,7 +110,7 @@ const StudentSignupForm = () => {
                 <Box component="form" onSubmit={handleSubmit} onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}>
                     <Stack spacing={2}>
                         <Box>
-                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={0.5}> Thông tin tài khoản </Typography>
+                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={1}> Thông tin tài khoản </Typography>
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12 }}> <TextField label="Tên đăng nhập *" size="small" fullWidth value={form.UserName} onChange={(e) => set("UserName", e.target.value)} /> </Grid>
                                 <Grid size={{ xs: 12 }}> <TextField label="Mật khẩu *" type="password" size="small" fullWidth value={form.Password} onChange={(e) => set("Password", e.target.value)} /></Grid>
@@ -96,28 +118,28 @@ const StudentSignupForm = () => {
                             </Grid>
                         </Box>
 
-                        <Divider />
-
                         <Box>
-                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={0.5}> Thông tin cá nhân </Typography>
+                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={1}> Thông tin cá nhân </Typography>
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12 }}> <TextField label="Họ và tên *" size="small" fullWidth value={form.FullName} onChange={(e) => set("FullName", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Email *" type="email" size="small" fullWidth value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Số điện thoại" size="small" fullWidth value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField select label="Giới tính" size="small" fullWidth value={form.Gender} onChange={(e) => set("Gender", e.target.value)}>
+                                    <MenuItem value={Gender.Undefined}>Không yêu cầu</MenuItem>
                                     <MenuItem value={Gender.Male}>Nam</MenuItem>
                                     <MenuItem value={Gender.Female}>Nữ</MenuItem>
                                     <MenuItem value={Gender.Other}>Khác</MenuItem>
                                 </TextField>
                                 </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Tuổi" type="number" size="small" fullWidth value={form.Age} onChange={(e) => set("Age", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Ngày sinh" type="date" value={form.DateOfBirth} onChange={(e) => set("DateOfBirth", e.target.value)} fullWidth size="small" InputLabelProps={{ shrink: true }} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Tỉnh / Thành phố" value={form.ProvinceId} onChange={(e) => handleProvinceChange(e.target.value)} fullWidth size="small">{provinces.map((p: Province) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}</TextField></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Quận / Xã" value={form.CommuneId} onChange={(e) => set("CommuneId", e.target.value)} fullWidth size="small" disabled={!selectedProvinceSeo}>{communes.map((c) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}</TextField></Grid>
+                                <Grid size={{ xs: 12 }}><TextField label="Địa chỉ" value={form.Address} onChange={(e) => set("Address", e.target.value)} fullWidth size="small" /></Grid>
                             </Grid>
                         </Box>
 
-                        <Divider />
-
                         <Box>
-                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={1.5}> Học vấn & Kinh nghiệm </Typography>
+                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={2}> Học vấn & Kinh nghiệm </Typography>
                             <Grid container spacing={1}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField select label="Trình độ học vấn" size="small" fullWidth value={form.EducationLevel} onChange={(e) => set("EducationLevel", e.target.value)}>

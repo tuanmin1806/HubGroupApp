@@ -478,7 +478,7 @@ const OrganizationDetailPage = () => {
                                                             position: 'relative',
                                                             '&:hover': { transform: 'translateY(-2px)' },
                                                         }}
-                                                        onClick={() => navigate(`/tin-tuyen-sinh/${post.SeoUrl}`)}
+                                                        onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`)}
                                                     >
                                                         {post.IsTop && (
                                                             <Box sx={{

@@ -65,6 +65,7 @@ export interface OrganizationResponse {
     Summary: string;
     IsTop: boolean;
     Highlights: string[];
+    WebsiteUrl: string;
 }
 
 export interface OrganizationFilterParams {

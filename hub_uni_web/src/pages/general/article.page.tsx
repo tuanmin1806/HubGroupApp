@@ -16,11 +16,7 @@ const ArticlePage = () => {
     const categoryListRef = useRef<HTMLDivElement>(null);
 
     const { data: categories = [] } = useGetAllCategoryQuery();
-    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({
-        page: page,
-        size: PAGE_SIZE,
-        searchValue,
-    });
+    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page,  size: PAGE_SIZE, searchValue,});
 
     const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
     const articles = articleData?.Items || [];
@@ -103,19 +99,6 @@ const ArticlePage = () => {
                                 setPage(1);
                                 setSearchValue(searchQuery.trim());
                             }
-                        }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search
-                                        sx={{ cursor: "pointer" }}
-                                        onClick={() => {
-                                            setPage(1);
-                                            setSearchValue(searchQuery.trim());
-                                        }}
-                                    />
-                                </InputAdornment>
-                            ),
                         }}
                     />
 
@@ -207,7 +190,7 @@ const ArticlePage = () => {
                     sx={{
                         display: "grid",
                         gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
-                        gap: 2.5,
+                        gap: 1,
                         mb: 4,
                     }}
                 >

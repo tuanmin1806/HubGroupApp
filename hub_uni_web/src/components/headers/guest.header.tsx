@@ -6,9 +6,9 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider, useMediaQuery, IconButton, Drawer, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
+import { createTheme, ThemeProvider, useMediaQuery, IconButton, Drawer, List, ListItem, ListItemText, ListItemButton, Menu, Button, MenuItem, Fade } from "@mui/material";
 import Link from "@mui/material/Link";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import hub_logo from "../../assets/hub_logo.png";
 
@@ -28,6 +28,15 @@ function GuestHeader() {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [openDrawer, setOpenDrawer] = useState(false);
 
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     const handleNavigateLogin = () => {
         navigate("/dang-nhap");
     }
@@ -37,15 +46,31 @@ function GuestHeader() {
     }
 
     const handleNavigateArticle = () => {
-        navigate("/danh-sach-bai-viet");
+        navigate("/bai-viet");
     }
 
     const handleNavigateOrganization = () => {
-        navigate("/tim-kiem-to-chuc");
+        navigate("/tim-kiem-truong");
     }
 
     const handleNavigateRecruitmentPost = () => {
-        navigate("/tin-tuyen-sinh");
+        navigate("/chuong-trinh-tuyen-sinh");
+    }
+
+    const handleNavigateAboutUs = () => {
+        window.open("https://hubgroup.vn/ve-chung-toi", "_blank");
+    };
+
+    const handleNavigateContact = () => {
+        window.open("https://hubgroup.vn/lien-he", "_blank");
+    }
+
+    const handleNavigateImageLibrary = () => {
+        window.open("https://hubgroup.vn/thu-vien-anh", "_blank");
+    }
+
+    const handleNavigateImageOffice = () => {
+        window.open("https://vanphong.hubgroup.vn/", "_blank");
     }
 
     const toggleDrawer = (newOpen: boolean) => () => {
@@ -90,11 +115,6 @@ function GuestHeader() {
                     >
                         <ListItemText
                             primary="Trang Chủ"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
                         />
                     </ListItemButton>
                 </ListItem>
@@ -215,6 +235,43 @@ function GuestHeader() {
                             >
                                 Bài viết
                             </Link>
+                            <div>
+                                <Button
+                                    id="fade-button"
+                                    aria-controls={open ? 'fade-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={open ? 'true' : undefined}
+                                    onClick={handleClick}
+                                    sx={{
+                                        ml: { xs: 1, md: 3 },
+                                        textAlign: "center",
+                                        textTransform: "uppercase",
+                                        fontWeight: "bold",
+                                        fontSize: { xs: "0.75rem", md: "0.875rem" },
+                                        color: "inherit",
+                                        background: "none",
+                                    }}
+                                >
+                                    Về HUBGROUP
+                                </Button>
+                                <Menu
+                                    id="fade-menu"
+                                    slotProps={{
+                                        list: {
+                                            'aria-labelledby': 'fade-button',
+                                        },
+                                    }}
+                                    slots={{ transition: Fade }}
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleClose}
+                                >
+                                    <MenuItem onClick={handleNavigateAboutUs}>Giới thiệu</MenuItem>
+                                    <MenuItem onClick={handleNavigateContact}>Liên hệ</MenuItem>
+                                    <MenuItem onClick={handleNavigateImageLibrary}>Thư viện ảnh</MenuItem>
+                                    <MenuItem onClick={handleNavigateImageOffice}>Văn phòng HUBGROUP</MenuItem>
+                                </Menu>
+                            </div>
                         </Box>
 
                         {/* Auth Links */}

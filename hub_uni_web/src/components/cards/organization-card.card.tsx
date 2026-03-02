@@ -1,19 +1,9 @@
-import * as React from "react";
-import {
-  Box,
-  Card,
-  Typography,
-  Tooltip,
-  Button,
-} from "@mui/material";
+import { Box, Card, Typography, Tooltip, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { OrganizationResponse } from "../../app/models/organization.model";
 import { Visibility } from "@mui/icons-material";
-import { BACK_GROUND_BUTTON_COLOR } from "../../constants/common.constant";
 
-interface Props {
-  organizations: OrganizationResponse[];
-}
+interface Props { organizations: OrganizationResponse[]; }
 
 export default function OrganizationSelectActionCard({ organizations }: Props) {
   const navigate = useNavigate();
@@ -36,8 +26,12 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
           sx={{
             display: "flex",
             alignItems: "stretch",
-            p: 2,
-            borderRadius: 2,
+            p: 1,
+            border: {xs: org.IsTop ? "0.5px solid #faa11b" : "0.5px solid #e0e0e0"},
+            borderRadius: 1,
+            "&:hover": {
+              transform: "translateY(-2px)",
+            },
           }}
         >
           {/* LEFT: IMAGE */}
@@ -54,12 +48,11 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               bgcolor: "#fafafa",
               cursor: "pointer",
             }}
-            onClick={() => navigate(`/to-chuc/${org.SeoUrl}`)}
+            onClick={() => navigate(`/chi-tiet-truong/${org.SeoUrl}`)}
           />
 
           {/* RIGHT: CONTENT */}
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            {/* NAME WITH TOOLTIP */}
             <Tooltip
               title={
                 <Box sx={{
@@ -68,33 +61,19 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                   overflowY: "auto",
                   overflowX: "hidden",
                 }}>
-                  <Typography fontWeight="bold" gutterBottom>
-                    {org.Name}
-                  </Typography>
-
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    {org.Summary}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    <b>Ngành chính:</b> {org.MainProfession?.Name}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    <b>Mã số thuế:</b> {org.TaxCode}
-                  </Typography>
-
-                  <Typography variant="body2" sx={{ mb: 2 }}>
-                    <b>Địa chỉ:</b> {org.Address}
-                  </Typography>
+                  <Typography fontWeight="bold" gutterBottom> {org.Name} </Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}> {org.Summary} </Typography>
+                  <Typography variant="body2"> <b>Ngành chính:</b> {org.MainProfession?.Name} </Typography>
+                  <Typography variant="body2"> <b>Mã số thuế:</b> {org.TaxCode} </Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}> <b>Địa chỉ:</b> {org.Address} </Typography>
 
                   <Button
                     variant="contained"
                     startIcon={<Visibility />}
                     size="small"
                     fullWidth
-                    sx={{backgroundColor: '#ff5722'}}
-                    onClick={() => navigate(`/to-chuc/${org.SeoUrl}`)}
+                    sx={{ backgroundColor: '#ff5722' }}
+                    onClick={() => navigate(`/chi-tiet-truong/${org.SeoUrl}`)}
                   >
                     Xem chi tiết
                   </Button>
@@ -130,16 +109,60 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               <Typography
                 variant="subtitle1"
                 fontWeight="bold"
-                sx={{ cursor: "pointer", width: "fit-content" }}
+                sx={{
+                  cursor: "pointer",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                }}
               >
                 {org.Name}
               </Typography>
             </Tooltip>
 
-            {/* TAX CODE */}
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {org.TaxCode}
-            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}> {org.OrganizationType} </Typography>
+
+            {org.WebsiteUrl && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  mb: 1,
+                  minWidth: 0,
+                }}
+              >
+
+                <Typography
+                  component="a"
+                  href={org.WebsiteUrl.startsWith("http") ? org.WebsiteUrl : `https://${org.WebsiteUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    textDecoration: "none",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "block",
+                    maxWidth: {
+                      xs: 180,
+                      sm: 160,
+                      md: 200,
+                    },
+                    "&:hover": {
+                      color: "#ff5722",
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  {org.WebsiteUrl}
+                </Typography>
+              </Box>
+            )}
 
             {/* BOTTOM ROW */}
             <Box
@@ -150,9 +173,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                 justifyContent: "space-between",
               }}
             >
-              <Typography variant="body2" color="primary">
-                {org.MainProfession?.Name}
-              </Typography>
+              <Typography variant="body2" color="primary"> {org.MainProfession?.Name} </Typography>
             </Box>
           </Box>
         </Card>

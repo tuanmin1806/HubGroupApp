@@ -10,6 +10,7 @@ import {
 import { CalendarToday, Person } from "@mui/icons-material";
 import { ArticleResponse } from "../../app/models/article.model";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../../utils/date.utils";
 
 interface Props {
   article: ArticleResponse;
@@ -19,17 +20,7 @@ export default function ArticleCard({ article }: Props) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/chi-tiet-bai-viet/${article.Seo}`);
-  };
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    navigate(`/bai-viet/${article.Seo}`);
   };
 
   return (

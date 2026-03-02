@@ -88,7 +88,7 @@ const OrganizationComponent = () => {
                 }}
             >
                 <Box sx={{ color: "#ff5722", fontSize: 26, fontWeight: 700 }}>
-                    Tổ chức
+                    Danh sách trường
                 </Box>
 
                 <Button
@@ -102,7 +102,7 @@ const OrganizationComponent = () => {
                     }}
                     variant="outlined"
                     endIcon={<ArrowForward />}
-                    onClick={() => navigate("/tim-kiem-to-chuc")}
+                    onClick={() => navigate("/tim-kiem-truong")}
                 >
                     Xem tất cả
                 </Button>
@@ -132,7 +132,7 @@ const OrganizationComponent = () => {
                                 </MenuItem>
                                 <MenuItem value="organizationType">
                                     <PeopleAlt fontSize="small" sx={{ mr: 1 }} />
-                                    Lọc theo loại tổ chức
+                                    Lọc theo loại hình
                                 </MenuItem>
                             </Select>
                         </FormControl>

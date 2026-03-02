@@ -69,7 +69,7 @@ const ArticleDetailPage = () => {
                 <Chip
                     icon={<ArrowBack />}
                     label="Quay lại danh sách bài viết"
-                    onClick={() => navigate("/danh-sach-bai-viet")}
+                    onClick={() => navigate("/bai-viet")}
                     color="primary"
                     sx={{ cursor: "pointer" }}
                 />
@@ -98,7 +98,7 @@ const ArticleDetailPage = () => {
                     <Link
                         underline="hover"
                         color="inherit"
-                        onClick={() => navigate("/danh-sach-bai-viet")}
+                        onClick={() => navigate("/bai-viet")}
                         sx={{ cursor: "pointer", fontSize: "0.875rem" }}
                     >
                         Bài viết
@@ -324,7 +324,7 @@ const ArticleDetailPage = () => {
                                     <Chip
                                         icon={<ArrowBack sx={{ fontSize: 16 }} />}
                                         label="Quay lại danh sách"
-                                        onClick={() => navigate("/danh-sach-bai-viet")}
+                                        onClick={() => navigate("/bai-viet")}
                                         sx={{
                                             cursor: "pointer",
                                             height: 32,
@@ -359,7 +359,7 @@ const ArticleDetailPage = () => {
                                             <Box
                                                 key={article.Id}
                                                 onClick={() => {
-                                                    navigate(`/chi-tiet-bai-viet/${article.Seo}`);
+                                                    navigate(`/bai-viet/${article.Seo}`);
                                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                                 }}
                                                 sx={{
@@ -450,7 +450,7 @@ const ArticleDetailPage = () => {
                                             <Box
                                                 key={article.Id}
                                                 onClick={() => {
-                                                    navigate(`/chi-tiet-bai-viet/${article.Seo}`);
+                                                    navigate(`/bai-viet/${article.Seo}`);
                                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                                 }}
                                                 sx={{
