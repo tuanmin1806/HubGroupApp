@@ -3,15 +3,12 @@ import {
   LocationOn,
   Phone,
   Work,
-  Public,
   Business,
   MenuBook,
   Info,
   Gavel,
-  Image,
   Security,
   ContactMail,
-  Map
 } from "@mui/icons-material";
 import {
   Box,
@@ -22,9 +19,23 @@ import {
   ListItemText,
   Typography
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { BACKGROUND_COLOR, TEXT_COLOR } from "../../constants/common.constant";
 
+const linkStyle = {
+  cursor: "pointer",
+  "&:hover .MuiListItemText-primary": {
+    textDecoration: "underline",
+    opacity: 0.85,
+  },
+};
+
 export default function Footer() {
+  const navigate = useNavigate();
+
+  const handleInternal = (path: string) => navigate(path);
+  const handleExternal = (url: string) => window.open(url, "_blank", "noopener noreferrer");
+
   return (
     <Box sx={{ bgcolor: BACKGROUND_COLOR, color: TEXT_COLOR }}>
       <Box sx={{ maxWidth: 1200, mx: "auto", px: 1, py: 3 }}>
@@ -36,14 +47,24 @@ export default function Footer() {
             </Typography>
 
             <List dense>
-              <ListItem disableGutters>
+              <ListItem
+                disableGutters
+                sx={linkStyle}
+                component="a"
+                href="tel:0865999110"
+              >
                 <ListItemIcon sx={{ color: "#ff5722" }}>
                   <Phone />
                 </ListItemIcon>
                 <ListItemText primary="0865 999 110" />
               </ListItem>
 
-              <ListItem disableGutters>
+              <ListItem
+                disableGutters
+                sx={linkStyle}
+                component="a"
+                href="mailto:contact@hubgroup.vn"
+              >
                 <ListItemIcon sx={{ color: "#ff5722" }}>
                   <Email />
                 </ListItemIcon>
@@ -59,84 +80,60 @@ export default function Footer() {
             </List>
           </Grid>
 
-          {/* CỘT 2 - VỀ HUBGROUP */}
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
               Về Hubgroup.vn
             </Typography>
 
             <List dense>
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <Info />
-                </ListItemIcon>
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/ve-chung-toi")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><Info /></ListItemIcon>
                 <ListItemText primary="Về chúng tôi" />
               </ListItem>
 
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <Gavel />
-                </ListItemIcon>
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/dieu-khoan-su-dung")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><Gavel /></ListItemIcon>
                 <ListItemText primary="Quy chế hoạt động" />
               </ListItem>
 
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <Security />
-                </ListItemIcon>
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/dieu-khoan-su-dung#bao-mat")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><Security /></ListItemIcon>
                 <ListItemText primary="Quy định bảo mật" />
               </ListItem>
 
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <ContactMail />
-                </ListItemIcon>
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/lien-he")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><ContactMail /></ListItemIcon>
                 <ListItemText primary="Liên hệ" />
-              </ListItem>
-
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <Map />
-                </ListItemIcon>
-                <ListItemText primary="Sơ đồ trang web" />
               </ListItem>
             </List>
           </Grid>
 
-          {/* CỘT 3 - DANH MỤC */}
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
               Danh mục
             </Typography>
 
             <List dense>
-
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <Business />
-                </ListItemIcon>
-                <ListItemText primary="Tổ chức" />
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleInternal("/tim-kiem-truong")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><Business /></ListItemIcon>
+                <ListItemText primary="Danh sách trường" />
               </ListItem>
 
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <Work />
-                </ListItemIcon>
-                <ListItemText primary="Ngành nghề" />
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleInternal("/chuong-trinh-tuyen-sinh")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><Work /></ListItemIcon>
+                <ListItemText primary="Chương trình tuyển sinh" />
               </ListItem>
 
-              <ListItem disableGutters>
-                <ListItemIcon sx={{ color: "#ff5722" }}>
-                  <MenuBook />
-                </ListItemIcon>
-                <ListItemText primary="Tin tuyển sinh" />
+              <ListItem disableGutters sx={linkStyle} onClick={() => handleInternal("/bai-viet")}>
+                <ListItemIcon sx={{ color: "#ff5722" }}><MenuBook /></ListItemIcon>
+                <ListItemText primary="Bài viết" />
               </ListItem>
             </List>
           </Grid>
+
         </Grid>
       </Box>
 
-      {/* COPYRIGHT */}
       <Box
         sx={{
           textAlign: "center",

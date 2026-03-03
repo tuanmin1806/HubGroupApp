@@ -24,10 +24,15 @@ function StudentHeader() {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [openDrawer, setOpenDrawer] = useState(false);
 
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+
+    const handleMouseEnter = (event) => {
         setAnchorEl(event.currentTarget);
+    };
+
+    const handleMouseLeave = () => {
+        setAnchorEl(null);
     };
     const handleNavigateArticle = () => {
         navigate("/bai-viet");
@@ -252,13 +257,13 @@ function StudentHeader() {
                             >
                                 Bài viết
                             </Link>
-                            <div>
+                            <div onMouseLeave={handleMouseLeave}>
                                 <Button
                                     id="fade-button"
                                     aria-controls={open ? 'fade-menu' : undefined}
                                     aria-haspopup="true"
                                     aria-expanded={open ? 'true' : undefined}
-                                    onClick={handleClick}
+                                    onMouseEnter={handleMouseEnter}
                                     sx={{
                                         ml: { xs: 1, md: 3 },
                                         textAlign: "center",
@@ -276,12 +281,16 @@ function StudentHeader() {
                                     slotProps={{
                                         list: {
                                             'aria-labelledby': 'fade-button',
+                                            onMouseLeave: handleMouseLeave,
                                         },
                                     }}
                                     slots={{ transition: Fade }}
                                     anchorEl={anchorEl}
                                     open={open}
-                                    onClose={handleClose}
+                                    onClose={handleMouseLeave}
+                                    disableRestoreFocus
+                                    sx={{ pointerEvents: 'none' }}
+                                    PaperProps={{ sx: { pointerEvents: 'auto' } }}
                                 >
                                     <MenuItem onClick={handleNavigateAboutUs}>Giới thiệu</MenuItem>
                                     <MenuItem onClick={handleNavigateContact}>Liên hệ</MenuItem>

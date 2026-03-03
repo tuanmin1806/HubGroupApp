@@ -384,7 +384,7 @@ const RecruitmentPostSearchPage = () => {
                                                 p: 2.5,
                                                 borderRadius: 2,
                                                 border: "1px solid",
-                                                borderColor: "divider",
+                                                borderColor: post.IsTop ? '#faa11b' : 'transparent',
                                                 cursor: "pointer",
                                                 transition: "all 0.2s ease",
                                                 "&:hover": {

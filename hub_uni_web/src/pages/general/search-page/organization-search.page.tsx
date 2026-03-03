@@ -561,6 +561,8 @@ const OrganizationSearchPage = () => {
                                                 borderRadius: 3,
                                                 boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
                                                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                border: '1px solid',
+                                                borderColor: org.IsTop ? '#faa11b' : 'transparent',
                                                 cursor: 'pointer',
                                                 '&:hover': {
                                                     transform: 'translateY(-4px)',
