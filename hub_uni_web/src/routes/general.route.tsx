@@ -10,10 +10,6 @@ import RecruitmentPostSearchPage from "../pages/general/search-page/recruitment-
 
 const generalRoutes = [
     {
-        path: 'unauthorized',
-        element: <UnauthorizedPage />,
-    },
-    {
         path: '/',
         element: <HomePage />,
     },

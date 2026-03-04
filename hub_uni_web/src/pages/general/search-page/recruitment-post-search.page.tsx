@@ -17,6 +17,9 @@ import {
     Grid,
     IconButton,
     CircularProgress,
+    Collapse,
+    TextField,
+    InputAdornment,
 } from "@mui/material";
 import {
     WorkOutline,
@@ -37,6 +40,8 @@ import {
     LocationCity,
     AccessTime,
     AttachMoney,
+    ExpandLess,
+    ExpandMore,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
@@ -47,13 +52,17 @@ import { BACK_GROUND_BUTTON_COLOR, DEFAULT_PAGE, PAGE_SIZE } from "../../../cons
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { getRecruitmentStatus } from "../../../utils/recruitment-post.utils";
 import { ConvertService } from "../../../app/services/convert.service";
+
 export interface RecruitmentPostFilterParams {
     page?: number;
     size?: number;
     searchValue?: string;
     professionId?: string;
     provinceId?: string;
+    fromCost?: number;
+    toCost?: number;
 }
+
 const RecruitmentPostSearchPage = () => {
     const navigate = useNavigate();
     const FILTER_PAGE_SIZE = 10;
@@ -62,23 +71,35 @@ const RecruitmentPostSearchPage = () => {
 
     const [showAllProfessions, setShowAllProfessions] = useState(false);
     const [showAllProvinces, setShowAllProvinces] = useState(false);
+    const [showCostFilter, setShowCostFilter] = useState(true);
+
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState(initialProvinceSeo);
     const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
+
     const [filters, setFilters] = useState({
         searchValue: "",
         provinceId: "",
         professionId: "",
+        fromCost: "",
+        toCost: "",
     });
+
+    const [costInput, setCostInput] = useState({ fromCost: "", toCost: "" });
+    const [costError, setCostError] = useState("");
 
     const { data: recruitmentData, isLoading } = useGetRecruitmentPostsByPageQuery({
         page,
         size: PAGE_SIZE,
-        ...filters,
+        searchValue: filters.searchValue,
+        provinceId: filters.provinceId,
+        professionId: filters.professionId,
+        fromCost: filters.fromCost ? Number(filters.fromCost) : undefined,
+        toCost: filters.toCost ? Number(filters.toCost) : undefined,
     });
 
-    const { data: professionsData, isLoading: isLoadingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: FILTER_PAGE_SIZE, });
+    const { data: professionsData, isLoading: isLoadingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: FILTER_PAGE_SIZE });
     const { data: provinces, isLoading: isLoadingProvinces } = useGetAllProvinceNoAuthenQuery();
 
     const [allProfessions, setAllProfessions] = useState<any[]>([]);
@@ -92,11 +113,32 @@ const RecruitmentPostSearchPage = () => {
             setSelectedProvinceSeo(province?.Seo || '');
             setFilters(prev => ({ ...prev, provinceId: value }));
         } else {
-            setFilters({ ...filters, [field]: value });
+            setFilters(prev => ({ ...prev, [field]: value }));
         }
         setPage(DEFAULT_PAGE);
     };
 
+    const handleCostInputChange = (field: "fromCost" | "toCost", value: string) => {
+        if (value !== "" && !/^\d+$/.test(value)) return;
+        setCostInput(prev => ({ ...prev, [field]: value }));
+        setCostError("");
+    };
+
+    const handleApplyCost = () => {
+        const from = costInput.fromCost ? Number(costInput.fromCost) : undefined;
+        const to = costInput.toCost ? Number(costInput.toCost) : undefined;
+        if (from !== undefined && to !== undefined && from > to) {
+            setCostError("Học phí từ không được lớn hơn học phí đến");
+            return;
+        }
+        setCostError("");
+        setFilters(prev => ({
+            ...prev,
+            fromCost: costInput.fromCost,
+            toCost: costInput.toCost,
+        }));
+        setPage(DEFAULT_PAGE);
+    };
 
     const handleSearch = (query?: string, provinceSeo?: string) => {
         if (query !== undefined) {
@@ -105,31 +147,22 @@ const RecruitmentPostSearchPage = () => {
         if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
             setSelectedProvinceSeo(provinceSeo);
             const province = provinces?.find(p => p.Seo === provinceSeo);
-            setFilters(prev => ({
-                ...prev,
-                provinceId: province?.Id || '',
-            }));
+            setFilters(prev => ({ ...prev, provinceId: province?.Id || '' }));
         }
         setPage(DEFAULT_PAGE);
     };
 
     const handleClearFilters = () => {
-        setFilters({
-            searchValue: "",
-            provinceId: "",
-            professionId: "",
-        });
+        setFilters({ searchValue: "", provinceId: "", professionId: "", fromCost: "", toCost: "" });
+        setCostInput({ fromCost: "", toCost: "" });
+        setCostError("");
         setSelectedProvinceSeo('');
         setPage(DEFAULT_PAGE);
     };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString("vi-VN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-        });
+        return date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
     };
 
     useEffect(() => {
@@ -145,14 +178,16 @@ const RecruitmentPostSearchPage = () => {
     useEffect(() => {
         if (initialProvinceSeo && provinces && provinces.length > 0 && !filters.provinceId) {
             const province = provinces.find(p => p.Seo === initialProvinceSeo);
-            if (province) {
-                setFilters(prev => ({ ...prev, provinceId: province.Id }));
-            }
+            if (province) setFilters(prev => ({ ...prev, provinceId: province.Id }));
         }
     }, [provinces]);
 
     const hasMoreProfessions = professionsData && (allProfessions.length < professionsData.Total);
-    const hasActiveFilters = filters.provinceId || filters.professionId || filters.searchValue;
+    const hasActiveFilters = filters.provinceId || filters.professionId || filters.searchValue || filters.fromCost || filters.toCost;
+
+    // Kiểm tra costInput có thay đổi so với filters đang áp dụng không
+    const costInputDirty = costInput.fromCost !== filters.fromCost || costInput.toCost !== filters.toCost;
+    const hasCostInput = costInput.fromCost || costInput.toCost;
 
     return (
         <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", py: 3 }}>
@@ -167,12 +202,8 @@ const RecruitmentPostSearchPage = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
-                    <Box
-                        sx={{
-                            width: { xs: "100%", md: 300 },
-                            flexShrink: 0,
-                        }}
-                    >
+                    {/* Sidebar Filter */}
+                    <Box sx={{ width: { xs: "100%", md: 300 }, flexShrink: 0 }}>
                         <Paper
                             elevation={0}
                             sx={{
@@ -208,14 +239,7 @@ const RecruitmentPostSearchPage = () => {
 
                             {/* Ngành nghề */}
                             <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
-                                <FormLabel
-                                    sx={{
-                                        fontWeight: 600,
-                                        fontSize: "0.9rem",
-                                        color: "text.primary",
-                                        mb: 1,
-                                    }}
-                                >
+                                <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
                                     <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
                                     Ngành nghề
                                 </FormLabel>
@@ -230,11 +254,7 @@ const RecruitmentPostSearchPage = () => {
                                             value={filters.professionId}
                                             onChange={(e) => handleFilterChange("professionId", e.target.value)}
                                         >
-                                            <FormControlLabel
-                                                value=""
-                                                control={<Radio size="small" />}
-                                                label={<Typography variant="body2">Tất cả</Typography>}
-                                            />
+                                            <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
                                             {(showAllProfessions ? allProfessions : allProfessions.slice(0, 5)).map((profession) => (
                                                 <FormControlLabel
                                                     key={profession.Id}
@@ -246,31 +266,14 @@ const RecruitmentPostSearchPage = () => {
                                         </RadioGroup>
                                     )}
                                     {hasMoreProfessions && !showAllProfessions && allProfessions.length >= 5 && (
-                                        <Button
-                                            size="small"
-                                            onClick={handleLoadMoreProfessions}
-                                            disabled={isLoadingProfessions}
-                                            sx={{
-                                                mt: 1,
-                                                fontSize: "0.75rem",
-                                                textTransform: "none",
-                                                color: "primary.main"
-                                            }}
-                                        >
+                                        <Button size="small" onClick={handleLoadMoreProfessions} disabled={isLoadingProfessions}
+                                            sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                             {isLoadingProfessions ? <CircularProgress size={16} /> : "Xem thêm"}
                                         </Button>
                                     )}
                                     {allProfessions.length > 5 && (
-                                        <Button
-                                            size="small"
-                                            onClick={() => setShowAllProfessions(!showAllProfessions)}
-                                            sx={{
-                                                mt: 1,
-                                                fontSize: "0.75rem",
-                                                textTransform: "none",
-                                                color: "primary.main"
-                                            }}
-                                        >
+                                        <Button size="small" onClick={() => setShowAllProfessions(!showAllProfessions)}
+                                            sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                             {showAllProfessions ? "Thu gọn" : "Xem thêm"}
                                         </Button>
                                     )}
@@ -281,14 +284,7 @@ const RecruitmentPostSearchPage = () => {
 
                             {/* Tỉnh / Thành phố */}
                             <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
-                                <FormLabel
-                                    sx={{
-                                        fontWeight: 600,
-                                        fontSize: "0.9rem",
-                                        color: "text.primary",
-                                        mb: 1,
-                                    }}
-                                >
+                                <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
                                     <LocationCity sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
                                     Tỉnh / Thành phố
                                 </FormLabel>
@@ -303,11 +299,7 @@ const RecruitmentPostSearchPage = () => {
                                             value={filters.provinceId}
                                             onChange={(e) => handleFilterChange("provinceId", e.target.value)}
                                         >
-                                            <FormControlLabel
-                                                value=""
-                                                control={<Radio size="small" />}
-                                                label={<Typography variant="body2">Tất cả</Typography>}
-                                            />
+                                            <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
                                             {(showAllProvinces ? provinces : provinces?.slice(0, 5))?.map((province) => (
                                                 <FormControlLabel
                                                     key={province.Id}
@@ -319,21 +311,107 @@ const RecruitmentPostSearchPage = () => {
                                         </RadioGroup>
                                     )}
                                     {provinces && provinces.length > 5 && (
-                                        <Button
-                                            size="small"
-                                            onClick={() => setShowAllProvinces(!showAllProvinces)}
-                                            sx={{
-                                                mt: 1,
-                                                fontSize: "0.75rem",
-                                                textTransform: "none",
-                                                color: "primary.main"
-                                            }}
-                                        >
+                                        <Button size="small" onClick={() => setShowAllProvinces(!showAllProvinces)}
+                                            sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                             {showAllProvinces ? "Thu gọn" : "Xem thêm"}
                                         </Button>
                                     )}
                                 </Box>
                             </FormControl>
+
+                            <Divider sx={{ mb: 2 }} />
+
+                            <Box sx={{ mb: 1 }}>
+                                <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    justifyContent="space-between"
+                                    onClick={() => setShowCostFilter(v => !v)}
+                                    sx={{ cursor: "pointer", mb: showCostFilter ? 1.5 : 0 }}
+                                >
+                                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", cursor: "pointer" }}>
+                                        <AttachMoney sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Khoảng học phí
+                                    </FormLabel>
+                                </Stack>
+
+                                <Collapse in={showCostFilter}>
+                                    <Stack spacing={1}>
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <TextField
+                                                size="small"
+                                                placeholder="Từ"
+                                                value={costInput.fromCost}
+                                                onChange={(e) => handleCostInputChange("fromCost", e.target.value)}
+                                                sx={{
+                                                    flex: 1,
+                                                    "& .MuiInputBase-input": { fontSize: "0.8rem", py: "6px" },
+                                                }}
+                                            />
+                                            <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>—</Typography>
+                                            <TextField
+                                                size="small"
+                                                placeholder="Đến"
+                                                value={costInput.toCost}
+                                                onChange={(e) => handleCostInputChange("toCost", e.target.value)}
+                                                sx={{
+                                                    flex: 1,
+                                                    "& .MuiInputBase-input": { fontSize: "0.8rem", py: "6px" },
+                                                }}
+                                            />
+                                        </Stack>
+
+                                        {costError && (
+                                            <Typography variant="caption" color="error" sx={{ fontSize: "0.7rem" }}>
+                                                {costError}
+                                            </Typography>
+                                        )}
+
+                                        {(filters.fromCost || filters.toCost) && !costInputDirty && (
+                                            <Stack direction="row" alignItems="center" spacing={0.5}>
+                                                <Chip
+                                                    label={`${filters.fromCost ? Number(filters.fromCost).toLocaleString("vi-VN") : "0"} — ${filters.toCost ? Number(filters.toCost).toLocaleString("vi-VN") : "∞"}`}
+                                                    size="small"
+                                                    onDelete={() => {
+                                                        setCostInput({ fromCost: "", toCost: "" });
+                                                        setFilters(prev => ({ ...prev, fromCost: "", toCost: "" }));
+                                                        setCostError("");
+                                                    }}
+                                                    sx={{
+                                                        fontSize: "0.68rem",
+                                                        height: 22,
+                                                        bgcolor: "rgba(243,103,48,0.1)",
+                                                        color: "primary.main",
+                                                        border: "1px solid",
+                                                        borderColor: "primary.light",
+                                                        "& .MuiChip-label": { px: 1 },
+                                                        "& .MuiChip-deleteIcon": { fontSize: 14 },
+                                                    }}
+                                                />
+                                            </Stack>
+                                        )}
+
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            onClick={handleApplyCost}
+                                            disableElevation
+                                            sx={{
+                                                fontSize: "0.75rem",
+                                                textTransform: "none",
+                                                fontWeight: 600,
+                                                bgcolor: BACK_GROUND_BUTTON_COLOR,
+                                                "&:hover": { bgcolor: "primary.dark" },
+                                                borderRadius: 1,
+                                                py: 0.5,
+                                            }}
+                                        >
+                                            Áp dụng
+                                        </Button>
+
+                                    </Stack>
+                                </Collapse>
+                            </Box>
                         </Paper>
                     </Box>
 
@@ -347,13 +425,7 @@ const RecruitmentPostSearchPage = () => {
                         ) : recruitmentPosts.length === 0 ? (
                             <Paper
                                 elevation={0}
-                                sx={{
-                                    p: 6,
-                                    textAlign: "center",
-                                    borderRadius: 2,
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                }}
+                                sx={{ p: 6, textAlign: "center", borderRadius: 2, border: "1px solid", borderColor: "divider" }}
                             >
                                 <WorkOutline sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
                                 <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -363,12 +435,7 @@ const RecruitmentPostSearchPage = () => {
                                     Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm
                                 </Typography>
                                 {hasActiveFilters && (
-                                    <Button
-                                        variant="outlined"
-                                        startIcon={<Clear />}
-                                        onClick={handleClearFilters}
-                                        sx={{ mt: 1 }}
-                                    >
+                                    <Button variant="outlined" startIcon={<Clear />} onClick={handleClearFilters} sx={{ mt: 1 }}>
                                         Xóa bộ lọc
                                     </Button>
                                 )}
@@ -396,9 +463,7 @@ const RecruitmentPostSearchPage = () => {
                                             }}
                                         >
                                             <Stack spacing={1.25}>
-                                                {/* Header row */}
                                                 <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                                                    {/* Logo */}
                                                     <Box
                                                         sx={{
                                                             width: { xs: 52, sm: 60 },
@@ -415,104 +480,64 @@ const RecruitmentPostSearchPage = () => {
                                                         }}
                                                     >
                                                         {post.Organization.LogoFullUrl ? (
-                                                            <Box
-                                                                component="img"
-                                                                src={post.Organization.LogoFullUrl}
-                                                                alt={post.Organization.Name}
-                                                                sx={{ width: "100%", height: "100%", objectFit: "contain" }}
-                                                            />
+                                                            <Box component="img" src={post.Organization.LogoFullUrl} alt={post.Organization.Name}
+                                                                sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
                                                         ) : (
                                                             <Business sx={{ fontSize: 26, color: "text.secondary" }} />
                                                         )}
                                                     </Box>
 
-                                                    {/* Main info */}
                                                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                        {/* Title + badge */}
                                                         <Stack direction="row" alignItems="flex-start" gap={1} flexWrap="wrap">
-                                                            <Typography
-                                                                variant="subtitle1"
-                                                                fontWeight={700}
+                                                            <Typography variant="subtitle1" fontWeight={700}
                                                                 sx={{
-                                                                    fontSize: { xs: "0.9rem", sm: "1rem" },
-                                                                    lineHeight: 1.35,
-                                                                    flex: 1,
-                                                                    minWidth: 0,
-                                                                    display: "-webkit-box",
-                                                                    WebkitLineClamp: 2,
-                                                                    WebkitBoxOrient: "vertical",
-                                                                    overflow: "hidden",
-                                                                }}
-                                                            >
+                                                                    fontSize: { xs: "0.9rem", sm: "1rem" }, lineHeight: 1.35, flex: 1, minWidth: 0,
+                                                                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden"
+                                                                }}>
                                                                 {post.Name}
                                                             </Typography>
-
                                                             {post.IsTop && (
-                                                                <Chip
-                                                                    label="Nổi bật"
-                                                                    size="small"
+                                                                <Chip label="Nổi bật" size="small"
                                                                     sx={{
-                                                                        height: 20,
-                                                                        fontSize: "0.62rem",
-                                                                        fontWeight: 700,
-                                                                        flexShrink: 0,
-                                                                        alignSelf: "flex-start",
-                                                                        bgcolor: "#f3522a",
-                                                                        color: "#ffffff",
-                                                                        border: "none",
-                                                                    }}
-                                                                />
+                                                                        height: 20, fontSize: "0.62rem", fontWeight: 700, flexShrink: 0,
+                                                                        alignSelf: "flex-start", bgcolor: "#f3522a", color: "#ffffff", border: "none"
+                                                                    }} />
                                                             )}
                                                         </Stack>
 
-                                                        {/* Org name */}
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                            fontWeight={500}
+                                                        <Typography variant="body2" color="text.secondary" fontWeight={500}
                                                             sx={{
-                                                                fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                                                                mt: 0.25,
-                                                                overflow: "hidden",
-                                                                textOverflow: "ellipsis",
-                                                                whiteSpace: "nowrap",
-                                                            }}
-                                                        >
+                                                                fontSize: { xs: "0.78rem", sm: "0.82rem" }, mt: 0.25,
+                                                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                                                            }}>
                                                             {post.Organization.Name}
                                                         </Typography>
 
-                                                        {/* Meta row: location, quantity, deadline */}
-                                                        <Stack
-                                                            direction="row"
-                                                            flexWrap="wrap"
-                                                            gap={{ xs: 0.75, sm: 1.5 }}
-                                                            mt={0.5}
-                                                        >
+                                                        <Stack direction="row" flexWrap="wrap" gap={{ xs: 0.75, sm: 1.5 }} mt={0.5}>
                                                             <Stack direction="row" spacing={0.4} alignItems="center">
                                                                 <LocationOn sx={{ fontSize: 14, color: "#faa11b" }} />
                                                                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
                                                                     {post.Province}
                                                                 </Typography>
                                                             </Stack>
-
                                                             <Stack direction="row" spacing={0.4} alignItems="center">
                                                                 <PeopleAlt sx={{ fontSize: 14, color: "#faa11b" }} />
                                                                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
                                                                     {post.Quantity} Chỉ tiêu
                                                                 </Typography>
                                                             </Stack>
-
                                                             {(post.MinCost || post.MaxCost) && (
                                                                 <Stack direction="row" spacing={0.4} alignItems="center">
                                                                     <AttachMoney sx={{ fontSize: 14, color: "#faa11b" }} />
                                                                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem", whiteSpace: "nowrap" }}>
-                                                                        {post.MinCost && post.MaxCost ? `${post.MinCost.toLocaleString("vi-VN")} - ${post.MaxCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}` : post.MinCost
+                                                                        {post.MinCost && post.MaxCost
+                                                                            ? `${post.MinCost.toLocaleString("vi-VN")} - ${post.MaxCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}`
+                                                                            : post.MinCost
                                                                                 ? `${post.MinCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}`
                                                                                 : `${post.MaxCost!.toLocaleString("vi-VN")} ${post.Currency ?? ""}`}
                                                                     </Typography>
                                                                 </Stack>
                                                             )}
-
                                                             {post.RecruitmentToDate && (
                                                                 <Stack direction="row" spacing={0.4} alignItems="center">
                                                                     <AccessTime sx={{ fontSize: 14, color: getRecruitmentStatus(post.RecruitmentToDate).color }} />
@@ -525,105 +550,59 @@ const RecruitmentPostSearchPage = () => {
                                                     </Box>
                                                 </Stack>
 
-                                                {/* Professions */}
                                                 {post.Professions && post.Professions.length > 0 && (
                                                     <Stack direction="row" flexWrap="wrap" gap={0.5}>
                                                         {post.Professions.slice(0, 3).map((profession) => (
-                                                            <Chip
-                                                                key={profession.Id}
-                                                                label={profession.Name}
-                                                                size="small"
-                                                                variant="outlined"
+                                                            <Chip key={profession.Id} label={profession.Name} size="small" variant="outlined"
                                                                 sx={{
-                                                                    height: 20,
-                                                                    fontSize: "0.65rem",
-                                                                    borderColor: "primary.light",
-                                                                    color: "primary.main",
-                                                                    "& .MuiChip-label": { px: 0.75 },
-                                                                }}
-                                                            />
+                                                                    height: 20, fontSize: "0.65rem", borderColor: "primary.light", color: "primary.main",
+                                                                    "& .MuiChip-label": { px: 0.75 }
+                                                                }} />
                                                         ))}
                                                         {post.Professions.length > 3 && (
-                                                            <Chip
-                                                                label={`+${post.Professions.length - 3}`}
-                                                                size="small"
-                                                                variant="outlined"
-                                                                sx={{ height: 20, fontSize: "0.65rem", "& .MuiChip-label": { px: 0.75 } }}
-                                                            />
+                                                            <Chip label={`+${post.Professions.length - 3}`} size="small" variant="outlined"
+                                                                sx={{ height: 20, fontSize: "0.65rem", "& .MuiChip-label": { px: 0.75 } }} />
                                                         )}
                                                     </Stack>
                                                 )}
 
-                                                {/* Footer: requirements + actions */}
-                                                <Stack
-                                                    direction="row"
-                                                    alignItems="center"
-                                                    justifyContent="space-between"
-                                                    flexWrap={{ xs: "wrap", sm: "nowrap" }}
-                                                    gap={1}
-                                                >
-                                                    {/* Requirements */}
+                                                <Stack direction="row" alignItems="center" justifyContent="space-between"
+                                                    flexWrap={{ xs: "wrap", sm: "nowrap" }} gap={1}>
                                                     {post.Requirement && (
                                                         <Stack direction="row" flexWrap="wrap" gap={{ xs: 0.5, sm: 1.5 }}>
                                                             {post.Requirement.Gender && (
-                                                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
-                                                                    {post.Requirement.Gender === "Male" ? (<Male sx={{ fontSize: "0.8rem" }} />) : post.Requirement.Gender === "Female" ? (<Female sx={{ fontSize: "0.8rem" }} />) : (<Transgender sx={{ fontSize: "0.8rem" }} />)}
+                                                                <Typography variant="caption" color="text.secondary"
+                                                                    sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                    {post.Requirement.Gender === "Male" ? <Male sx={{ fontSize: "0.8rem" }} /> : post.Requirement.Gender === "Female" ? <Female sx={{ fontSize: "0.8rem" }} /> : <Transgender sx={{ fontSize: "0.8rem" }} />}
                                                                     {post.Requirement.Gender === "Male" ? "Nam" : post.Requirement.Gender === "Female" ? "Nữ" : "Không yêu cầu"}
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.FromAge && post.Requirement.ToAge && (
-                                                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                <Typography variant="caption" color="text.secondary"
+                                                                    sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
                                                                     <Cake sx={{ fontSize: "0.8rem" }} /> {post.Requirement.FromAge} đến {post.Requirement.ToAge} tuổi
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.Experience && (
-                                                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                <Typography variant="caption" color="text.secondary"
+                                                                    sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
                                                                     <Work sx={{ fontSize: "0.8rem" }} /> {ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(post.Requirement.Experience))}
                                                                 </Typography>
                                                             )}
                                                         </Stack>
                                                     )}
-
-                                                    {/* Actions */}
-                                                    <Stack
-                                                        direction="row"
-                                                        spacing={0.75}
-                                                        flexShrink={0}
-                                                        sx={{ ml: "auto" }}
-                                                    >
-                                                        <Button
-                                                            variant="contained"
-                                                            size="small"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`);
-                                                            }}
+                                                    <Stack direction="row" spacing={0.75} flexShrink={0} sx={{ ml: "auto" }}>
+                                                        <Button variant="contained" size="small"
+                                                            onClick={(e) => { e.stopPropagation(); navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`); }}
                                                             sx={{
-                                                                backgroundColor: BACK_GROUND_BUTTON_COLOR,
-                                                                borderRadius: 1.5,
-                                                                fontSize: "0.72rem",
-                                                                px: 1.5,
-                                                                height: 30,
-                                                                textTransform: "none",
-                                                                fontWeight: 600,
-                                                            }}
-                                                        >
+                                                                backgroundColor: BACK_GROUND_BUTTON_COLOR, borderRadius: 1.5, fontSize: "0.72rem",
+                                                                px: 1.5, height: 30, textTransform: "none", fontWeight: 600
+                                                            }}>
                                                             Ứng tuyển
                                                         </Button>
-                                                        <IconButton
-                                                            size="small"
-                                                            color="primary"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                            }}
-                                                            sx={{
-                                                                border: "1px solid",
-                                                                borderColor: "primary.light",
-                                                                borderRadius: 1.5,
-                                                                width: 30,
-                                                                height: 30,
-                                                            }}
-                                                        >
+                                                        <IconButton size="small" color="primary"
+                                                            onClick={(e) => { e.stopPropagation(); }}
+                                                            sx={{ border: "1px solid", borderColor: "primary.light", borderRadius: 1.5, width: 30, height: 30 }}>
                                                             <FavoriteBorder sx={{ fontSize: 16 }} />
                                                         </IconButton>
                                                     </Stack>
@@ -633,7 +612,6 @@ const RecruitmentPostSearchPage = () => {
                                     ))}
                                 </Stack>
 
-                                {/* Pagination */}
                                 <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
                                     <OrganizationPagination
                                         page={page}
@@ -647,7 +625,7 @@ const RecruitmentPostSearchPage = () => {
                     </Box>
                 </Box>
             </Container>
-        </Box >
+        </Box>
     );
 };
 

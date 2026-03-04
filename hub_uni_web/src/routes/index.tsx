@@ -8,9 +8,14 @@ import StaffLayout from "../layouts/staff.layout";
 import RoleBasedLayout from "../layouts/role-based.layout";
 import Login from "../pages/general/auth-page/signin.page";
 import Signup from "../pages/general/auth-page/sign-up.page";
+import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
 
 const router = createBrowserRouter(
     [
+        {
+            path: "/unauthorized",
+            element: <UnauthorizedPage />,
+        },
         {
             element: <AuthLayout />,
             children: [

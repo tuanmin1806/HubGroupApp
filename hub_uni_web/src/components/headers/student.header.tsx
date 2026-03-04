@@ -1,12 +1,13 @@
-import { Close, TableBar } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import Person3Icon from "@mui/icons-material/Person3";
 import MenuIcon from "@mui/icons-material/Menu";
 import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography, useMediaQuery, Menu, Button, Fade } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
 import hub_logo from "../../assets/hub_logo.png";
+import { RootState } from "../../app/store";
+import ProfileDialog from "../dialogs/general/profile.dialog";
 
 const theme = createTheme({
     palette: {
@@ -21,11 +22,26 @@ const theme = createTheme({
 
 function StudentHeader() {
     const navigate = useNavigate();
+    const { user } = useSelector((state: RootState) => state.auth);
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [openDrawer, setOpenDrawer] = useState(false);
 
     const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
     const open = Boolean(anchorEl);
+
+    const handleSignOut = async () => {
+        navigate("/sign-out");
+    };
+
+     const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
 
     const handleMouseEnter = (event) => {
         setAnchorEl(event.currentTarget);
@@ -166,6 +182,10 @@ function StudentHeader() {
 
     return (
         <ThemeProvider theme={theme}>
+            <ProfileDialog
+                open={openProfileDialog}
+                setOpen={setOpenProfileDialog}
+            ></ProfileDialog>
             <AppBar position="fixed" sx={{
                 color: '#242424',
                 backgroundColor: '#fff'
@@ -299,60 +319,62 @@ function StudentHeader() {
                                 </Menu>
                             </div>
                         </Box>
-
-                        {/* Auth Links */}
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: { xs: 0.5, md: 1 },
-                            }}
-                        >
-                            <Person3Icon
-                                sx={{
-                                    p: 0,
-                                    fontSize: { xs: "1.25rem", md: "1.5rem" },
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title="cài đặt">
+                                <Box
+                                    sx={{ display: "flex" }}
+                                    style={{ cursor: "pointer" }}
+                                    onClick={handleOpenUserMenu}
+                                >
+                                    <Person3Icon sx={{ p: 0, fontSize: { xs: 'medium', md: 'large' } }} />
+                                    <Link
+                                        sx={{
+                                            ml: 1,
+                                            textAlign: "center",
+                                            fontWeight: "bold",
+                                            fontSize: { xs: '0.875rem', md: '1rem' },
+                                        }}
+                                        component="button"
+                                        color="inherit"
+                                        variant="body1"
+                                        underline="hover"
+                                    >
+                                        {user?.UserName}
+                                    </Link>
+                                </Box>
+                            </Tooltip>
+                            <Menu
+                                sx={{ mt: "45px" }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
                                 }}
-                            />
-                            <Link
-                                sx={{
-                                    ml: 1,
-                                    textAlign: "center",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.75rem", md: "1rem" },
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
                                 }}
-                                component="button"
-                                color="inherit"
-                                variant="body1"
-                                underline="hover"
-                                onClick={() => handleNavigateLogin()}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
                             >
-                                Đăng nhập
-                            </Link>
-                            <Typography
-                                sx={{
-                                    ml: 1,
-                                    textAlign: "center",
-                                    fontSize: { xs: "0.75rem", md: "1rem" },
-                                }}
-                            >
-                                /
-                            </Typography>
-                            <Link
-                                sx={{
-                                    ml: 1,
-                                    textAlign: "center",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.75rem", md: "1rem" },
-                                }}
-                                component="button"
-                                color="inherit"
-                                variant="body1"
-                                underline="hover"
-                                onClick={() => handleNavigateSignUp()}
-                            >
-                                Đăng ký
-                            </Link>
+                                <MenuItem onClick={handleCloseUserMenu}>
+                                    <Typography
+                                        sx={{ textAlign: "center" }}
+                                        onClick={() =>
+                                            setOpenProfileDialog(true)
+                                        }
+                                    >
+                                        Thông tin tài khoản
+                                    </Typography>
+                                </MenuItem>
+                                <MenuItem onClick={handleSignOut}>
+                                    <Typography sx={{ textAlign: "center" }}>
+                                        Đăng xuất
+                                    </Typography>
+                                </MenuItem>
+                            </Menu>
                         </Box>
                     </Toolbar>
                 </Container>

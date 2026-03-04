@@ -22,6 +22,7 @@ export interface RecruitmentPostResponse {
     ProvinceId: string;
     Currency: string;
     Requirement: Requirement;
+    RecruitmentFromDate: string; 
     RecruitmentToDate: string;
     IsTop: boolean;
     Organization: OrganizationResponse;
@@ -30,6 +31,7 @@ export interface RecruitmentPostResponse {
     SeoUrl: string;
     MinCost: number;
     MaxCost: number;
+    Highlights?: string[];
 }
 
 export interface CreateRecruitmentPostRequest {
@@ -51,5 +53,7 @@ export interface RecruitmentPostFilterParams {
     size?: number;
     professionId?: string;
     provinceId?: string;
+    fromCost?: number;
+    toCost?: number;
     searchValue?: string;
 }

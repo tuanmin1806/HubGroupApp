@@ -20,7 +20,7 @@ export default function ArticleCard({ article }: Props) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/bai-viet/${article.Seo}`);
+    navigate(`/bai-viet/${article.SeoUrl}`);
   };
 
   return (

@@ -1,7 +1,8 @@
 import { Box, Card, Typography, Tooltip, Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { OrganizationResponse } from "../../app/models/organization.model";
-import { Language, LocationOn, School, Visibility } from "@mui/icons-material";
+import { Language, LocationOn, Visibility } from "@mui/icons-material";
+import defaultImage from "../../assets/default_organization_card.jpg"
 
 interface Props { organizations: OrganizationResponse[]; }
 
@@ -48,7 +49,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
           >
             <Box
               component="img"
-              src={org.LogoFullUrl}
+              src={org.LogoFullUrl || defaultImage}
               alt={org.Name}
               sx={{
                 width: "100%",
@@ -131,34 +132,38 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               </Typography>
             </Tooltip>
 
-            <Box sx={{ height: 22, display: "flex", alignItems: "center" }}>
-              <Chip
-                label={org.OrganizationType}
-                size="small"
-                variant="outlined"
-                sx={{
-                  fontSize: "0.62rem",
-                  height: 18,
-                  borderColor: "#ec3b05",
-                  color: "#ec3b05",
-                  fontWeight: 600,
-                  maxWidth: "100%",
-                  "& .MuiChip-label": {
-                    px: 0.75,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  },
-                }}
-              />
-            </Box>
+            {org.OrganizationType && (
+              <Box sx={{ height: 22, display: "flex", alignItems: "center" }}>
+                <Chip
+                  label={org.OrganizationType}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    fontSize: "0.62rem",
+                    height: 18,
+                    borderColor: "#ec3b05",
+                    color: "#ec3b05",
+                    fontWeight: 600,
+                    maxWidth: "100%",
+                    "& .MuiChip-label": {
+                      px: 0.75,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    },
+                  }}
+                />
+              </Box>
+            )}
 
-            <Box sx={{ height: 20, display: "flex", alignItems: "center", minWidth: 0 }}>
-              <LocationOn sx={{ fontSize: 12, color: "text.disabled", mr: 0.4, flexShrink: 0 }} />
-              <Typography variant="caption" color="text.secondary" noWrap>
-                {[org.Province, org.Commune].filter(Boolean).join(", ") || "—"}
-              </Typography>
-            </Box>
+            {org.Province && org.Commune && (
+              <Box sx={{ height: 20, display: "flex", alignItems: "center", minWidth: 0 }}>
+                <LocationOn sx={{ fontSize: 12, color: "text.disabled", mr: 0.4, flexShrink: 0 }} />
+                <Typography variant="caption" color="text.secondary" noWrap>
+                  {[org.Province, org.Commune].filter(Boolean).join(", ") || "—"}
+                </Typography>
+              </Box>
+            )}   
 
             {org.WebsiteUrl && (
               <Box sx={{ height: 20, display: "flex", alignItems: "center", minWidth: 0 }}>

@@ -3,7 +3,7 @@ import { CategoryResponse } from "./category.model";
 export interface ArticleResponse {
     Id: string;
     Title: string;
-    Seo: string;
+    SeoUrl: string;
     Summary: string;
     Content: string;
     Keywords: string;
