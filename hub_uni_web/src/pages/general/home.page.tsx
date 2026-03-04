@@ -43,7 +43,7 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-        document.title = "Trang Chủ | HUB UNI";
+        document.title = "Nền tảng tra cứu thông tin du học Hàn Quốc số 1 Việt Nam | duhochan.hubgroup.vn";
     }, [navigate]);
 
     return (

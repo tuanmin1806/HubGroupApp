@@ -45,7 +45,7 @@ const getPageTitle = (pathname) => {
         case "/staff":
             return "Trang chủ | Nhân viên";
         default:
-            return "Staff | HUB UNI";
+            return "Nền tảng tra cứu thông tin du học Hàn Quốc số 1 Việt Nam | duhochan.hubgroup.vn";
     }
 };
 

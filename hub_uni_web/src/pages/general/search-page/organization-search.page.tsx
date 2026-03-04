@@ -86,7 +86,7 @@ const OrganizationSearchPage = () => {
     const [allOrgTypes, setAllOrgTypes] = useState<any[]>([]);
     const [allProfessions, setAllProfessions] = useState<any[]>([]);
 
-    useEffect(() => { document.title = "Tìm kiếm trường | HUB UNI"; }, []);
+    useEffect(() => { document.title = "Tìm kiếm trường Đại học/Cao đẳng tại Hàn Quốc | duhochan.hubgroup.vn"; }, []);
 
     useEffect(() => {
         if (orgTypesData?.Items) {
