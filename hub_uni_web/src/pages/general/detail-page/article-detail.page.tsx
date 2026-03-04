@@ -359,7 +359,7 @@ const ArticleDetailPage = () => {
                                             <Box
                                                 key={article.Id}
                                                 onClick={() => {
-                                                    navigate(`/bai-viet/${article.Seo}`);
+                                                    navigate(`/bai-viet/${article.SeoUrl}`);
                                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                                 }}
                                                 sx={{
@@ -450,7 +450,7 @@ const ArticleDetailPage = () => {
                                             <Box
                                                 key={article.Id}
                                                 onClick={() => {
-                                                    navigate(`/bai-viet/${article.Seo}`);
+                                                    navigate(`/bai-viet/${article.SeoUrl}`);
                                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                                 }}
                                                 sx={{
