@@ -445,7 +445,7 @@ const RecruitmentPostDetailPage = () => {
                                                 <Button
                                                     variant="outlined"
                                                     fullWidth
-                                                    onClick={() => navigate(`/chi-tiet-truong/${recruitmentPost.Organization.SeoUrl}`)}
+                                                    onClick={() => navigate(`/thong-tin-truong/${recruitmentPost.Organization.SeoUrl}`)}
                                                     sx={{
                                                         mt: 2,
                                                         borderColor: '#ff5722',

@@ -159,7 +159,7 @@ const OrganizationSearchPage = () => {
         setPage(DEFAULT_PAGE);
     };
 
-    const handleViewDetail = (organizationId: string) => { navigate(`/chi-tiet-truong/${organizationId}`); };
+    const handleViewDetail = (organizationId: string) => { navigate(`/thong-tin-truong/${organizationId}`); };
     const handleLoadMoreOrgTypes = () => { setOrgTypePage(prev => prev + 1); };
     const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
 
@@ -628,7 +628,7 @@ const OrganizationSearchPage = () => {
 
                                                             {org.IsTop && (
                                                                 <Chip
-                                                                    label="TOP"
+                                                                    label="Nổi bật"
                                                                     color="primary"
                                                                     size="small"
                                                                     sx={{
@@ -683,7 +683,7 @@ const OrganizationSearchPage = () => {
                                                                     minWidth: 0,
                                                                 }}
                                                             >
-                                                                {org.MainProfession?.Name || 'Chưa cập nhật ngành nghề'}
+                                                                {org.MainProfession?.ProfessionName || 'Chưa cập nhật ngành nghề'}
                                                             </Typography>
                                                         </Box>
 

@@ -159,7 +159,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
               </Tooltip>
 
               <Stack direction="row" spacing={0.5} alignItems="center">
-                <PeopleAlt sx={{ fontSize: 14, color: "text.disabled" }} />
+                <PeopleAlt sx={{ fontSize: 14, color: "#faa11b" }} />
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.8rem" }}>{rcp.Quantity} chỉ tiêu </Typography>
               </Stack>
 

@@ -1,4 +1,9 @@
-import { ProfessionResponse } from "./profession.model";
+export interface Profession {
+    ProfessionId: string;
+    ProfessionName?: string;
+    ProfessionSeoUrl?: string;
+    Cost: number;
+}
 
 export interface OrganizationDetailResponse {
     Id: string;
@@ -12,9 +17,9 @@ export interface OrganizationDetailResponse {
     OrganizationTypeId: string;
     OrganizationType: string;
     ProfessionIds: string[];
-    Professions: ProfessionResponse[];
+    Professions: Profession[];
     MainProfessionId: string;
-    MainProfession: ProfessionResponse;
+    MainProfession: Profession;
     ProvinceId: string;
     Province: string;
     CommuneId: string;
@@ -59,8 +64,8 @@ export interface OrganizationResponse {
     CommuneSeo: string;
     Address: string;
     LogoFullUrl: string;
-    MainProfession: ProfessionResponse;
-    Professions: ProfessionResponse[];
+    MainProfession: Profession;
+    Professions: Profession[];
     OrganizationType: string;
     Summary: string;
     IsTop: boolean;

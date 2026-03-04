@@ -34,7 +34,7 @@ const generalRoutes = [
         element: <OrganizationSearchPage />,
     },
     {
-        path: '/chi-tiet-truong/:seoUrl',
+        path: '/thong-tin-truong/:seoUrl',
         element: <OrganizationDetailPage />,
     },
     {

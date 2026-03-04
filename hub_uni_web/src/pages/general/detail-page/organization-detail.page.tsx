@@ -299,7 +299,7 @@ const OrganizationDetailPage = () => {
     if (error || !organization) {
         return (
             <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="error">Không tìm thấy thông tin tổ chức</Typography>
+                <Typography color="error">Không tìm thấy thông tin trường</Typography>
                 <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/')}> Quay về trang chủ </Button>
             </Box>
         );
@@ -363,7 +363,7 @@ const OrganizationDetailPage = () => {
                                         )}
                                         <Box sx={{ flex: 1, minWidth: 0 }}>
                                             <Typography variant="h5" fontWeight={600} gutterBottom> {organization.Name} </Typography>
-                                            {organization.IsTop && (<Chip label="Tổ chức nổi bật" color="primary" size="small" />)}
+                                            {organization.IsTop && (<Chip label="Danh sách trường nổi bật" color="primary" size="small" />)}
                                         </Box>
                                     </Box>
 
@@ -580,10 +580,10 @@ const OrganizationDetailPage = () => {
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                             {organization.Professions.map((profession) => (
                                                 <Chip
-                                                    key={profession.Id}
-                                                    label={profession.Name}
-                                                    variant={profession.Id === organization.MainProfessionId ? 'filled' : 'outlined'}
-                                                    color={profession.Id === organization.MainProfessionId ? 'primary' : 'default'}
+                                                    key={profession.ProfessionId}
+                                                    label={profession.ProfessionName}
+                                                    variant={profession.ProfessionId === organization.MainProfessionId ? 'filled' : 'outlined'}
+                                                    color={profession.ProfessionId === organization.MainProfessionId ? 'primary' : 'default'}
                                                     onClick={() => { }}
                                                 />
                                             ))}
@@ -595,7 +595,7 @@ const OrganizationDetailPage = () => {
                             {/* Related Organizations */}
                             <Card>
                                 <CardContent>
-                                    <Typography variant="h6" fontWeight={600} gutterBottom> Tổ chức liên quan </Typography>
+                                    <Typography variant="h6" fontWeight={600} gutterBottom> Danh sách trường liên quan </Typography>
                                     <Divider sx={{ mb: 2 }} />
                                     <OrganizationSelectActionCard organizations={[]} />
                                 </CardContent>
@@ -695,7 +695,7 @@ const OrganizationDetailPage = () => {
                                         <Stack spacing={1} mt={1}>
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <School fontSize="small" color="primary" />
-                                                <Typography variant="body2">{organization.MainProfession.Name}</Typography>
+                                                <Typography variant="body2">{organization.MainProfession.ProfessionName}</Typography>
                                             </Stack>
                                         </Stack>
                                     </CardContent>

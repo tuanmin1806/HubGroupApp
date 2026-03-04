@@ -36,6 +36,7 @@ import {
     Category,
     LocationCity,
     AccessTime,
+    AttachMoney,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
@@ -501,6 +502,17 @@ const RecruitmentPostSearchPage = () => {
                                                                 </Typography>
                                                             </Stack>
 
+                                                            {(post.MinCost || post.MaxCost) && (
+                                                                <Stack direction="row" spacing={0.4} alignItems="center">
+                                                                    <AttachMoney sx={{ fontSize: 14, color: "#faa11b" }} />
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem", whiteSpace: "nowrap" }}>
+                                                                        {post.MinCost && post.MaxCost ? `${post.MinCost.toLocaleString("vi-VN")} - ${post.MaxCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}` : post.MinCost
+                                                                                ? `${post.MinCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}`
+                                                                                : `${post.MaxCost!.toLocaleString("vi-VN")} ${post.Currency ?? ""}`}
+                                                                    </Typography>
+                                                                </Stack>
+                                                            )}
+
                                                             {post.RecruitmentToDate && (
                                                                 <Stack direction="row" spacing={0.4} alignItems="center">
                                                                     <AccessTime sx={{ fontSize: 14, color: getRecruitmentStatus(post.RecruitmentToDate).color }} />
@@ -561,7 +573,7 @@ const RecruitmentPostSearchPage = () => {
                                                             )}
                                                             {post.Requirement.FromAge && post.Requirement.ToAge && (
                                                                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
-                                                                    <Cake sx={{ fontSize: "0.8rem" }} />Từ: {post.Requirement.FromAge} đến {post.Requirement.ToAge}
+                                                                    <Cake sx={{ fontSize: "0.8rem" }} /> {post.Requirement.FromAge} đến {post.Requirement.ToAge} tuổi
                                                                 </Typography>
                                                             )}
                                                             {post.Requirement.Experience && (

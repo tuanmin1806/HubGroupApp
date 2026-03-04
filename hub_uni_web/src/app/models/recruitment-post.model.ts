@@ -28,6 +28,8 @@ export interface RecruitmentPostResponse {
     Province: string;
     Professions: ProfessionResponse[];
     SeoUrl: string;
+    MinCost: number;
+    MaxCost: number;
 }
 
 export interface CreateRecruitmentPostRequest {

@@ -1,7 +1,7 @@
-import { Box, Card, Typography, Tooltip, Button } from "@mui/material";
+import { Box, Card, Typography, Tooltip, Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { OrganizationResponse } from "../../app/models/organization.model";
-import { Visibility } from "@mui/icons-material";
+import { Language, LocationOn, School, Visibility } from "@mui/icons-material";
 
 interface Props { organizations: OrganizationResponse[]; }
 
@@ -18,6 +18,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
           md: "repeat(3, 1fr)",
         },
         gap: 2,
+        alignItems: "stretch",
       }}
     >
       {organizations.map((org) => (
@@ -25,55 +26,68 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
           key={org.SeoUrl}
           sx={{
             display: "flex",
-            alignItems: "stretch",
-            p: 1,
-            border: {xs: org.IsTop ? "0.5px solid #faa11b" : "0.5px solid #e0e0e0"},
+            flexDirection: "row",
+            p: 1.25,
+            border: org.IsTop ? "0.5px solid #faa11b" : "0.5px solid #e0e0e0",
             borderRadius: 1,
+            transition: "transform 0.2s, box-shadow 0.2s",
             "&:hover": {
               transform: "translateY(-2px)",
+              boxShadow: 3,
             },
           }}
         >
-          {/* LEFT: IMAGE */}
           <Box
-            component="img"
-            src={org.LogoFullUrl || "/default_organization_card.jpg"}
-            alt={org.Name}
             sx={{
-              width: 120,
-              height: 120,
-              objectFit: "contain",
-              mr: 2,
-              borderRadius: 1,
-              bgcolor: "#fafafa",
-              cursor: "pointer",
+              flexShrink: 0,
+              width: { xs: 80, sm: 96 },
+              height: { xs: 80, sm: 96 },
+              alignSelf: "flex-start",
+              mr: 1.5,
             }}
-            onClick={() => navigate(`/chi-tiet-truong/${org.SeoUrl}`)}
-          />
+          >
+            <Box
+              component="img"
+              src={org.LogoFullUrl}
+              alt={org.Name}
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                borderRadius: 1,
+                bgcolor: "#fafafa",
+                border: "1px solid #f0f0f0",
+                cursor: "pointer",
+                display: "block",
+              }}
+              onClick={() => navigate(`/thong-tin-truong/${org.SeoUrl}`)}
+            />
+          </Box>
 
-          {/* RIGHT: CONTENT */}
-          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minWidth: 0,
+              gap: 0.4,
+            }}
+          >
             <Tooltip
               title={
-                <Box sx={{
-                  p: 1, width: 350,
-                  maxHeight: 450,
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                }}>
-                  <Typography fontWeight="bold" gutterBottom> {org.Name} </Typography>
-                  <Typography variant="body2" sx={{ mb: 1 }}> {org.Summary} </Typography>
-                  <Typography variant="body2"> <b>Ngành chính:</b> {org.MainProfession?.Name} </Typography>
-                  <Typography variant="body2"> <b>Mã số thuế:</b> {org.TaxCode} </Typography>
-                  <Typography variant="body2" sx={{ mb: 2 }}> <b>Địa chỉ:</b> {org.Address} </Typography>
-
+                <Box sx={{ p: 1, width: 320, maxHeight: 420, overflowY: "auto" }}>
+                  <Typography fontWeight="bold" gutterBottom>{org.Name}</Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}>{org.Summary}</Typography>
+                  <Typography variant="body2"><b>Ngành chính:</b> {org.MainProfession?.ProfessionName || "—"}</Typography>
+                  <Typography variant="body2"><b>Mã số thuế:</b> {org.TaxCode}</Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}><b>Địa chỉ:</b> {org.Address}</Typography>
                   <Button
                     variant="contained"
                     startIcon={<Visibility />}
                     size="small"
                     fullWidth
-                    sx={{ backgroundColor: '#ff5722' }}
-                    onClick={() => navigate(`/chi-tiet-truong/${org.SeoUrl}`)}
+                    sx={{ backgroundColor: "#ff5722" }}
+                    onClick={() => navigate(`/thong-tin-truong/${org.SeoUrl}`)}
                   >
                     Xem chi tiết
                   </Button>
@@ -85,14 +99,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               leaveDelay={200}
               slotProps={{
                 popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, 8],
-                      },
-                    },
-                  ],
+                  modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
                 },
                 tooltip: {
                   sx: {
@@ -107,7 +114,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               }}
             >
               <Typography
-                variant="subtitle1"
+                variant="subtitle2"
                 fontWeight="bold"
                 sx={{
                   cursor: "pointer",
@@ -116,65 +123,71 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                   display: "-webkit-box",
                   WebkitLineClamp: 2,
                   WebkitBoxOrient: "vertical",
+                  lineHeight: 1.4,
+                  minHeight: "2.8em",
                 }}
               >
                 {org.Name}
               </Typography>
             </Tooltip>
 
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}> {org.OrganizationType} </Typography>
-
-            {org.WebsiteUrl && (
-              <Box
+            <Box sx={{ height: 22, display: "flex", alignItems: "center" }}>
+              <Chip
+                label={org.OrganizationType}
+                size="small"
+                variant="outlined"
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  mb: 1,
-                  minWidth: 0,
-                }}
-              >
-
-                <Typography
-                  component="a"
-                  href={org.WebsiteUrl.startsWith("http") ? org.WebsiteUrl : `https://${org.WebsiteUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                    textDecoration: "none",
+                  fontSize: "0.62rem",
+                  height: 18,
+                  borderColor: "#ec3b05",
+                  color: "#ec3b05",
+                  fontWeight: 600,
+                  maxWidth: "100%",
+                  "& .MuiChip-label": {
+                    px: 0.75,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                    display: "block",
-                    maxWidth: {
-                      xs: 180,
-                      sm: 160,
-                      md: 200,
-                    },
-                    "&:hover": {
-                      color: "#ff5722",
-                      textDecoration: "underline",
-                    },
-                  }}
-                >
-                  {org.WebsiteUrl}
-                </Typography>
+                  },
+                }}
+              />
+            </Box>
+
+            <Box sx={{ height: 20, display: "flex", alignItems: "center", minWidth: 0 }}>
+              <LocationOn sx={{ fontSize: 12, color: "text.disabled", mr: 0.4, flexShrink: 0 }} />
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {[org.Province, org.Commune].filter(Boolean).join(", ") || "—"}
+              </Typography>
+            </Box>
+
+            {org.WebsiteUrl && (
+              <Box sx={{ height: 20, display: "flex", alignItems: "center", minWidth: 0 }}>
+                <Language sx={{ fontSize: 12, color: "text.disabled", mr: 0.4, flexShrink: 0 }} />
+                {org.WebsiteUrl ? (
+                  <Typography
+                    component="a"
+                    href={org.WebsiteUrl.startsWith("http") ? org.WebsiteUrl : `https://${org.WebsiteUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="caption"
+                    noWrap
+                    sx={{
+                      color: "text.secondary",
+                      textDecoration: "none",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      display: "block",
+                      "&:hover": { color: "#ff5722", textDecoration: "underline" },
+                    }}
+                  >
+                    {org.WebsiteUrl.replace(/^https?:\/\//, "")}
+                  </Typography>
+                ) : (
+                  <Typography variant="caption" color="text.disabled"></Typography>
+                )}
               </Box>
             )}
-
-            {/* BOTTOM ROW */}
-            <Box
-              sx={{
-                mt: "auto",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography variant="body2" color="primary"> {org.MainProfession?.Name} </Typography>
-            </Box>
           </Box>
         </Card>
       ))}
