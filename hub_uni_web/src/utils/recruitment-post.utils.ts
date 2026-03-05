@@ -30,3 +30,8 @@ export const formatCurrency = (value?: number) => {
     if (value === undefined || value === null) return "";
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
+
+export const normalizeUrl = (url: string) => {
+    if (!url) return '';
+    return url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
+};

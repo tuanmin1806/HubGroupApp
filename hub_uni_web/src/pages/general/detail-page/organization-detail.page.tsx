@@ -7,6 +7,9 @@ import OrganizationSelectActionCard from "../../../components/cards/organization
 import MuiLink from "@mui/material/Link";
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/date.utils";
+import { ConvertService } from "../../../app/services/convert.service";
+import { OrgStatus } from "../../../app/models/enums.model";
+import { normalizeUrl } from "../../../utils/recruitment-post.utils";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -455,7 +458,7 @@ const OrganizationDetailPage = () => {
                                                     size="medium"
                                                     startIcon={<Language />}
                                                     component="a"
-                                                    href={organization.WebsiteUrl}
+                                                    href={normalizeUrl(organization.WebsiteUrl)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     disabled={!organization.WebsiteUrl}
@@ -679,15 +682,6 @@ const OrganizationDetailPage = () => {
                                                 <Typography variant="body2">{organization.Commune}, {organization.Province}</Typography>
                                             </Box>
                                         )}
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary">Trạng thái:</Typography>
-                                            <Chip
-                                                label={organization.Status || 'Đang hoạt động'}
-                                                color={organization.Status === 'Active' ? 'success' : 'default'}
-                                                size="small"
-                                                sx={{ mt: 0.5 }}
-                                            />
-                                        </Box>
                                     </Stack>
                                 </CardContent>
                             </Card>

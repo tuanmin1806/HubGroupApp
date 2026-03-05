@@ -103,3 +103,17 @@ export enum EducationLevel {
   University = 6,
   Postgraduate = 7,
 }
+
+export enum OrgStatus {
+    Undefined = 0,
+    Active = 1,
+    Inactive = 2,
+    Locked = 3,
+}
+
+export enum RecruitPostStatus {
+    Undefined = 0,
+    Active = 1,
+    Inactive = 2,
+    Draft = 3
+}

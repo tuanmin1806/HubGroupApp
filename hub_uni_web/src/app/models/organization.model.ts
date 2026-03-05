@@ -1,3 +1,5 @@
+import { OrgStatus } from "./enums.model";
+
 export interface Profession {
     ProfessionId: string;
     ProfessionName?: string;
@@ -50,7 +52,7 @@ export interface OrganizationDetailResponse {
     CreatedAt: string;
     UpdatedAt: string;
     UpdatedBy: string;
-    Status: string;
+    OrgStatus: OrgStatus;
     Description: string;
 }
 

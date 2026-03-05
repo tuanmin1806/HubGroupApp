@@ -34,7 +34,7 @@ const ArticleComponent = () => {
                     mb: 2,
                 }}
             >
-                <Box sx={{ color: "#ff5722", fontSize: 26, fontWeight: 700 }}>
+                <Box sx={{ color: "#ff5722", fontSize: 18, fontWeight: 700, textTransform: "uppercase" }}>
                     Bài viết
                 </Box>
 

@@ -1,4 +1,4 @@
-import { AccountStatus, AccountType, EducationStatus, Gender, RoleStatus, StudentStatus, PermissionStatus, PositionStatus, DepartmentStatus, JobExperience, EducationLevel } from "../models/enums.model";
+import { AccountStatus, AccountType, EducationStatus, Gender, RoleStatus, StudentStatus, PermissionStatus, PositionStatus, DepartmentStatus, JobExperience, EducationLevel, OrgStatus, RecruitPostStatus } from "../models/enums.model";
 
 export class ConvertService {
 
@@ -206,6 +206,33 @@ export class ConvertService {
         'WaitingApproval': DepartmentStatus.WaitingApproval,
     };
 
+    private static ORG_STATUS_MAP: Record<OrgStatus, string> = {
+        [OrgStatus.Undefined]: 'Không xác định',
+        [OrgStatus.Active]: 'Hoạt động',
+        [OrgStatus.Inactive]: 'Dừng hoạt động',
+        [OrgStatus.Locked]: 'Bị khóa',
+    };
+
+    private static REVERSE_ORG_STATUS_MAP: Record<string, OrgStatus> = {
+        'Undefined': OrgStatus.Undefined,
+        'Active': OrgStatus.Active,
+        'Inactive': OrgStatus.Inactive,
+        'Locked': OrgStatus.Locked
+    };
+
+    private static POST_STATUS_MAP: Record<RecruitPostStatus, string> = {
+        [RecruitPostStatus.Undefined]: 'Không xác định',
+        [RecruitPostStatus.Active]: 'Hoạt động',
+        [RecruitPostStatus.Inactive]: 'Dừng hoạt động',
+        [RecruitPostStatus.Draft]: 'Nháp',
+    };
+
+    private static REVERSE_POST_STATUS_MAP: Record<string, RecruitPostStatus> = {
+        'Undefined': RecruitPostStatus.Undefined,
+        'Active': RecruitPostStatus.Active,
+        'Inactive': RecruitPostStatus.Inactive,
+        'Draft': RecruitPostStatus.Draft
+    };
 
     static convertStatus(status: StudentStatus | null | undefined): string {
         return status !== null && status !== undefined
@@ -379,5 +406,27 @@ export class ConvertService {
         return statusString !== null && statusString !== undefined
             ? this.REVERSE_DEPARTMENT_STATUS_MAP[statusString] || DepartmentStatus.Undefined
             : DepartmentStatus.Undefined;
+    }
+
+    static convertOrgStatus(orgStatus: OrgStatus | null | undefined): string {
+        return orgStatus !== null && orgStatus !== undefined
+            ? this.ORG_STATUS_MAP[orgStatus] || 'Không xác định'
+            : 'Không xác định';
+    }
+    static convertOrgStatusFromString(orgStatusString: string | null | undefined | OrgStatus): OrgStatus {
+        return orgStatusString !== null && orgStatusString !== undefined
+            ? this.REVERSE_ORG_STATUS_MAP[orgStatusString] || OrgStatus.Undefined
+            : OrgStatus.Undefined;
+    }
+
+    static convertPostStatus(postStatus: RecruitPostStatus | null | undefined): string {
+        return postStatus !== null && postStatus !== undefined
+            ? this.POST_STATUS_MAP[postStatus] || 'Không xác định'
+            : 'Không xác định';
+    }
+    static convertPostStatusFromString(postStatusString: string | null | undefined | RecruitPostStatus): RecruitPostStatus {
+        return postStatusString !== null && postStatusString !== undefined
+            ? this.REVERSE_POST_STATUS_MAP[postStatusString] || RecruitPostStatus.Undefined
+            : RecruitPostStatus.Undefined;
     }
 }

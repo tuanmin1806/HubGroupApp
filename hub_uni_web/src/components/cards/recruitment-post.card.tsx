@@ -29,9 +29,10 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
             sx={{
               display: "flex",
               alignItems: "stretch",
-              p: 2,
+              p: 1,
               borderRadius: 2,
               position: "relative",
+              border: rcp.IsTop ? "0.5px solid #faa11b" : "0.5px solid #dbd8d8",
             }}
           >
             {/* IsTop badge */}

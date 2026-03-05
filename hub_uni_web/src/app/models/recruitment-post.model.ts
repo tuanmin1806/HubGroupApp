@@ -11,7 +11,7 @@ export interface Requirement {
 
 export interface RecruitmentPostResponse {
     Id: string;
-    Status: string;
+    RecruitPostStatus: string;
     Name: string;
     OrganizationId: string;
     ProfessionIds: string[];

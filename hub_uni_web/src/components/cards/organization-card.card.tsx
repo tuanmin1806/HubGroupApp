@@ -29,7 +29,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
             display: "flex",
             flexDirection: "row",
             p: 1.25,
-            border: org.IsTop ? "0.5px solid #faa11b" : "0.5px solid #e0e0e0",
+            border: org.IsTop ? "0.5px solid #faa11b" : "0.5px solid #dbd8d8",
             borderRadius: 1,
             transition: "transform 0.2s, box-shadow 0.2s",
             "&:hover": {
@@ -121,11 +121,8 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                   cursor: "pointer",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
+                  whiteSpace: "nowrap",
                   lineHeight: 1.4,
-                  minHeight: "2.8em",
                 }}
               >
                 {org.Name}

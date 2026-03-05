@@ -209,7 +209,7 @@ const OrganizationSearchPage = () => {
                                 }}
                             >
                                 {/* Header */}
-                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <FilterList sx={{ fontSize: 20 }} />
                                         <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
@@ -231,7 +231,7 @@ const OrganizationSearchPage = () => {
                                 <Divider sx={{ mb: 2 }} />
 
                                 {/* Loại hình*/}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                     <FormLabel
                                         sx={{
                                             fontWeight: 600,
@@ -304,7 +304,7 @@ const OrganizationSearchPage = () => {
                                 <Divider sx={{ mb: 2 }} />
 
                                 {/* Ngành nghề */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                     <FormLabel
                                         sx={{
                                             fontWeight: 600,
@@ -377,7 +377,7 @@ const OrganizationSearchPage = () => {
                                 <Divider sx={{ mb: 2 }} />
 
                                 {/* Tỉnh / Thành phố */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                     <FormLabel
                                         sx={{
                                             fontWeight: 600,
@@ -435,7 +435,7 @@ const OrganizationSearchPage = () => {
                                 <Divider sx={{ mb: 2 }} />
 
                                 {/* Quận / Huyện */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                     <FormLabel
                                         sx={{
                                             fontWeight: 600,
@@ -545,7 +545,7 @@ const OrganizationSearchPage = () => {
                                     </Typography>
                                 </Card>
                             ) : (
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                     {/* Results count */}
                                     <Box sx={{
                                         display: 'flex',
@@ -562,15 +562,14 @@ const OrganizationSearchPage = () => {
                                         <Card
                                             key={org.SeoUrl}
                                             sx={{
-                                                borderRadius: 3,
-                                                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                                borderRadius: 2,
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
                                                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                                                 border: '1px solid',
-                                                borderColor: org.IsTop ? '#faa11b' : 'transparent',
+                                                borderColor: org.IsTop ? '#faa11b' : '#dbd8d8',
                                                 cursor: 'pointer',
                                                 '&:hover': {
-                                                    transform: 'translateY(-4px)',
-                                                    boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
+                                                    transform: 'translateY(-3px)',
                                                 },
                                             }}
                                             onClick={() => handleViewDetail(org.SeoUrl || '')}
@@ -685,9 +684,10 @@ const OrganizationSearchPage = () => {
                                                                     whiteSpace: 'nowrap',
                                                                     flex: 1,
                                                                     minWidth: 0,
+                                                                    fontStyle: org.MainProfession?.ProfessionName ? 'normal' : 'italic'
                                                                 }}
                                                             >
-                                                                {org.MainProfession?.ProfessionName || 'Chưa cập nhật ngành nghề'}
+                                                                {org.MainProfession?.ProfessionName || 'Chưa có thông tin'}
                                                             </Typography>
                                                         </Box>
 

@@ -32,6 +32,8 @@ import { useEffect, useState } from "react";
 import ApplyConfirmDialog from "../../../components/dialogs/general/apply-confirm-dialog.dialog";
 import { useAuthGuard } from "../../../hooks/useAuthGuard";
 import { formatDate } from "../../../utils/date.utils";
+import { ConvertService } from "../../../app/services/convert.service";
+import { formatCurrency } from "../../../utils/recruitment-post.utils";
 
 const RecruitmentPostDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
@@ -107,39 +109,6 @@ const RecruitmentPostDetailPage = () => {
         setApplyDialogOpen(true);
     };
 
-    const getExperienceLabel = (exp: string) => {
-        const labels: Record<string, string> = {
-            'LessThan1Year': 'Dưới 1 năm',
-            'From1To2Years': '1-2 năm',
-            'From2To3Years': '2-3 năm',
-            'From3To5Years': '3-5 năm',
-            'MoreThan5Years': 'Trên 5 năm'
-        };
-        return labels[exp] || exp;
-    };
-
-    const getEducationLabel = (edu: string) => {
-        const labels: Record<string, string> = {
-            'PrimarySchool': 'Tiểu học',
-            'MiddleSchool': 'Trung học cơ sở',
-            'HighSchool': 'Trung học phổ thông',
-            'College': 'Cao đẳng',
-            'University': 'Đại học',
-            'Master': 'Thạc sĩ',
-            'PhD': 'Tiến sĩ'
-        };
-        return labels[edu] || edu;
-    };
-
-    const getGenderLabel = (gender: string) => {
-        const labels: Record<string, string> = {
-            'Male': 'Nam',
-            'Female': 'Nữ',
-            'Other': 'Khác'
-        };
-        return labels[gender] || 'Không yêu cầu';
-    };
-
     return (
         <Box sx={{ bgcolor: '#f5f7fa', minHeight: '100vh', pb: 3 }}>
             {/* Hero Section */}
@@ -180,7 +149,7 @@ const RecruitmentPostDetailPage = () => {
                                 />
                             )}
                             <Chip
-                                label={recruitmentPost.Status === 'Activated' ? 'Đang tuyển' : recruitmentPost.Status}
+                                label={ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(recruitmentPost.RecruitPostStatus))}
                                 sx={{ bgcolor: 'rgba(47,153,51,0.9)', color: 'white', fontWeight: 600 }}
                             />
                         </Stack>
@@ -239,28 +208,41 @@ const RecruitmentPostDetailPage = () => {
                             sx={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: 1,
+                                gap: 1.5,
                                 bgcolor: 'rgba(255,255,255,0.15)',
                                 border: '1px solid rgba(255,255,255,0.35)',
                                 borderRadius: 2,
-                                px: 1,
-                                py: 0.5,
-                                width: 'fit-content',
+                                px: 2,
+                                width: { xs: '100%', sm: 'fit-content' },
+                                boxSizing: 'border-box',
                             }}
                         >
-                            <AttachMoney sx={{ color: 'white', fontSize: 32 }} />
-                            <Box>
+                            <AttachMoney sx={{ color: 'white', fontSize: { xs: 28, md: 32 }, flexShrink: 0 }} />
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
                                 <Typography variant="caption" color="rgba(255,255,255,0.8)" fontWeight={500}>
                                     Học phí
                                 </Typography>
-                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                                    <Typography variant="h6" fontWeight={700} color="white">
-                                        {recruitmentPost.Cost?.toLocaleString('vi-VN')} {recruitmentPost.Currency}
-                                    </Typography>
-                                    <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255,255,255,0.4)' }} />
-                                    <Typography variant="body2" color="rgba(255,255,255,0.9)" fontWeight={500}>
-                                        ≈ ${recruitmentPost.CostUsd?.toLocaleString('en-US')} USD
-                                    </Typography>
+                                <Stack
+                                    direction={{ xs: 'column', sm: 'row' }}
+                                    spacing={{ xs: 0.5, sm: 1 }}
+                                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                                    flexWrap="wrap"
+                                >
+                                    {recruitmentPost.MinCost === recruitmentPost.MaxCost ? (
+                                        <Typography variant="h6" fontWeight={700} color="white" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                            {formatCurrency(recruitmentPost.MinCost)} {recruitmentPost.Currency}
+                                        </Typography>
+                                    ) : (
+                                        <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap">
+                                            <Typography variant="h6" fontWeight={700} color="white" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                                {formatCurrency(recruitmentPost.MinCost)}
+                                            </Typography>
+                                            <Typography variant="body2" color="rgba(255,255,255,0.8)" fontWeight={500}>—</Typography>
+                                            <Typography variant="h6" fontWeight={700} color="white" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                                {formatCurrency(recruitmentPost.MaxCost)}{recruitmentPost.Currency}
+                                            </Typography>
+                                        </Stack>
+                                    )}
                                 </Stack>
                             </Box>
                         </Box>
@@ -292,7 +274,7 @@ const RecruitmentPostDetailPage = () => {
                                     />
 
                                     {/* ACTION BUTTONS */}
-                                    <Divider sx={{ my: 4 }} />
+                                    <Divider sx={{ my: 2 }} />
 
                                     <Stack
                                         direction={{ xs: 'column', sm: 'row' }}
@@ -306,7 +288,7 @@ const RecruitmentPostDetailPage = () => {
                                             sx={{
                                                 bgcolor: '#ff5722',
                                                 fontWeight: 600,
-                                                px: 4,
+                                                px: 2,
                                                 '&:hover': {
                                                     bgcolor: '#e64a19',
                                                     transform: 'translateY(-2px)',
@@ -325,7 +307,7 @@ const RecruitmentPostDetailPage = () => {
                                                 borderColor: '#ff5722',
                                                 color: '#ff5722',
                                                 fontWeight: 600,
-                                                px: 3,
+                                                px: 2,
                                                 '&:hover': {
                                                     bgcolor: '#ff5722',
                                                     color: 'white'
@@ -344,7 +326,7 @@ const RecruitmentPostDetailPage = () => {
                                                 borderColor: '#ff5722',
                                                 color: '#ff5722',
                                                 fontWeight: 600,
-                                                px: 3,
+                                                px: 2,
                                                 '&:hover': {
                                                     bgcolor: '#ff5722',
                                                     color: 'white'
@@ -477,9 +459,9 @@ const RecruitmentPostDetailPage = () => {
                                             <Typography variant="h6" fontWeight={700} gutterBottom color="primary.main">
                                                 Yêu cầu ứng viên
                                             </Typography>
-                                            <Divider sx={{ mb: 2 }} />
+                                            <Divider sx={{ mb: 1 }} />
 
-                                            <Stack spacing={2}>
+                                            <Stack spacing={1}>
                                                 <Paper
                                                     elevation={0}
                                                     sx={{
@@ -522,7 +504,7 @@ const RecruitmentPostDetailPage = () => {
                                                                 Giới tính
                                                             </Typography>
                                                             <Typography variant="body2" fontWeight={600} color="text.primary">
-                                                                {getGenderLabel(recruitmentPost.Requirement.Gender)}
+                                                                {ConvertService.convertGender(ConvertService.convertGenderFromString(recruitmentPost.Requirement.Gender))}
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
@@ -546,7 +528,7 @@ const RecruitmentPostDetailPage = () => {
                                                                 Kinh nghiệm
                                                             </Typography>
                                                             <Typography variant="body2" fontWeight={600} color="text.primary">
-                                                                {getExperienceLabel(recruitmentPost.Requirement.Experience)}
+                                                                {ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(recruitmentPost.Requirement.Experience))}
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
@@ -570,7 +552,7 @@ const RecruitmentPostDetailPage = () => {
                                                                 Trình độ học vấn
                                                             </Typography>
                                                             <Typography variant="body2" fontWeight={600} color="text.primary">
-                                                                {getEducationLabel(recruitmentPost.Requirement.EducationLevel)}
+                                                                {ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(recruitmentPost.Requirement.EducationLevel))}
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
@@ -587,7 +569,7 @@ const RecruitmentPostDetailPage = () => {
                 {/* Related Jobs Section */}
                 {relatedPosts && relatedPosts.Items && relatedPosts.Items.length > 0 && (
                     <Box sx={{ mt: 6 }}>
-                        <Typography variant="h5" fontWeight={700} gutterBottom color="primary.main">
+                        <Typography fontSize={20} fontWeight={700} gutterBottom color="primary.main">
                             Tin tuyển sinh khác
                         </Typography>
 
@@ -650,7 +632,7 @@ const RecruitmentPostDetailPage = () => {
                                                             {/* Title and Organization */}
                                                             <Box>
                                                                 <Typography
-                                                                    variant="h6"
+                                                                    fontSize={18}
                                                                     fontWeight={700}
                                                                     sx={{
                                                                         display: '-webkit-box',
@@ -667,7 +649,7 @@ const RecruitmentPostDetailPage = () => {
                                                                     {post.Name}
                                                                 </Typography>
                                                                 <Typography
-                                                                    variant="body2"
+                                                                    fontSize={14}
                                                                     color="text.secondary"
                                                                     sx={{
                                                                         overflow: 'hidden',
@@ -685,13 +667,6 @@ const RecruitmentPostDetailPage = () => {
                                                                 spacing={{ xs: 1.5, sm: 3 }}
                                                                 flexWrap="wrap"
                                                             >
-                                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                                    <AttachMoney sx={{ color: '#4caf50', fontSize: 20 }} />
-                                                                    <Typography variant="body2" fontWeight={600} color="#4caf50">
-                                                                        {post.Currency}
-                                                                    </Typography>
-                                                                </Stack>
-
                                                                 <Stack direction="row" spacing={1} alignItems="center">
                                                                     <LocationOn sx={{ color: 'text.secondary', fontSize: 20 }} />
                                                                     <Typography variant="body2" color="text.secondary">

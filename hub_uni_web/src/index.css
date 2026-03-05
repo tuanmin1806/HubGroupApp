@@ -1,1 +1,94 @@
 @import "tailwindcss";
+
+#zalo-position {
+  position: fixed !important;
+  bottom: 200px !important;
+  right: 10px !important;
+  z-index: 9999;
+}
+
+@media (max-width: 768px) {
+  #zalo-position {
+    bottom: 220px !important;
+    right: 10px !important;
+  }
+}
+
+#hotline-call {
+  position: fixed;
+  bottom: 120px;
+  right: 10px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #ffb347, #ff7a18);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: pointer;
+  animation: shake 1.5s infinite, pulse 2s infinite;
+  box-shadow: 0 0 0 rgba(255, 122, 24, 0.6);
+  transition: transform 0.2s;
+}
+
+#hotline-call:hover {
+  transform: scale(1.1);
+}
+
+#hotline-call img {
+  width: 28px;
+  height: 28px;
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  20% {
+    transform: rotate(-8deg);
+  }
+
+  40% {
+    transform: rotate(8deg);
+  }
+
+  60% {
+    transform: rotate(-6deg);
+  }
+
+  80% {
+    transform: rotate(6deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 24, 0.6);
+  }
+
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 122, 24, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 24, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  #zalo-position {
+    bottom: 120px !important;
+    right: 12px !important;
+  }
+
+  #hotline-call {
+    bottom: 40px;
+    right: 10px;
+  }
+}

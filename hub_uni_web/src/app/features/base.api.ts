@@ -28,14 +28,6 @@ const baseQueryWithAuth: BaseQueryFn<
     FetchBaseQueryMeta
 > = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);
-    if (
-        result.meta?.response?.status
-        && result.meta.response.status >= 200
-        && result.meta.response.status < 300
-    ) {
-        const message = 'Tải dữ liệu thành công';
-        api.dispatch(showSnackbar({ message, severity: 'success' }));
-    }
 
     if (result.error) {
         const status = result.error.status;

@@ -9,12 +9,17 @@ import RoleBasedLayout from "../layouts/role-based.layout";
 import Login from "../pages/general/auth-page/signin.page";
 import Signup from "../pages/general/auth-page/sign-up.page";
 import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
+import NotFoundPage from "../pages/general/auth-page/not-found.page";
 
 const router = createBrowserRouter(
     [
         {
             path: "/unauthorized",
             element: <UnauthorizedPage />,
+        },
+        {
+            path: "*",
+            element: <NotFoundPage />,
         },
         {
             element: <AuthLayout />,

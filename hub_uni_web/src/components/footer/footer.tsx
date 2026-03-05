@@ -13,6 +13,7 @@ import {
 import {
   Box,
   Grid,
+  Link,
   List,
   ListItem,
   ListItemIcon,
@@ -142,7 +143,11 @@ export default function Footer() {
           fontSize: 14,
         }}
       >
-        © Copyright 2021 by Hubgroup.vn. All rights reserved.
+        © Copyright 2021 by{" "}
+        <Link href="https://hubgroup.vn" target="_blank" rel="noopener noreferrer" underline="hover" color="inherit" sx={{ fontWeight: "bold", "&:hover": { textDecoration: "underline" } }}>
+          Hubgroup.vn
+        </Link>
+        . All rights reserved.
       </Box>
     </Box>
   );

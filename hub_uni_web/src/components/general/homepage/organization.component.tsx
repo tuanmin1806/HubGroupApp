@@ -84,10 +84,10 @@ const OrganizationComponent = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    mb: 3,
+                    mb: 2,
                 }}
             >
-                <Box sx={{ color: "#ff5722", fontSize: 26, fontWeight: 700 }}>
+                <Box sx={{ color: "#ff5722", fontSize: 18, fontWeight: 700, textTransform: "uppercase" }}>
                     Danh sách trường
                 </Box>
 
@@ -95,6 +95,7 @@ const OrganizationComponent = () => {
                     sx={{
                         borderColor: "#ff5722",
                         color: "#ff5722",
+                        fontSize: 12,
                         "&:hover": {
                             bgcolor: "#ff5722",
                             color: "#fff",
@@ -172,8 +173,8 @@ const OrganizationComponent = () => {
                                         <Box
                                             key={profession.Id}
                                             sx={{
-                                                px: 2,
-                                                py: 1,
+                                                px: 1.5,
+                                                py: 0.5,
                                                 border: "1px solid #ddd",
                                                 borderRadius: 20,
                                                 cursor: "pointer",
@@ -243,8 +244,8 @@ const OrganizationComponent = () => {
                                         <Box
                                             key={organizationType.Id}
                                             sx={{
-                                                px: 2,
-                                                py: 1,
+                                                px: 1.5,
+                                                py: 0.5,
                                                 border: "1px solid #ddd",
                                                 borderRadius: 20,
                                                 cursor: "pointer",

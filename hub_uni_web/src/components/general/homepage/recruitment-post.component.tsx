@@ -90,10 +90,10 @@ const RecruitmentPostComponent = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    mb: 3,
+                    mb: 2,
                 }}
             >
-                <Box sx={{ color: "#ff5722", fontSize: 26, fontWeight: 700 }}>
+                <Box sx={{ color: "#ff5722", fontSize: 18, fontWeight: 700, textTransform: "uppercase" }}>
                     Chương trình tuyển sinh
                 </Box>
 
@@ -104,6 +104,7 @@ const RecruitmentPostComponent = () => {
                     sx={{
                         borderColor: "#ff5722",
                         color: "#ff5722",
+                        fontSize: 12,
                         "&:hover": {
                             bgcolor: "#ff5722",
                             color: "#fff",
@@ -179,8 +180,8 @@ const RecruitmentPostComponent = () => {
                                         <Box
                                             key={province.Id}
                                             sx={{
-                                                px: 2,
-                                                py: 1,
+                                                px: 1.5,
+                                                py: 0.5,
                                                 border: "1px solid #ddd",
                                                 borderRadius: 20,
                                                 cursor: "pointer",
@@ -250,8 +251,8 @@ const RecruitmentPostComponent = () => {
                                         <Box
                                             key={profession.Id}
                                             sx={{
-                                                px: 2,
-                                                py: 1,
+                                                px: 1.5,
+                                                py: 0.5,
                                                 border: "1px solid #ddd",
                                                 borderRadius: 20,
                                                 cursor: "pointer",
