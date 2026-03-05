@@ -53,6 +53,7 @@ export interface RecruitmentPostFilterParams {
     size?: number;
     professionId?: string;
     provinceId?: string;
+    visaTypeId?: string;
     fromCost?: number;
     toCost?: number;
     searchValue?: string;

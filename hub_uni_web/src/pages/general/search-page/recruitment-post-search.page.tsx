@@ -13,24 +13,19 @@ import {
     Radio,
     Divider,
     Button,
-    Skeleton,
-    Grid,
     IconButton,
     CircularProgress,
     Collapse,
     TextField,
-    InputAdornment,
 } from "@mui/material";
 import {
     WorkOutline,
     LocationOn,
     Business,
-    CalendarToday,
     FilterList,
     Clear,
     FavoriteBorder,
     PeopleAlt,
-    Wc,
     Male,
     Transgender,
     Cake,
@@ -40,8 +35,6 @@ import {
     LocationCity,
     AccessTime,
     AttachMoney,
-    ExpandLess,
-    ExpandMore,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
@@ -50,38 +43,36 @@ import OrganizationPagination from "../../../components/pagination/organization-
 import SearchBar from "../../../components/searchs/search-bar.search";
 import { BACK_GROUND_BUTTON_COLOR, DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
-import { getRecruitmentStatus } from "../../../utils/recruitment-post.utils";
+import { formatCurrency, getRecruitmentStatus } from "../../../utils/recruitment-post.utils";
 import { ConvertService } from "../../../app/services/convert.service";
-
-export interface RecruitmentPostFilterParams {
-    page?: number;
-    size?: number;
-    searchValue?: string;
-    professionId?: string;
-    provinceId?: string;
-    fromCost?: number;
-    toCost?: number;
-}
+import { RecruitmentPostFilterParams } from "../../../app/models/recruitment-post.model";
+import { useGetVisaTypesByPageQuery } from "../../../app/features/visa-type.api";
+import { ProfessionResponse } from "../../../app/models/profession.model";
+import { VisaTypeResponse } from "../../../app/models/visa-type.model";
 
 const RecruitmentPostSearchPage = () => {
     const navigate = useNavigate();
     const FILTER_PAGE_SIZE = 10;
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [professionPage, setProfessionPage] = useState(1);
+    const [visaTypePage, setVisaTypePage] = useState(1);
 
     const [showAllProfessions, setShowAllProfessions] = useState(false);
     const [showAllProvinces, setShowAllProvinces] = useState(false);
-    const [showCostFilter, setShowCostFilter] = useState(true);
+    const [showAllVisaTypes, setShowAllVisaTypes] = useState(false);
+    const [showCostFilter] = useState(true);
 
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState(initialProvinceSeo);
     const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
+    const handleLoadMoreVisaTypes = () => { setVisaTypePage(prev => prev + 1); };
 
     const [filters, setFilters] = useState({
         searchValue: "",
         provinceId: "",
         professionId: "",
+        visaTypeId: "",
         fromCost: "",
         toCost: "",
     });
@@ -95,14 +86,17 @@ const RecruitmentPostSearchPage = () => {
         searchValue: filters.searchValue,
         provinceId: filters.provinceId,
         professionId: filters.professionId,
+        visaTypeId: filters.visaTypeId,
         fromCost: filters.fromCost ? Number(filters.fromCost) : undefined,
         toCost: filters.toCost ? Number(filters.toCost) : undefined,
     });
 
     const { data: professionsData, isLoading: isLoadingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: FILTER_PAGE_SIZE });
     const { data: provinces, isLoading: isLoadingProvinces } = useGetAllProvinceNoAuthenQuery();
+    const { data: visaTypesData, isLoading: isLoadingVisaTypes } = useGetVisaTypesByPageQuery({ page: visaTypePage, size: FILTER_PAGE_SIZE });
 
-    const [allProfessions, setAllProfessions] = useState<any[]>([]);
+    const [allProfessions, setAllProfessions] = useState<ProfessionResponse[]>([]);
+    const [allVisaTypes, setAllVisaTypes] = useState<VisaTypeResponse[]>([]);
 
     const totalPages = recruitmentData ? Math.ceil(recruitmentData.Total / PAGE_SIZE) : 1;
     const recruitmentPosts = recruitmentData?.Items || [];
@@ -153,7 +147,7 @@ const RecruitmentPostSearchPage = () => {
     };
 
     const handleClearFilters = () => {
-        setFilters({ searchValue: "", provinceId: "", professionId: "", fromCost: "", toCost: "" });
+        setFilters({ searchValue: "", provinceId: "", professionId: "", visaTypeId: "", fromCost: "", toCost: "" });
         setCostInput({ fromCost: "", toCost: "" });
         setCostError("");
         setSelectedProvinceSeo('');
@@ -176,24 +170,37 @@ const RecruitmentPostSearchPage = () => {
     }, [professionsData]);
 
     useEffect(() => {
+        if (visaTypesData?.Items) {
+            setAllVisaTypes(prev => {
+                const existingIds = new Set(prev.map(item => item.Id));
+                const newItems = visaTypesData.Items.filter(item => !existingIds.has(item.Id));
+                return [...prev, ...newItems];
+            });
+        }
+    }, [visaTypesData]);
+
+    useEffect(() => {
         if (initialProvinceSeo && provinces && provinces.length > 0 && !filters.provinceId) {
             const province = provinces.find(p => p.Seo === initialProvinceSeo);
             if (province) setFilters(prev => ({ ...prev, provinceId: province.Id }));
         }
     }, [provinces]);
 
+    useEffect(() => {
+        document.title = "Tìm kiếm chương trình du học Hàn Quốc | duhochan.hubgroup.vn";
+    }, [navigate]);
+
     const hasMoreProfessions = professionsData && (allProfessions.length < professionsData.Total);
+    const hasMoreVisaTypes = visaTypesData && (allVisaTypes.length < visaTypesData.Total);
     const hasActiveFilters = filters.provinceId || filters.professionId || filters.searchValue || filters.fromCost || filters.toCost;
 
-    // Kiểm tra costInput có thay đổi so với filters đang áp dụng không
     const costInputDirty = costInput.fromCost !== filters.fromCost || costInput.toCost !== filters.toCost;
-    const hasCostInput = costInput.fromCost || costInput.toCost;
 
     return (
-        <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", py: 3 }}>
+        <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", py: 2 }}>
             <Container maxWidth="lg">
                 {/* Search Bar */}
-                <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
                     <SearchBar
                         onSearch={handleSearch}
                         initialQuery={filters.searchValue}
@@ -201,7 +208,7 @@ const RecruitmentPostSearchPage = () => {
                     />
                 </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                     {/* Sidebar Filter */}
                     <Box sx={{ width: { xs: "100%", md: 300 }, flexShrink: 0 }}>
                         <Paper
@@ -216,7 +223,7 @@ const RecruitmentPostSearchPage = () => {
                             }}
                         >
                             {/* Header */}
-                            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <FilterList sx={{ fontSize: 20 }} />
                                     <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
@@ -238,7 +245,7 @@ const RecruitmentPostSearchPage = () => {
                             <Divider sx={{ mb: 2 }} />
 
                             {/* Ngành nghề */}
-                            <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                            <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                 <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
                                     <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
                                     Ngành nghề
@@ -265,13 +272,14 @@ const RecruitmentPostSearchPage = () => {
                                             ))}
                                         </RadioGroup>
                                     )}
-                                    {hasMoreProfessions && !showAllProfessions && allProfessions.length >= 5 && (
+                                    {hasMoreProfessions && !showAllProfessions && (
                                         <Button size="small" onClick={handleLoadMoreProfessions} disabled={isLoadingProfessions}
                                             sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                             {isLoadingProfessions ? <CircularProgress size={16} /> : "Xem thêm"}
                                         </Button>
                                     )}
-                                    {allProfessions.length > 5 && (
+
+                                    {!hasMoreProfessions && allProfessions.length > 5 && (
                                         <Button size="small" onClick={() => setShowAllProfessions(!showAllProfessions)}
                                             sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                             {showAllProfessions ? "Thu gọn" : "Xem thêm"}
@@ -283,7 +291,7 @@ const RecruitmentPostSearchPage = () => {
                             <Divider sx={{ mb: 2 }} />
 
                             {/* Tỉnh / Thành phố */}
-                            <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                            <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                 <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
                                     <LocationCity sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
                                     Tỉnh / Thành phố
@@ -321,13 +329,55 @@ const RecruitmentPostSearchPage = () => {
 
                             <Divider sx={{ mb: 2 }} />
 
+                            <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                                <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
+                                    <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                    Loại hình Visa
+                                </FormLabel>
+                                <Box sx={{ maxHeight: showAllVisaTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                                    {isLoadingVisaTypes && allVisaTypes.length === 0 ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                            <CircularProgress size={20} sx={{ mr: 1 }} />
+                                            <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                                        </Box>
+                                    ) : (
+                                        <RadioGroup
+                                            value={filters.visaTypeId}
+                                            onChange={(e) => handleFilterChange("visaTypeId", e.target.value)}
+                                        >
+                                            <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
+                                            {(showAllVisaTypes ? allVisaTypes : allVisaTypes.slice(0, 5)).map((visaType) => (
+                                                <FormControlLabel
+                                                    key={visaType.Id}
+                                                    value={visaType.Id}
+                                                    control={<Radio size="small" />}
+                                                    label={<Typography variant="body2">{visaType.Name}</Typography>}
+                                                />
+                                            ))}
+                                        </RadioGroup>
+                                    )}
+                                    {hasMoreVisaTypes && !showAllVisaTypes && (
+                                        <Button size="small" onClick={handleLoadMoreVisaTypes} disabled={isLoadingVisaTypes}
+                                            sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
+                                            {isLoadingVisaTypes ? <CircularProgress size={16} /> : "Xem thêm"}
+                                        </Button>
+                                    )}
+                                    {!hasMoreVisaTypes && allVisaTypes.length > 5 && (
+                                        <Button size="small" onClick={() => setShowAllVisaTypes(!showAllVisaTypes)}
+                                            sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
+                                            {showAllVisaTypes ? "Thu gọn" : "Xem thêm"}
+                                        </Button>
+                                    )}
+                                </Box>
+                            </FormControl>
+
+                            <Divider sx={{ mb: 2 }} />
+
                             <Box sx={{ mb: 1 }}>
                                 <Stack
                                     direction="row"
                                     alignItems="center"
                                     justifyContent="space-between"
-                                    onClick={() => setShowCostFilter(v => !v)}
-                                    sx={{ cursor: "pointer", mb: showCostFilter ? 1.5 : 0 }}
                                 >
                                     <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", cursor: "pointer" }}>
                                         <AttachMoney sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
@@ -401,7 +451,7 @@ const RecruitmentPostSearchPage = () => {
                                                 textTransform: "none",
                                                 fontWeight: 600,
                                                 bgcolor: BACK_GROUND_BUTTON_COLOR,
-                                                "&:hover": { bgcolor: "primary.dark" },
+                                                "&:hover": { bgcolor: "#f59d19" },
                                                 borderRadius: 1,
                                                 py: 0.5,
                                             }}
@@ -425,7 +475,7 @@ const RecruitmentPostSearchPage = () => {
                         ) : recruitmentPosts.length === 0 ? (
                             <Paper
                                 elevation={0}
-                                sx={{ p: 6, textAlign: "center", borderRadius: 2, border: "1px solid", borderColor: "divider" }}
+                                sx={{ p: 2, textAlign: "center", borderRadius: 2, border: "1px solid", borderColor: "divider" }}
                             >
                                 <WorkOutline sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
                                 <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -442,14 +492,14 @@ const RecruitmentPostSearchPage = () => {
                             </Paper>
                         ) : (
                             <>
-                                <Stack spacing={2} mb={4}>
+                                <Stack spacing={1} mb={2}>
                                     {recruitmentPosts.map((post) => (
                                         <Paper
                                             key={post.Id}
                                             elevation={0}
                                             onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`)}
                                             sx={{
-                                                p: 2.5,
+                                                p: 2,
                                                 borderRadius: 2,
                                                 border: "1px solid",
                                                 borderColor: post.IsTop ? '#faa11b' : 'transparent',
@@ -526,15 +576,11 @@ const RecruitmentPostSearchPage = () => {
                                                                     {post.Quantity} Chỉ tiêu
                                                                 </Typography>
                                                             </Stack>
-                                                            {(post.MinCost || post.MaxCost) && (
+                                                            {(post.MinCost || post.MaxCost || post.MinCost != 0 || post.MaxCost != 0) && (
                                                                 <Stack direction="row" spacing={0.4} alignItems="center">
                                                                     <AttachMoney sx={{ fontSize: 14, color: "#faa11b" }} />
                                                                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem", whiteSpace: "nowrap" }}>
-                                                                        {post.MinCost && post.MaxCost
-                                                                            ? `${post.MinCost.toLocaleString("vi-VN")} - ${post.MaxCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}`
-                                                                            : post.MinCost
-                                                                                ? `${post.MinCost.toLocaleString("vi-VN")} ${post.Currency ?? ""}`
-                                                                                : `${post.MaxCost!.toLocaleString("vi-VN")} ${post.Currency ?? ""}`}
+                                                                        {post.MinCost && post.MaxCost ? `${formatCurrency(post.MinCost)} - ${formatCurrency(post.MaxCost)} ${post.Currency ?? ""}` : formatCurrency(post.MinCost)}
                                                                     </Typography>
                                                                 </Stack>
                                                             )}

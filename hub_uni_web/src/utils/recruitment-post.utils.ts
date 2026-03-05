@@ -25,3 +25,8 @@ export const getRecruitmentStatus = (date?: string | null) => {
         color: "success.main",
     };
 };
+
+export const formatCurrency = (value?: number) => {
+    if (value === undefined || value === null) return "";
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};

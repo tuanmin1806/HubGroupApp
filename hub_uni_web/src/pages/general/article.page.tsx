@@ -1,13 +1,15 @@
 import { Search, ChevronLeft, ChevronRight, Category } from "@mui/icons-material";
 import ArticleCard from "../../components/cards/article-card.card";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
 import { useGetAllCategoryQuery } from "../../app/features/category.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
 import OrganizationPagination from "../../components/pagination/organization-pagination";
 import { Box, IconButton, InputAdornment, Stack, TextField, Typography, Container, Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const ArticlePage = () => {
+    const navigate = useNavigate();
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -30,6 +32,10 @@ const ArticlePage = () => {
             behavior: "smooth",
         });
     };
+
+    useEffect(() => {
+        document.title = "Cẩm nang du học Hàn Quốc | duhochan.hubgroup.vn";
+    }, [navigate]);
 
     return (
         <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>

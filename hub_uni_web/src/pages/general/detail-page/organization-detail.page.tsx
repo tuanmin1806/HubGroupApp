@@ -5,7 +5,7 @@ import { useGetOrganizationBySeoQuery } from "../../../app/features/organization
 import { useGetRecruitmentPostsByOrganizationWithPageQuery } from "../../../app/features/recruitment-post.api";
 import OrganizationSelectActionCard from "../../../components/cards/organization-card.card";
 import MuiLink from "@mui/material/Link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/date.utils";
 
 interface TabPanelProps {
@@ -286,6 +286,12 @@ const OrganizationDetailPage = () => {
 
     const { data: organization, isLoading, error } = useGetOrganizationBySeoQuery(seoUrl!, { skip: !seoUrl });
     const { data: recruitmentPosts, isLoading: loadingPosts } = useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, { skip: !seoUrl });
+
+    useEffect(() => {
+        if (organization?.Name) {
+            document.title = `${organization?.Name} | duhochan.hubgroup.vn`;
+        }
+    }, [organization?.Name]);
 
     if (isLoading) {
         return (

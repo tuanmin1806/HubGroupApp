@@ -117,6 +117,10 @@ const OrganizationSearchPage = () => {
         }
     }, [provinces]);
 
+    useEffect(() => {
+        document.title = "Tìm kiếm trường Đại học/Cao đẳng tại Hàn Quốc | duhochan.hubgroup.vn";
+    }, [navigate]);
+
     const handleFilterChange = (field: keyof OrganizationFilterParams, value: string) => {
         if (field === 'provinceId' && value !== filters.provinceId) {
             const province = provinces?.find(p => p.Id === value);

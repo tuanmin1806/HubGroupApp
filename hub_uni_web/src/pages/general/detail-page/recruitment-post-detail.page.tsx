@@ -28,7 +28,7 @@ import {
     Grid,
     Paper
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ApplyConfirmDialog from "../../../components/dialogs/general/apply-confirm-dialog.dialog";
 import { useAuthGuard } from "../../../hooks/useAuthGuard";
 import { formatDate } from "../../../utils/date.utils";
@@ -44,12 +44,17 @@ const RecruitmentPostDetailPage = () => {
             skip: !seoUrl,
         });
 
-    // Lấy các tin tuyển dụng cùng ngành
     const { data: relatedPosts, isLoading: isLoadingRelated } =
         useGetRecruitmentPostsByPageQuery({
             page: 1,
             size: 6,
         });
+
+    useEffect(() => {
+        if (recruitmentPost?.Name) {
+            document.title = `${recruitmentPost?.Name} | duhochan.hubgroup.vn`;
+        }
+    }, [recruitmentPost?.Name]);
 
     if (isLoading) {
         return (

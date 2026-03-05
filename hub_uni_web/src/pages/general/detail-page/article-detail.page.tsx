@@ -21,6 +21,7 @@ import {
     NavigateNext,
 } from "@mui/icons-material";
 import { useGetArticleBySeoQuery } from "../../../app/features/article.api";
+import { useEffect } from "react";
 
 const ArticleDetailPage = () => {
     const { seo } = useParams<{ seo: string }>();
@@ -44,6 +45,12 @@ const ArticleDetailPage = () => {
             day: "numeric",
         });
     };
+
+    useEffect(() => {
+        if (data?.MainArticle.Title) {
+            document.title = `${MainArticle.Title} | duhochan.hubgroup.vn`;
+        }
+    }, [data?.MainArticle.Title]);
 
     if (isLoading) {
         return (
