@@ -80,8 +80,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                   <Typography fontWeight="bold" gutterBottom>{org.Name}</Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>{org.Summary}</Typography>
                   <Typography variant="body2"><b>Ngành chính:</b> {org.MainProfession?.ProfessionName || "—"}</Typography>
-                  <Typography variant="body2"><b>Mã số thuế:</b> {org.TaxCode}</Typography>
-                  <Typography variant="body2" sx={{ mb: 2 }}><b>Địa chỉ:</b> {org.Address}</Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}><b>Tỉnh/Thành Phố:</b> {org.Province}</Typography>
                   <Button
                     variant="contained"
                     startIcon={<Visibility />}

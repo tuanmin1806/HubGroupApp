@@ -124,7 +124,7 @@ const OrganizationSearchPage = () => {
     const handleFilterChange = (field: keyof OrganizationFilterParams, value: string) => {
         if (field === 'provinceId' && value !== filters.provinceId) {
             const province = provinces?.find(p => p.Id === value);
-            setSelectedProvinceSeo(province?.Seo || '');
+            setSelectedProvinceSeo(province?.SeoUrl || '');
             setFilters({ ...filters, [field]: value, communeId: '' });
         } else {
             setFilters({ ...filters, [field]: value });
@@ -138,7 +138,7 @@ const OrganizationSearchPage = () => {
         }
         if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
             setSelectedProvinceSeo(provinceSeo);
-            const province = provinces?.find(p => p.Seo === provinceSeo);
+            const province = provinces?.find(p => p.SeoUrl === provinceSeo);
             setFilters(prev => ({
                 ...prev,
                 provinceId: province?.Id || '',
@@ -164,12 +164,32 @@ const OrganizationSearchPage = () => {
     };
 
     const handleViewDetail = (organizationId: string) => { navigate(`/thong-tin-truong/${organizationId}`); };
-    const handleLoadMoreOrgTypes = () => { setOrgTypePage(prev => prev + 1); };
-    const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
+    const handleLoadMoreOrgTypes = () => { setOrgTypePage(prev => prev + 1); setShowAllOrgTypes(true); };
+    const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); setShowAllProfessions(true); };
 
     const hasMoreOrgTypes = orgTypesData && (allOrgTypes.length < orgTypesData.Total);
     const hasMoreProfessions = professionsData && (allProfessions.length < professionsData.Total);
     const hasActiveFilters = Boolean(filters.organizationTypeId || filters.professionId || filters.provinceId || filters.communeId || filters.taxSearch);
+
+    const handleToggleProfessions = () => {
+        if (showAllProfessions && !hasMoreProfessions) {
+            setShowAllProfessions(false);
+        } else if (hasMoreProfessions) {
+            handleLoadMoreProfessions();
+        } else {
+            setShowAllProfessions(true);
+        }
+    };
+
+    const handleToggleOrgTypes = () => {
+        if (showAllOrgTypes && !hasMoreOrgTypes) {
+            setShowAllOrgTypes(false);
+        } else if (hasMoreOrgTypes) {
+            handleLoadMoreOrgTypes();
+        } else {
+            setShowAllOrgTypes(true);
+        }
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -269,14 +289,14 @@ const OrganizationSearchPage = () => {
                                                 ))}
                                             </RadioGroup>
                                         )}
-                                        {hasMoreOrgTypes && !showAllOrgTypes && (
-                                            <Button size="small" onClick={handleLoadMoreOrgTypes} disabled={isLoadingOrgTypes} sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {isLoadingOrgTypes ? <CircularProgress size={16} /> : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                        {!hasMoreOrgTypes && allOrgTypes.length > 5 && (
-                                            <Button size="small" onClick={() => setShowAllOrgTypes(!showAllOrgTypes)} sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {showAllOrgTypes ? "Thu gọn" : "Xem thêm"}
+                                        {(hasMoreOrgTypes || allOrgTypes.length > 5) && (
+                                            <Button
+                                                size="small"
+                                                onClick={handleToggleOrgTypes}
+                                                disabled={isLoadingOrgTypes}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                                            >
+                                                {isLoadingOrgTypes ? <CircularProgress size={16} /> : (showAllOrgTypes && !hasMoreOrgTypes) ? "Thu gọn" : "Xem thêm"}
                                             </Button>
                                         )}
                                     </Box>
@@ -323,23 +343,14 @@ const OrganizationSearchPage = () => {
                                                 ))}
                                             </RadioGroup>
                                         )}
-                                        {hasMoreProfessions && !showAllProfessions && (
+                                        {(hasMoreProfessions || allProfessions.length > 5) && (
                                             <Button
                                                 size="small"
-                                                onClick={handleLoadMoreProfessions}
+                                                onClick={handleToggleProfessions}
                                                 disabled={isLoadingProfessions}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main"}}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
                                             >
-                                                {isLoadingProfessions ? <CircularProgress size={16} /> : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                        {!hasMoreProfessions && allProfessions.length > 5 && (
-                                            <Button
-                                                size="small"
-                                                onClick={() => setShowAllProfessions(!showAllProfessions)}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main"}}
-                                            >
-                                                {showAllProfessions ? "Thu gọn" : "Xem thêm"}
+                                                {isLoadingProfessions ? <CircularProgress size={16} /> : (showAllProfessions && !hasMoreProfessions) ? "Thu gọn" : "Xem thêm"}
                                             </Button>
                                         )}
                                     </Box>

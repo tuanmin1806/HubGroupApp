@@ -1,22 +1,8 @@
 @import "tailwindcss";
 
-#zalo-position {
-  position: fixed !important;
-  bottom: 200px !important;
-  right: 10px !important;
-  z-index: 9999;
-}
-
 @media (max-width: 768px) {
   #zalo-position {
-    bottom: 220px !important;
-    right: 10px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  #zalo-position {
-    bottom: 120px !important;
+    bottom: 50px !important;
     right: 12px !important;
   }
 
@@ -28,7 +14,7 @@
 
 #hotline-call {
   position: fixed;
-  bottom: 120px;
+  bottom: 70px;
   right: 10px;
   z-index: 9999;
   width: 60px;

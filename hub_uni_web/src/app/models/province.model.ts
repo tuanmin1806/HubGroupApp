@@ -10,4 +10,5 @@ export interface Province {
     UpdatedBy?: string;
     Status?: string;
     Seo: string;
+    SeoUrl: string;
 }

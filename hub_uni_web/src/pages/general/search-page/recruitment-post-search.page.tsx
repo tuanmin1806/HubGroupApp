@@ -87,8 +87,8 @@ const RecruitmentPostSearchPage = () => {
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState(initialProvinceSeo);
-    const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); };
-    const handleLoadMoreVisaTypes = () => { setVisaTypePage(prev => prev + 1); };
+    const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); setShowAllProfessions(true); };
+    const handleLoadMoreVisaTypes = () => { setVisaTypePage(prev => prev + 1); setShowAllVisaTypes(true); };
 
     const [filters, setFilters] = useState({
         searchValue: "",
@@ -175,6 +175,26 @@ const RecruitmentPostSearchPage = () => {
         setCostError("");
         setSelectedProvinceSeo('');
         setPage(DEFAULT_PAGE);
+    };
+
+    const handleToggleProfessions = () => {
+        if (showAllProfessions && !hasMoreProfessions) {
+            setShowAllProfessions(false);
+        } else if (hasMoreProfessions) {
+            handleLoadMoreProfessions();
+        } else {
+            setShowAllProfessions(true);
+        }
+    };
+
+    const handleToggleVisaTypes = () => {
+        if (showAllVisaTypes && !hasMoreVisaTypes) {
+            setShowAllVisaTypes(false);
+        } else if (hasMoreVisaTypes) {
+            handleLoadMoreVisaTypes();
+        } else {
+            setShowAllVisaTypes(true);
+        }
     };
 
     const formatDate = (dateString: string) => {
@@ -297,17 +317,14 @@ const RecruitmentPostSearchPage = () => {
                                                 ))}
                                             </RadioGroup>
                                         )}
-                                        {hasMoreProfessions && !showAllProfessions && (
-                                            <Button size="small" onClick={handleLoadMoreProfessions} disabled={isLoadingProfessions}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {isLoadingProfessions ? <CircularProgress size={16} /> : "Xem thêm"}
-                                            </Button>
-                                        )}
-
-                                        {!hasMoreProfessions && allProfessions.length > 5 && (
-                                            <Button size="small" onClick={() => setShowAllProfessions(!showAllProfessions)}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {showAllProfessions ? "Thu gọn" : "Xem thêm"}
+                                        {(hasMoreProfessions || allProfessions.length > 5) && (
+                                            <Button
+                                                size="small"
+                                                onClick={handleToggleProfessions}
+                                                disabled={isLoadingProfessions}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                                            >
+                                                {isLoadingProfessions ? <CircularProgress size={16} /> : (showAllProfessions && !hasMoreProfessions) ? "Thu gọn" : "Xem thêm"}
                                             </Button>
                                         )}
                                     </Box>
@@ -381,16 +398,17 @@ const RecruitmentPostSearchPage = () => {
                                                 ))}
                                             </RadioGroup>
                                         )}
-                                        {hasMoreVisaTypes && !showAllVisaTypes && (
-                                            <Button size="small" onClick={handleLoadMoreVisaTypes} disabled={isLoadingVisaTypes}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {isLoadingVisaTypes ? <CircularProgress size={16} /> : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                        {!hasMoreVisaTypes && allVisaTypes.length > 5 && (
-                                            <Button size="small" onClick={() => setShowAllVisaTypes(!showAllVisaTypes)}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {showAllVisaTypes ? "Thu gọn" : "Xem thêm"}
+                                        {(hasMoreVisaTypes || allVisaTypes.length > 5) && (
+                                            <Button
+                                                size="small"
+                                                onClick={handleToggleVisaTypes}
+                                                disabled={isLoadingVisaTypes}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                                            >
+                                                {isLoadingVisaTypes
+                                                    ? <CircularProgress size={16} />
+                                                    : (showAllVisaTypes && !hasMoreVisaTypes) ? "Thu gọn" : "Xem thêm"
+                                                }
                                             </Button>
                                         )}
                                     </Box>
@@ -427,7 +445,7 @@ const RecruitmentPostSearchPage = () => {
                                                 <TextField
                                                     size="small"
                                                     placeholder="Đến"
-                                                    value={formatNumberDisplay(costInput.toCost)} 
+                                                    value={formatNumberDisplay(costInput.toCost)}
                                                     onChange={(e) => handleCostInputChange("toCost", e.target.value)}
                                                     sx={{
                                                         flex: 1,
