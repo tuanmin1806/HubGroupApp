@@ -35,3 +35,22 @@ export const normalizeUrl = (url: string) => {
     if (!url) return '';
     return url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
 };
+
+export const handleNumberInputChange = (e: React.ChangeEvent<HTMLInputElement>, setValue: (val: string | number) => void) => {
+    let priceText = e.target.value;
+
+    const isNegative = priceText.indexOf("-") === 0;
+
+    priceText = priceText.substr(Number(isNegative)).replace(/\D/g, "");
+
+    setValue(`${isNegative ? "-" : ""}${priceText}`);
+};
+
+export const formatNumberDisplay = (value: string | number) => {
+    if (value === "-") return "-";
+    return Number(value).toLocaleString("en-US") || "";
+};
+
+export const parseNumberInput = (value: string) => {
+    return value.replace(/\D/g, "");
+};

@@ -7,16 +7,7 @@ import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
 import { useGetRecruitmentPostsByCurrentCustomerQuery } from "../../app/features/recruitment-post.api";
-
-const getStatusChip = (status: string) => {
-    const config: Record<string, { label: string; color: "success" | "warning" | "error" | "default" }> = {
-        Active: { label: "Đang tuyển", color: "success" },
-        Inactive: { label: "Ngừng tuyển", color: "error" },
-        Pending: { label: "Chờ duyệt", color: "warning" },
-    };
-    const { label, color } = config[status] ?? { label: status, color: "default" };
-    return <Chip label={label} size="small" variant="outlined" color={color} />;
-};
+import { ConvertService } from "../../app/services/convert.service";
 
 export default function ManageRecruitmentPostPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -98,7 +89,7 @@ export default function ManageRecruitmentPostPage() {
                 </TableCell>
                 <TableCell>{post.Quantity}</TableCell>
                 <TableCell>{post.RecruitmentToDate}</TableCell>
-                <TableCell>{getStatusChip(post.Status)}</TableCell>
+                <TableCell>{ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(post.RecruitPostStatus))}</TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết">
                         <IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton>

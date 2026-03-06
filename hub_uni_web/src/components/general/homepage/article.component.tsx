@@ -49,7 +49,7 @@ const ArticleComponent = () => {
                     }}
                     variant="outlined"
                     endIcon={<ArrowForward />}
-                    onClick={() => navigate("/danh-sach-bai-viet")}
+                    onClick={() => navigate("/bai-viet")}
                 >
                     Xem tất cả
                 </Button>

@@ -7,7 +7,7 @@ import {
   Stack,
   Box,
 } from "@mui/material";
-import { CalendarToday, Person } from "@mui/icons-material";
+import { CalendarToday } from "@mui/icons-material";
 import { ArticleResponse } from "../../app/models/article.model";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/date.utils";
@@ -23,6 +23,10 @@ export default function ArticleCard({ article }: Props) {
     navigate(`/bai-viet/${article.SeoUrl}`);
   };
 
+  const categories = article.Categories ?? [];
+  const visibleCats = categories.slice(0, 2);
+  const remainingCount = categories.length - visibleCats.length;
+
   return (
     <Card
       onClick={handleClick}
@@ -36,21 +40,30 @@ export default function ArticleCard({ article }: Props) {
         cursor: "pointer",
         border: "1px solid",
         borderColor: "divider",
+        boxShadow: "none",
         "&:hover": {
           transform: "translateY(-4px)",
           boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
           borderColor: "primary.main",
           "& .card-image": {
             transform: "scale(1.05)",
-          }
-        }
+          },
+        },
       }}
     >
       {/* Image */}
-      <Box sx={{ overflow: "hidden", height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Box
+        sx={{
+          overflow: "hidden",
+          height: 180,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#f5f5f5",
+        }}
+      >
         <CardMedia
           component="img"
-          height="180"
           image={article.AvatarFullUrl || "/placeholder-image.jpg"}
           alt={article.Title}
           className="card-image"
@@ -71,23 +84,9 @@ export default function ArticleCard({ article }: Props) {
           display: "flex",
           flexDirection: "column",
           gap: 1,
+          "&:last-child": { pb: 2 },
         }}
       >
-        {/* Category Badge */}
-        {article.Categories?.[0]?.Name && (
-          <Chip
-            label={article.Categories[0].Name}
-            size="small"
-            color="primary"
-            sx={{
-              height: 22,
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              alignSelf: "flex-start",
-            }}
-          />
-        )}
-
         {/* Title */}
         <Typography
           variant="subtitle1"
@@ -97,10 +96,9 @@ export default function ArticleCard({ article }: Props) {
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            textOverflow: "ellipsis",
             fontSize: "0.95rem",
-            lineHeight: 1.3,
-            minHeight: "2.6em",
+            lineHeight: 1.4,
+            minHeight: "2.8em",
             color: "text.primary",
           }}
         >
@@ -116,62 +114,71 @@ export default function ArticleCard({ article }: Props) {
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontSize: "0.85rem",
-            lineHeight: 1.5,
+            fontSize: "0.82rem",
+            lineHeight: 1.55,
             flex: 1,
           }}
         >
           {article.Summary}
         </Typography>
 
-        {/* Meta Information */}
+        {/* Footer */}
         <Stack
           direction="row"
-          spacing={1.5}
           alignItems="center"
+          justifyContent="space-between"
+          flexWrap="wrap"
+          gap={0.75}
           sx={{
-            pt: 1,
+            pt: 1.25,
             mt: "auto",
             borderTop: "1px solid",
             borderColor: "divider",
           }}
         >
-          {/* Author */}
-          <Stack
-            direction="row"
-            spacing={0.5}
-            alignItems="center"
-            sx={{ flex: 1, minWidth: 0 }}
-          >
-            <Person sx={{ fontSize: 14, color: "text.secondary" }} />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                fontSize: "0.7rem",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {article.CreatedBy}
-            </Typography>
+          {/* Categories */}
+          <Stack direction="row" flexWrap="wrap" gap={0.5} sx={{ flex: 1, minWidth: 0 }}>
+            {categories.length === 0 ? null : (
+              <>
+                {visibleCats.map((cat) => (
+                  <Chip
+                    key={cat.Id ?? cat.Name}
+                    label={cat.Name}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: "0.65rem",
+                      fontWeight: 600,
+                      bgcolor: "rgba(236,59,5,0.08)",
+                      color: "primary.main",
+                      border: "1px solid",
+                      borderColor: "rgba(236,59,5,0.2)",
+                      "& .MuiChip-label": { px: 0.75 },
+                    }}
+                  />
+                ))}
+                {remainingCount > 0 && (
+                  <Chip
+                    label={`+${remainingCount}`}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: "0.65rem",
+                      fontWeight: 600,
+                      bgcolor: "grey.100",
+                      color: "text.secondary",
+                      "& .MuiChip-label": { px: 0.75 },
+                    }}
+                  />
+                )}
+              </>
+            )}
           </Stack>
 
           {/* Date */}
-          <Stack
-            direction="row"
-            spacing={0.5}
-            alignItems="center"
-            sx={{ flexShrink: 0 }}
-          >
-            <CalendarToday sx={{ fontSize: 14, color: "text.secondary" }} />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ fontSize: "0.7rem" }}
-            >
+          <Stack direction="row" spacing={0.4} alignItems="center" sx={{ flexShrink: 0 }}>
+            <CalendarToday sx={{ fontSize: 13, color: "text.disabled" }} />
+            <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
               {formatDate(article.CreatedAt)}
             </Typography>
           </Stack>

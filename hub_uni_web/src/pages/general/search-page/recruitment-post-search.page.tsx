@@ -45,7 +45,7 @@ import OrganizationPagination from "../../../components/pagination/organization-
 import SearchBar from "../../../components/searchs/search-bar.search";
 import { BACK_GROUND_BUTTON_COLOR, DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
-import { formatCurrency, getRecruitmentStatus } from "../../../utils/recruitment-post.utils";
+import { formatCurrency, formatNumberDisplay, getRecruitmentStatus, parseNumberInput } from "../../../utils/recruitment-post.utils";
 import { ConvertService } from "../../../app/services/convert.service";
 import { RecruitmentPostFilterParams } from "../../../app/models/recruitment-post.model";
 import { useGetVisaTypesByPageQuery } from "../../../app/features/visa-type.api";
@@ -135,14 +135,15 @@ const RecruitmentPostSearchPage = () => {
     };
 
     const handleCostInputChange = (field: "fromCost" | "toCost", value: string) => {
-        if (value !== "" && !/^\d+$/.test(value)) return;
-        setCostInput(prev => ({ ...prev, [field]: value }));
+        const numericValue = value.replace(/\D/g, "");
+        setCostInput(prev => ({ ...prev, [field]: numericValue }));
         setCostError("");
     };
 
     const handleApplyCost = () => {
-        const from = costInput.fromCost ? Number(costInput.fromCost) : undefined;
-        const to = costInput.toCost ? Number(costInput.toCost) : undefined;
+        const from = costInput.fromCost ? Number(parseNumberInput(costInput.fromCost)) : undefined;
+        const to = costInput.toCost ? Number(parseNumberInput(costInput.toCost)) : undefined;
+
         if (from !== undefined && to !== undefined && from > to) {
             setCostError("Học phí từ không được lớn hơn học phí đến");
             return;
@@ -150,8 +151,8 @@ const RecruitmentPostSearchPage = () => {
         setCostError("");
         setFilters(prev => ({
             ...prev,
-            fromCost: costInput.fromCost,
-            toCost: costInput.toCost,
+            fromCost: costInput.fromCost ? parseNumberInput(costInput.fromCost) : "",
+            toCost: costInput.toCost ? parseNumberInput(costInput.toCost) : "",
         }));
         setPage(DEFAULT_PAGE);
     };
@@ -217,6 +218,7 @@ const RecruitmentPostSearchPage = () => {
     const hasActiveFilters = filters.provinceId || filters.professionId || filters.searchValue || filters.fromCost || filters.toCost;
 
     const costInputDirty = costInput.fromCost !== filters.fromCost || costInput.toCost !== filters.toCost;
+    const currency = recruitmentPosts.find(p => p.Currency)?.Currency ?? "";
 
     return (
         <ThemeProvider theme={theme}>
@@ -402,9 +404,9 @@ const RecruitmentPostSearchPage = () => {
                                         alignItems="center"
                                         justifyContent="space-between"
                                     >
-                                        <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", cursor: "pointer" }}>
+                                        <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", cursor: "pointer", mb: 1.5 }}>
                                             <AttachMoney sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                            Khoảng học phí
+                                            Khoảng học phí ({currency})
                                         </FormLabel>
                                     </Stack>
 
@@ -414,7 +416,7 @@ const RecruitmentPostSearchPage = () => {
                                                 <TextField
                                                     size="small"
                                                     placeholder="Từ"
-                                                    value={costInput.fromCost}
+                                                    value={formatNumberDisplay(costInput.fromCost)}
                                                     onChange={(e) => handleCostInputChange("fromCost", e.target.value)}
                                                     sx={{
                                                         flex: 1,
@@ -425,7 +427,7 @@ const RecruitmentPostSearchPage = () => {
                                                 <TextField
                                                     size="small"
                                                     placeholder="Đến"
-                                                    value={costInput.toCost}
+                                                    value={formatNumberDisplay(costInput.toCost)} 
                                                     onChange={(e) => handleCostInputChange("toCost", e.target.value)}
                                                     sx={{
                                                         flex: 1,

@@ -269,32 +269,13 @@ const OrganizationSearchPage = () => {
                                                 ))}
                                             </RadioGroup>
                                         )}
-                                        {hasMoreOrgTypes && !showAllOrgTypes && allOrgTypes.length >= 5 && (
-                                            <Button
-                                                size="small"
-                                                onClick={handleLoadMoreOrgTypes}
-                                                disabled={isLoadingOrgTypes}
-                                                sx={{
-                                                    mt: 1,
-                                                    fontSize: "0.75rem",
-                                                    textTransform: "none",
-                                                    color: "primary.main"
-                                                }}
-                                            >
+                                        {hasMoreOrgTypes && !showAllOrgTypes && (
+                                            <Button size="small" onClick={handleLoadMoreOrgTypes} disabled={isLoadingOrgTypes} sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                                 {isLoadingOrgTypes ? <CircularProgress size={16} /> : "Xem thêm"}
                                             </Button>
                                         )}
-                                        {allOrgTypes.length > 5 && (
-                                            <Button
-                                                size="small"
-                                                onClick={() => setShowAllOrgTypes(!showAllOrgTypes)}
-                                                sx={{
-                                                    mt: 1,
-                                                    fontSize: "0.75rem",
-                                                    textTransform: "none",
-                                                    color: "primary.main"
-                                                }}
-                                            >
+                                        {!hasMoreOrgTypes && allOrgTypes.length > 5 && (
+                                            <Button size="small" onClick={() => setShowAllOrgTypes(!showAllOrgTypes)} sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                                 {showAllOrgTypes ? "Thu gọn" : "Xem thêm"}
                                             </Button>
                                         )}
@@ -342,31 +323,21 @@ const OrganizationSearchPage = () => {
                                                 ))}
                                             </RadioGroup>
                                         )}
-                                        {hasMoreProfessions && !showAllProfessions && allProfessions.length >= 5 && (
+                                        {hasMoreProfessions && !showAllProfessions && (
                                             <Button
                                                 size="small"
                                                 onClick={handleLoadMoreProfessions}
                                                 disabled={isLoadingProfessions}
-                                                sx={{
-                                                    mt: 1,
-                                                    fontSize: "0.75rem",
-                                                    textTransform: "none",
-                                                    color: "primary.main"
-                                                }}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main"}}
                                             >
                                                 {isLoadingProfessions ? <CircularProgress size={16} /> : "Xem thêm"}
                                             </Button>
                                         )}
-                                        {allProfessions.length > 5 && (
+                                        {!hasMoreProfessions && allProfessions.length > 5 && (
                                             <Button
                                                 size="small"
                                                 onClick={() => setShowAllProfessions(!showAllProfessions)}
-                                                sx={{
-                                                    mt: 1,
-                                                    fontSize: "0.75rem",
-                                                    textTransform: "none",
-                                                    color: "primary.main"
-                                                }}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main"}}
                                             >
                                                 {showAllProfessions ? "Thu gọn" : "Xem thêm"}
                                             </Button>
