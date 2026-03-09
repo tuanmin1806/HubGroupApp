@@ -7,25 +7,6 @@ import { logout, setCredentials } from "./auth.slice";
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        // LOGIN
-        login: builder.mutation<AuthInfo, AuthLoginRequestBody>({
-            query: (credentials) => ({
-                url: "/account/login",
-                method: "POST",
-                body: credentials,
-            }),
-
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                try {
-                    const { data } = await queryFulfilled;
-                    saveUserInfo(data);
-                    dispatch(setCredentials(data));
-                } catch (err) {
-                    console.error("Login failed", err);
-                }
-            },
-
-        }),
 
         customerLogin: builder.mutation<AuthInfo, AuthLoginRequestBody>({
             query: (credentials) => ({
@@ -119,7 +100,6 @@ export const authApi = baseApi.injectEndpoints({
     }),
 });
 export const {
-    useLoginMutation,
     useCustomerLoginMutation,
     useRegisterMutation,
     useStudentRegisterMutation,

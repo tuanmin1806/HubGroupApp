@@ -1,7 +1,7 @@
 import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, IconButton, InputAdornment, Link, Stack, TextField, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { requiredValidator, validate } from "../../app/services/validation.service";
-import { useCustomerLoginMutation, useLoginMutation } from "../../app/features/auth/auth.api";
+import { useCustomerLoginMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 

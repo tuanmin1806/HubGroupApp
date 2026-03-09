@@ -1,12 +1,13 @@
+import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "./enums.model";
 import { OrganizationResponse } from "./organization.model";
 import { ProfessionResponse } from "./profession.model";
 
 export interface Requirement {
     FromAge: number | undefined;
     ToAge: number | undefined;
-    Gender: string;
-    Experience: string;
-    EducationLevel: string;
+    Gender: Gender;
+    Experience: JobExperience;
+    EducationLevel: EducationLevel;
 }
 
 export interface RecruitmentPostResponse {
@@ -22,7 +23,7 @@ export interface RecruitmentPostResponse {
     ProvinceId: string;
     Currency: string;
     Requirement: Requirement;
-    RecruitmentFromDate: string; 
+    RecruitmentFromDate: string;
     RecruitmentToDate: string;
     IsTop: boolean;
     Organization: OrganizationResponse;
@@ -35,15 +36,31 @@ export interface RecruitmentPostResponse {
 }
 
 export interface CreateRecruitmentPostRequest {
-    Status: string;
+    RecruitPostStatus: RecruitPostStatus | undefined;
     Name: string;
     ProfessionIds: string[];
     Quantity: number;
     Description: string;
     ProvinceId: string;
-    Currency: string;
     Requirement: Requirement;
-    RecruitmentToDate: string;
+    RecruitmentFromDate: string | null;
+    RecruitmentToDate: string | null;
+    IsTop: boolean;
+    Highlights: string[];
+}
+
+export interface UpdateRecruitmentPostRequest {
+    Id: string;
+    RecruitPostStatus: RecruitPostStatus;
+    Name: string;
+    OrganizationId: string;
+    ProfessionIds: string[];
+    Quantity: number;
+    Description: string;
+    ProvinceId: string;
+    Requirement: Requirement;
+    RecruitmentFromDate: string | null;
+    RecruitmentToDate: string | null;
     IsTop: boolean;
     Highlights: string[];
 }

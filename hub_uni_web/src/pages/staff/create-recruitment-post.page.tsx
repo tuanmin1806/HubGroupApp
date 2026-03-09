@@ -1,37 +1,34 @@
 import {
     Box, Button, Chip, CircularProgress, FormControl, FormControlLabel,
-    FormHelperText, Grid, InputLabel, MenuItem, OutlinedInput, Paper,
-    Select, Switch, TextField, Typography, Autocomplete, Checkbox,
-    ListItemText, SelectChangeEvent
+    FormHelperText, Grid, InputLabel, MenuItem, Paper,
+    Select, Switch, TextField, Typography, Autocomplete,
+    SelectChangeEvent
 } from "@mui/material";
-import { ArrowBack, Save } from "@mui/icons-material";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { Save } from "@mui/icons-material";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RichTextEditorComponent from "../../components/editor";
 import { useCreateRecruitmentPostMutation } from "../../app/features/recruitment-post.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
 import { CreateRecruitmentPostRequest, Requirement } from "../../app/models/recruitment-post.model";
 import { useGetProfessionsByPageQuery } from "../../app/features/professtion.api";
-
-const STATUS_OPTIONS = [
-    { value: "Activated", label: "Đang tuyển" },
-    { value: "Inactive", label: "Ngừng tuyển" },
-    { value: "Pending", label: "Chờ duyệt" },
-    { value: "Underfined", label: "Không xác định" },
-];
-
-const CURRENCY_OPTIONS = [
-    { value: "VND", label: "VND" },
-    { value: "USD", label: "USD" },
-];
+import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "../../app/models/enums.model";
+import { ConvertService } from "../../app/services/convert.service";
 
 const defaultRequirement: Requirement = {
     FromAge: undefined,
     ToAge: undefined,
-    Gender: "",
-    Experience: "",
-    EducationLevel: "",
+    Gender: Gender.Undefined,
+    Experience: JobExperience.Undefined,
+    EducationLevel: EducationLevel.Undefined,
 };
+
+const STATUS_OPTIONS = [
+    RecruitPostStatus.Undefined,
+    RecruitPostStatus.Active,
+    RecruitPostStatus.Inactive,
+    RecruitPostStatus.Draft,
+];
 
 export default function CreateRecruitmentPostPage() {
     const navigate = useNavigate();
@@ -42,7 +39,6 @@ export default function CreateRecruitmentPostPage() {
     const [professionPage, setProfessionPage] = useState(1);
     const [allProfessions, setAllProfessions] = useState<{ Id: string; Name: string }[]>([]);
     const [hasMoreProfessions, setHasMoreProfessions] = useState(true);
-    const professionListRef = useRef<HTMLUListElement | null>(null);
 
     const { data: professionData, isFetching: professionsFetching } = useGetProfessionsByPageQuery({
         page: professionPage,
@@ -73,16 +69,16 @@ export default function CreateRecruitmentPostPage() {
         }
     }, [professionsFetching, hasMoreProfessions]);
 
-    // Form state
+    // Form state — matches CreateRecruitmentPostRequest exactly
     const [form, setForm] = useState<Omit<CreateRecruitmentPostRequest, "Requirement">>({
-        Status: "Activated",
+        RecruitPostStatus: RecruitPostStatus.Undefined,
         Name: "",
         ProfessionIds: [],
         Quantity: 1,
         Description: "",
         ProvinceId: "",
-        Currency: "VND",
-        RecruitmentToDate: "",
+        RecruitmentFromDate: null,
+        RecruitmentToDate: null,
         IsTop: false,
         Highlights: [],
     });
@@ -123,6 +119,7 @@ export default function CreateRecruitmentPostPage() {
     };
 
     const handleSubmit = async () => {
+        if (!validate()) return;
         try {
             await createRecruitmentPost({
                 ...form,
@@ -143,6 +140,7 @@ export default function CreateRecruitmentPostPage() {
             </Box>
 
             <Grid container spacing={3}>
+                {/* Cột trái - Thông tin cơ bản */}
                 <Grid size={{ xs: 12, md: 5 }}>
                     <Paper elevation={1} sx={{ p: 3, height: "100%" }}>
                         <Typography variant="h6" fontWeight={600} mb={2}>
@@ -160,6 +158,7 @@ export default function CreateRecruitmentPostPage() {
                                     size="small"
                                 />
                             </Grid>
+
                             <Grid size={12}>
                                 <FormControl fullWidth size="small" error={!!errors.ProvinceId}>
                                     <InputLabel>Tỉnh/Thành phố *</InputLabel>
@@ -179,6 +178,7 @@ export default function CreateRecruitmentPostPage() {
                                     {errors.ProvinceId && <FormHelperText>{errors.ProvinceId}</FormHelperText>}
                                 </FormControl>
                             </Grid>
+
                             <Grid size={12}>
                                 <Autocomplete
                                     multiple
@@ -213,6 +213,7 @@ export default function CreateRecruitmentPostPage() {
                                     }
                                 />
                             </Grid>
+
                             <Grid size={{ xs: 6 }}>
                                 <TextField
                                     label="Số lượng *"
@@ -226,47 +227,52 @@ export default function CreateRecruitmentPostPage() {
                                     inputProps={{ min: 1 }}
                                 />
                             </Grid>
+
                             <Grid size={{ xs: 6 }}>
                                 <FormControl fullWidth size="small">
-                                    <InputLabel>Đơn vị tiền tệ</InputLabel>
+                                    <InputLabel>Trạng thái</InputLabel>
                                     <Select
-                                        value={form.Currency}
-                                        label="Đơn vị tiền tệ"
-                                        onChange={(e: SelectChangeEvent) => handleChange("Currency", e.target.value)}
+                                        value={form.RecruitPostStatus ?? RecruitPostStatus.Undefined}
+                                        label="Trạng thái"
+                                        onChange={(e: SelectChangeEvent<number>) =>
+                                            handleChange("RecruitPostStatus", e.target.value as RecruitPostStatus)
+                                        }
                                     >
-                                        {CURRENCY_OPTIONS.map(c => (
-                                            <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+                                        {STATUS_OPTIONS.map(s => (
+                                            <MenuItem key={s} value={s}>
+                                                {ConvertService.convertPostStatus(s)}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
+
+                            <Grid size={{ xs: 6 }}>
+                                <TextField
+                                    label="Ngày bắt đầu"
+                                    fullWidth
+                                    type="date"
+                                    value={form.RecruitmentFromDate ?? ""}
+                                    onChange={e => handleChange("RecruitmentFromDate", e.target.value || null)}
+                                    size="small"
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
+
                             <Grid size={{ xs: 6 }}>
                                 <TextField
                                     label="Hạn tuyển dụng *"
                                     fullWidth
                                     type="date"
-                                    value={form.RecruitmentToDate}
-                                    onChange={e => handleChange("RecruitmentToDate", e.target.value)}
+                                    value={form.RecruitmentToDate ?? ""}
+                                    onChange={e => handleChange("RecruitmentToDate", e.target.value || null)}
                                     error={!!errors.RecruitmentToDate}
                                     helperText={errors.RecruitmentToDate}
                                     size="small"
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 6 }}>
-                                <FormControl fullWidth size="small">
-                                    <InputLabel>Trạng thái</InputLabel>
-                                    <Select
-                                        value={form.Status}
-                                        label="Trạng thái"
-                                        onChange={(e: SelectChangeEvent) => handleChange("Status", e.target.value)}
-                                    >
-                                        {STATUS_OPTIONS.map(s => (
-                                            <MenuItem key={s.value} value={s.value}>{s.label}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
+
                             <Grid size={12}>
                                 <FormControlLabel
                                     control={
@@ -283,7 +289,7 @@ export default function CreateRecruitmentPostPage() {
                     </Paper>
                 </Grid>
 
-                {/* Cột phải - Yêu cầu + Điểm nổi bật xếp dọc */}
+                {/* Cột phải - Yêu cầu + Điểm nổi bật */}
                 <Grid size={{ xs: 12, md: 7 }}>
                     <Grid container spacing={3} sx={{ height: "100%" }}>
                         <Grid size={{ xs: 12, sm: 6 }}>
@@ -314,34 +320,64 @@ export default function CreateRecruitmentPostPage() {
                                         />
                                     </Grid>
                                     <Grid size={12}>
-                                        <TextField
-                                            label="Giới tính"
-                                            fullWidth
-                                            value={requirement.Gender ?? ""}
-                                            onChange={e => handleRequirementChange("Gender", e.target.value)}
-                                            size="small"
-                                            placeholder="Nam/Nữ/Không yêu cầu"
-                                        />
+                                        <FormControl fullWidth size="small">
+                                            <InputLabel>Giới tính</InputLabel>
+                                            <Select
+                                                value={requirement.Gender ?? Gender.Undefined}
+                                                label="Giới tính"
+                                                onChange={(e: SelectChangeEvent<number>) =>
+                                                    handleRequirementChange("Gender", Number(e.target.value))
+                                                }
+                                            >
+                                                {Object.values(Gender)
+                                                    .filter(v => typeof v === "number")
+                                                    .map((g) => (
+                                                        <MenuItem key={g} value={g}>
+                                                            {ConvertService.convertGender(g as Gender)}
+                                                        </MenuItem>
+                                                    ))}
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
                                     <Grid size={12}>
-                                        <TextField
-                                            label="Kinh nghiệm"
-                                            fullWidth
-                                            value={requirement.Experience ?? ""}
-                                            onChange={e => handleRequirementChange("Experience", e.target.value)}
-                                            size="small"
-                                            placeholder="VD: 1-2 năm"
-                                        />
+                                        <FormControl fullWidth size="small">
+                                            <InputLabel>Kinh nghiệm</InputLabel>
+                                            <Select
+                                                value={requirement.Experience ?? JobExperience.Undefined}
+                                                label="Kinh nghiệm"
+                                                onChange={(e: SelectChangeEvent<number>) =>
+                                                    handleRequirementChange("Experience", Number(e.target.value))
+                                                }
+                                            >
+                                                {Object.values(JobExperience)
+                                                    .filter(v => typeof v === "number")
+                                                    .map((exp) => (
+                                                        <MenuItem key={exp} value={exp}>
+                                                            {ConvertService.convertJobExperience(exp as JobExperience)}
+                                                        </MenuItem>
+                                                    ))}
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
                                     <Grid size={12}>
-                                        <TextField
-                                            label="Trình độ học vấn"
-                                            fullWidth
-                                            value={requirement.EducationLevel ?? ""}
-                                            onChange={e => handleRequirementChange("EducationLevel", e.target.value)}
-                                            size="small"
-                                            placeholder="VD: Đại học"
-                                        />
+                                        <FormControl fullWidth size="small">
+                                            <InputLabel>Trình độ học vấn</InputLabel>
+                                            <Select
+                                                value={requirement.EducationLevel ?? EducationLevel.Undefined}
+                                                label="Trình độ học vấn"
+                                                onChange={(e: SelectChangeEvent<number>) =>
+                                                    handleRequirementChange("EducationLevel", Number(e.target.value))
+                                                }
+                                            >
+                                                {Object.values(EducationLevel)
+                                                    .filter(v => typeof v === "number")
+                                                    .map((edu) => (
+                                                        <MenuItem key={edu} value={edu}>
+                                                            {ConvertService.convertEducationLevel(edu as EducationLevel)}
+                                                        </MenuItem>
+                                                    ))}
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
                                 </Grid>
                             </Paper>
@@ -388,7 +424,7 @@ export default function CreateRecruitmentPostPage() {
                     </Grid>
                 </Grid>
 
-                {/* HÀNG DƯỚI - Mô tả full width */}
+                {/* Mô tả full width */}
                 <Grid size={12}>
                     <Paper elevation={1} sx={{ p: 3 }}>
                         <Typography variant="h6" fontWeight={600} mb={2}>

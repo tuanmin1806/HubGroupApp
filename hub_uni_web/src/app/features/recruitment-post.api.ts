@@ -73,7 +73,7 @@ const recruitmentPostApi = baseApi.injectEndpoints({
 
         createRecruitmentPost: builder.mutation<void, CreateRecruitmentPostRequest>({
             query: (body) => ({
-                url: "recruitmentpost/add",
+                url: "recruitmentpost/customadd",
                 method: "POST",
                 body,
             }),

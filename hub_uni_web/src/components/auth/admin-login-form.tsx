@@ -1,9 +1,9 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, IconButton, InputAdornment, Link, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton, InputAdornment, Link, Stack, TextField, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { requiredValidator, validate } from "../../app/services/validation.service";
-import { useLoginMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useCustomerLoginMutation } from "../../app/features/auth/auth.api";
 
 
 const initialState = {
@@ -16,7 +16,7 @@ const validators = {
   Password: [requiredValidator],
 };
 const LoginForm = () => {
-  const [login] = useLoginMutation();
+  const [login] = useCustomerLoginMutation();
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState(initialState);
   const [showPassword, setShowPassword] = useState(false);

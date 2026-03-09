@@ -288,13 +288,13 @@ function GuestHeader() {
                                 gap: { xs: 0.5, md: 1 },
                             }}
                         >
-                            {/* <Person3Icon
+                            <Person3Icon
                                 sx={{
                                     p: 0,
                                     fontSize: { xs: "1.25rem", md: "1.5rem" },
                                 }}
-                            /> */}
-                            {/* <Link
+                            />
+                            <Link
                                 sx={{
                                     ml: 1,
                                     textAlign: "center",
@@ -332,7 +332,7 @@ function GuestHeader() {
                                 onClick={() => handleNavigateSignUp()}
                             >
                                 Đăng ký
-                            </Link> */}
+                            </Link>
                         </Box>
                     </Toolbar>
                 </Container>

@@ -6,10 +6,14 @@ import staffRoutes from "./staff.route";
 import AdminLayout from "../layouts/admin.layout";
 import StaffLayout from "../layouts/staff.layout";
 import RoleBasedLayout from "../layouts/role-based.layout";
-import Login from "../pages/general/auth-page/signin.page";
-import Signup from "../pages/general/auth-page/sign-up.page";
 import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
 import NotFoundPage from "../pages/general/auth-page/not-found.page";
+import AdminLogin from "../pages/general/auth-page/admin-login.page";
+import CustomerLogin from "../pages/general/auth-page/customer-login.page";
+import SelectLoginType from "../components/auth/select-login.page";
+import CustomerRegister from "../pages/general/auth-page/customer-register.page";
+import AdminRegister from "../pages/general/auth-page/admin-register.page";
+import SelectRegisterType from "../components/auth/select-register.page";
 
 const router = createBrowserRouter(
     [
@@ -25,13 +29,29 @@ const router = createBrowserRouter(
             element: <AuthLayout />,
             children: [
                 {
-                    path: 'dang-nhap',
-                    element: <Login />,
+                    path: "dang-nhap",
+                    element: <SelectLoginType />,
                 },
                 {
-                    path: 'dang-ky',
-                    element: <Signup />,
-                }
+                    path: "dang-nhap/customer",
+                    element: <CustomerLogin />,
+                },
+                {
+                    path: "dang-nhap/admin",
+                    element: <AdminLogin />,
+                },
+                {
+                    path: "dang-ky",
+                    element: <SelectRegisterType />,
+                },
+                {
+                    path: "dang-ky/customer",
+                    element: <CustomerRegister />,
+                },
+                {
+                    path: "dang-ky/admin",
+                    element: <AdminRegister />,
+                },
             ],
         },
         {

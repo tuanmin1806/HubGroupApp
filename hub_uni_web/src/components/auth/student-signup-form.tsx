@@ -1,9 +1,8 @@
-import { Box, Button, Stack, TextField, Typography, MenuItem, Grid, Alert, CircularProgress, Divider, Paper } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography, MenuItem, Grid, Alert, CircularProgress, Paper } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useStudentRegisterMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
 import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
-import { string } from "prop-types";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
 import { Province } from "../../app/models/province.model";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
@@ -52,7 +51,7 @@ const StudentSignupForm = () => {
         const province = provinces.find((p: Province) => p.Id === provinceId);
         set("ProvinceId", provinceId);
         set("CommuneId", "");
-        setSelectedProvinceSeo(province?.Seo ?? "");
+        setSelectedProvinceSeo(province?.SeoUrl ?? "");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -154,6 +153,11 @@ const StudentSignupForm = () => {
                                     <TextField select label="Kinh nghiệm" size="small" fullWidth value={form.Experience} onChange={(e) => set("Experience", e.target.value)}>
                                         <MenuItem value={JobExperience.Undefined}>Không xác định</MenuItem>
                                         <MenuItem value={JobExperience.LessThan1Year}>Dưới 1 năm</MenuItem>
+                                        <MenuItem value={JobExperience.From1To2Years}>Từ 1 - 2 năm</MenuItem>
+                                        <MenuItem value={JobExperience.From2To3Years}>Từ 2 - 3 năm</MenuItem>
+                                        <MenuItem value={JobExperience.From3To5Years}>Từ 3 - 5 năm</MenuItem>
+                                        <MenuItem value={JobExperience.From5To10Years}>Từ 5 - 10 năm</MenuItem>
+                                        <MenuItem value={JobExperience.Above10Years}>Trên 10 năm</MenuItem>
                                     </TextField>
                                 </Grid>
                             </Grid>

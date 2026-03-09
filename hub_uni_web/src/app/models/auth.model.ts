@@ -3,6 +3,13 @@ import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } fro
 import { Role } from "./role.model";
 import { SystemConfig } from "./system-config.model";
 
+export interface Profession {
+    ProfessionId: string;
+    ProfessionName?: string;
+    ProfessionSeoUrl?: string;
+    Cost?: number;
+}
+
 export interface AuthRegisterRequestBody {
     firstName: string;
     lastName: string;
@@ -43,17 +50,15 @@ export interface RecruiterRegisterRequestBody {
     };
     OrganizationModel: {
         Name: string;
-        InternationalName: string;
-        TaxCode: string;
-        Address: string;
+        TaxCode?: string;
         PhoneNumber: string;
-        IssueDate: string;
+        IssueDate?: string;
         OrganizationTypeId: string;
-        ProfessionIds: string[];
-        MainProfessionId: string;
+        DormCost?: number;
         ProvinceId: string;
         CommuneId: string;
-        ManagedBy: string;
+        Address: string;
+        ManagedBy?: string;
         LogoUrl?: string;
         WallpaperUrl?: string;
         Description?: string;

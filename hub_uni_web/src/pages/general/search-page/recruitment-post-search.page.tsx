@@ -51,6 +51,7 @@ import { RecruitmentPostFilterParams } from "../../../app/models/recruitment-pos
 import { useGetVisaTypesByPageQuery } from "../../../app/features/visa-type.api";
 import { ProfessionResponse } from "../../../app/models/profession.model";
 import { VisaTypeResponse } from "../../../app/models/visa-type.model";
+import { Gender } from "../../../app/models/enums.model";
 
 const theme = createTheme({
     palette: {
@@ -662,8 +663,8 @@ const RecruitmentPostSearchPage = () => {
                                                                 {post.Requirement.Gender && (
                                                                     <Typography variant="caption" color="text.secondary"
                                                                         sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
-                                                                        {post.Requirement.Gender === "Male" ? <Male sx={{ fontSize: "0.8rem" }} /> : post.Requirement.Gender === "Female" ? <Female sx={{ fontSize: "0.8rem" }} /> : <Transgender sx={{ fontSize: "0.8rem" }} />}
-                                                                        {post.Requirement.Gender === "Male" ? "Nam" : post.Requirement.Gender === "Female" ? "Nữ" : "Không yêu cầu"}
+                                                                        {post.Requirement.Gender === Gender.Male ? <Male sx={{ fontSize: "0.8rem" }} /> : post.Requirement.Gender === Gender.Female ? <Female sx={{ fontSize: "0.8rem" }} /> : <Transgender sx={{ fontSize: "0.8rem" }} />}
+                                                                        {post.Requirement.Gender === Gender.Male ? "Nam" : post.Requirement.Gender === Gender.Female ? "Nữ" : "Không yêu cầu"}
                                                                     </Typography>
                                                                 )}
                                                                 {post.Requirement.FromAge && post.Requirement.ToAge && (

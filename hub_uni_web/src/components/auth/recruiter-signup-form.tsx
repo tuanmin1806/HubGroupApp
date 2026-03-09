@@ -1,18 +1,13 @@
-import { Box, Stack, Typography, TextField, Divider, Button, MenuItem, Checkbox, ListItemText, OutlinedInput, Select, FormControl, InputLabel, SelectChangeEvent, Stepper, Step, StepLabel, IconButton, CircularProgress, Chip, Paper, Grid, LinearProgress, Alert } from "@mui/material";
+import { Box, Stack, Typography, TextField, Button, MenuItem, Stepper, Step, StepLabel, CircularProgress, Paper, Grid, Alert } from "@mui/material";
 import { useState, useRef } from "react";
-import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useRecruiterRegisterMutation } from "../../app/features/auth/auth.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
-import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
 import { useGetOrganizationTypesByPageQuery } from "../../app/features/organization-type.api";
-import { useUploadOneFileMutation } from "../../app/features/mediafile.api";
 import { Province } from "../../app/models/province.model";
-import { ProfessionResponse } from "../../app/models/profession.model";
 import { Gender, AccountStatus } from "../../app/models/enums.model";
 import { DEFAULT_PAGE } from "../../constants/common.constant";
 
@@ -27,7 +22,6 @@ const RecruiterSignupForm = () => {
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState("");
 
     const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
-    const { data: professions = [] } = useGetAllProfessionNoAuthenQuery();
     const { data: communes = [] } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo, });
     const { data: orgTypesData } = useGetOrganizationTypesByPageQuery({ page: DEFAULT_PAGE, size: PAGE_SIZE });
     const orgTypes = orgTypesData?.Items ?? [];
@@ -36,11 +30,9 @@ const RecruiterSignupForm = () => {
 
     const [form, setForm] = useState({
         UserName: "", Password: "", ConfirmPassword: "", FullName: "",
-        Gender: Gender.Undefined, Email: "", PhoneNumber: "",
-        OrgName: "", InternationalName: "", TaxCode: "", IssueDate: "",
-        OrganizationTypeId: "", ProfessionIds: [] as string[], MainProfessionId: "",
+        Gender: Gender.Undefined, Email: "", PhoneNumber: "", OrganizationTypeId: "",
+        OrgName: "", IssueDate: "",
         ProvinceId: "", CommuneId: "", Address: "", OrgPhoneNumber: "", OrgEmail: "",
-        ManagedBy: "", Summary: ""
     });
 
     const set = (field: string, value: any) => setForm((prev) => ({ ...prev, [field]: value }));
@@ -49,16 +41,7 @@ const RecruiterSignupForm = () => {
         const province = provinces.find((p: Province) => p.Id === provinceId);
         set("ProvinceId", provinceId);
         set("CommuneId", "");
-        setSelectedProvinceSeo(province?.Seo ?? "");
-    };
-
-    const handleProfessionChange = (event: SelectChangeEvent<string[]>) => {
-        const value = event.target.value as string[];
-        set("ProfessionIds", value);
-        if (value.length > 0 && !value.includes(form.MainProfessionId)) {
-            set("MainProfessionId", value[0]);
-        }
-        if (value.length === 0) set("MainProfessionId", "");
+        setSelectedProvinceSeo(province?.SeoUrl ?? "");
     };
 
     const validateStep = (step: number): string => {
@@ -106,19 +89,12 @@ const RecruiterSignupForm = () => {
                 },
                 OrganizationModel: {
                     Name: form.OrgName,
-                    InternationalName: form.InternationalName,
-                    TaxCode: form.TaxCode,
-                    IssueDate: form.IssueDate,
                     OrganizationTypeId: form.OrganizationTypeId,
-                    ProfessionIds: form.ProfessionIds,
-                    MainProfessionId: form.MainProfessionId,
                     ProvinceId: form.ProvinceId,
                     CommuneId: form.CommuneId,
                     Address: form.Address,
                     PhoneNumber: form.OrgPhoneNumber,
                     Email: form.OrgEmail,
-                    ManagedBy: form.ManagedBy,
-                    Summary: form.Summary,
                 },
             }).unwrap();
 
@@ -139,8 +115,6 @@ const RecruiterSignupForm = () => {
             </Box>
         );
     }
-
-    const professionMap = Object.fromEntries(professions.map((p: ProfessionResponse) => [p.Id, p.Name]));
 
     return (
         <Box sx={{ maxWidth: 680, mx: "auto", px: { xs: 0.5, sm: 0.5 }, py: { xs: 0.5, sm: 0.5 } }}>
@@ -191,35 +165,13 @@ const RecruiterSignupForm = () => {
                             <Typography variant="subtitle1" fontWeight={600} color="primary"> Thông tin tổ chức </Typography>
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12 }}> <TextField label="Tên tổ chức *" value={form.OrgName} onChange={(e) => set("OrgName", e.target.value)} fullWidth size="small" /> </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Tên quốc tế" value={form.InternationalName} onChange={(e) => set("InternationalName", e.target.value)} fullWidth size="small" /> </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Mã số thuế" value={form.TaxCode} onChange={(e) => set("TaxCode", e.target.value)} fullWidth size="small" /> </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Ngày cấp phép" type="date" value={form.IssueDate} onChange={(e) => set("IssueDate", e.target.value)} fullWidth size="small" InputLabelProps={{ shrink: true }} /> </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField select label="Loại tổ chức" value={form.OrganizationTypeId} onChange={(e) => set("OrganizationTypeId", e.target.value)} fullWidth size="small"> {orgTypes.map((ot) => (<MenuItem key={ot.Id} value={ot.Id}>{ot.Name}</MenuItem>))}</TextField> </Grid>
-
-                                {/* Multi-select professions */}
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <FormControl fullWidth size="small">
-                                        <InputLabel>Ngành nghề</InputLabel>
-                                        <Select multiple value={form.ProfessionIds} onChange={handleProfessionChange} input={<OutlinedInput label="Ngành nghề" />} renderValue={(selected) => (
-                                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                                {(selected as string[]).slice(0, 2).map((id) => (<Chip key={id} label={professionMap[id]} size="small" />))}
-                                                {(selected as string[]).length > 2 && (<Chip label={`+${(selected as string[]).length - 2}`} size="small" />)}
-                                            </Box>
-                                        )}
-                                        >
-                                            {professions.map((p: ProfessionResponse) => (<MenuItem key={p.Id} value={p.Id}> <Checkbox checked={form.ProfessionIds.includes(p.Id)} size="small" /> <ListItemText primary={p.Name} /> </MenuItem>))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                {form.ProfessionIds.length > 0 && (<Grid size={{ xs: 12, sm: 6 }}><TextField select label="Ngành nghề chính" value={form.MainProfessionId} onChange={(e) => set("MainProfessionId", e.target.value)} fullWidth size="small">{professions.filter((p: ProfessionResponse) => form.ProfessionIds.includes(p.Id)).map((p: ProfessionResponse) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}</TextField></Grid>)}
-
                                 <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Tỉnh / Thành phố" value={form.ProvinceId} onChange={(e) => handleProvinceChange(e.target.value)} fullWidth size="small">{provinces.map((p: Province) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}</TextField></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Quận / Xã" value={form.CommuneId} onChange={(e) => set("CommuneId", e.target.value)} fullWidth size="small" disabled={!selectedProvinceSeo}>{communes.map((c) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}</TextField></Grid>
                                 <Grid size={{ xs: 12 }}><TextField label="Địa chỉ" value={form.Address} onChange={(e) => set("Address", e.target.value)} fullWidth size="small" /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}><TextField label="SĐT tổ chức" value={form.OrgPhoneNumber} onChange={(e) => set("OrgPhoneNumber", e.target.value)} fullWidth size="small" /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}><TextField label="Email tổ chức" type="email" value={form.OrgEmail} onChange={(e) => set("OrgEmail", e.target.value)} fullWidth size="small" /></Grid>
-                                <Grid size={{ xs: 12 }}><TextField label="Mô tả ngắn" value={form.Summary} onChange={(e) => set("Summary", e.target.value)} fullWidth size="small" multiline rows={2} /></Grid>
                             </Grid>
                         </Stack>
                     )}
