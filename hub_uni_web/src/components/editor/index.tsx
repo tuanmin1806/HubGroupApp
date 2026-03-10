@@ -8,7 +8,7 @@ interface RichTextEditorProps {
 
 export default function RichTextEditorComponent({ value, onChange }: RichTextEditorProps) {
   return (
-    <Box sx={{ p: 3, maxWidth: '100%', margin: "0 auto" }}>
+    <Box sx={{maxWidth: '100%', margin: "0 auto" }}>
       <Editor value={value} onChange={onChange} />
     </Box>
   );

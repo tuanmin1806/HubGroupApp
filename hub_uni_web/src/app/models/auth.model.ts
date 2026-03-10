@@ -108,4 +108,5 @@ export interface AuthInfo {
     PermissionKeys: string[],
     Token: string,
     SystemConfig: SystemConfig,
+    OrganizationId: string
 }

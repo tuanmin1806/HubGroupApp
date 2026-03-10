@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse } from "../models/organization.model";
+import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse, UpdateOrganizationRequest } from "../models/organization.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: OrganizationFilterParams): string => {
@@ -56,11 +56,29 @@ const organizationApi = baseApi.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        getOrganizationById: builder.query<OrganizationDetailResponse, string>({
+            query: (id) => ({
+                url: `organization/getbyid?id=${id}`,
+                method: 'GET',
+            }),
+        }),
+
+        updateOrganization: builder.mutation<void, UpdateOrganizationRequest>({
+            query: (body) => ({
+                url: "organization/update",
+                method: "PUT",
+                body,
+            }),
+        }),
     }),
 });
 
 export const {
     useOrganizationsFullTextSearchQuery,
     useOrganizationsGetByPageNoAuthenQuery,
-    useGetOrganizationBySeoQuery
+    useGetOrganizationByIdQuery,
+    useGetOrganizationBySeoQuery,
+    useUpdateOrganizationMutation,
+    useLazyGetOrganizationByIdQuery
 } = organizationApi;

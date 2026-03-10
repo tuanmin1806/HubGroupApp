@@ -1,13 +1,11 @@
 import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
-import {
-    Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow,
-    TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography
-} from "@mui/material";
+import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography } from "@mui/material";
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
 import { useGetRecruitmentPostsByCurrentCustomerQuery } from "../../app/features/recruitment-post.api";
 import { ConvertService } from "../../app/services/convert.service";
+import { useNavigate } from "react-router-dom";
 
 export default function ManageRecruitmentPostPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -15,13 +13,9 @@ export default function ManageRecruitmentPostPage() {
     const [filterParams, setFilterParams] = useState<Omit<RecruitmentPostFilterParams, "page" | "size" | "searchValue">>({});
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZE);
+    const navigate = useNavigate();
 
-    const queryParams: RecruitmentPostFilterParams = {
-        page: page + 1,
-        size: rowsPerPage,
-        searchValue: searchValue || undefined,
-        ...filterParams,
-    };
+    const queryParams: RecruitmentPostFilterParams = { page: page + 1, size: rowsPerPage, searchValue: searchValue || undefined, ...filterParams, };
 
     const { data, isLoading, isError } = useGetRecruitmentPostsByCurrentCustomerQuery(queryParams);
 
@@ -36,41 +30,15 @@ export default function ManageRecruitmentPostPage() {
         setPage(0);
     }, []);
 
-    const handlePageChange = useCallback((_: unknown, newPage: number) => {
-        setPage(newPage);
-    }, []);
+    const handlePageChange = useCallback((_: unknown, newPage: number) => { setPage(newPage); }, []);
 
-    const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    }, []);
+    const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); }, []);
 
     const renderTableContent = () => {
-        if (isLoading) {
-            return (
-                <TableRow>
-                    <TableCell colSpan={8} align="center">
-                        <Box sx={{ py: 4 }}><CircularProgress size={32} /></Box>
-                    </TableCell>
-                </TableRow>
-            );
-        }
-        if (isError) {
-            return (
-                <TableRow>
-                    <TableCell colSpan={8} align="center">
-                        <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography>
-                    </TableCell>
-                </TableRow>
-            );
-        }
+        if (isLoading) { return (<TableRow><TableCell colSpan={8} align="center"> <Box sx={{ py: 4 }}><CircularProgress size={32} /></Box> </TableCell></TableRow>); }
+        if (isError) { return (<TableRow> <TableCell colSpan={8} align="center"> <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography></TableCell></TableRow>); }
         if (!data?.Items?.length) {
-            return (
-                <TableRow>
-                    <TableCell colSpan={8} align="center">
-                        <Typography sx={{ py: 4 }}>Không có dữ liệu.</Typography>
-                    </TableCell>
-                </TableRow>
+            return (<TableRow> <TableCell colSpan={8} align="center"> <Typography sx={{ py: 4 }}>Không có dữ liệu.</Typography> </TableCell> </TableRow>
             );
         }
         return data.Items.map((post: RecruitmentPostResponse) => (
@@ -82,24 +50,14 @@ export default function ManageRecruitmentPostPage() {
                 <TableCell component="th" scope="row">{post.Name}</TableCell>
                 <TableCell>{post.Organization?.Name ?? "—"}</TableCell>
                 <TableCell>{post.Province ?? "—"}</TableCell>
-                <TableCell>
-                    {post.Professions?.map(p => (
-                        <Chip key={p.Id} label={p.Name} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
-                    )) ?? "—"}
-                </TableCell>
+                <TableCell>{post.Professions?.map(p => (<Chip key={p.Id} label={p.Name} size="small" sx={{ mr: 0.5, mb: 0.5 }} />)) ?? "—"}</TableCell>
                 <TableCell>{post.Quantity}</TableCell>
                 <TableCell>{post.RecruitmentToDate}</TableCell>
                 <TableCell>{ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(post.RecruitPostStatus))}</TableCell>
                 <TableCell align="center">
-                    <Tooltip title="Xem chi tiết">
-                        <IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton>
-                    </Tooltip>
-                    <Tooltip title="Cập nhật">
-                        <IconButton size="small" color="primary"><Edit fontSize="small" /></IconButton>
-                    </Tooltip>
-                    <Tooltip title="Thay đổi trạng thái">
-                        <IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton>
-                    </Tooltip>
+                    <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Cập nhật"><IconButton size="small" color="primary"><Edit fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Thay đổi trạng thái"><IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton></Tooltip>
                 </TableCell>
             </TableRow>
         ));
@@ -117,16 +75,17 @@ export default function ManageRecruitmentPostPage() {
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         />
-                        <IconButton onClick={handleClearSearch} sx={{ p: "10px" }} aria-label="clear">
-                            <Clear />
-                        </IconButton>
-                        <IconButton onClick={handleSearch} sx={{ p: "10px" }} aria-label="search">
-                            <Search />
-                        </IconButton>
+                        <IconButton onClick={handleClearSearch} sx={{ p: "10px" }} aria-label="clear"><Clear /></IconButton>
+                        <IconButton onClick={handleSearch} sx={{ p: "10px" }} aria-label="search"><Search /></IconButton>
                     </Paper>
                 </Grid>
                 <Grid size="auto">
-                    <Button variant="contained" color="primary" startIcon={<Add />}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={() => navigate("/staff/create-recruitment-post")}
+                    >
                         Thêm bài đăng
                     </Button>
                 </Grid>

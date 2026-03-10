@@ -40,9 +40,16 @@ const customerApi = baseApi.injectEndpoints({
                 body,
             }),
         }),
+
+        getCustomerInfor: builder.query<CustomerResponse, string>({
+            query: (id) => ({
+                url: `customer/getbyid?id=${id}`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
 export const {
-    useGetCustomerByOrganizationWithPageQuery,
+    useGetCustomerByOrganizationWithPageQuery, useCreateCollabAccountMutation, useGetCustomerInforQuery
 } = customerApi;

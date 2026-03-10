@@ -120,6 +120,7 @@ export default function Editor({ value, onChange }: EditorProps) {
         extensions={extensions}
         content={value}
         editable={isEditable}
+        sx={{minHeight: 500 }}
         editorProps={{
           handleDrop: handleDrop,
           handlePaste: handlePaste,

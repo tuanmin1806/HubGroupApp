@@ -44,7 +44,7 @@ export default function Footer() {
 
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              HUBGROUP.VN
+              Kết nối với chúng tôi
             </Typography>
 
             <List dense>

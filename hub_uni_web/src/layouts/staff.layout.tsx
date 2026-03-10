@@ -1,4 +1,4 @@
-import { Dashboard, FactCheck, HourglassTop, ManageSearch, MenuBook, RamenDining, TableRestaurant } from "@mui/icons-material";
+import { AddBox, CorporateFare, Dashboard, FactCheck, HourglassTop, Info, ManageAccounts, ManageSearch, MenuBook, Person, RamenDining, TableRestaurant } from "@mui/icons-material";
 import { createTheme, Grid } from "@mui/material";
 import { AppProvider, NavigationItem } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
@@ -17,8 +17,13 @@ const NAVIGATION: NavigationItem[] = [
         icon: <Dashboard />,
     },
     {
+        segment: "manage-staff-accont",
+        title: "Quản lý CTV",
+        icon: <ManageAccounts />,
+    },
+    {
         title: "Quản lý bài đăng",
-        icon: <RamenDining />,
+        icon: <ManageSearch />,
         children: [
             {
                 segment: "manage-recruitment-post",
@@ -28,7 +33,23 @@ const NAVIGATION: NavigationItem[] = [
             {
                 segment: "create-recruitment-post",
                 title: "Tạo bài đăng mới",
-                icon: <ManageSearch />,
+                icon: <AddBox />,
+            },
+        ],
+    },
+    {
+        title: "Thông tin chung",
+        icon: <Info />,
+        children: [
+            {
+                segment: "personal-information",
+                title: "Thông tin cá nhân",
+                icon: <Person />,
+            },
+            {
+                segment: "organization-info",
+                title: "Thông tin tổ chức",
+                icon: <CorporateFare />,
             },
         ],
     },

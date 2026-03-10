@@ -54,6 +54,8 @@ export interface OrganizationDetailResponse {
     UpdatedBy: string;
     OrgStatus: OrgStatus;
     Description: string;
+    Currency: string;
+    DormCost: number;
 }
 
 export interface OrganizationResponse {
@@ -73,6 +75,38 @@ export interface OrganizationResponse {
     IsTop: boolean;
     Highlights: string[];
     WebsiteUrl: string;
+}
+
+export interface UpdateOrganizationRequest {
+    Id: string;
+    OrgStatus: OrgStatus;
+    Name: string;
+    TaxCode: string;
+    OrganizationTypeId: string;
+    Professions: Profession[];
+    MainProfession: Profession;
+    DormCost: number;
+    ProvinceId: string;
+    CommuneId: string;
+    Address: string;
+    WebsiteUrl: string;
+    PhoneNumber: string;
+    Email: string;
+    ManagedBy: string;
+    LogoUrl: string;
+    WallpaperUrl: string;
+    IsTop: boolean;
+    InternationalName: string;
+    Summary: string;
+    FacebookUrl?: string;
+    LinkedinUrl?: string;
+    YoutubeUrl?: string;
+    GoogleMapUrl?: string;
+    TwitterUrl?: string;
+    InstagramUrl?: string;
+    Highlights?: string[];
+    FeaturedImageUrls?: string[];
+    Description: string;
 }
 
 export interface OrganizationFilterParams {

@@ -1,5 +1,5 @@
-import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email, WorkOutline, PeopleAlt, CalendarToday, Star, PhotoLibrary, ChevronRight, ChevronLeft } from "@mui/icons-material";
-import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, Tabs, Tab, CircularProgress, ImageList, ImageListItem } from "@mui/material";
+import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email, WorkOutline, PeopleAlt, CalendarToday, Star, PhotoLibrary, ChevronRight, ChevronLeft, NotificationsActive } from "@mui/icons-material";
+import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, Tabs, Tab, CircularProgress } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetOrganizationBySeoQuery } from "../../../app/features/organization.api";
 import { useGetRecruitmentPostsByOrganizationWithPageQuery } from "../../../app/features/recruitment-post.api";
@@ -7,9 +7,8 @@ import OrganizationSelectActionCard from "../../../components/cards/organization
 import MuiLink from "@mui/material/Link";
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/date.utils";
-import { ConvertService } from "../../../app/services/convert.service";
-import { OrgStatus } from "../../../app/models/enums.model";
 import { normalizeUrl } from "../../../utils/recruitment-post.utils";
+import { ConvertService } from "../../../app/services/convert.service";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -419,15 +418,15 @@ const OrganizationDetailPage = () => {
                                                 fontWeight: 600,
                                                 fontSize: '1rem',
                                                 minHeight: 50,
-                                                py: 0,
                                                 gap: 0.5,
                                                 '&.Mui-selected': { color: 'primary.main' },
                                             },
-                                            '& .MuiTab-iconWrapper': { fontSize: 18 },
+                                            '& .MuiTab-iconWrapper': { fontSize: 25 },
                                         }}
                                     >
                                         <Tab label="Giới thiệu" icon={<Info sx={{ fontSize: 18 }} />} iconPosition="start" />
-                                        <Tab label={`Tin tuyển sinh (${recruitmentPosts?.Total || 0})`} icon={<WorkOutline sx={{ fontSize: 18 }} />} iconPosition="start" />
+                                        <Tab label="Tin tuyển sinh" icon={<NotificationsActive sx={{ fontSize: 18 }} />} iconPosition="start" />
+                                        <Tab label="Học phí" icon={<School sx={{ fontSize: 18 }} />} iconPosition="start" />
                                     </Tabs>
                                 </Box>
 
@@ -576,6 +575,194 @@ const OrganizationDetailPage = () => {
                                                 <Typography color="text.secondary">Chưa có tin tuyển sinh</Typography>
                                             </Box>
                                         )}
+                                    </CardContent>
+                                </TabPanel>
+                                <TabPanel value={tabValue} index={2}>
+                                    <CardContent sx={{ p: { xs: 1, md: 1.5 } }}>
+
+                                        {/* Header */}
+                                        <Box sx={{ mb: 2 }}>
+                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                <Box sx={{
+                                                    width: 36, height: 36, borderRadius: '10px',
+                                                    background: 'linear-gradient(135deg, #1565c0 0%, #42a5f5 100%)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                }}>
+                                                    <School sx={{ fontSize: 20, color: '#fff' }} />
+                                                </Box>
+                                                <Typography variant="h6" fontWeight={700}>
+                                                    Học phí các ngành
+                                                </Typography>
+                                            </Stack>
+                                        </Box>
+
+                                        <Stack spacing={2}>
+
+                                            {/* Main Profession */}
+                                            {organization.MainProfession && (
+                                                <Box sx={{
+                                                    position: 'relative',
+                                                    borderRadius: 2.5,
+                                                    background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 60%, #42a5f5 100%)',
+                                                    p: { xs: 1, md: 1.5 },
+                                                    overflow: 'hidden',
+                                                }}>
+                                                    {/* Decorative circles */}
+                                                    <Box sx={{
+                                                        position: 'absolute', top: -20, right: -20,
+                                                        width: 120, height: 120, borderRadius: '50%',
+                                                        bgcolor: 'rgba(255,255,255,0.07)',
+                                                    }} />
+                                                    <Box sx={{
+                                                        position: 'absolute', bottom: -30, right: 60,
+                                                        width: 80, height: 80, borderRadius: '50%',
+                                                        bgcolor: 'rgba(255,255,255,0.05)',
+                                                    }} />
+
+                                                    <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1} sx={{ position: 'relative', zIndex: 1 }}>
+                                                        <Box>
+                                                            <Chip
+                                                                label="Ngành thế mạnh"
+                                                                size="small"
+                                                                sx={{
+                                                                    mb: 1,
+                                                                    bgcolor: 'rgba(255,255,255,0.18)',
+                                                                    color: '#fff',
+                                                                    fontWeight: 600,
+                                                                    fontSize: '0.68rem',
+                                                                }}
+                                                            />
+                                                            <Typography variant="subtitle1" fontWeight={700} color="#fff" lineHeight={1.3}>
+                                                                {organization.MainProfession.ProfessionName}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box sx={{
+                                                            bgcolor: 'rgba(255,255,255,0.15)',
+                                                            border: '1px solid rgba(255,255,255,0.25)',
+                                                            borderRadius: 2,
+                                                            px: 2, py: 1,
+                                                            textAlign: { xs: 'left', sm: 'right' },
+                                                            flexShrink: 0,
+                                                        }}>
+                                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', display: 'block', fontSize: '0.68rem' }}>
+                                                                Học phí
+                                                            </Typography>
+                                                            <Typography variant="h6" fontWeight={800} color="#fff" sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+                                                                {ConvertService.formatCurrencyVND(organization.MainProfession.Cost)}
+                                                                <Typography component="span" variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500, ml: 0.5 }}>
+                                                                    {organization.Currency}
+                                                                </Typography>
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+                                                </Box>
+                                            )}
+
+                                            {/* Other Professions */}
+                                            {organization.Professions && organization.Professions.length > 0 && (
+                                                <Box>
+                                                    <Typography variant="caption" fontWeight={700} sx={{ mb: 1, display: 'block' }}>
+                                                        Các ngành khác
+                                                    </Typography>
+                                                    <Stack spacing={1}>
+                                                        {organization.Professions.map((p, idx) => (
+                                                            <Box
+                                                                key={p.ProfessionId}
+                                                                sx={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'space-between',
+                                                                    px: { xs: 1, md: 1.5 },
+                                                                    py: 1,
+                                                                    borderRadius: 2,
+                                                                    border: '1px solid',
+                                                                    borderColor: 'divider',
+                                                                    bgcolor: '#fafafa',
+                                                                    transition: 'all 0.18s',
+                                                                    '&:hover': {
+                                                                        borderColor: 'primary.light',
+                                                                        bgcolor: '#f0f7ff',
+                                                                        transform: 'translateX(3px)',
+                                                                    },
+                                                                    gap: 1,
+                                                                }}
+                                                            >
+                                                                <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+                                                                    <Box sx={{
+                                                                        width: 5, height: 5, borderRadius: '50%',
+                                                                        bgcolor: 'primary.main', flexShrink: 0,
+                                                                    }} />
+                                                                    <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', lineHeight: 1.4 }}>
+                                                                        {p.ProfessionName}
+                                                                    </Typography>
+                                                                </Stack>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    fontWeight={700}
+                                                                    color="primary.dark"
+                                                                    sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+                                                                >
+                                                                    {ConvertService.formatCurrencyVND(p.Cost)}
+                                                                    <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.4, fontWeight: 400 }}>
+                                                                        {organization.Currency}
+                                                                    </Typography>
+                                                                </Typography>
+                                                            </Box>
+                                                        ))}
+                                                    </Stack>
+                                                </Box>
+                                            )}
+
+                                            {/* Dorm Cost */}
+                                            {organization.DormCost && (
+                                                <Box sx={{
+                                                    borderRadius: 2,
+                                                    border: '1px dashed',
+                                                    borderColor: 'primary.light',
+                                                    bgcolor: '#f8fbff',
+                                                    p: { xs: 0.5, md: 1 },
+                                                }}>
+                                                    <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+                                                        <Box sx={{
+                                                            width: 28, height: 28, borderRadius: '8px',
+                                                            bgcolor: '#e3f2fd',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        }}>
+                                                            <Business sx={{ fontSize: 16, color: 'primary.main' }} />
+                                                        </Box>
+                                                        <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                                                            Phí ký túc xá
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        bgcolor: '#fff',
+                                                        borderRadius: 1.5,
+                                                        px: 2, py: 1.25,
+                                                        border: '1px solid #e3f2fd',
+                                                    }}>
+                                                        <Typography variant="body2" color="text.secondary">Chi phí ký túc xá</Typography>
+                                                        <Typography variant="body1" fontWeight={700} color="primary.dark">
+                                                            {ConvertService.formatCurrencyVND(organization.DormCost)}
+                                                            <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.4, fontWeight: 400 }}>
+                                                                {organization.Currency}
+                                                            </Typography>
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            )}
+
+                                            {/* Empty state */}
+                                            {!organization.MainProfession && (!organization.Professions || organization.Professions.length === 0) && !organization.DormCost && (
+                                                <Box sx={{ textAlign: 'center', py: 6 }}>
+                                                    <School sx={{ fontSize: 48, color: 'text.disabled', mb: 1.5 }} />
+                                                    <Typography color="text.secondary" variant="body2">Chưa có thông tin học phí</Typography>
+                                                </Box>
+                                            )}
+
+                                        </Stack>
                                     </CardContent>
                                 </TabPanel>
                             </Card>
