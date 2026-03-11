@@ -7,12 +7,17 @@ import { useGetCustomerByOrganizationWithPageQuery } from "../../app/features/cu
 import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
 import { AccountStatus } from "../../app/models/enums.model";
+import CreateCustomerAccountDialog from "../../components/dialogs/staff/create-customer-account.dialog";
+import UpdateCustomerAccountDialog from "../../components/dialogs/staff/update-customer-account.dialog";
 
 export default function ManageStaffAccountPage() {
     const [inputValue, setInputValue] = useState("");
     const [searchValue, setSearchValue] = useState("");
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+    const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const userInfo = getUserInfo();
@@ -24,7 +29,7 @@ export default function ManageStaffAccountPage() {
         organizationId,
     };
 
-    const { data, isLoading, isError } = useGetCustomerByOrganizationWithPageQuery(queryParams, { skip: !organizationId, });
+    const { data, isLoading, isError } = useGetCustomerByOrganizationWithPageQuery(queryParams, { skip: !organizationId });
 
     const handleSearch = useCallback(() => {
         setSearchValue(inputValue);
@@ -35,6 +40,11 @@ export default function ManageStaffAccountPage() {
         setInputValue("");
         setSearchValue("");
         setPage(0);
+    }, []);
+
+    const handleOpenUpdate = useCallback((id: string) => {
+        setSelectedCustomerId(id);
+        setOpenUpdateDialog(true);
     }, []);
 
     const handlePageChange = useCallback((_: unknown, newPage: number) => { setPage(newPage); }, []);
@@ -77,7 +87,7 @@ export default function ManageStaffAccountPage() {
                 </TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Chỉnh sửa"><IconButton size="small" color="primary"><Edit fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Chỉnh sửa"><IconButton size="small" color="primary" onClick={() => handleOpenUpdate(staff.Id)}><Edit fontSize="small" /></IconButton></Tooltip>
                     <Tooltip title="Thay đổi trạng thái"><IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton></Tooltip>
                 </TableCell>
             </TableRow>
@@ -105,7 +115,7 @@ export default function ManageStaffAccountPage() {
                         variant="contained"
                         color="primary"
                         startIcon={<Add />}
-                        onClick={() => navigate("/staff/create-staff-account")}
+                        onClick={() => setOpenDialog(true)}
                     >
                         Thêm nhân viên
                     </Button>
@@ -138,6 +148,15 @@ export default function ManageStaffAccountPage() {
                     </TableContainer>
                 </Grid>
             </Grid>
+            <CreateCustomerAccountDialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+            />
+            <UpdateCustomerAccountDialog
+                open={openUpdateDialog}
+                customerId={selectedCustomerId}
+                onClose={() => { setOpenUpdateDialog(false); setSelectedCustomerId(null); }}
+            />
         </>
     );
 }

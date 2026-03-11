@@ -33,7 +33,7 @@ const staffRoutes = [
         element: <PersonalInforPage />,
     },
     {
-        path: "manage-staff-accont",
+        path: "manage-staff-account",
         element: <ManageStaffAccountPage />,
     },
     {

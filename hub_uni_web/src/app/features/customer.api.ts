@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse } from "../models/customer.model";
+import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse, UpdateCustomerRequest } from "../models/customer.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: CustomerFilterParams): string => {
@@ -41,7 +41,22 @@ const customerApi = baseApi.injectEndpoints({
             }),
         }),
 
+        updateCustomer: builder.mutation<void, UpdateCustomerRequest>({
+            query: (body) => ({
+                url: "customer/update",
+                method: "PUT",
+                body,
+            }),
+        }),
+
         getCustomerInfor: builder.query<CustomerResponse, string>({
+            query: (id) => ({
+                url: `customer/getbyid?id=${id}`,
+                method: 'GET',
+            }),
+        }),
+
+        getCustomerById: builder.query<CustomerResponse, string>({
             query: (id) => ({
                 url: `customer/getbyid?id=${id}`,
                 method: 'GET',
@@ -51,5 +66,5 @@ const customerApi = baseApi.injectEndpoints({
 });
 
 export const {
-    useGetCustomerByOrganizationWithPageQuery, useCreateCollabAccountMutation, useGetCustomerInforQuery
+    useGetCustomerByOrganizationWithPageQuery, useCreateCollabAccountMutation, useGetCustomerInforQuery, useGetCustomerByIdQuery, useUpdateCustomerMutation
 } = customerApi;

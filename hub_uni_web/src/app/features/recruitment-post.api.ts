@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { CreateRecruitmentPostRequest, RecruitmentPostFilterParams, RecruitmentPostResponse } from "../models/recruitment-post.model";
+import { CreateRecruitmentPostRequest, RecruitmentPostFilterParams, RecruitmentPostResponse, UpdateRecruitmentPostRequest } from "../models/recruitment-post.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: RecruitmentPostFilterParams): string => {
@@ -71,12 +71,27 @@ const recruitmentPostApi = baseApi.injectEndpoints({
             }),
         }),
 
+        getRecruitmentPostById: builder.query<RecruitmentPostResponse, string>({
+            query: (id) => ({
+                url: `recruitmentpost/getbyseourl/${id}`,
+                method: 'GET',
+            }),
+        }),
+
         createRecruitmentPost: builder.mutation<void, CreateRecruitmentPostRequest>({
             query: (body) => ({
                 url: "recruitmentpost/customadd",
                 method: "POST",
                 body,
             }),
+        }),
+
+        updateRecruitmentPost: builder.mutation<void, UpdateRecruitmentPostRequest>({
+            query: (body) => ({
+                url: "recruitmentpost/update",
+                method: "PUT",
+                body,
+            })
         }),
     }),
 });
@@ -86,5 +101,7 @@ export const {
     useGetRecruitmentPostBySeoQuery,
     useGetRecruitmentPostsByCurrentCustomerQuery,
     useCreateRecruitmentPostMutation,
-    useGetRecruitmentPostsByOrganizationWithPageQuery
+    useGetRecruitmentPostsByOrganizationWithPageQuery,
+    useGetRecruitmentPostByIdQuery,
+    useUpdateRecruitmentPostMutation
 } = recruitmentPostApi;

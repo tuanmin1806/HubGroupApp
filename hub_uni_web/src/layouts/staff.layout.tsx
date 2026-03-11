@@ -17,22 +17,22 @@ const NAVIGATION: NavigationItem[] = [
         icon: <Dashboard />,
     },
     {
-        segment: "manage-staff-accont",
-        title: "Quản lý CTV",
+        segment: "manage-staff-account",
+        title: "Quản lý nhân viên",
         icon: <ManageAccounts />,
     },
     {
-        title: "Quản lý bài đăng",
+        title: "Quản lý tin tuyển sinh",
         icon: <ManageSearch />,
         children: [
             {
                 segment: "manage-recruitment-post",
-                title: "Danh sách bài đăng",
+                title: "Danh sách tin tuyển sinh",
                 icon: <MenuBook />,
             },
             {
                 segment: "create-recruitment-post",
-                title: "Tạo bài đăng mới",
+                title: "Tạo tin tuyển sinh",
                 icon: <AddBox />,
             },
         ],

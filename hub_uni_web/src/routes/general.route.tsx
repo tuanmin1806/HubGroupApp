@@ -1,5 +1,3 @@
-import { HomePage } from "../pages/general";
-import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
 import ArticlePage from "../pages/general/article.page";
 import OrganizationSearchPage from "../pages/general/search-page/organization-search.page";
 import OrganizationDetailPage from "../pages/general/detail-page/organization-detail.page";
@@ -7,11 +5,12 @@ import SignOutPage from "../pages/general/auth-page/sign-out.page";
 import ArticleDetailPage from "../pages/general/detail-page/article-detail.page";
 import RecruitmentPostDetailPage from "../pages/general/detail-page/recruitment-post-detail.page";
 import RecruitmentPostSearchPage from "../pages/general/search-page/recruitment-post-search.page";
+import RootRedirect from "../components/auth/root-redirect";
 
 const generalRoutes = [
     {
         path: '/',
-        element: <HomePage />,
+        element: <RootRedirect />,
     },
     {
         path: 'sign-out',

@@ -6,6 +6,7 @@ import { PAGE_SIZE } from "../../constants/common.constant";
 import { useGetRecruitmentPostsByCurrentCustomerQuery } from "../../app/features/recruitment-post.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { useNavigate } from "react-router-dom";
+import UpdateRecruitmentPostDialog from "../../components/dialogs/staff/update-recruitment-post.dialog";
 
 export default function ManageRecruitmentPostPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -13,6 +14,8 @@ export default function ManageRecruitmentPostPage() {
     const [filterParams, setFilterParams] = useState<Omit<RecruitmentPostFilterParams, "page" | "size" | "searchValue">>({});
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZE);
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const queryParams: RecruitmentPostFilterParams = { page: page + 1, size: rowsPerPage, searchValue: searchValue || undefined, ...filterParams, };
@@ -28,6 +31,16 @@ export default function ManageRecruitmentPostPage() {
         setInputValue("");
         setSearchValue("");
         setPage(0);
+    }, []);
+
+    const handleOpenUpdate = useCallback((id: string) => {
+        setSelectedPostId(id);
+        setOpenUpdateDialog(true);
+    }, []);
+
+    const handleCloseUpdate = useCallback(() => {
+        setOpenUpdateDialog(false);
+        setSelectedPostId(null);
     }, []);
 
     const handlePageChange = useCallback((_: unknown, newPage: number) => { setPage(newPage); }, []);
@@ -56,7 +69,11 @@ export default function ManageRecruitmentPostPage() {
                 <TableCell>{ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(post.RecruitPostStatus))}</TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Cập nhật"><IconButton size="small" color="primary"><Edit fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Cập nhật">
+                        <IconButton size="small" color="primary" onClick={() => handleOpenUpdate(post.Id)}>
+                            <Edit fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Thay đổi trạng thái"><IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton></Tooltip>
                 </TableCell>
             </TableRow>
@@ -119,6 +136,11 @@ export default function ManageRecruitmentPostPage() {
                     </TableContainer>
                 </Grid>
             </Grid>
+            <UpdateRecruitmentPostDialog
+                open={openUpdateDialog}
+                postId={selectedPostId}
+                onClose={handleCloseUpdate}
+            />
         </>
     );
 }
