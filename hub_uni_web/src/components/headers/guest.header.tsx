@@ -309,30 +309,6 @@ function GuestHeader() {
                             >
                                 Đăng nhập
                             </Link>
-                            <Typography
-                                sx={{
-                                    ml: 1,
-                                    textAlign: "center",
-                                    fontSize: { xs: "0.75rem", md: "1rem" },
-                                }}
-                            >
-                                /
-                            </Typography>
-                            <Link
-                                sx={{
-                                    ml: 1,
-                                    textAlign: "center",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.75rem", md: "1rem" },
-                                }}
-                                component="button"
-                                color="inherit"
-                                variant="body1"
-                                underline="hover"
-                                onClick={() => handleNavigateSignUp()}
-                            >
-                                Đăng ký
-                            </Link>
                         </Box>
                     </Toolbar>
                 </Container>

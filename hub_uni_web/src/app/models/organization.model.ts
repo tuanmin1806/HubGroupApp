@@ -59,8 +59,10 @@ export interface OrganizationDetailResponse {
 }
 
 export interface OrganizationResponse {
+    Id: string;
     Name: string;
-    SeoUrl?: string;
+    SeoUrl: string;
+    Code: string;
     TaxCode: string;
     Province: string;
     ProvinceSeo: string;
@@ -113,6 +115,7 @@ export interface OrganizationFilterParams {
     page?: number;
     size?: number;
     nameSearch?: string;
+    searchValue?: string;
     organizationTypeId?: string;
     professionId?: string;
     provinceId?: string;

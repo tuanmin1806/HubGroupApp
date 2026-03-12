@@ -1,6 +1,7 @@
-import { Box } from "@mui/material";
+import { Box, Toolbar } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import Logo from "../components/general/logo";
+import GuestHeader from "../components/headers/guest.header";
+import Footer from "../components/footer/footer";
 
 const AuthLayout = () => {
     return (
@@ -9,25 +10,16 @@ const AuthLayout = () => {
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#f9fafb",
             }}
         >
-            {/* Logo */}
-            <Box>
-                <Logo />
-            </Box>
+            <GuestHeader />
+            <Toolbar />
 
-            {/* Form */}
-            <Box
-                sx={{
-                    width: "100%",
-                    maxWidth: 500,
-                }}
-            >
+            <Box sx={{ flexGrow: 1 , backgroundColor: "#fffbf2" }}>
                 <Outlet />
             </Box>
+
+            <Footer />
         </Box>
     );
 };

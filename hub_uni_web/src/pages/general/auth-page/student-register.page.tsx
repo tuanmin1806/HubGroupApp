@@ -1,14 +1,14 @@
 import { Box, Card } from "@mui/material";
 import StudentSignupForm from "../../../components/auth/student-signup-form";
 
-const CustomerRegister = () => {
+const StudentRegister = () => {
     return (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-            <Card sx={{ width: 600, p: 3, borderRadius: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <Card sx={{ width: 550, p: 2.5, borderRadius: 3 }}>
                 <StudentSignupForm />
             </Card>
         </Box>
     );
 };
 
-export default CustomerRegister;
+export default StudentRegister;

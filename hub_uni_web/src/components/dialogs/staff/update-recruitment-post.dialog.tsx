@@ -90,7 +90,6 @@ export default function UpdateRecruitmentPostDialog({
     open,
     postId,
     onClose,
-    onSuccess,
 }: UpdateRecruitmentPostDialogProps) {
     const dispatch = useDispatch<AppDispatch>();
 
@@ -211,7 +210,7 @@ export default function UpdateRecruitmentPostDialog({
     const isLoading = isFetchingPost || isUpdating;
 
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+        <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
                 <Typography variant="h6" fontWeight={600}>Chỉnh sửa bài tuyển sinh</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>

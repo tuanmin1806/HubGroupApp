@@ -73,7 +73,7 @@ const recruitmentPostApi = baseApi.injectEndpoints({
 
         getRecruitmentPostById: builder.query<RecruitmentPostResponse, string>({
             query: (id) => ({
-                url: `recruitmentpost/getbyseourl/${id}`,
+                url: `recruitmentpost/getbyid?id=${id}`,
                 method: 'GET',
             }),
         }),

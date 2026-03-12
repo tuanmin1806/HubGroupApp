@@ -8,10 +8,8 @@ import StaffLayout from "../layouts/staff.layout";
 import RoleBasedLayout from "../layouts/role-based.layout";
 import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
 import NotFoundPage from "../pages/general/auth-page/not-found.page";
-import AdminLogin from "../pages/general/auth-page/admin-login.page";
 import CustomerLogin from "../pages/general/auth-page/customer-login.page";
-import SelectLoginType from "../components/auth/select-login.page";
-import CustomerRegister from "../pages/general/auth-page/customer-register.page";
+import StudentRegister from "../pages/general/auth-page/student-register.page";
 import AdminRegister from "../pages/general/auth-page/admin-register.page";
 import SelectRegisterType from "../components/auth/select-register.page";
 
@@ -30,15 +28,7 @@ const router = createBrowserRouter(
             children: [
                 {
                     path: "dang-nhap",
-                    element: <SelectLoginType />,
-                },
-                {
-                    path: "dang-nhap/customer",
                     element: <CustomerLogin />,
-                },
-                {
-                    path: "dang-nhap/admin",
-                    element: <AdminLogin />,
                 },
                 {
                     path: "dang-ky",
@@ -46,7 +36,7 @@ const router = createBrowserRouter(
                 },
                 {
                     path: "dang-ky/customer",
-                    element: <CustomerRegister />,
+                    element: <StudentRegister />,
                 },
                 {
                     path: "dang-ky/admin",

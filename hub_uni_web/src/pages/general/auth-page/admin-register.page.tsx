@@ -3,8 +3,8 @@ import RecruiterSignupForm from "../../../components/auth/recruiter-signup-form"
 
 const AdminRegister = () => {
     return (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-            <Card sx={{ width: 600, p: 3, borderRadius: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <Card sx={{ width: 550,  borderRadius: 3 }}>
                 <RecruiterSignupForm />
             </Card>
         </Box>

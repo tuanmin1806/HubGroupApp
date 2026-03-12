@@ -1,253 +1,429 @@
-import { Box, Container, Typography, Stack, Grid, Chip, CircularProgress, Divider, Button } from "@mui/material";
+import { Box, Container, Typography, Stack, Grid, Chip, CircularProgress, Divider, Button, IconButton, Tooltip } from "@mui/material";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetOrganizationByIdQuery } from "../../app/features/organization.api";
-import { Edit } from "@mui/icons-material";
+import { Edit, LocationOn, Email, Language, Business, School, Phone, AccountBalance, Star, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, Bed } from "@mui/icons-material";
 import { useState } from "react";
 import UpdateOrganizationDialog from "../../components/dialogs/admin/organization/update-organization.dialog";
+import { ConvertService } from "../../app/services/convert.service";
+import { Profession } from "../../app/models/organization.model";
 
 export default function OrganizationInforPage() {
     const userInfo = getUserInfo();
     const organizationId = userInfo?.OrganizationId ?? "";
     const [open, setOpen] = useState(false);
 
-    const { data, isLoading } = useGetOrganizationByIdQuery(organizationId, { skip: !organizationId, });
+    const { data, isLoading } = useGetOrganizationByIdQuery(organizationId, { skip: !organizationId });
 
-    if (isLoading) { return (<Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}><CircularProgress /></Box>); }
+    if (isLoading) { return (<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}> <CircularProgress sx={{ color: "#faa11b" }} /></Box>); }
 
     if (!data) return null;
 
+    const socialLinks = [
+        { icon: <Facebook />, url: data.FacebookUrl, label: "Facebook" },
+        { icon: <LinkedIn />, url: data.LinkedinUrl, label: "LinkedIn" },
+        { icon: <YouTube />, url: data.YoutubeUrl, label: "YouTube" },
+        { icon: <Twitter />, url: data.TwitterUrl, label: "Twitter" },
+        { icon: <Instagram />, url: data.InstagramUrl, label: "Instagram" },
+        { icon: <Map />, url: data.GoogleMapUrl, label: "Google Maps" },
+    ].filter((s) => s.url);
+
     return (
-        <Box sx={{ bgcolor: "#f7f8fa", pb: 6 }}>
-            {/* Banner */}
+        <Box sx={{ bgcolor: "#f0f2f5", minHeight: "100vh", pb: 3 }}>
             <Box
                 sx={{
                     width: "100%",
-                    height: { xs: 220, md: 350 },
-                    backgroundImage: `url(${data.WallpaperFullUrl})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    height: { xs: 240, sm: 300, md: 400 },
                     position: "relative",
+                    overflow: "hidden",
                 }}
             >
-                <Box sx={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)", }} />
+                <Box
+                    component="img"
+                    src={data.WallpaperFullUrl}
+                    sx={{
+                        width: "100%", height: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                    }}
+                />
+                <Box
+                    sx={{
+                        position: "absolute", inset: 0,
+                        background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%)",
+                    }}
+                />
+
+                <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 3 }}>
+                    <Button
+                        variant="contained"
+                        startIcon={<Edit />}
+                        onClick={() => setOpen(true)}
+                        size="small"
+                        sx={{
+                            bgcolor: "#1975d1",
+                            backdropFilter: "blur(8px)",
+                            border: "1px solid rgba(255,255,255,0.3)",
+                            color: "#fff",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            textTransform: "none",
+                            "&:hover": { bgcolor: "rgba(255,255,255,0.25)" },
+                        }}
+                    >
+                        Cập nhật thông tin
+                    </Button>
+                </Box>
 
                 <Container
                     sx={{
-                        position: "relative",
-                        zIndex: 2,
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "flex-end",
-                        pb: 4,
+                        position: "absolute", bottom: 0, left: "50%",
+                        transform: "translateX(-50%)",
+                        zIndex: 2, pb: { xs: 2, md: 3 },
+                        width: "100%",
                     }}
                 >
-                    <Stack direction="row" spacing={3} alignItems="center">
+                    <Stack direction="row" spacing={{ xs: 2, md: 3 }} alignItems="flex-end">
                         <Box
-                            component="img"
-                            src={data.LogoFullUrl}
                             sx={{
-                                width: { xs: 70, md: 100 },
-                                height: { xs: 70, md: 100 },
+                                flexShrink: 0,
+                                width: { xs: 72, md: 110 },
+                                height: { xs: 72, md: 110 },
                                 borderRadius: 3,
+                                overflow: "hidden",
+                                border: "3px solid #fff",
                                 bgcolor: "#fff",
-                                p: 1,
+                                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                                mb: { xs: 0, md: "6px" },
                             }}
-                        />
+                        >
+                            <Box
+                                component="img"
+                                src={data.LogoFullUrl}
+                                sx={{ width: "100%", height: "100%", objectFit: "contain", p: 0.5 }}
+                            />
+                        </Box>
 
-                        <Box>
-                            <Typography
-                                variant="h4"
-                                sx={{
-                                    color: "#fff",
-                                    fontWeight: 700,
-                                    fontSize: { xs: 22, md: 32 },
-                                }}
-                            >
-                                {data.Name}
-                            </Typography>
-
-                            <Typography color="rgba(255,255,255,0.8)"> {data.InternationalName} </Typography>
+                        <Box pb={0.5}>
+                            <Stack direction="row" alignItems="center" spacing={1} mb={0.5} flexWrap="wrap">
+                                <Typography
+                                    variant="h5"
+                                    sx={{
+                                        color: "#fff",
+                                        fontWeight: 800,
+                                        fontSize: { xs: 16, sm: 22, md: 28 },
+                                        lineHeight: 1.2,
+                                        textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                                    }}
+                                >
+                                    {data.Name}
+                                </Typography>
+                                {data.IsTop && (
+                                    <Chip
+                                        icon={<Star sx={{ fontSize: 14, color: "#faa11b !important" }} />}
+                                        label="TOP"
+                                        size="small"
+                                        sx={{
+                                            bgcolor: "rgba(250,161,27,0.2)",
+                                            border: "1px solid #faa11b",
+                                            color: "#faa11b",
+                                            fontWeight: 700,
+                                            fontSize: 11,
+                                            height: 22,
+                                        }}
+                                    />
+                                )}
+                            </Stack>
+                            {data.InternationalName && (
+                                <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: { xs: 12, md: 14 } }}>
+                                    {data.InternationalName}
+                                </Typography>
+                            )}
+                            <Stack direction="row" spacing={1} mt={0.5} flexWrap="wrap">
+                                {data.OrganizationType && (
+                                    <Chip
+                                        label={data.OrganizationType}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: "rgba(255,255,255,0.15)",
+                                            backdropFilter: "blur(6px)",
+                                            color: "#fff",
+                                            fontSize: 11,
+                                            height: 20,
+                                            border: "1px solid rgba(255,255,255,0.25)",
+                                        }}
+                                    />
+                                )}
+                                {data.Province && (
+                                    <Chip
+                                        icon={<LocationOn sx={{ fontSize: 12, color: "rgba(255,255,255,0.8) !important" }} />}
+                                        label={data.Province}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: "rgba(255,255,255,0.15)",
+                                            backdropFilter: "blur(6px)",
+                                            color: "#fff",
+                                            fontSize: 11,
+                                            height: 20,
+                                            border: "1px solid rgba(255,255,255,0.25)",
+                                        }}
+                                    />
+                                )}
+                            </Stack>
                         </Box>
                     </Stack>
                 </Container>
             </Box>
 
-            <Container sx={{ mt: 4 }}>
-                <Grid container spacing={2}>
+            <Container sx={{ mt: 1 }}>
+                <Grid container spacing={0.5}>
+
                     <Grid size={{ xs: 12, md: 8 }}>
-                        <Stack spacing={2}>
-                            <Box
-                                sx={{
-                                    bgcolor: "#fff",
-                                    p: 2,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                <Typography variant="h6" fontWeight={700} mb={2}> Giới thiệu </Typography>
+                        <Stack spacing={0.5}>
 
-                                <Typography color="text.secondary"> {data.Summary} </Typography>
-                            </Box>
+                            {data.Summary && (
+                                <SectionCard title="Giới thiệu" icon={<School sx={{ color: "#faa11b" }} />}>
+                                    <Typography
+                                        color="text.secondary"
+                                        sx={{ lineHeight: 1.8, fontSize: 15 }}
+                                    >
+                                        {data.Summary}
+                                    </Typography>
+                                </SectionCard>
+                            )}
 
-                            {/* Description */}
-                            <Box
-                                sx={{
-                                    bgcolor: "#fff",
-                                    p: 2,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                <Typography variant="h6" fontWeight={700} mb={2}> Thông tin chi tiết </Typography>
+                            {data.Highlights?.length > 0 && (
+                                <SectionCard title="Điểm nổi bật" icon={<Star sx={{ color: "#faa11b" }} />}>
+                                    <Stack spacing={1}>
+                                        {data.Highlights.map((h: string, i: number) => (
+                                            <Stack key={i} direction="row" spacing={1} alignItems="center">
+                                                <Box
+                                                    sx={{
+                                                        width: 6, height: 6, borderRadius: "50%",
+                                                        bgcolor: "#faa11b", mt: "8px", flexShrink: 0,
+                                                    }}
+                                                />
+                                                <Typography color="text.secondary" sx={{ fontSize: 14, lineHeight: 1.7 }}>
+                                                    {h}
+                                                </Typography>
+                                            </Stack>
+                                        ))}
+                                    </Stack>
+                                </SectionCard>
+                            )}
 
-                                <Box
-                                    sx={{ "& img": { maxWidth: "100%" }, }}
-                                    dangerouslySetInnerHTML={{
-                                        __html: data.Description,
-                                    }}
-                                />
-                            </Box>
+                            {data.Description && (
+                                <SectionCard title="Thông tin chi tiết" icon={<Business sx={{ color: "#faa11b" }} />}>
+                                    <Box
+                                        sx={{
+                                            "& img": { maxWidth: "100%", borderRadius: 2 },
+                                            "& h1,& h2,& h3": { color: "#222", mt: 2, mb: 1 },
+                                            "& table": {
+                                                width: "100%", borderCollapse: "collapse",
+                                                fontSize: 13, mb: 2,
+                                            },
+                                            "& td, & th": {
+                                                border: "1px solid #e0e0e0",
+                                                p: "6px 10px",
+                                            },
+                                            "& th": { bgcolor: "#faf5ec", fontWeight: 700 },
+                                            "& p": { lineHeight: 1.8, color: "#444", mb: 1 },
+                                            "& a": { color: "#faa11b" },
+                                            fontSize: 14,
+                                        }}
+                                        dangerouslySetInnerHTML={{ __html: data.Description }}
+                                    />
+                                </SectionCard>
+                            )}
 
-                            {/* Gallery */}
-                            <Box
-                                sx={{
-                                    bgcolor: "#fff",
-                                    p: 2,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                <Typography variant="h6" fontWeight={700} mb={2}> Hình ảnh </Typography>
-
-                                <Grid container spacing={2}>
-                                    {data.FeaturedImageFullUrls?.map((img, index) => (
-                                        <Grid key={index} size={{ xs: 6, md: 4 }}>
-                                            <Box
-                                                component="img"
-                                                src={img}
-                                                sx={{
-                                                    width: "100%",
-                                                    height: 160,
-                                                    objectFit: "cover",
-                                                    borderRadius: 2,
-                                                }}
-                                            />
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </Box>
+                            {data.FeaturedImageFullUrls?.length > 0 && (
+                                <SectionCard title="Hình ảnh" icon={<Star sx={{ color: "#faa11b" }} />}>
+                                    <Grid container spacing={1.5}>
+                                        {data.FeaturedImageFullUrls.map((img: string, index: number) => (
+                                            <Grid key={index} size={{ xs: 6, sm: 4 }}>
+                                                <Box
+                                                    component="img"
+                                                    src={img}
+                                                    sx={{
+                                                        width: "100%",
+                                                        height: { xs: 120, sm: 150 },
+                                                        objectFit: "cover",
+                                                        borderRadius: 2,
+                                                        display: "block",
+                                                        transition: "transform 0.2s",
+                                                        "&:hover": { transform: "scale(1.02)" },
+                                                    }}
+                                                />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </SectionCard>
+                            )}
                         </Stack>
                     </Grid>
 
-                    {/* RIGHT SIDEBAR */}
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Stack spacing={2}>
-                            {/* Info */}
-                            <Box
-                                sx={{
-                                    bgcolor: "#fff",
-                                    p: 2,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                <Typography fontWeight={700} mb={2}> Thông tin tổ chức </Typography>
+                        <Stack spacing={0.5}>
 
+                            {/* Contact info */}
+                            <SectionCard title="Thông tin liên hệ" icon={<Phone sx={{ color: "#faa11b" }} />}>
                                 <Stack spacing={1.5}>
-                                    <Typography> <b>Địa chỉ:</b> {data.Address} </Typography>
-
-                                    <Typography> <b>Tỉnh:</b> {data.Province} </Typography>
-
-                                    <Typography> <b>Email:</b> {data.Email} </Typography>
-
-                                    <Typography> <b>Website:</b> {data.WebsiteUrl} </Typography>
-
-                                    <Typography> <b>Quản lý bởi:</b> {data.ManagedBy} </Typography>
+                                    {[
+                                        { icon: <LocationOn sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.Province },
+                                        data.PhoneNumber && { icon: <Phone sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.PhoneNumber },
+                                        data.Email && { icon: <Email sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.Email },
+                                        data.WebsiteUrl && { icon: <Language sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.WebsiteUrl, href: data.WebsiteUrl },
+                                        data.ManagedBy && { icon: <AccountBalance sx={{ fontSize: 16, color: "#faa11b" }} />, label: `Quản lý: ${data.ManagedBy}` },
+                                    ].filter(Boolean).map((item: any, i) => (
+                                        item && (
+                                            <Stack key={i} direction="row" spacing={1} alignItems="flex-start">
+                                                <Box mt="2px" flexShrink={0}>{item.icon}</Box>
+                                                {item.href ? (
+                                                    <Typography
+                                                        component="a"
+                                                        href={item.href}
+                                                        target="_blank"
+                                                        rel="noopener"
+                                                        sx={{ fontSize: 13, color: "#faa11b", wordBreak: "break-all", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                                                    >
+                                                        {item.label}
+                                                    </Typography>
+                                                ) : (
+                                                    <Typography sx={{ fontSize: 13, color: "text.secondary", lineHeight: 1.5 }}>
+                                                        {item.label}
+                                                    </Typography>
+                                                )}
+                                            </Stack>
+                                        )
+                                    ))}
                                 </Stack>
-                            </Box>
+
+                                {socialLinks.length > 0 && (
+                                    <>
+                                        <Divider sx={{ my: 1.5 }} />
+                                        <Stack direction="row" spacing={0.5} flexWrap="wrap">
+                                            {socialLinks.map((s, i) => (
+                                                <Tooltip key={i} title={s.label}>
+                                                    <IconButton
+                                                        component="a"
+                                                        href={s.url!}
+                                                        target="_blank"
+                                                        rel="noopener"
+                                                        size="small"
+                                                        sx={{
+                                                            color: "text.secondary",
+                                                            "&:hover": { color: "#faa11b", bgcolor: "rgba(250,161,27,0.08)" },
+                                                        }}
+                                                    >
+                                                        {s.icon}
+                                                    </IconButton>
+                                                </Tooltip>
+                                            ))}
+                                        </Stack>
+                                    </>
+                                )}
+                            </SectionCard>
+
+                            {/* Dorm cost */}
+                            {data.DormCost && (
+                                <SectionCard title="Ký túc xá" icon={<Bed sx={{ color: "#faa11b" }} />}>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                        <Typography sx={{ fontSize: 13, color: "text.secondary" }}>Chi phí / kỳ</Typography>
+                                        <Typography sx={{ fontWeight: 700, color: "#faa11b", fontSize: 15 }}>
+                                            {ConvertService.formatCurrencyVND(data.DormCost)}{data.Currency}
+                                        </Typography>
+                                    </Stack>
+                                </SectionCard>
+                            )}
 
                             {/* Main Profession */}
                             {data.MainProfession && (
-                                <Box
-                                    sx={{
-                                        bgcolor: "#fff",
-                                        p: 2,
-                                        borderRadius: 3,
-                                        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                    }}
-                                >
-                                    <Typography fontWeight={700} mb={2}> Ngành chính </Typography>
-
-                                    <Chip
-                                        label={`${data.MainProfession.ProfessionName} - ${data.MainProfession.Cost?.toLocaleString()} ${data.Currency}`}
-                                        color="primary"
-                                    />
-                                </Box>
+                                <SectionCard title="Ngành chính" icon={<Star sx={{ color: "#faa11b" }} />}>
+                                    <Box
+                                        sx={{
+                                            p: 0.5,
+                                            borderRadius: 2,
+                                            bgcolor: "rgba(250,161,27,0.06)",
+                                            border: "1px solid rgba(250,161,27,0.2)",
+                                        }}
+                                    >
+                                        <Typography fontWeight={700} fontSize={14} mb={0.5}>
+                                            {data.MainProfession.ProfessionName}
+                                        </Typography>
+                                        <Typography sx={{ color: "#faa11b", fontWeight: 600, fontSize: 13 }}>
+                                            {ConvertService.formatCurrencyVND(data.MainProfession.Cost)}{data.Currency}
+                                        </Typography>
+                                    </Box>
+                                </SectionCard>
                             )}
 
                             {/* Professions */}
-                            <Box
-                                sx={{
-                                    bgcolor: "#fff",
-                                    p: 2,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                <Typography fontWeight={700} mb={2}> Ngành đào tạo </Typography>
-
-                                <Stack spacing={1}>
-                                    {data.Professions?.map((p) => (
-                                        <Box key={p.ProfessionId}>
-                                            <Typography> {p.ProfessionName} </Typography>
-
-                                            <Typography
-                                                variant="caption"
-                                                color="text.secondary"
+                            {data.Professions?.length > 0 && (
+                                <SectionCard title={`Ngành đào tạo (${data.Professions.length})`} icon={<School sx={{ color: "#faa11b" }} />}>
+                                    <Stack spacing={0} divider={<Divider />}>
+                                        {data.Professions.map((p: Profession, i: number) => (
+                                            <Stack
+                                                key={i}
+                                                direction="row"
+                                                justifyContent="space-between"
+                                                alignItems="center"
+                                                py={1}
                                             >
-                                                {p.Cost?.toLocaleString()} {data.Currency}
-                                            </Typography>
-
-                                            <Divider sx={{ my: 1 }} />
-                                        </Box>
-                                    ))}
-                                </Stack>
-                            </Box>
-
-                            {/* Highlights */}
-                            {data.Highlights?.length > 0 && (
-                                <Box
-                                    sx={{
-                                        bgcolor: "#fff",
-                                        p: 2,
-                                        borderRadius: 3,
-                                        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                    }}
-                                >
-                                    <Typography fontWeight={700} mb={2}> Điểm nổi bật </Typography>
-
-                                    <Stack spacing={1}>
-                                        {data.Highlights.map((h, i) => (
-                                            <Typography key={i}>
-                                                • {h}
-                                            </Typography>
+                                                <Typography sx={{ fontSize: 13, flex: 1, pr: 1 }}>
+                                                    {p.ProfessionName}
+                                                </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: 12, fontWeight: 600,
+                                                        color: "#faa11b", whiteSpace: "nowrap",
+                                                    }}
+                                                >
+                                                    {ConvertService.formatCurrencyVND(p.Cost)} {data.Currency}
+                                                </Typography>
+                                            </Stack>
                                         ))}
                                     </Stack>
-                                </Box>
+                                </SectionCard>
                             )}
                         </Stack>
                     </Grid>
                 </Grid>
-                <Button
-                    variant="contained"
-                    startIcon={<Edit />}
-                    onClick={() => setOpen(true)}
-                    sx={{ borderRadius: 3 }}
-                >
-                    Cập nhật thông tin
-                </Button>
             </Container>
+
             <UpdateOrganizationDialog open={open} onClose={() => setOpen(false)} />
+        </Box>
+    );
+}
+
+function SectionCard({
+    title, icon, children,
+}: {
+    title: string;
+    icon: React.ReactNode;
+    children: React.ReactNode;
+}) {
+    return (
+        <Box
+            sx={{
+                bgcolor: "#fff",
+                borderRadius: 1.5,
+                overflow: "hidden",
+            }}
+        >
+            <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{
+                    px: 2, py: 1,
+                    borderBottom: "1px solid #f0f0f0",
+                }}
+            >
+                <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>
+                <Typography fontWeight={700} fontSize={15}>
+                    {title}
+                </Typography>
+            </Stack>
+            <Box sx={{ p: 2 }}>{children}</Box>
         </Box>
     );
 }

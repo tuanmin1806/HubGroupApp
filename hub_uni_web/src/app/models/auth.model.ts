@@ -72,6 +72,7 @@ export interface RecruiterRegisterRequestBody {
         WebsiteUrl?: string;
         Summary?: string;
     };
+    OrganizationId?: string;
 }
 
 export interface AuthForgotPasswordRequestBody {

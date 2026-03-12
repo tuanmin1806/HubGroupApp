@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography, MenuItem, Grid, Alert, CircularProgress, Paper } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography, MenuItem, Grid, Alert, CircularProgress, Paper, Link } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useStudentRegisterMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
@@ -92,25 +92,25 @@ const StudentSignupForm = () => {
         return (
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "50vh", gap: 2, px: 2 }}>
                 <CheckCircleIcon sx={{ fontSize: 72, color: "success.main" }} />
-                <Typography variant="h5" fontWeight={700}>Đăng ký thành công!</Typography>
-                <Typography color="text.secondary" textAlign="center">Tài khoản của bạn đang chờ phê duyệt.</Typography>
+                <Typography variant="h5" fontWeight={700} color="#faa11b">Đăng ký thành công!</Typography>
+                <Typography color="#faa11b" textAlign="center">Tài khoản của bạn đang chờ phê duyệt.</Typography>
             </Box>
         );
     }
 
     return (
-        <Box sx={{ maxWidth: 600, mx: "auto", px: { xs: 1, sm: 1 }, py: { xs: 1, sm: 1 } }}>
-            <Typography variant="h5" fontWeight={700} textAlign="center" mb={0.5}> Đăng ký thông tin </Typography>
+        <Box sx={{ maxWidth: 600, mx: "auto", px: { xs: 0.5, sm: 0.5 }, py: { xs: 0.5, sm: 0.5 } }}>
+            <Typography variant="h5" fontWeight={700} textAlign="center" color="#faa11b" mb={0.5}> Đăng ký thông tin </Typography>
             <Typography variant="body2" color="text.secondary" textAlign="center" mb={1}> Vui lòng điền đầy đủ thông tin để tạo tài khoản </Typography>
 
             {error && (<Alert severity="error" sx={{ mb: 1 }} onClose={() => setError("")}>{error}</Alert>)}
 
-            <Paper elevation={0} sx={{ p: { xs: 1, sm: 1 } }}>
+            <Paper elevation={0}>
                 <Box component="form" onSubmit={handleSubmit} onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}>
                     <Stack spacing={2}>
                         <Box>
-                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={1}> Thông tin tài khoản </Typography>
-                            <Grid container spacing={2}>
+                            <Typography variant="subtitle2" fontWeight={600} color="#faa11b" mb={1}> Thông tin tài khoản </Typography>
+                            <Grid container spacing={2.5}>
                                 <Grid size={{ xs: 12 }}> <TextField label="Tên đăng nhập *" size="small" fullWidth value={form.UserName} onChange={(e) => set("UserName", e.target.value)} /> </Grid>
                                 <Grid size={{ xs: 12 }}> <TextField label="Mật khẩu *" type="password" size="small" fullWidth value={form.Password} onChange={(e) => set("Password", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12 }}> <TextField label="Xác nhận mật khẩu *" type="password" size="small" fullWidth value={form.ConfirmPassword} onChange={(e) => set("ConfirmPassword", e.target.value)} error={!!form.ConfirmPassword && form.Password !== form.ConfirmPassword} helperText={form.ConfirmPassword && form.Password !== form.ConfirmPassword ? "Mật khẩu không khớp" : ""} /></Grid>
@@ -118,8 +118,8 @@ const StudentSignupForm = () => {
                         </Box>
 
                         <Box>
-                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={1}> Thông tin cá nhân </Typography>
-                            <Grid container spacing={2}>
+                            <Typography variant="subtitle2" fontWeight={600} color="#faa11b" mb={1}> Thông tin cá nhân </Typography>
+                            <Grid container spacing={2.5}>
                                 <Grid size={{ xs: 12 }}> <TextField label="Họ và tên *" size="small" fullWidth value={form.FullName} onChange={(e) => set("FullName", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Email *" type="email" size="small" fullWidth value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Số điện thoại" size="small" fullWidth value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
@@ -138,8 +138,8 @@ const StudentSignupForm = () => {
                         </Box>
 
                         <Box>
-                            <Typography variant="subtitle2" fontWeight={600} color="primary" mb={2}> Học vấn & Kinh nghiệm </Typography>
-                            <Grid container spacing={1}>
+                            <Typography variant="subtitle2" fontWeight={600} color="#faa11b" mb={2}> Học vấn & Kinh nghiệm </Typography>
+                            <Grid container spacing={1.5}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField select label="Trình độ học vấn" size="small" fullWidth value={form.EducationLevel} onChange={(e) => set("EducationLevel", e.target.value)}>
                                         <MenuItem value={EducationLevel.Undefined}>Không xác định</MenuItem>
@@ -170,10 +170,24 @@ const StudentSignupForm = () => {
                             fullWidth
                             disabled={submitting}
                             startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
-                            sx={{ mt: 1, py: 1 }}
+                            sx={{ py: 1 , backgroundColor: "#faa11b", borderRadius: 2}}
                         >
                             {submitting ? "Đang xử lý..." : "Đăng ký học sinh"}
                         </Button>
+                       
+                        <Typography
+                            variant="body2"
+                            textAlign="center"
+                            sx={{ color: "text.secondary" }}
+                        >
+                            Bạn là Admin? Đăng ký
+                            <Link
+                                href="/dang-ky/admin"
+                                sx={{ ml: 0.5, }}
+                            >
+                                tại đây
+                            </Link>
+                        </Typography>
                     </Stack>
                 </Box>
             </Paper>
