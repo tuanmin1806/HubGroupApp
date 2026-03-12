@@ -4,11 +4,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Person3Icon from "@mui/icons-material/Person3";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider, useMediaQuery, IconButton, Drawer, List, ListItem, ListItemText, ListItemButton, Menu, Button, MenuItem, Fade } from "@mui/material";
 import Link from "@mui/material/Link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import hub_logo from "../../assets/hub_logo.png";
 
@@ -41,10 +40,6 @@ function GuestHeader() {
 
     const handleNavigateLogin = () => {
         navigate("/dang-nhap");
-    }
-
-    const handleNavigateSignUp = () => {
-        navigate("/dang-ky");
     }
 
     const handleNavigateArticle = () => {

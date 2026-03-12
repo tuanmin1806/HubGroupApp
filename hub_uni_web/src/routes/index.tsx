@@ -31,10 +31,6 @@ const router = createBrowserRouter(
                     element: <CustomerLogin />,
                 },
                 {
-                    path: "dang-ky",
-                    element: <SelectRegisterType />,
-                },
-                {
                     path: "dang-ky/customer",
                     element: <StudentRegister />,
                 },

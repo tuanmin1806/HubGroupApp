@@ -5,6 +5,7 @@ import { useCustomerLoginMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
 import { Visibility, VisibilityOff, Login } from "@mui/icons-material";
 import LogoImage from "../../assets/hub_logo.png";
+import SelectRegisterType from "./select-register.page";
 
 const initialState = {
   UserName: "",
@@ -21,6 +22,7 @@ const CustomerLoginForm = () => {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState(initialState);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -146,8 +148,8 @@ const CustomerLoginForm = () => {
             >
               Chưa có tài khoản?
               <Link
-                href="/dang-ky"
                 sx={{ ml: 0.5, }}
+                onClick={() => setLoginDialogOpen(true)}
               >
                 Đăng ký ngay
               </Link>
@@ -155,6 +157,7 @@ const CustomerLoginForm = () => {
           </Stack>
         </Box>
       </Stack>
+      <SelectRegisterType open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} />
     </Paper>
   );
 };

@@ -1,57 +1,49 @@
-import { AdminPanelSettings, Person2 } from "@mui/icons-material";
-import { Box, Card, Typography, Button, Stack, Link } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, Stack, Button, Typography, IconButton, Link, } from "@mui/material";
+import { Close, School } from "@mui/icons-material";
+import { Person2 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-const SelectRegisterType = () => {
+interface Props {
+    open: boolean;
+    onClose: () => void;
+}
+
+export default function SelectRegisterType({ open, onClose }: Props) {
     const navigate = useNavigate();
 
-    return (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
-            <Card sx={{ p: 5, width: 450, borderRadius: 3 }}>
-                <Stack spacing={3} alignItems="center">
-                    <Typography variant="h5" fontWeight="bold">
-                        Chọn loại đăng ký
-                    </Typography>
+    const handleSelect = (path: string) => {
+        onClose();
+        navigate(path);
+    };
 
+    return (
+        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth
+            PaperProps={{ sx: { borderRadius: 3 } }}>
+            <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
+                <Typography fontWeight={700} fontSize={17}>Chọn loại tài khoản</Typography>
+                <IconButton size="small" onClick={onClose}><Close fontSize="small" /></IconButton>
+            </DialogTitle>
+
+            <DialogContent>
+                <Stack spacing={2} pt={0.5}>
                     <Button
-                        sx={{ backgroundColor: "#faa11b" }}
-                        fullWidth
-                        size="medium"
-                        variant="contained"
-                        onClick={() => navigate("/dang-ky/customer")}
+                        fullWidth size="large" variant="outlined"
+                        startIcon={<School />}
+                        onClick={() => handleSelect("/dang-ky/admin")}
+                        sx={{ borderColor: "#faa11b", color: "#faa11b", "&:hover": { borderColor: "#e28e13", bgcolor: "rgba(250,161,27,0.05)" }, textTransform: "none", fontWeight: 600, borderRadius: 2 }}
+                    >
+                        Trường
+                    </Button>
+                    <Button
+                        fullWidth size="large" variant="contained"
                         startIcon={<Person2 />}
+                        onClick={() => handleSelect("/dang-ky/customer")}
+                        sx={{ bgcolor: "#faa11b", "&:hover": { bgcolor: "#e28e13" }, textTransform: "none", fontWeight: 600, borderRadius: 2 }}
                     >
                         Học sinh
                     </Button>
-
-                    <Button
-                        sx={{ border: "1px solid", borderColor: "#faa11b", color: "#faa11b" }}
-                        fullWidth
-                        size="medium"
-                        variant="outlined"
-                        onClick={() => navigate("/dang-ky/admin")}
-                        startIcon={<AdminPanelSettings />}
-                    >
-                        Admin
-                    </Button>
-
-                    <Typography
-                        variant="body2"
-                        textAlign="center"
-                        sx={{ color: "text.secondary" }}
-                    >
-                        Đã có tài khoản?
-                        <Link
-                            href="/dang-nhap"
-                            sx={{ ml: 0.5, }}
-                        >
-                            Đăng nhập
-                        </Link>
-                    </Typography>
                 </Stack>
-            </Card>
-        </Box>
+            </DialogContent>
+        </Dialog>
     );
-};
-
-export default SelectRegisterType;
+}

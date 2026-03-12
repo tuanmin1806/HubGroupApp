@@ -52,7 +52,7 @@ const RecruiterSignupForm = () => {
 
     const [form, setForm] = useState({
         UserName: "", Password: "", ConfirmPassword: "", FullName: "",
-        Gender: Gender.Undefined, Email: "", PhoneNumber: "",
+        Gender: Gender.Other, Email: "", PhoneNumber: "",
         OrganizationTypeId: "", OrgName: "",
         ProvinceId: "", CommuneId: "", Address: "", OrgPhoneNumber: "", OrgEmail: "",
     });
@@ -207,10 +207,10 @@ const RecruiterSignupForm = () => {
     if (submitSuccess) {
         return (
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: 2 }}>
-                <CheckCircleIcon sx={{ fontSize: 72, color: "#faa11b" }} />
-                <Typography variant="h5" fontWeight={700} color="#faa11b">Đăng ký thành công!</Typography>
-                <Typography color="#faa11b">Tài khoản của bạn đang chờ phê duyệt.</Typography>
-                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#faa11b", px: 1, fontWeight: 600, "&:hover": { backgroundColor: "#e28e13" } }}> Đăng nhập </Button>
+                <CheckCircleIcon sx={{ fontSize: 72, color: "#008631" }} />
+                <Typography variant="h5" fontWeight={700} color="#008631">Đăng ký thành công!</Typography>
+                <Typography color="#008631">Tài khoản của bạn đang chờ phê duyệt.</Typography>
+                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#008631", px: 3, fontWeight: 600, "&:hover": { backgroundColor: "#09a743" } }}> Đăng nhập </Button>
             </Box>
         );
     }
@@ -261,7 +261,6 @@ const RecruiterSignupForm = () => {
                                 <Grid size={{ xs: 12 }}> <TextField label={<>Họ và tên <RequiredStar /></>} value={form.FullName} onChange={(e) => set("FullName", e.target.value)} fullWidth size="small" /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField select label="Giới tính" value={form.Gender} onChange={(e) => set("Gender", e.target.value)} fullWidth size="small">
-                                        <MenuItem value={Gender.Undefined}>Không yêu cầu</MenuItem>
                                         <MenuItem value={Gender.Male}>Nam</MenuItem>
                                         <MenuItem value={Gender.Female}>Nữ</MenuItem>
                                         <MenuItem value={Gender.Other}>Khác</MenuItem>
