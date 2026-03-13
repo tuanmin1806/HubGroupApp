@@ -35,11 +35,6 @@ const NAVIGATION: NavigationItem[] = [
         ],
     },
     {
-        segment: "manage-staff-account",
-        title: "Quản lý tài khoản",
-        icon: <ManageAccounts />,
-    },
-    {
         title: "Thông tin chung",
         icon: <Info />,
         children: [

@@ -522,8 +522,8 @@ const OrganizationDetailPage = () => {
                                                                         <Stack direction="row" flexWrap="wrap" gap={0.5} mb={0.75}>
                                                                             {post.Professions.slice(0, 3).map((p) => (
                                                                                 <Chip
-                                                                                    key={p.Id}
-                                                                                    label={p.Name}
+                                                                                    key={p.ProfessionId}
+                                                                                    label={p.ProfessionName}
                                                                                     size="small"
                                                                                     variant="outlined"
                                                                                     sx={{

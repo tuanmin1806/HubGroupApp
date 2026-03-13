@@ -1,38 +1,57 @@
-import { Dashboard, People } from "@mui/icons-material";
-import { createTheme, Grid } from "@mui/material";
+import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, People, Person } from "@mui/icons-material";
+import { createTheme, GlobalStyles, Grid } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import AdminHeader from "../components/headers/admin.header";
 import { AppProvider, type NavigationItem } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
 
 const NAVIGATION: NavigationItem[] = [
     {
         kind: "header",
-        title: "Tiện ích chính",
+        title: "Danh mục",
     },
     {
-        kind: "page",
-        segment: "admin",
+        segment: "/admin",
         title: "Trang chủ",
         icon: <Dashboard />,
     },
     {
-        kind: "page",
-        segment: "account-management",
-        title: "Quản lý tài khoản",
+        title: "Quản lý tuyển sinh",
+        icon: <ManageSearch />,
         children: [
             {
-                kind: "page",
-                segment: "manage-staff-accounts",
-                title: "Tài khoản nhân viên",
-                icon: <People />,
+                segment: "manage-recruitment-post",
+                title: "Quản lý chương trình tuyển sinh",
+                icon: <MenuBook />,
             },
             {
-                kind: "page",
-                segment: "manage-customer-accounts",
-                title: "Tài khoản khách hàng",
-                icon: <People />,
+                segment: "create-recruitment-post",
+                title: "Thêm chương trình tuyển sinh",
+                icon: <AddBox />,
+            },
+        ],
+    },
+    {
+        segment: "manage-staff-account",
+        title: "Quản lý tài khoản",
+        icon: <ManageAccounts />,
+    },
+    {
+        title: "Thông tin chung",
+        icon: <Info />,
+        children: [
+            {
+                segment: "personal-information",
+                title: "Thông tin cá nhân",
+                icon: <Person />,
+            },
+            {
+                segment: "organization-info",
+                title: "Thông tin tổ chức",
+                icon: <CorporateFare />,
             },
         ],
     },
@@ -44,30 +63,30 @@ const theme = createTheme({
     },
 });
 
-const getPageTitle = (pathname?: string) => {
+const getPageTitle = (pathname: string, schoolName?: string) => {
+    const name = schoolName || "trường";
     switch (pathname) {
         case "/admin":
-            return "Trang chủ";
+            return `Quản lý tin tuyển sinh ${name} | duhochan.hubgroup.vn`;
         default:
-            return "Admin";
+            return `Quản lý tin tuyển sinh ${name} | duhochan.hubgroup.vn`;
     }
 };
 
 export default function AdminLayout() {
+    const { user } = useSelector((state: RootState) => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
-        document.title = getPageTitle(location.pathname);
-    }, [location.pathname]);
+        const schoolName = user?.OrganizationName;
+        document.title = getPageTitle(location.pathname, schoolName);
+    }, [location.pathname, user]);
 
-    const handleNavigation = (path: string | URL) => {
-        if (typeof path === "string") {
-            navigate(path);
-        } else {
-            navigate(path.pathname + path.search);
-        }
+    const handleNavigation = (path) => {
+        navigate(`/admin/${path}`);
     };
+
     const router = {
         pathname: location.pathname,
         searchParams: new URLSearchParams(location.search),
@@ -79,7 +98,18 @@ export default function AdminLayout() {
             navigation={NAVIGATION}
             theme={theme}
             router={router}
+
         >
+            <GlobalStyles
+                styles={{
+                    'nav .MuiListItemButton-root:has(+ .MuiCollapse-root) .MuiListItemText-primary': {
+                        fontSize: '0.9rem',
+                    },
+                    'nav .MuiCollapse-root .MuiListItemText-primary': {
+                        fontSize: '0.9rem',
+                    },
+                }}
+            />
             <DashboardLayout>
                 <div style={{ padding: "8px 16px" }}>
                     <AdminHeader />

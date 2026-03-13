@@ -11,7 +11,6 @@ function StaffHeader() {
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
-    const roleName = user?.Roles[0].Name || "Nhân viên";
 
     const handleOpenUserMenu = (event) => { setAnchorElUser(event.currentTarget); };
     const handleCloseUserMenu = () => { setAnchorElUser(null); };

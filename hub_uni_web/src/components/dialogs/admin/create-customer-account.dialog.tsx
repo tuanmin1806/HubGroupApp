@@ -70,7 +70,7 @@ export default function CreateCustomerAccountDialog({
         if (!form.FullName.trim()) newErrors.FullName = "Họ và tên không được để trống";
         if (!form.UserName.trim()) newErrors.UserName = "Tên đăng nhập không được để trống";
         if (!form.Password.trim()) newErrors.Password = "Mật khẩu không được để trống";
-        else if (form.Password.length < 6) newErrors.Password = "Mật khẩu phải có ít nhất 6 ký tự";
+        else if (form.Password.length < 3) newErrors.Password = "Mật khẩu phải có ít nhất 3 ký tự";
         if (!form.Email.trim()) newErrors.Email = "Email không được để trống";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email)) newErrors.Email = "Email không hợp lệ";
         setErrors(newErrors);

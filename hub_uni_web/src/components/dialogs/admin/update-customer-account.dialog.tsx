@@ -24,11 +24,7 @@ const GENDER_OPTIONS = [
 
 const ACCOUNT_TYPE_OPTIONS = [
     { value: AccountType.Staff, label: "Nhân viên" },
-    { value: AccountType.Teacher, label: "Giáo viên" },
-    { value: AccountType.Collaborator, label: "Cộng tác viên" },
-    { value: AccountType.Manager, label: "Trưởng phòng" },
-    { value: AccountType.ViceDirector, label: "Phó Giám đốc" },
-    { value: AccountType.Director, label: "Giám đốc" },
+    { value: AccountType.Manager, label: "Quản lý" },
 ];
 
 const ACCOUNT_STATUS_OPTIONS = [

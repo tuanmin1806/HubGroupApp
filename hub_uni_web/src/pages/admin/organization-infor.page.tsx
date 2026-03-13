@@ -6,7 +6,7 @@ import { useState } from "react";
 import UpdateOrganizationDialog from "../../components/dialogs/admin/organization/update-organization.dialog";
 import { ConvertService } from "../../app/services/convert.service";
 import { Profession } from "../../app/models/organization.model";
-import LogoUploadDialog from "../../components/dialogs/staff/logo-upload.dialog";
+import LogoUploadDialog from "../../components/dialogs/admin/logo-upload.dialog";
 
 export default function OrganizationInforPage() {
     const userInfo = getUserInfo();

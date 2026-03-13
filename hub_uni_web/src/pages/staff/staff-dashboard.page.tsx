@@ -12,7 +12,6 @@ export default function StaffDashboardPage() {
                 Tổng quan hoạt động trường
             </Typography>
 
-            {/* Summary Cards */}
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Card sx={{ borderRadius: 3 }}>

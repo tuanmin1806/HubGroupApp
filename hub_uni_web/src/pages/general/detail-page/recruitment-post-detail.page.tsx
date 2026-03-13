@@ -694,8 +694,8 @@ const RecruitmentPostDetailPage = () => {
                                                                 <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                                                                     {post.Professions.slice(0, 3).map((profession) => (
                                                                         <Chip
-                                                                            key={profession.Id}
-                                                                            label={profession.Name}
+                                                                            key={profession.ProfessionId}
+                                                                            label={profession.ProfessionName}
                                                                             size="small"
                                                                             sx={{
                                                                                 bgcolor: '#fff3e0',

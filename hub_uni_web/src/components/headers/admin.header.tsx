@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import { Person3 } from "@mui/icons-material";
 import LogoImage from "../../assets/hub_logo.png"
+import { ConvertService } from "../../app/services/convert.service";
 
 function AdminHeader() {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ function AdminHeader() {
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, }}>
                 <Container maxWidth="xl">
-                    <Toolbar disableGutters>
+                    <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
                         <Box
                             onClick={() => navigate("/admin")}
                             sx={{
@@ -43,7 +44,6 @@ function AdminHeader() {
                                 Quản lý thông tin trường
                             </Typography>
                         </Box>
-                        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, }}></Box>
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="cài đặt">
                                 <Box
@@ -70,7 +70,7 @@ function AdminHeader() {
                                             {user?.UserName}
                                         </Typography>
 
-                                        <Typography variant="caption"> {roleName} </Typography>
+                                        <Typography variant="caption"> {ConvertService.convertAccountType(ConvertService.convertAccountTypeFromString(user?.AccountType))} </Typography>
                                     </Stack>
 
                                 </Box>

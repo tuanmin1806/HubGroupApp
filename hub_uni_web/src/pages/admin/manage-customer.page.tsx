@@ -7,8 +7,8 @@ import { useGetCustomerByOrganizationWithPageQuery } from "../../app/features/cu
 import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
 import { AccountStatus } from "../../app/models/enums.model";
-import CreateCustomerAccountDialog from "../../components/dialogs/staff/create-customer-account.dialog";
-import UpdateCustomerAccountDialog from "../../components/dialogs/staff/update-customer-account.dialog";
+import CreateCustomerAccountDialog from "../../components/dialogs/admin/create-customer-account.dialog";
+import UpdateCustomerAccountDialog from "../../components/dialogs/admin/update-customer-account.dialog";
 
 export default function ManageStaffAccountPage() {
     const [inputValue, setInputValue] = useState("");
