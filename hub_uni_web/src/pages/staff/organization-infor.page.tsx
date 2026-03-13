@@ -1,20 +1,22 @@
 import { Box, Container, Typography, Stack, Grid, Chip, CircularProgress, Divider, Button, IconButton, Tooltip } from "@mui/material";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetOrganizationByIdQuery } from "../../app/features/organization.api";
-import { Edit, LocationOn, Email, Language, Business, School, Phone, AccountBalance, Star, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, Bed } from "@mui/icons-material";
+import { Edit, LocationOn, Email, Language, Business, School, Phone, AccountBalance, Star, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, Bed, CameraAlt } from "@mui/icons-material";
 import { useState } from "react";
 import UpdateOrganizationDialog from "../../components/dialogs/admin/organization/update-organization.dialog";
 import { ConvertService } from "../../app/services/convert.service";
 import { Profession } from "../../app/models/organization.model";
+import LogoUploadDialog from "../../components/dialogs/staff/logo-upload.dialog";
 
 export default function OrganizationInforPage() {
     const userInfo = getUserInfo();
     const organizationId = userInfo?.OrganizationId ?? "";
     const [open, setOpen] = useState(false);
+    const [logoDialogOpen, setLogoDialogOpen] = useState(false);
 
     const { data, isLoading } = useGetOrganizationByIdQuery(organizationId, { skip: !organizationId });
 
-    if (isLoading) { return (<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}> <CircularProgress sx={{ color: "#faa11b" }} /></Box>); }
+    if (isLoading) { return (<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}> <CircularProgress sx={{ color: "#1975d1" }} /></Box>); }
 
     if (!data) return null;
 
@@ -28,7 +30,7 @@ export default function OrganizationInforPage() {
     ].filter((s) => s.url);
 
     return (
-        <Box sx={{ bgcolor: "#f0f2f5", minHeight: "100vh", pb: 3 }}>
+        <Box sx={{ bgcolor: "#f0f2f5", minHeight: "100vh", pb: 2 }}>
             <Box
                 sx={{
                     width: "100%",
@@ -78,7 +80,7 @@ export default function OrganizationInforPage() {
                     sx={{
                         position: "absolute", bottom: 0, left: "50%",
                         transform: "translateX(-50%)",
-                        zIndex: 2, pb: { xs: 2, md: 3 },
+                        zIndex: 2, pb: { xs: 1, md: 2 },
                         width: "100%",
                     }}
                 >
@@ -86,21 +88,49 @@ export default function OrganizationInforPage() {
                         <Box
                             sx={{
                                 flexShrink: 0,
+                                position: "relative",
                                 width: { xs: 72, md: 110 },
                                 height: { xs: 72, md: 110 },
-                                borderRadius: 3,
-                                overflow: "hidden",
-                                border: "3px solid #fff",
-                                bgcolor: "#fff",
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
                                 mb: { xs: 0, md: "6px" },
+                                cursor: "pointer",
+                                "&:hover .logo-overlay": { opacity: 1 },
                             }}
+                            onClick={() => setLogoDialogOpen(true)}
                         >
                             <Box
-                                component="img"
-                                src={data.LogoFullUrl}
-                                sx={{ width: "100%", height: "100%", objectFit: "contain", p: 0.5 }}
-                            />
+                                sx={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: 3,
+                                    overflow: "hidden",
+                                    border: "3px solid #fff",
+                                    bgcolor: "#fff",
+                                    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={data.LogoFullUrl}
+                                    sx={{ width: "100%", height: "100%", objectFit: "contain", p: 0.5 }}
+                                />
+                            </Box>
+
+                            <Box
+                                className="logo-overlay"
+                                sx={{
+                                    position: "absolute",
+                                    inset: 0,
+                                    borderRadius: 3,
+                                    bgcolor: "rgba(0,0,0,0.45)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    opacity: 0,
+                                    transition: "opacity 0.2s ease",
+                                }}
+                            >
+                                <CameraAlt sx={{ color: "#fff", fontSize: { xs: 20, md: 28 } }} />
+                            </Box>
                         </Box>
 
                         <Box pb={0.5}>
@@ -119,13 +149,13 @@ export default function OrganizationInforPage() {
                                 </Typography>
                                 {data.IsTop && (
                                     <Chip
-                                        icon={<Star sx={{ fontSize: 14, color: "#faa11b !important" }} />}
+                                        icon={<Star sx={{ fontSize: 14, color: "#1975d1 !important" }} />}
                                         label="TOP"
                                         size="small"
                                         sx={{
                                             bgcolor: "rgba(250,161,27,0.2)",
-                                            border: "1px solid #faa11b",
-                                            color: "#faa11b",
+                                            border: "1px solid #1975d1",
+                                            color: "#1975d1",
                                             fontWeight: 700,
                                             fontSize: 11,
                                             height: 22,
@@ -181,7 +211,7 @@ export default function OrganizationInforPage() {
                         <Stack spacing={0.5}>
 
                             {data.Summary && (
-                                <SectionCard title="Giới thiệu" icon={<School sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title="Giới thiệu" icon={<School sx={{ color: "#1975d1" }} />}>
                                     <Typography
                                         color="text.secondary"
                                         sx={{ lineHeight: 1.8, fontSize: 15 }}
@@ -192,14 +222,14 @@ export default function OrganizationInforPage() {
                             )}
 
                             {data.Highlights?.length > 0 && (
-                                <SectionCard title="Điểm nổi bật" icon={<Star sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title="Điểm nổi bật" icon={<Star sx={{ color: "#1975d1" }} />}>
                                     <Stack spacing={1}>
                                         {data.Highlights.map((h: string, i: number) => (
                                             <Stack key={i} direction="row" spacing={1} alignItems="center">
                                                 <Box
                                                     sx={{
                                                         width: 6, height: 6, borderRadius: "50%",
-                                                        bgcolor: "#faa11b", mt: "8px", flexShrink: 0,
+                                                        bgcolor: "#1975d1", mt: "8px", flexShrink: 0,
                                                     }}
                                                 />
                                                 <Typography color="text.secondary" sx={{ fontSize: 14, lineHeight: 1.7 }}>
@@ -212,7 +242,7 @@ export default function OrganizationInforPage() {
                             )}
 
                             {data.Description && (
-                                <SectionCard title="Thông tin chi tiết" icon={<Business sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title="Thông tin chi tiết" icon={<Business sx={{ color: "#1975d1" }} />}>
                                     <Box
                                         sx={{
                                             "& img": { maxWidth: "100%", borderRadius: 2 },
@@ -227,7 +257,7 @@ export default function OrganizationInforPage() {
                                             },
                                             "& th": { bgcolor: "#faf5ec", fontWeight: 700 },
                                             "& p": { lineHeight: 1.8, color: "#444", mb: 1 },
-                                            "& a": { color: "#faa11b" },
+                                            "& a": { color: "#1975d1" },
                                             fontSize: 14,
                                         }}
                                         dangerouslySetInnerHTML={{ __html: data.Description }}
@@ -236,7 +266,7 @@ export default function OrganizationInforPage() {
                             )}
 
                             {data.FeaturedImageFullUrls?.length > 0 && (
-                                <SectionCard title="Hình ảnh" icon={<Star sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title="Hình ảnh" icon={<Star sx={{ color: "#1975d1" }} />}>
                                     <Grid container spacing={1.5}>
                                         {data.FeaturedImageFullUrls.map((img: string, index: number) => (
                                             <Grid key={index} size={{ xs: 6, sm: 4 }}>
@@ -265,14 +295,14 @@ export default function OrganizationInforPage() {
                         <Stack spacing={0.5}>
 
                             {/* Contact info */}
-                            <SectionCard title="Thông tin liên hệ" icon={<Phone sx={{ color: "#faa11b" }} />}>
+                            <SectionCard title="Thông tin liên hệ" icon={<Phone sx={{ color: "#1975d1" }} />}>
                                 <Stack spacing={1.5}>
                                     {[
-                                        { icon: <LocationOn sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.Province },
-                                        data.PhoneNumber && { icon: <Phone sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.PhoneNumber },
-                                        data.Email && { icon: <Email sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.Email },
-                                        data.WebsiteUrl && { icon: <Language sx={{ fontSize: 16, color: "#faa11b" }} />, label: data.WebsiteUrl, href: data.WebsiteUrl },
-                                        data.ManagedBy && { icon: <AccountBalance sx={{ fontSize: 16, color: "#faa11b" }} />, label: `Quản lý: ${data.ManagedBy}` },
+                                        { icon: <LocationOn sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.Province },
+                                        data.PhoneNumber && { icon: <Phone sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.PhoneNumber },
+                                        data.Email && { icon: <Email sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.Email },
+                                        data.WebsiteUrl && { icon: <Language sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.WebsiteUrl, href: data.WebsiteUrl },
+                                        data.ManagedBy && { icon: <AccountBalance sx={{ fontSize: 16, color: "#1975d1" }} />, label: `Quản lý: ${data.ManagedBy}` },
                                     ].filter(Boolean).map((item: any, i) => (
                                         item && (
                                             <Stack key={i} direction="row" spacing={1} alignItems="flex-start">
@@ -283,7 +313,7 @@ export default function OrganizationInforPage() {
                                                         href={item.href}
                                                         target="_blank"
                                                         rel="noopener"
-                                                        sx={{ fontSize: 13, color: "#faa11b", wordBreak: "break-all", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                                                        sx={{ fontSize: 13, color: "#1975d1", wordBreak: "break-all", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
                                                     >
                                                         {item.label}
                                                     </Typography>
@@ -311,7 +341,7 @@ export default function OrganizationInforPage() {
                                                         size="small"
                                                         sx={{
                                                             color: "text.secondary",
-                                                            "&:hover": { color: "#faa11b", bgcolor: "rgba(250,161,27,0.08)" },
+                                                            "&:hover": { color: "#1975d1", bgcolor: "rgba(250,161,27,0.08)" },
                                                         }}
                                                     >
                                                         {s.icon}
@@ -325,10 +355,10 @@ export default function OrganizationInforPage() {
 
                             {/* Dorm cost */}
                             {data.DormCost && (
-                                <SectionCard title="Ký túc xá" icon={<Bed sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title="Ký túc xá" icon={<Bed sx={{ color: "#1975d1" }} />}>
                                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                        <Typography sx={{ fontSize: 13, color: "text.secondary" }}>Chi phí / kỳ</Typography>
-                                        <Typography sx={{ fontWeight: 700, color: "#faa11b", fontSize: 15 }}>
+                                        <Typography sx={{ fontSize: 13, color: "text.secondary" }}>Chi phí</Typography>
+                                        <Typography sx={{ fontWeight: 700, color: "#1975d1", fontSize: 15 }}>
                                             {ConvertService.formatCurrencyVND(data.DormCost)}{data.Currency}
                                         </Typography>
                                     </Stack>
@@ -337,20 +367,19 @@ export default function OrganizationInforPage() {
 
                             {/* Main Profession */}
                             {data.MainProfession && (
-                                <SectionCard title="Ngành chính" icon={<Star sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title="Ngành chính" icon={<Star sx={{ color: "#1975d1" }} />}>
                                     <Box
                                         sx={{
-                                            p: 0.5,
-                                            borderRadius: 2,
-                                            bgcolor: "rgba(250,161,27,0.06)",
-                                            border: "1px solid rgba(250,161,27,0.2)",
+                                            p: 1,
+                                            borderRadius: 1,
+                                            bgcolor: "#c8dff7ff",
                                         }}
                                     >
                                         <Typography fontWeight={700} fontSize={14} mb={0.5}>
                                             {data.MainProfession.ProfessionName}
                                         </Typography>
-                                        <Typography sx={{ color: "#faa11b", fontWeight: 600, fontSize: 13 }}>
-                                            {ConvertService.formatCurrencyVND(data.MainProfession.Cost)}{data.Currency}
+                                        <Typography sx={{ color: "#1975d1", fontWeight: 600, fontSize: 13 }}>
+                                            {ConvertService.formatCurrencyVND(data.MainProfession.Cost)} {data.Currency}
                                         </Typography>
                                     </Box>
                                 </SectionCard>
@@ -358,7 +387,7 @@ export default function OrganizationInforPage() {
 
                             {/* Professions */}
                             {data.Professions?.length > 0 && (
-                                <SectionCard title={`Ngành đào tạo (${data.Professions.length})`} icon={<School sx={{ color: "#faa11b" }} />}>
+                                <SectionCard title={`Ngành đào tạo (${data.Professions.length})`} icon={<School sx={{ color: "#1975d1" }} />}>
                                     <Stack spacing={0} divider={<Divider />}>
                                         {data.Professions.map((p: Profession, i: number) => (
                                             <Stack
@@ -374,7 +403,7 @@ export default function OrganizationInforPage() {
                                                 <Typography
                                                     sx={{
                                                         fontSize: 12, fontWeight: 600,
-                                                        color: "#faa11b", whiteSpace: "nowrap",
+                                                        color: "#1975d1", whiteSpace: "nowrap",
                                                     }}
                                                 >
                                                     {ConvertService.formatCurrencyVND(p.Cost)} {data.Currency}
@@ -390,6 +419,7 @@ export default function OrganizationInforPage() {
             </Container>
 
             <UpdateOrganizationDialog open={open} onClose={() => setOpen(false)} />
+            <LogoUploadDialog open={logoDialogOpen} onClose={() => setLogoDialogOpen(false)} currentLogoUrl={data.LogoFullUrl} organizationId={organizationId} />
         </Box>
     );
 }

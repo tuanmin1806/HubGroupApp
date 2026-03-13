@@ -38,7 +38,7 @@ const GlobalSnackbar = () => {
                 open={success.open}
                 autoHideDuration={2000}
                 onClose={handleCloseSuccess}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <Alert
                     onClose={handleCloseAlertSuccess}
@@ -53,7 +53,7 @@ const GlobalSnackbar = () => {
                 open={error.open}
                 autoHideDuration={2000}
                 onClose={handleCloseError}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <Alert
                     onClose={handleCloseAlertError}

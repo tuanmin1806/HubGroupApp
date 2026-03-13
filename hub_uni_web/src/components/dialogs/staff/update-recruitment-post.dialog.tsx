@@ -1,18 +1,19 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Grid, IconButton, CircularProgress, Typography, Divider, Box, Chip, Autocomplete, FormControlLabel, Switch, Paper, FormHelperText } from "@mui/material";
-import { Close, Add, Remove } from "@mui/icons-material";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Grid, IconButton, CircularProgress, Typography, Divider, Box, Chip, Autocomplete, Paper, FormHelperText, Accordion, AccordionSummary, AccordionDetails, FormControlLabel, Checkbox, } from "@mui/material";
+import { Close, Add, Remove, ExpandMore } from "@mui/icons-material";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
-import { useGetRecruitmentPostByIdQuery, useUpdateRecruitmentPostMutation } from "../../../app/features/recruitment-post.api";
+import { useGetRecruitmentPostByIdQuery, useLazyGetRecruitmentPostByIdQuery, useUpdateRecruitmentPostMutation } from "../../../app/features/recruitment-post.api";
+import { useGetOrganizationByIdQuery } from "../../../app/features/organization.api";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { RecruitPostStatus, Gender, JobExperience, EducationLevel } from "../../../app/models/enums.model";
-import { ProfessionResponse } from "../../../app/models/profession.model";
 import { Province } from "../../../app/models/province.model";
-import { UpdateRecruitmentPostRequest } from "../../../app/models/recruitment-post.model";
+import { Profession, Requirement, UpdateRecruitmentPostRequest } from "../../../app/models/recruitment-post.model";
 import { ConvertService } from "../../../app/services/convert.service";
 import { AppDispatch } from "../../../app/store";
 import RichTextEditorComponent from "../../editor";
+import { useGetAllVisaTypesQuery } from "../../../app/features/visa-type.api";
 
 interface UpdateRecruitmentPostDialogProps {
     open: boolean;
@@ -55,6 +56,19 @@ const EDUCATION_OPTIONS = [
     { value: EducationLevel.Postgraduate, label: "Sau đại học" },
 ];
 
+const emptyRequirement: Requirement = {
+    FromAge: undefined,
+    ToAge: undefined,
+    Gender: Gender.Undefined,
+    Experience: JobExperience.Undefined,
+    EducationLevel: EducationLevel.Undefined,
+    MinimumGpa: 0,
+    MaxYearsSinceGrad: 0,
+    MaxAbsence: 0,
+    VisaTypeId: "",
+    OtherReqs: [""],
+};
+
 const defaultForm: UpdateRecruitmentPostRequest = {
     Id: "",
     RecruitPostStatus: RecruitPostStatus.Draft,
@@ -64,13 +78,7 @@ const defaultForm: UpdateRecruitmentPostRequest = {
     Quantity: 1,
     Description: "",
     ProvinceId: "",
-    Requirement: {
-        FromAge: undefined,
-        ToAge: undefined,
-        Gender: Gender.Undefined,
-        Experience: JobExperience.Undefined,
-        EducationLevel: EducationLevel.Undefined,
-    },
+    Requirement: emptyRequirement,
     RecruitmentFromDate: null,
     RecruitmentToDate: null,
     IsTop: false,
@@ -80,110 +88,165 @@ const defaultForm: UpdateRecruitmentPostRequest = {
 interface FormErrors {
     Name?: string;
     ProvinceId?: string;
+    ProfessionIds?: string;
     Quantity?: string;
     Description?: string;
-    RecruitmentFromDate?: string;
-    RecruitmentToDate?: string;
 }
 
-export default function UpdateRecruitmentPostDialog({
-    open,
-    postId,
-    onClose,
-}: UpdateRecruitmentPostDialogProps) {
+export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onSuccess }: UpdateRecruitmentPostDialogProps) {
     const dispatch = useDispatch<AppDispatch>();
 
     const [form, setForm] = useState<UpdateRecruitmentPostRequest>(defaultForm);
     const [errors, setErrors] = useState<FormErrors>({});
-    const [selectedProfessions, setSelectedProfessions] = useState<ProfessionResponse[]>([]);
+    const [selectedProfessions, setSelectedProfessions] = useState<Profession[]>([]);
+    const [orgChangedManually, setOrgChangedManually] = useState(false);
 
     const [professionPage, setProfessionPage] = useState(1);
-    const [professionList, setProfessionList] = useState<ProfessionResponse[]>([]);
+    const [professionList, setProfessionList] = useState<Profession[]>([]);
     const [hasMoreProfessions, setHasMoreProfessions] = useState(true);
+    const professionSyncedRef = useRef(false);
     const professionListboxRef = useRef<HTMLUListElement | null>(null);
 
-    const { data: postData, isFetching: isFetchingPost } = useGetRecruitmentPostByIdQuery(postId ?? "", { skip: !postId || !open });
+    const [fetchRecruitmentPost, { data: postData, isFetching: isFetchingPost }] = useLazyGetRecruitmentPostByIdQuery();
     const { data: professionData, isFetching: isFetchingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: 10 }, { skip: !open });
     const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery(undefined, { skip: !open });
+    const { data: visaTypesData } = useGetAllVisaTypesQuery(undefined, { skip: !open });
+    const { data: organizationDetail, isFetching: isOrgDetailFetching } = useGetOrganizationByIdQuery(form.OrganizationId, { skip: !form.OrganizationId || !orgChangedManually });
     const [updateRecruitmentPost, { isLoading: isUpdating }] = useUpdateRecruitmentPostMutation();
 
+    const visaTypeOptions = useMemo(() => visaTypesData?.map((v: { Id: string; Name: string }) => ({ value: v.Id, label: v.Name })) ?? [], [visaTypesData]);
+
     useEffect(() => {
-        if (professionData?.Items) {
-            setProfessionList((prev) => {
-                const existingIds = new Set(prev.map((p) => p.Id));
-                const newItems = professionData.Items.filter((p: ProfessionResponse) => !existingIds.has(p.Id));
-                return [...prev, ...newItems];
-            });
-            if (professionData.Items.length < 10) setHasMoreProfessions(false);
-        }
+        if (!professionData?.Items) return;
+        setProfessionList((prev) => {
+            const existingIds = new Set(prev.map((p) => p.ProfessionId));
+            const newItems: Profession[] = professionData.Items
+                .filter((p: { Id: string }) => !existingIds.has(p.Id))
+                .map((p: { Id: string; Name: string }) => ({
+                    ProfessionId: p.Id,
+                    ProfessionName: p.Name,
+                    ProfessionSeoUrl: "",
+                    Cost: 0,
+                }));
+            return [...prev, ...newItems];
+        });
+        if (professionData.Items.length < 10) setHasMoreProfessions(false);
     }, [professionData]);
+
+    useEffect(() => {
+        if (!postData || professionSyncedRef.current) return;
+
+        const idsToResolve: string[] = postData.Professions?.length > 0 ? postData.Professions.map((p: { ProfessionId: string }) => p.ProfessionId) : (postData.ProfessionIds ?? []);
+
+        if (idsToResolve.length === 0) { professionSyncedRef.current = true; return; }
+
+        const matched = idsToResolve.map((id) => professionList.find((p) => p.ProfessionId === id)).filter((p): p is Profession => p !== undefined);
+
+        if (matched.length === idsToResolve.length || !hasMoreProfessions) {
+            setSelectedProfessions(matched);
+            setForm((prev) => ({ ...prev, ProfessionIds: matched.map((p) => p.ProfessionId) }));
+            professionSyncedRef.current = true;
+        }
+    }, [postData, professionList, hasMoreProfessions]);
+
+    useEffect(() => {
+        if (!organizationDetail || !orgChangedManually) return;
+
+        if (organizationDetail.ProvinceId) setForm((prev) => ({ ...prev, ProvinceId: organizationDetail.ProvinceId }));
+
+        const allIds: string[] = [];
+        if (organizationDetail.MainProfession?.ProfessionId) allIds.push(organizationDetail.MainProfession.ProfessionId);
+        organizationDetail.Professions?.forEach((p: { ProfessionId: string }) => {
+            if (p.ProfessionId && !allIds.includes(p.ProfessionId)) allIds.push(p.ProfessionId);
+        });
+
+        if (allIds.length > 0) {
+            const matched = allIds.map((id) => professionList.find((p) => p.ProfessionId === id)).filter((p): p is Profession => p !== undefined);
+            setSelectedProfessions(matched);
+            setForm((prev) => ({ ...prev, ProfessionIds: allIds }));
+        }
+    }, [organizationDetail, orgChangedManually]);
+
+    useEffect(() => { if (open) professionSyncedRef.current = false; }, [open, postId]);
+
+    useEffect(() => {
+        if (!postData) return;
+        setOrgChangedManually(false);
+        setForm({
+            Id: postData.Id,
+            RecruitPostStatus: ConvertService.convertPostStatusFromString(postData.RecruitPostStatus),
+            Name: postData.Name ?? "",
+            OrganizationId: postData.OrganizationId ?? "",
+            ProfessionIds: postData.ProfessionIds ?? [],
+            Quantity: postData.Quantity ?? 1,
+            Description: postData.Description ?? "",
+            ProvinceId: postData.ProvinceId ?? "",
+            Requirement: {
+                FromAge: postData.Requirement?.FromAge ?? undefined,
+                ToAge: postData.Requirement?.ToAge ?? undefined,
+                Gender: ConvertService.convertGenderFromString(postData.Requirement?.Gender),
+                Experience: ConvertService.convertJobExperienceFromString(postData.Requirement?.Experience),
+                EducationLevel: ConvertService.convertEducationLevelFromString(postData.Requirement?.EducationLevel),
+                MinimumGpa: postData.Requirement?.MinimumGpa ?? 0,
+                MaxYearsSinceGrad: postData.Requirement?.MaxYearsSinceGrad ?? 0,
+                MaxAbsence: postData.Requirement?.MaxAbsence ?? 0,
+                VisaTypeId: postData.Requirement?.VisaTypeId ?? "",
+                OtherReqs: postData.Requirement?.OtherReqs?.length > 0 ? postData.Requirement.OtherReqs : [""],
+            },
+            RecruitmentFromDate: postData.RecruitmentFromDate ?? null,
+            RecruitmentToDate: postData.RecruitmentToDate ?? null,
+            IsTop: postData.IsTop ?? false,
+            Highlights: postData.Highlights?.length > 0 ? postData.Highlights : [],
+        });
+    }, [postData]);
+
+    useEffect(() => {
+        if (open && postId) {
+            fetchRecruitmentPost(postId);
+        }
+    }, [open, postId, fetchRecruitmentPost]);
 
     const handleProfessionScroll = useCallback((event: React.UIEvent<HTMLUListElement>) => {
         const list = event.currentTarget;
-        if (list.scrollTop + list.clientHeight >= list.scrollHeight - 30 && hasMoreProfessions && !isFetchingProfessions) {
-            setProfessionPage((prev) => prev + 1);
-        }
+        if (list.scrollTop + list.clientHeight >= list.scrollHeight - 30 && hasMoreProfessions && !isFetchingProfessions) setProfessionPage((prev) => prev + 1);
     }, [hasMoreProfessions, isFetchingProfessions]);
 
-    useEffect(() => {
-        if (postData) {
-            setForm({
-                Id: postData.Id,
-                RecruitPostStatus: ConvertService.convertPostStatusFromString(postData.RecruitPostStatus),
-                Name: postData.Name ?? "",
-                OrganizationId: postData.OrganizationId ?? "",
-                ProfessionIds: postData.ProfessionIds ?? [],
-                Quantity: postData.Quantity ?? 1,
-                Description: postData.Description ?? "",
-                ProvinceId: postData.ProvinceId ?? "",
-                Requirement: {
-                    FromAge: postData.Requirement?.FromAge ?? undefined,
-                    ToAge: postData.Requirement?.ToAge ?? undefined,
-                    Gender: ConvertService.convertGenderFromString(postData.Requirement?.Gender),
-                    Experience: ConvertService.convertJobExperienceFromString(postData.Requirement?.Experience),
-                    EducationLevel: ConvertService.convertEducationLevelFromString(postData.Requirement?.EducationLevel),
-                },
-                RecruitmentFromDate: postData.RecruitmentFromDate ?? null,
-                RecruitmentToDate: postData.RecruitmentToDate ?? null,
-                IsTop: postData.IsTop ?? false,
-                Highlights: postData.Highlights ?? [],
-            });
-            setSelectedProfessions(postData.Professions ?? []);
-        }
-    }, [postData]);
-
-    const handleChange = (field: keyof UpdateRecruitmentPostRequest, value: unknown) => {
+    const handleChange = <K extends keyof UpdateRecruitmentPostRequest>(field: K, value: UpdateRecruitmentPostRequest[K]) => {
         setForm((prev) => ({ ...prev, [field]: value }));
         setErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
-    const handleRequirementChange = (field: keyof UpdateRecruitmentPostRequest["Requirement"], value: unknown) => { setForm((prev) => ({ ...prev, Requirement: { ...prev.Requirement, [field]: value } })); };
+    const handleRequirementChange = <K extends keyof Requirement>(field: K, value: Requirement[K]) => setForm((prev) => ({ ...prev, Requirement: { ...prev.Requirement, [field]: value } }));
 
-    const handleAddHighlight = () => { setForm((prev) => ({ ...prev, Highlights: [...prev.Highlights, ""] })); };
-
-    const handleHighlightChange = (index: number, value: string) => {
-        setForm((prev) => {
-            const updated = [...prev.Highlights];
-            updated[index] = value;
-            return { ...prev, Highlights: updated };
-        });
-    };
-
-    const handleRemoveHighlight = (index: number) => { setForm((prev) => ({ ...prev, Highlights: prev.Highlights.filter((_, i) => i !== index) })); };
-
-    const handleProfessionChange = (_: unknown, value: ProfessionResponse[]) => {
+    const handleProfessionChange = (_: unknown, value: Profession[]) => {
         setSelectedProfessions(value);
-        setForm((prev) => ({ ...prev, ProfessionIds: value.map((p) => p.Id) }));
+        setForm((prev) => ({ ...prev, ProfessionIds: value.map((p) => p.ProfessionId) }));
+        setErrors((prev) => ({ ...prev, ProfessionIds: undefined }));
     };
+
+    const selectedProvince = provinces.find((p: Province) => p.Id === form.ProvinceId) ?? null;
+    const handleProvinceChange = (_: React.SyntheticEvent, opt: Province | null) => {
+        setForm((prev) => ({ ...prev, ProvinceId: opt?.Id ?? "" }));
+        setErrors((prev) => ({ ...prev, ProvinceId: undefined }));
+    };
+
+    const handleAddHighlight = () => handleChange("Highlights", [...form.Highlights, ""]);
+    const handleHighlightChange = (i: number, val: string) => { const arr = [...form.Highlights]; arr[i] = val; handleChange("Highlights", arr); };
+    const handleRemoveHighlight = (i: number) => handleChange("Highlights", form.Highlights.filter((_, idx) => idx !== i));
+
+    const handleOtherReqChange = (i: number, val: string) => { const arr = [...form.Requirement.OtherReqs]; arr[i] = val; handleRequirementChange("OtherReqs", arr); };
+    const handleAddOtherReq = () => handleRequirementChange("OtherReqs", [...form.Requirement.OtherReqs, ""]);
+    const handleRemoveOtherReq = (i: number) => { const arr = form.Requirement.OtherReqs.filter((_, idx) => idx !== i); handleRequirementChange("OtherReqs", arr.length ? arr : [""]); };
 
     const validate = (): boolean => {
-        const newErrors: FormErrors = {};
-        if (!form.Name.trim()) newErrors.Name = "Tên bài đăng không được để trống";
-        if (!form.ProvinceId) newErrors.ProvinceId = "Vui lòng chọn tỉnh thành";
-        if (!form.Quantity || form.Quantity < 1) newErrors.Quantity = "Số lượng phải lớn hơn 0";
-        if (!form.Description.trim()) newErrors.Description = "Mô tả không được để trống";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        const e: FormErrors = {};
+        if (!form.Name.trim()) e.Name = "Tên bài đăng không được để trống";
+        if (!form.ProvinceId) e.ProvinceId = "Vui lòng chọn tỉnh thành";
+        if (!form.ProfessionIds.length) e.ProfessionIds = "Vui lòng chọn ít nhất một ngành nghề";
+        if (!form.Quantity || form.Quantity < 1) e.Quantity = "Số lượng phải lớn hơn 0";
+        if (!form.Description.trim()) e.Description = "Mô tả không được để trống";
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleClose = () => {
@@ -193,24 +256,34 @@ export default function UpdateRecruitmentPostDialog({
         setProfessionPage(1);
         setProfessionList([]);
         setHasMoreProfessions(true);
+        setOrgChangedManually(false);
+        professionSyncedRef.current = false;
         onClose();
     };
 
     const handleSubmit = async () => {
         if (!validate()) return;
         try {
-            await updateRecruitmentPost(form).unwrap();
+            await updateRecruitmentPost({
+                ...form,
+                Highlights: form.Highlights.filter((h) => h.trim()),
+                Requirement: { ...form.Requirement, OtherReqs: form.Requirement.OtherReqs.filter((r) => r.trim()) },
+            }).unwrap();
             dispatch(showSnackbar({ message: "Cập nhật bài tuyển sinh thành công!", severity: "success" }));
+            onSuccess?.();
             handleClose();
-        } catch (err) {
+        } catch {
             dispatch(showSnackbar({ message: "Cập nhật bài tuyển sinh thất bại. Vui lòng thử lại!", severity: "error" }));
         }
     };
 
     const isLoading = isFetchingPost || isUpdating;
+    const selectedVisaType = visaTypeOptions.find((v) => v.value === form.Requirement.VisaTypeId) ?? null;
+
+    const tf = { size: "small" as const, fullWidth: true };
 
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
+        <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth PaperProps={{ sx: { maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
                 <Typography variant="h6" fontWeight={600}>Chỉnh sửa bài tuyển sinh</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
@@ -218,293 +291,78 @@ export default function UpdateRecruitmentPostDialog({
             <Divider />
 
             <DialogContent sx={{ pt: 2 }}>
-                {isFetchingPost ? (
-                    <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                        <CircularProgress size={36} />
-                    </Box>
-                ) : (
+                {isFetchingPost ? <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}><CircularProgress size={36} /></Box> : (
                     <Grid container spacing={2}>
-
-                        <Grid size={{ xs: 12 }}>
-                            <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                                THÔNG TIN CƠ BẢN
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 8 }}>
-                            <TextField
-                                label="Tên bài đăng"
-                                fullWidth size="small" required
-                                value={form.Name}
-                                onChange={(e) => handleChange("Name", e.target.value)}
-                                error={!!errors.Name}
-                                helperText={errors.Name}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                            <TextField
-                                select label="Trạng thái"
-                                fullWidth size="small"
-                                value={form.RecruitPostStatus}
-                                onChange={(e) => handleChange("RecruitPostStatus", Number(e.target.value))}
-                            >
-                                {POST_STATUS_OPTIONS.map((opt) => (
-                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                        <Grid size={{ xs: 12 }}><Typography variant="subtitle2" fontWeight={600} color="text.secondary">THÔNG TIN CƠ BẢN</Typography></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tên bài đăng" required value={form.Name} onChange={(e) => handleChange("Name", e.target.value)} error={!!errors.Name} helperText={errors.Name} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Trạng thái" value={form.RecruitPostStatus} onChange={(e) => handleChange("RecruitPostStatus", Number(e.target.value) as RecruitPostStatus)}>{POST_STATUS_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Province> {...tf} options={provinces} getOptionLabel={(opt) => opt.Name ?? ""} isOptionEqualToValue={(opt, val) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label="Tỉnh / Thành phố" required error={!!errors.ProvinceId} helperText={errors.ProvinceId} />} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Profession, true> multiple {...tf} options={professionList} getOptionLabel={(opt) => opt.ProfessionName ?? opt.ProfessionId} value={selectedProfessions} onChange={handleProfessionChange} isOptionEqualToValue={(opt, val) => opt.ProfessionId === val.ProfessionId} loading={isFetchingProfessions || isOrgDetailFetching} ListboxProps={{ onScroll: handleProfessionScroll, ref: professionListboxRef, style: { maxHeight: 220 } }} renderTags={(value, getTagProps) => value.map((opt, index) => { const { key, ...tagProps } = getTagProps({ index }); return <Chip key={opt.ProfessionId} label={opt.ProfessionName ?? opt.ProfessionId} size="small" {...tagProps} />; })} renderInput={(params) => (<TextField {...params} label="Ngành nghề" required placeholder={selectedProfessions.length === 0 ? "Chọn ngành nghề..." : ""} error={!!errors.ProfessionIds} helperText={errors.ProfessionIds} InputProps={{ ...params.InputProps, endAdornment: (<> {(isFetchingProfessions || isOrgDetailFetching) && <CircularProgress size={16} />} {params.InputProps.endAdornment}</>) }} />)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Số lượng tuyển" type="number" required value={form.Quantity} onChange={(e) => handleChange("Quantity", Number(e.target.value))} error={!!errors.Quantity} helperText={errors.Quantity} inputProps={{ min: 1 }} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tuyển từ ngày" type="date" value={form.RecruitmentFromDate ?? ""} onChange={(e) => handleChange("RecruitmentFromDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tuyển đến ngày" type="date" value={form.RecruitmentToDate ?? ""} onChange={(e) => handleChange("RecruitmentToDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
+                        <Grid size={{ xs: 12 }}><Accordion variant="outlined" disableGutters sx={{ borderRadius: 1 }}><AccordionSummary expandIcon={<ExpandMore />}><Typography variant="subtitle2" fontWeight={600} color="text.secondary"> Yêu cầu ứng viên </Typography></AccordionSummary><AccordionDetails><Grid container spacing={2}>
+                            <Grid size={{ xs: 6 }}><TextField {...tf} label="Tuổi từ" type="number" value={form.Requirement.FromAge ?? ""} onChange={(e) => handleRequirementChange("FromAge", e.target.value ? Number(e.target.value) : undefined)} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 6 }}><TextField {...tf} label="Tuổi đến" type="number" value={form.Requirement.ToAge ?? ""} onChange={(e) => handleRequirementChange("ToAge", e.target.value ? Number(e.target.value) : undefined)} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Giới tính" value={form.Requirement.Gender} onChange={(e) => handleRequirementChange("Gender", Number(e.target.value) as Gender)}>{GENDER_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Kinh nghiệm" value={form.Requirement.Experience} onChange={(e) => handleRequirementChange("Experience", Number(e.target.value) as JobExperience)}>{EXPERIENCE_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Trình độ học vấn" value={form.Requirement.EducationLevel} onChange={(e) => handleRequirementChange("EducationLevel", Number(e.target.value) as EducationLevel)}>{EDUCATION_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="GPA tối thiểu" type="number" value={form.Requirement.MinimumGpa ?? 0} onChange={(e) => handleRequirementChange("MinimumGpa", Number(e.target.value))} inputProps={{ min: 0, step: 0.1 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Thời hạn tốt nghiệp tối đa (năm)" type="number" value={form.Requirement.MaxYearsSinceGrad ?? 0} onChange={(e) => handleRequirementChange("MaxYearsSinceGrad", Number(e.target.value))} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Số buổi nghỉ tối đa" type="number" value={form.Requirement.MaxAbsence ?? 0} onChange={(e) => handleRequirementChange("MaxAbsence", Number(e.target.value))} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><Autocomplete {...tf} options={visaTypeOptions} getOptionLabel={(opt) => opt.label} isOptionEqualToValue={(opt, val) => opt.value === val?.value} value={selectedVisaType} onChange={(_, opt) => handleRequirementChange("VisaTypeId", opt?.value ?? "")} renderInput={(params) => <TextField {...params} label="Loại visa" />} /></Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+                                    <Typography variant="body2" fontWeight={600} color="text.secondary"> Yêu cầu khác </Typography>
+                                    <Button size="small" startIcon={<Add />} onClick={handleAddOtherReq} sx={{ textTransform: "none", fontSize: 12 }}> Thêm </Button>
+                                </Box>
+                                {form.Requirement.OtherReqs.map((req, i) => (
+                                    <Box key={i} sx={{ display: "flex", gap: 1, mb: 1 }}>
+                                        <TextField {...tf} size="small" placeholder={`Yêu cầu ${i + 1}`} value={req} onChange={(e) => handleOtherReqChange(i, e.target.value)} />
+                                        <IconButton size="small" color="error" onClick={() => handleRemoveOtherReq(i)} disabled={form.Requirement.OtherReqs.length === 1 && !req.trim()}><Remove fontSize="small" /></IconButton>
+                                    </Box>
                                 ))}
-                            </TextField>
+                            </Grid>
                         </Grid>
-
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                            <TextField
-                                select label="Tỉnh / Thành phố"
-                                fullWidth size="small" required
-                                value={form.ProvinceId}
-                                onChange={(e) => handleChange("ProvinceId", e.target.value)}
-                                error={!!errors.ProvinceId}
-                                helperText={errors.ProvinceId}
-                            >
-                                {provinces.map((prov: Province) => (
-                                    <MenuItem key={prov.Id} value={prov.Id}>{prov.Name}</MenuItem>
-                                ))}
-                            </TextField>
+                        </AccordionDetails>
+                        </Accordion>
                         </Grid>
-
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                            <TextField
-                                label="Số lượng tuyển"
-                                type="number" fullWidth size="small" required
-                                value={form.Quantity}
-                                onChange={(e) => handleChange("Quantity", Number(e.target.value))}
-                                error={!!errors.Quantity}
-                                helperText={errors.Quantity}
-                                inputProps={{ min: 1 }}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={form.IsTop}
-                                        onChange={(e) => handleChange("IsTop", e.target.checked)}
-                                        color="primary"
-                                    />
-                                }
-                                label="Bài đăng nổi bật"
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
-                            <Autocomplete
-                                multiple
-                                options={professionList}
-                                getOptionLabel={(opt) => opt.Name}
-                                value={selectedProfessions}
-                                onChange={handleProfessionChange}
-                                isOptionEqualToValue={(opt, val) => opt.Id === val.Id}
-                                loading={isFetchingProfessions}
-                                ListboxProps={{
-                                    onScroll: handleProfessionScroll,
-                                    ref: professionListboxRef,
-                                    style: { maxHeight: 220 },
-                                }}
-                                renderTags={(value, getTagProps) =>
-                                    value.map((opt, index) => {
-                                        const { key, ...tagProps } = getTagProps({ index });
-                                        return (
-                                            <Chip
-                                                key={opt.Id}
-                                                label={opt.Name}
-                                                size="small"
-                                                {...tagProps}
-                                            />
-                                        );
-                                    })
-                                }
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Ngành nghề"
-                                        size="small"
-                                        placeholder="Chọn ngành nghề..."
-                                        InputProps={{
-                                            ...params.InputProps,
-                                            endAdornment: (
-                                                <>
-                                                    {isFetchingProfessions && <CircularProgress size={16} />}
-                                                    {params.InputProps.endAdornment}
-                                                </>
-                                            ),
-                                        }}
-                                    />
-                                )}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField
-                                label="Ngày bắt đầu tuyển dụng"
-                                type="date" fullWidth size="small"
-                                value={form.RecruitmentFromDate ?? ""}
-                                onChange={(e) => handleChange("RecruitmentFromDate", e.target.value || null)}
-                                InputLabelProps={{ shrink: true }}
-                                error={!!errors.RecruitmentFromDate}
-                                helperText={errors.RecruitmentFromDate}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField
-                                label="Ngày kết thúc tuyển dụng"
-                                type="date" fullWidth size="small"
-                                value={form.RecruitmentToDate ?? ""}
-                                onChange={(e) => handleChange("RecruitmentToDate", e.target.value || null)}
-                                InputLabelProps={{ shrink: true }}
-                                error={!!errors.RecruitmentToDate}
-                                helperText={errors.RecruitmentToDate}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
-                            <Paper elevation={1} sx={{ p: 2 }}>
-                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                                    Mô tả *
-                                </Typography>
-                                <RichTextEditorComponent
-                                    value={form.Description}
-                                    onChange={(value: string) => handleChange("Description", value)}
-                                />
-                                {errors.Description && (
-                                    <FormHelperText error sx={{ mt: 1 }}>{errors.Description}</FormHelperText>
-                                )}
-                            </Paper>
-                        </Grid>
-
-                        <Grid size={{ xs: 12 }}>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                                YÊU CẦU ỨNG VIÊN
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 3 }}>
-                            <TextField
-                                label="Tuổi từ"
-                                type="number" fullWidth size="small"
-                                value={form.Requirement.FromAge ?? ""}
-                                onChange={(e) => handleRequirementChange("FromAge", e.target.value ? Number(e.target.value) : undefined)}
-                                inputProps={{ min: 0 }}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 3 }}>
-                            <TextField
-                                label="Tuổi đến"
-                                type="number" fullWidth size="small"
-                                value={form.Requirement.ToAge ?? ""}
-                                onChange={(e) => handleRequirementChange("ToAge", e.target.value ? Number(e.target.value) : undefined)}
-                                inputProps={{ min: 0 }}
-                            />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 3 }}>
-                            <TextField
-                                select label="Giới tính"
-                                fullWidth size="small"
-                                value={form.Requirement.Gender}
-                                onChange={(e) => handleRequirementChange("Gender", Number(e.target.value))}
-                            >
-                                {GENDER_OPTIONS.map((opt) => (
-                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 3 }}>
-                            <TextField
-                                select label="Trình độ học vấn"
-                                fullWidth size="small"
-                                value={form.Requirement.EducationLevel}
-                                onChange={(e) => handleRequirementChange("EducationLevel", Number(e.target.value))}
-                            >
-                                {EDUCATION_OPTIONS.map((opt) => (
-                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                            <TextField
-                                select label="Kinh nghiệm"
-                                fullWidth size="small"
-                                value={form.Requirement.Experience}
-                                onChange={(e) => handleRequirementChange("Experience", Number(e.target.value))}
-                            >
-                                {EXPERIENCE_OPTIONS.map((opt) => (
-                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-
                         <Grid size={{ xs: 12 }}>
                             <Divider sx={{ my: 1 }} />
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-                                    ĐIỂM NỔI BẬT
-                                </Typography>
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                    onClick={handleAddHighlight}
-                                >
-                                    Thêm
-                                </Button>
+                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary"> THÔNG TIN NỔI BẬT </Typography>
+                                <Button size="small" variant="outlined" startIcon={<Add />} onClick={handleAddHighlight}> Thêm </Button>
                             </Box>
 
-                            {form.Highlights.length === 0 && (
-                                <Typography variant="body2" color="text.disabled" sx={{ fontStyle: "italic" }}>
-                                    Chưa có điểm nổi bật nào. Nhấn "Thêm" để bổ sung.
-                                </Typography>
-                            )}
+                            {form.Highlights.length === 0 && <Typography variant="body2" color="text.disabled" sx={{ fontStyle: "italic" }}> Chưa có điểm nổi bật nào. Nhấn "Thêm" để bổ sung. </Typography>}
 
-                            {form.Highlights.map((highlight, index) => (
-                                <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                                    <TextField
-                                        fullWidth size="small"
-                                        placeholder={`Điểm nổi bật ${index + 1}`}
-                                        value={highlight}
-                                        onChange={(e) => handleHighlightChange(index, e.target.value)}
-                                    />
-                                    <IconButton
-                                        size="small"
-                                        color="error"
-                                        onClick={() => handleRemoveHighlight(index)}
-                                    >
-                                        <Remove fontSize="small" />
-                                    </IconButton>
+                            {form.Highlights.map((h, i) => (
+                                <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                                    <TextField fullWidth size="small" placeholder={`Điểm nổi bật ${i + 1}`} value={h} onChange={(e) => handleHighlightChange(i, e.target.value)} />
+                                    <IconButton size="small" color="error" onClick={() => handleRemoveHighlight(i)}><Remove fontSize="small" /></IconButton>
                                 </Box>
                             ))}
                         </Grid>
 
+                        <Grid size={{ xs: 12 }}>
+                            <Paper elevation={1} sx={{ p: 2 }}>
+                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}> Mô tả * </Typography>
+                                <RichTextEditorComponent
+                                    key={form.Description}
+                                    value={form.Description}
+                                    onChange={(value) => handleChange("Description", value)}
+                                />
+                                {errors.Description && <FormHelperText error sx={{ mt: 1 }}>{errors.Description}</FormHelperText>}
+                            </Paper>
+                        </Grid>
                     </Grid>
                 )}
             </DialogContent>
-
             <Divider />
             <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
-                <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}>
-                    Hủy
-                </Button>
-                <Button
-                    onClick={handleSubmit}
-                    variant="contained"
-                    color="primary"
-                    disabled={isLoading}
-                    startIcon={isUpdating ? <CircularProgress size={16} color="inherit" /> : null}
-                >
-                    {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
+                <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}> Hủy </Button>
+                <Button onClick={handleSubmit} variant="contained" color="primary" disabled={isLoading} startIcon={isUpdating ? <CircularProgress size={16} color="inherit" /> : null}>
+                    {isUpdating ? "Đang lưu..." : "Lưu"}
                 </Button>
             </DialogActions>
         </Dialog>

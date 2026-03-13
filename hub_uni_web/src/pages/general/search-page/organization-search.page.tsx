@@ -50,12 +50,11 @@ const OrganizationSearchPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
-    const initialSearch = searchParams.get('search') || '';
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
 
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filters, setFilters] = useState<OrganizationFilterParams>({
-        nameSearch: initialSearch,
+        nameSearch: '',
         organizationTypeId: '',
         professionId: '',
         provinceId: '',
@@ -138,7 +137,7 @@ const OrganizationSearchPage = () => {
         }
         if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
             setSelectedProvinceSeo(provinceSeo);
-            const province = provinces?.find(p => p.SeoUrl === provinceSeo);
+            const province = provinces?.find(p => p.Seo === provinceSeo);
             setFilters(prev => ({
                 ...prev,
                 provinceId: province?.Id || '',

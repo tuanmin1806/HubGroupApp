@@ -111,6 +111,11 @@ export interface UpdateOrganizationRequest {
     Description: string;
 }
 
+export interface UpdateOrganizationLogoRequest {
+    Id: string;
+    formData: FormData;
+}
+
 export interface OrganizationFilterParams {
     page?: number;
     size?: number;

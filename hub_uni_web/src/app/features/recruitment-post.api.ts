@@ -103,5 +103,6 @@ export const {
     useCreateRecruitmentPostMutation,
     useGetRecruitmentPostsByOrganizationWithPageQuery,
     useGetRecruitmentPostByIdQuery,
-    useUpdateRecruitmentPostMutation
+    useUpdateRecruitmentPostMutation,
+    useLazyGetRecruitmentPostByIdQuery
 } = recruitmentPostApi;

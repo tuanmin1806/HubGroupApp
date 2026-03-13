@@ -83,7 +83,7 @@ export default function ManageStaffAccountPage() {
                 <TableCell>{staff.Email ?? "—"}</TableCell>
                 <TableCell>{staff.PhoneNumber ?? "—"}</TableCell>
                 <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(staff.Gender))}</TableCell>
-                <TableCell><Chip label={ConvertService.convertAccountStatus(staff.AccountStatus)} size="small" color={staff.AccountStatus === AccountStatus.Activated ? "success" : staff.AccountStatus === AccountStatus.Locked ? "error" : "default"} variant="outlined" />
+                <TableCell><Chip label={ConvertService.convertAccountStatus(ConvertService.convertAccountStatusFromString(staff.AccountStatus))} size="small" color={ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Activated ? "success" : staff.AccountStatus === AccountStatus.Locked ? "error" : "default"} variant="outlined" />
                 </TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>

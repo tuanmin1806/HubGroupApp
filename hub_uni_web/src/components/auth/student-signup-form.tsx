@@ -40,6 +40,7 @@ const StudentSignupForm = () => {
 
     const validate = (): string => {
         if (!form.UserName.trim()) return "Vui lòng nhập tên đăng nhập";
+        if (form.UserName.trim().length < 3) return "Tên đăng nhập phải có ít nhất 3 ký tự";
         if (!form.Password) return "Vui lòng nhập mật khẩu";
         if (form.Password !== form.ConfirmPassword) return "Mật khẩu xác nhận không khớp";
         if (!form.FullName.trim()) return "Vui lòng nhập họ và tên";

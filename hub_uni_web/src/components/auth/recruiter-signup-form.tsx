@@ -136,6 +136,7 @@ const RecruiterSignupForm = () => {
     const validateStep = (step: number): string => {
         if (step === 0) {
             if (!form.UserName.trim()) return "Vui lòng nhập tên đăng nhập";
+            if (form.UserName.trim().length < 3) return "Tên đăng nhập phải có ít nhất 3 ký tự";
             if (!form.Password) return "Vui lòng nhập mật khẩu";
             if (form.Password !== form.ConfirmPassword) return "Mật khẩu xác nhận không khớp";
             if (!form.FullName.trim()) return "Vui lòng nhập họ và tên";
@@ -210,7 +211,7 @@ const RecruiterSignupForm = () => {
                 <CheckCircleIcon sx={{ fontSize: 72, color: "#008631" }} />
                 <Typography variant="h5" fontWeight={700} color="#008631">Đăng ký thành công!</Typography>
                 <Typography color="#008631">Tài khoản của bạn đang chờ phê duyệt.</Typography>
-                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#008631", px: 3, fontWeight: 600, "&:hover": { backgroundColor: "#09a743" } }}> Đăng nhập </Button>
+                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#faa11b", px: 3, fontWeight: 600, "&:hover": { backgroundColor: "#fcb448ff" } }}> Đăng nhập </Button>
             </Box>
         );
     }

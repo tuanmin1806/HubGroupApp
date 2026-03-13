@@ -33,9 +33,19 @@ const visaTypeApi = baseApi.injectEndpoints({
                 Total: responseData.Total,
             }),
         }),
+        getAllVisaTypes: builder.query<VisaTypeResponse[], void>({
+            query: () => ({
+                url: `visatype/getall`,
+                method: "GET",
+            }),
+            transformResponse: (response: VisaTypeResponse[]): VisaTypeResponse[] => {
+                return response;
+            },
+        }),
     }),
 });
 
 export const {
     useGetVisaTypesByPageQuery,
+    useGetAllVisaTypesQuery
 } = visaTypeApi;

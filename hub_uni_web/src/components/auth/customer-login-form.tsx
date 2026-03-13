@@ -6,6 +6,9 @@ import { useState } from "react";
 import { Visibility, VisibilityOff, Login } from "@mui/icons-material";
 import LogoImage from "../../assets/hub_logo.png";
 import SelectRegisterType from "./select-register.page";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../app/store";
+import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 
 const initialState = {
   UserName: "",
@@ -18,6 +21,7 @@ const validators = {
 };
 
 const CustomerLoginForm = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const [customerLogin] = useCustomerLoginMutation();
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState(initialState);
@@ -49,7 +53,7 @@ const CustomerLoginForm = () => {
 
     try {
       const data = await customerLogin(form).unwrap();
-
+      dispatch(showSnackbar({ message: "Đăng nhập thành công", severity: "success" }));
       const defaultPage = data?.Roles?.[0]?.DefaultPage;
 
       if (from) {
@@ -60,7 +64,7 @@ const CustomerLoginForm = () => {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      console.log("đã xảy ra lỗi");
+      dispatch(showSnackbar({ message: "Không thể đăng nhập, vui lòng kiểm tra lại thông tin hoặc liên hệ với hỗ trợ kỹ thuật!", severity: "error" }));
     }
   };
 
@@ -144,7 +148,7 @@ const CustomerLoginForm = () => {
             <Typography
               variant="body2"
               textAlign="center"
-              sx={{ color: "text.secondary" }}
+              sx={{ color: "text.secondary", p: 1, cursor: "pointer" }}
             >
               Chưa có tài khoản?
               <Link

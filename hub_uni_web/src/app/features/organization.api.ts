@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse, UpdateOrganizationRequest } from "../models/organization.model";
+import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse, UpdateOrganizationLogoRequest, UpdateOrganizationRequest } from "../models/organization.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: OrganizationFilterParams): string => {
@@ -88,6 +88,14 @@ const organizationApi = baseApi.injectEndpoints({
                 body,
             }),
         }),
+
+        updateOrganizationLogo: builder.mutation<void, UpdateOrganizationLogoRequest>({
+            query: ({ Id, formData }) => ({
+                url: `organization/updatelogo?organizationId=${Id}`,
+                method: "PUT",
+                body: formData,
+            }),
+        }),
     }),
 });
 
@@ -99,5 +107,6 @@ export const {
     useUpdateOrganizationMutation,
     useLazyGetOrganizationByIdQuery,
     useLazyOrganizationsNameSearchQuery,
-    useLazyGetOrganizationBySeoQuery
+    useLazyGetOrganizationBySeoQuery,
+    useUpdateOrganizationLogoMutation
 } = organizationApi;

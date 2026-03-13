@@ -1,6 +1,5 @@
 import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "./enums.model";
 import { OrganizationResponse } from "./organization.model";
-import { ProfessionResponse } from "./profession.model";
 
 export interface Requirement {
     FromAge: number | undefined;
@@ -8,31 +7,50 @@ export interface Requirement {
     Gender: Gender;
     Experience: JobExperience;
     EducationLevel: EducationLevel;
+    MinimumGpa?: number;
+    MaxYearsSinceGrad?: number;
+    MaxAbsence?: number;
+    VisaTypeId?: string;
+    OtherReqs: string[];
+}
+
+export interface Profession {
+    ProfessionId: string;
+    ProfessionName: string;
+    ProfessionSeoUrl: string;
+    Cost: number;
 }
 
 export interface RecruitmentPostResponse {
     Id: string;
-    RecruitPostStatus: string;
+    Code: number;
+    RecruitPostStatus: RecruitPostStatus;
     Name: string;
+    Seo: string;
+    SeoUrl: string;
     OrganizationId: string;
     ProfessionIds: string[];
     Quantity: number;
     Cost: number;
     CostUsd: number;
+    MinCost: number;
+    MaxCost: number;
+    Currency: string;
     Description: string;
     ProvinceId: string;
-    Currency: string;
+    Province: string;
     Requirement: Requirement;
     RecruitmentFromDate: string;
     RecruitmentToDate: string;
     IsTop: boolean;
+    Highlights: string[];
+    Applied: boolean;
     Organization: OrganizationResponse;
-    Province: string;
-    Professions: ProfessionResponse[];
-    SeoUrl: string;
-    MinCost: number;
-    MaxCost: number;
-    Highlights?: string[];
+    Professions: Profession[];
+    CreatedBy: string;
+    CreatedAt: string;
+    UpdatedAt: string;
+    UpdatedBy: string;
 }
 
 export interface CreateRecruitmentPostRequest {

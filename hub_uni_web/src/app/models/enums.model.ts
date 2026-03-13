@@ -36,11 +36,7 @@ export enum Gender {
 export enum AccountType {
   Undefined = 0,
   Staff = 1,
-  Teacher = 2,
-  Collaborator = 3,
   Manager = 4,
-  ViceDirector = 5,
-  Director = 6,
   Student = 7,
   Admin = 10,
   SuperAdmin = 100
@@ -105,15 +101,15 @@ export enum EducationLevel {
 }
 
 export enum OrgStatus {
-    Undefined = 0,
-    Active = 1,
-    Inactive = 2,
-    Locked = 3,
+  Undefined = 0,
+  Active = 1,
+  Inactive = 2,
+  Locked = 3,
 }
 
 export enum RecruitPostStatus {
-    Undefined = 0,
-    Active = 1,
-    Inactive = 2,
-    Draft = 3
+  Undefined = 0,
+  Active = 1,
+  Inactive = 2,
+  Draft = 3
 }

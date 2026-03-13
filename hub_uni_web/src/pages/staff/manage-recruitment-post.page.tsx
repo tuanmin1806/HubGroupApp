@@ -1,5 +1,5 @@
 import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
-import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography } from "@mui/material";
+import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Tooltip, TablePagination, Button, CircularProgress, Box, Typography } from "@mui/material";
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
@@ -7,6 +7,7 @@ import { useGetRecruitmentPostsByCurrentCustomerQuery } from "../../app/features
 import { ConvertService } from "../../app/services/convert.service";
 import { useNavigate } from "react-router-dom";
 import UpdateRecruitmentPostDialog from "../../components/dialogs/staff/update-recruitment-post.dialog";
+import { formatDate } from "../../utils/date.utils";
 
 export default function ManageRecruitmentPostPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -61,11 +62,9 @@ export default function ManageRecruitmentPostPage() {
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
                 <TableCell component="th" scope="row">{post.Name}</TableCell>
-                <TableCell>{post.Organization?.Name ?? "—"}</TableCell>
                 <TableCell>{post.Province ?? "—"}</TableCell>
-                <TableCell>{post.Professions?.map(p => (<Chip key={p.Id} label={p.Name} size="small" sx={{ mr: 0.5, mb: 0.5 }} />)) ?? "—"}</TableCell>
                 <TableCell>{post.Quantity}</TableCell>
-                <TableCell>{post.RecruitmentToDate}</TableCell>
+                <TableCell>{formatDate(post.RecruitmentToDate)}</TableCell>
                 <TableCell>{ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(post.RecruitPostStatus))}</TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
@@ -87,7 +86,7 @@ export default function ManageRecruitmentPostPage() {
                     <Paper sx={{ display: "flex", alignItems: "center" }}>
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
-                            placeholder="Tìm kiếm bài đăng tuyển dụng"
+                            placeholder="Tìm kiếm chương trình tuyển sinh"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -103,7 +102,7 @@ export default function ManageRecruitmentPostPage() {
                         startIcon={<Add />}
                         onClick={() => navigate("/staff/create-recruitment-post")}
                     >
-                        Thêm bài đăng
+                        Thêm
                     </Button>
                 </Grid>
                 <Grid size={12}>
@@ -111,10 +110,8 @@ export default function ManageRecruitmentPostPage() {
                         <Table sx={{ minWidth: 650 }} size="small" aria-label="recruitment post table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Tên bài đăng</TableCell>
-                                    <TableCell>Tổ chức</TableCell>
+                                    <TableCell>Tên chương trình tuyển sinh</TableCell>
                                     <TableCell>Tỉnh/Thành phố</TableCell>
-                                    <TableCell>Nghề nghiệp</TableCell>
                                     <TableCell>Số lượng</TableCell>
                                     <TableCell>Hạn tuyển</TableCell>
                                     <TableCell>Trạng thái</TableCell>

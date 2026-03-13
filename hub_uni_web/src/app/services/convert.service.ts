@@ -16,7 +16,7 @@ export class ConvertService {
     };
 
     private static GENDER_MAP: Record<Gender, string> = {
-        [Gender.Undefined]: 'Không xác định',
+        [Gender.Undefined]: 'Không yêu cầu',
         [Gender.Male]: 'Nam',
         [Gender.Female]: 'Nữ',
         [Gender.Other]: 'Khác',
@@ -43,7 +43,7 @@ export class ConvertService {
     };
 
     private static EDUCATION_LEVEL_MAP: Record<EducationLevel, string> = {
-        [EducationLevel.Undefined]: 'Không xác định',
+        [EducationLevel.Undefined]: 'Không yêu cầu',
         [EducationLevel.PrimarySchool]: 'Tiểu học',
         [EducationLevel.MiddleSchool]: 'THCS',
         [EducationLevel.HighSchool]: 'THPT',
@@ -65,7 +65,7 @@ export class ConvertService {
     };
 
     private static JOB_EXPERIENCE_MAP: Record<JobExperience, string> = {
-        [JobExperience.Undefined]: 'Không xác định',
+        [JobExperience.Undefined]: 'Không yêu cầu',
         [JobExperience.LessThan1Year]: '< 1 năm',
         [JobExperience.From1To2Years]: '1-2 năm',
         [JobExperience.From2To3Years]: '2-3 năm',
@@ -87,11 +87,7 @@ export class ConvertService {
     private static ACCOUNT_TYPE_MAP: Record<AccountType, string> = {
         [AccountType.Undefined]: 'Không xác định',
         [AccountType.Staff]: 'Nhân viên',
-        [AccountType.Teacher]: 'Giáo viên',
-        [AccountType.Collaborator]: 'Cộng tác viên',
-        [AccountType.Manager]: 'Trưởng phòng',
-        [AccountType.ViceDirector]: 'Phó Giám đốc',
-        [AccountType.Director]: 'Giám đốc',
+        [AccountType.Manager]: 'Quản lý',
         [AccountType.Admin]: 'Quản trị viên',
         [AccountType.SuperAdmin]: 'SuperAdmin',
         [AccountType.Student]: 'Học sinh'
@@ -127,13 +123,10 @@ export class ConvertService {
     private static REVERSE_ACCOUNT_TYPE_MAP: Record<string, AccountType> = {
         'Undefined': AccountType.Undefined,
         'Staff': AccountType.Staff,
-        'Teacher': AccountType.Teacher,
-        'Collaborator': AccountType.Collaborator,
         'Manager': AccountType.Manager,
-        'ViceDirector': AccountType.ViceDirector,
-        'Director': AccountType.Director,
         'Admin': AccountType.Admin,
-        'SuperAdmin': AccountType.SuperAdmin
+        'SuperAdmin': AccountType.SuperAdmin,
+        'Student': AccountType.Student
     };
 
     private static ACCOUNT_STATUS_MAP: Record<AccountStatus, string> = {

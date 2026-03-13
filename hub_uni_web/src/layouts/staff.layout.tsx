@@ -1,15 +1,17 @@
-import { AddBox, CorporateFare, Dashboard, FactCheck, HourglassTop, Info, ManageAccounts, ManageSearch, MenuBook, Person, RamenDining, TableRestaurant } from "@mui/icons-material";
-import { createTheme, Grid } from "@mui/material";
+import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, Person } from "@mui/icons-material";
+import { createTheme, GlobalStyles, Grid } from "@mui/material";
 import { AppProvider, NavigationItem } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import StaffHeader from "../components/headers/staff.header";
+import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
 
 const NAVIGATION: NavigationItem[] = [
     {
         kind: "header",
-        title: "Tiện ích chính",
+        title: "Danh mục",
     },
     {
         segment: "/staff",
@@ -17,25 +19,25 @@ const NAVIGATION: NavigationItem[] = [
         icon: <Dashboard />,
     },
     {
-        segment: "manage-staff-account",
-        title: "Quản lý nhân viên",
-        icon: <ManageAccounts />,
-    },
-    {
-        title: "Quản lý tin tuyển sinh",
+        title: "Quản lý tuyển sinh",
         icon: <ManageSearch />,
         children: [
             {
                 segment: "manage-recruitment-post",
-                title: "Danh sách tin tuyển sinh",
+                title: "Quản lý chương trình tuyển sinh",
                 icon: <MenuBook />,
             },
             {
                 segment: "create-recruitment-post",
-                title: "Tạo tin tuyển sinh",
+                title: "Thêm chương trình tuyển sinh",
                 icon: <AddBox />,
             },
         ],
+    },
+    {
+        segment: "manage-staff-account",
+        title: "Quản lý tài khoản",
+        icon: <ManageAccounts />,
     },
     {
         title: "Thông tin chung",
@@ -61,22 +63,25 @@ const theme = createTheme({
     },
 });
 
-const getPageTitle = (pathname) => {
+const getPageTitle = (pathname: string, schoolName?: string) => {
+    const name = schoolName || "trường";
     switch (pathname) {
         case "/staff":
-            return "Trang chủ | Nhân viên";
+            return `Quản lý thông tin ${name} | duhochan.hubgroup.vn`;
         default:
-            return "Nền tảng tra cứu thông tin du học Hàn Quốc số 1 Việt Nam | duhochan.hubgroup.vn";
+            return `Quản lý thông tin ${name} | duhochan.hubgroup.vn`;
     }
 };
 
 export default function StaffLayout() {
+    const { user } = useSelector((state: RootState) => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
-        document.title = getPageTitle(location.pathname);
-    }, [location.pathname]);
+        const schoolName = user?.OrganizationName;
+        document.title = getPageTitle(location.pathname, schoolName);
+    }, [location.pathname, user]);
 
     const handleNavigation = (path) => {
         navigate(`/staff/${path}`);
@@ -93,7 +98,18 @@ export default function StaffLayout() {
             navigation={NAVIGATION}
             theme={theme}
             router={router}
+
         >
+            <GlobalStyles
+                styles={{
+                    'nav .MuiListItemButton-root:has(+ .MuiCollapse-root) .MuiListItemText-primary': {
+                        fontSize: '0.9rem',
+                    },
+                    'nav .MuiCollapse-root .MuiListItemText-primary': {
+                        fontSize: '0.9rem',
+                    },
+                }}
+            />
             <DashboardLayout>
                 <div style={{ padding: "8px 16px" }}>
                     <StaffHeader />
