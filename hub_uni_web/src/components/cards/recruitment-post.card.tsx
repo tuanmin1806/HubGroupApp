@@ -1,11 +1,11 @@
 import { Box, Card, Typography, Button, Tooltip, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
+import { RecruitmentPostDetailResponse } from "../../app/models/recruitment-post.model";
 import { Send, Visibility, PeopleAlt, CalendarToday, LocationOn, AccessTime } from "@mui/icons-material";
 import { formatDate } from "../../utils/date.utils";
 import { getRecruitmentStatus } from "../../utils/recruitment-post.utils";
 
-interface Props { recruitmentPosts: RecruitmentPostResponse[]; }
+interface Props { recruitmentPosts: RecruitmentPostDetailResponse[]; }
 
 export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Props) {
   const navigate = useNavigate();
