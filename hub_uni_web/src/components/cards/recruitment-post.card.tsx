@@ -1,4 +1,4 @@
-import { Box, Card, Typography, Button, Tooltip, Stack } from "@mui/material";
+import { Box, Card, Typography, Button, Tooltip, Stack, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostDetailResponse } from "../../app/models/recruitment-post.model";
 import { Send, Visibility, PeopleAlt, CalendarToday, LocationOn, AccessTime } from "@mui/icons-material";
@@ -81,7 +81,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 title={
                   <Box sx={{ p: 1, width: 350, maxHeight: 450, overflowY: "auto", overflowX: "hidden" }}>
                     <Typography fontWeight="bold" gutterBottom> {rcp.Name}</Typography>
-                    <Typography variant="body2"><b>Tổ chức:</b> {rcp.Organization.Name}</Typography>
+                    <Chip label={rcp.Organization.Name} size="small" variant="outlined" sx={{ height: "auto", fontSize: "0.8rem", borderColor: "#f3522a", color: "#f3522a", "& .MuiChip-label": { px: 0.7, whiteSpace: "normal" },}}/>
 
                     <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5}>
                       <PeopleAlt sx={{ fontSize: 14, color: "text.secondary" }} />
