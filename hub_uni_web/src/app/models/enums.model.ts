@@ -113,3 +113,10 @@ export enum RecruitPostStatus {
   Inactive = 2,
   Draft = 3
 }
+
+export enum ApplicationStatus {
+  Undefined = 0,
+  Accepted = 1,
+  Rejected = 2,
+  Pending = 3,
+}

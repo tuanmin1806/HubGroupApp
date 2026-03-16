@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Typography, Box, Stack, Checkbox, FormControlLabel, Divider, Avatar, IconButton, Link, Paper, CircularProgress, Alert,} from "@mui/material";
-import { Close, Warning, CheckCircle, Business} from "@mui/icons-material";
-import { useCreateApplicationMutation } from "../../../app/features/application";
+import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Typography, Box, Stack, Checkbox, FormControlLabel, Divider, Avatar, IconButton, Link, Paper, CircularProgress, Alert, } from "@mui/material";
+import { Close, Warning, CheckCircle, Business } from "@mui/icons-material";
+import { useCreateApplicationMutation } from "../../../app/features/application.api";
 import { getUserInfo } from "../../../app/services/auth.service";
 
 interface ApplyConfirmDialogProps {

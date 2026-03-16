@@ -11,7 +11,6 @@ import NotFoundPage from "../pages/general/auth-page/not-found.page";
 import CustomerLogin from "../pages/general/auth-page/customer-login.page";
 import StudentRegister from "../pages/general/auth-page/student-register.page";
 import AdminRegister from "../pages/general/auth-page/admin-register.page";
-import SelectRegisterType from "../components/auth/select-register.page";
 
 const router = createBrowserRouter(
     [

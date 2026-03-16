@@ -148,10 +148,6 @@ const RecruitmentPostDetailPage = () => {
                                     }}
                                 />
                             )}
-                            <Chip
-                                label={ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(recruitmentPost.RecruitPostStatus))}
-                                sx={{ bgcolor: 'rgba(47,153,51,0.9)', color: 'white', fontWeight: 600 }}
-                            />
                         </Stack>
 
                         {/* Title */}
@@ -445,7 +441,7 @@ const RecruitmentPostDetailPage = () => {
                                                         }
                                                     }}
                                                 >
-                                                    Xem trang tổ chức
+                                                    Xem thông tin trường
                                                 </Button>
                                             </Stack>
                                         </CardContent>
@@ -694,8 +690,8 @@ const RecruitmentPostDetailPage = () => {
                                                                 <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                                                                     {post.Professions.slice(0, 3).map((profession) => (
                                                                         <Chip
-                                                                            key={profession.ProfessionId}
-                                                                            label={profession.ProfessionName}
+                                                                            key={profession.Id}
+                                                                            label={profession.Name}
                                                                             size="small"
                                                                             sx={{
                                                                                 bgcolor: '#fff3e0',

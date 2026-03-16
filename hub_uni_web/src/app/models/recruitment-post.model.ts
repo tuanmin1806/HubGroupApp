@@ -21,6 +21,44 @@ export interface Profession {
     Cost: number;
 }
 
+export interface ProfessionDetail {
+    Id: string;
+    Name: string;
+    SeoUrl: string;
+}
+
+export interface RecruitmentPostDetailResponse {
+    Id: string;
+    Code: number;
+    RecruitPostStatus: RecruitPostStatus;
+    Name: string;
+    Seo: string;
+    SeoUrl: string;
+    OrganizationId: string;
+    ProfessionIds: string[];
+    Quantity: number;
+    Cost: number;
+    CostUsd: number;
+    MinCost: number;
+    MaxCost: number;
+    Currency: string;
+    Description: string;
+    ProvinceId: string;
+    Province: string;
+    Requirement: Requirement;
+    RecruitmentFromDate: string;
+    RecruitmentToDate: string;
+    IsTop: boolean;
+    Highlights: string[];
+    Applied: boolean;
+    Organization: OrganizationResponse;
+    Professions: ProfessionDetail[];
+    CreatedBy: string;
+    CreatedAt: string;
+    UpdatedAt: string;
+    UpdatedBy: string;
+}
+
 export interface RecruitmentPostResponse {
     Id: string;
     Code: number;
@@ -101,6 +139,7 @@ export interface UpdateRecruitmentPostRequest {
 export interface RecruitmentPostFilterParams {
     page?: number;
     size?: number;
+    organizationId?: string;
     professionId?: string;
     provinceId?: string;
     visaTypeId?: string;

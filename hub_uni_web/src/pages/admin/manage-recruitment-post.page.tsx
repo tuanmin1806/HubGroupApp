@@ -3,11 +3,12 @@ import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, T
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
-import { useGetRecruitmentPostsByCurrentCustomerQuery } from "../../app/features/recruitment-post.api";
+import { useGetRecruitmentPostsByCurrentCustomerQuery, useGetRecruitmentPostsByOrganizationQuery } from "../../app/features/recruitment-post.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { useNavigate } from "react-router-dom";
 import UpdateRecruitmentPostDialog from "../../components/dialogs/staff/update-recruitment-post.dialog";
 import { formatDate } from "../../utils/date.utils";
+import { getUserInfo } from "../../app/services/auth.service";
 
 export default function ManageRecruitmentPostPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -18,10 +19,12 @@ export default function ManageRecruitmentPostPage() {
     const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     const navigate = useNavigate();
+    const userInfo = getUserInfo();
+    const organizationId = userInfo?.OrganizationId ?? "";
 
-    const queryParams: RecruitmentPostFilterParams = { page: page + 1, size: rowsPerPage, searchValue: searchValue || undefined, ...filterParams, };
+    const queryParams: RecruitmentPostFilterParams = { page: page + 1, size: rowsPerPage, searchValue: searchValue || undefined, ...filterParams, organizationId: organizationId };
 
-    const { data, isLoading, isError } = useGetRecruitmentPostsByCurrentCustomerQuery(queryParams);
+    const { data, isLoading, isError } = useGetRecruitmentPostsByOrganizationQuery(queryParams);
 
     const handleSearch = useCallback(() => {
         setSearchValue(inputValue);
@@ -91,8 +94,14 @@ export default function ManageRecruitmentPostPage() {
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         />
-                        <IconButton onClick={handleClearSearch} sx={{ p: "10px" }} aria-label="clear"><Clear /></IconButton>
-                        <IconButton onClick={handleSearch} sx={{ p: "10px" }} aria-label="search"><Search /></IconButton>
+                        {inputValue && (
+                            <IconButton onClick={handleClearSearch} sx={{ p: "10px" }}>
+                                <Clear />
+                            </IconButton>
+                        )}
+                        <IconButton onClick={handleSearch} sx={{ p: "10px" }}>
+                            <Search />
+                        </IconButton>
                     </Paper>
                 </Grid>
                 <Grid size="auto">

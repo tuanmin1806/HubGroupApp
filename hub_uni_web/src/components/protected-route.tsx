@@ -1,27 +1,27 @@
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
 import { RootState } from "../app/store";
+import { PermissionGroupKey, PermissionGroups } from "../app/models/permissions-group-key.model";
+import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
-    permissions?: string[];
+    children: React.ReactNode;
+    permissionGroup: PermissionGroupKey;
 }
 
-const ProtectedRoute = ({ permissions }: ProtectedRouteProps) => {
-    const { user, token } = useSelector((state: RootState) => state.auth);
+export default function ProtectedRoute({ children, permissionGroup }: ProtectedRouteProps) {
+    const { user } = useSelector((state: RootState) => state.auth);
 
-    if (!token) {
-        return <Navigate to="/dang-nhap" replace />;
+    const userPermissions: string[] = user?.PermissionKeys ?? [];
+
+    const requiredPermissions = PermissionGroups[permissionGroup];
+
+    const hasAllPermissions = requiredPermissions.every(p =>
+        userPermissions.includes(p)
+    );
+
+    if (!user || !hasAllPermissions) {
+        return <Navigate to="/unauthorized" replace />;
     }
 
-    if (permissions && permissions.length > 0) {
-        const userPerms: string[] = user?.PermissionKeys ?? [];
-        const hasAccess = permissions.some((p) => userPerms.includes(p));
-        if (!hasAccess) {
-            return <Navigate to="/unauthorized" replace />;
-        }
-    }
-
-    return <Outlet />;
-};
-
-export default ProtectedRoute;
+    return <>{children}</>;
+}

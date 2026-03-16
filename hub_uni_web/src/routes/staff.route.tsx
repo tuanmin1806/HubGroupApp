@@ -1,4 +1,3 @@
-import { PermissionKeys } from "../app/models/permissions-key.model"
 import ProtectedRoute from "../components/protected-route"
 import CreateRecruitmentPostPage from "../pages/admin/create-recruitment-post.page"
 import ManageRecruitmentPostPage from "../pages/admin/manage-recruitment-post.page"
@@ -13,7 +12,11 @@ const staffRoutes = [
     },
     {
         path: "manage-recruitment-post",
-        element: <ManageRecruitmentPostPage />,
+        element: (
+            <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
+                <ManageRecruitmentPostPage />
+            </ProtectedRoute>
+        ),
     },
     {
         path: "organization-info",

@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { CreateRecruitmentPostRequest, RecruitmentPostFilterParams, RecruitmentPostResponse, UpdateRecruitmentPostRequest } from "../models/recruitment-post.model";
+import { CreateRecruitmentPostRequest, RecruitmentPostDetailResponse, RecruitmentPostFilterParams, RecruitmentPostResponse, UpdateRecruitmentPostRequest } from "../models/recruitment-post.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: RecruitmentPostFilterParams): string => {
@@ -16,7 +16,7 @@ const buildQueryString = (params?: RecruitmentPostFilterParams): string => {
 const recruitmentPostApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        getRecruitmentPostsByPage: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, RecruitmentPostFilterParams>({
+        getRecruitmentPostsByPage: builder.query<ApiPaginationResponse<RecruitmentPostDetailResponse[]>, RecruitmentPostFilterParams>({
             query: (params) => {
                 const queryString = buildQueryString(params);
                 return {
@@ -25,9 +25,9 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 };
             },
             transformResponse: (responseData: {
-                Items: RecruitmentPostResponse[];
+                Items: RecruitmentPostDetailResponse[];
                 Total: number;
-            }): ApiPaginationResponse<RecruitmentPostResponse[]> => ({
+            }): ApiPaginationResponse<RecruitmentPostDetailResponse[]> => ({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
@@ -55,6 +55,23 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 url: `recruitmentpost/getbyorganizationseo/${organizationSeo}`,
                 method: "GET",
             }),
+            transformResponse: (responseData: {
+                Items: RecruitmentPostResponse[];
+                Total: number;
+            }): ApiPaginationResponse<RecruitmentPostResponse[]> => ({
+                Items: responseData.Items,
+                Total: responseData.Total,
+            }),
+        }),
+
+        getRecruitmentPostsByOrganization: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, RecruitmentPostFilterParams>({
+            query: (params) => {
+                const queryString = buildQueryString(params);
+                return {
+                    url: `recruitmentpost/getbyorganization?${queryString}`,
+                    method: "GET",
+                };
+            },
             transformResponse: (responseData: {
                 Items: RecruitmentPostResponse[];
                 Total: number;
@@ -104,5 +121,6 @@ export const {
     useGetRecruitmentPostsByOrganizationWithPageQuery,
     useGetRecruitmentPostByIdQuery,
     useUpdateRecruitmentPostMutation,
-    useLazyGetRecruitmentPostByIdQuery
+    useLazyGetRecruitmentPostByIdQuery,
+    useGetRecruitmentPostsByOrganizationQuery
 } = recruitmentPostApi;

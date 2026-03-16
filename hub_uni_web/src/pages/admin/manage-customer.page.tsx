@@ -1,7 +1,6 @@
 import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
 import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Avatar } from "@mui/material";
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { CustomerResponse, CustomerFilterParams } from "../../app/models/customer.model";
 import { useGetCustomerByOrganizationWithPageQuery } from "../../app/features/customer.api";
 import { ConvertService } from "../../app/services/convert.service";
@@ -18,7 +17,6 @@ export default function ManageStaffAccountPage() {
     const [openDialog, setOpenDialog] = useState(false);
     const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
     const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
-    const navigate = useNavigate();
 
     const userInfo = getUserInfo();
     const organizationId = userInfo?.OrganizationId ?? "";

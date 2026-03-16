@@ -1,4 +1,4 @@
-import { AccountStatus, AccountType, EducationStatus, Gender, RoleStatus, StudentStatus, PermissionStatus, PositionStatus, DepartmentStatus, JobExperience, EducationLevel, OrgStatus, RecruitPostStatus } from "../models/enums.model";
+import { AccountStatus, AccountType, EducationStatus, Gender, RoleStatus, StudentStatus, PermissionStatus, PositionStatus, DepartmentStatus, JobExperience, EducationLevel, OrgStatus, RecruitPostStatus, ApplicationStatus } from "../models/enums.model";
 
 export class ConvertService {
 
@@ -227,6 +227,20 @@ export class ConvertService {
         'Draft': RecruitPostStatus.Draft
     };
 
+    private static APPLICATION_STATUS_MAP: Record<ApplicationStatus, string> = {
+        [ApplicationStatus.Undefined]: 'Không xác định',
+        [ApplicationStatus.Accepted]: 'Đã chấp nhận',
+        [ApplicationStatus.Rejected]: 'Đã từ chối',
+        [ApplicationStatus.Pending]: 'Chờ xử lý',
+    };
+
+    private static REVERSE_APPLICATION_STATUS_MAP: Record<string, ApplicationStatus> = {
+        'Undefined': ApplicationStatus.Undefined,
+        'Accepted': ApplicationStatus.Accepted,
+        'Rejected': ApplicationStatus.Rejected,
+        'Pending': ApplicationStatus.Pending
+    };
+
     static convertStatus(status: StudentStatus | null | undefined): string {
         return status !== null && status !== undefined
             ? this.STATUS_MAP[status] || 'Không xác định'
@@ -421,5 +435,17 @@ export class ConvertService {
         return postStatusString !== null && postStatusString !== undefined
             ? this.REVERSE_POST_STATUS_MAP[postStatusString] || RecruitPostStatus.Undefined
             : RecruitPostStatus.Undefined;
+    }
+
+    static convertApplicationStatus(applicationStatus: ApplicationStatus | null | undefined): string {
+        return applicationStatus !== null && applicationStatus !== undefined
+            ? this.APPLICATION_STATUS_MAP[applicationStatus] || 'Không xác định'
+            : 'Không xác định';
+    }
+
+    static convertApplicationStatusFromString(applicationStatusString: string | null | undefined | ApplicationStatus): ApplicationStatus {
+        return applicationStatusString !== null && applicationStatusString !== undefined
+            ? this.REVERSE_APPLICATION_STATUS_MAP[applicationStatusString] || ApplicationStatus.Undefined
+            : ApplicationStatus.Undefined;
     }
 }

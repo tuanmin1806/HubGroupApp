@@ -6,6 +6,7 @@ import ArticleDetailPage from "../pages/general/detail-page/article-detail.page"
 import RecruitmentPostDetailPage from "../pages/general/detail-page/recruitment-post-detail.page";
 import RecruitmentPostSearchPage from "../pages/general/search-page/recruitment-post-search.page";
 import RootRedirect from "../components/auth/root-redirect";
+import ApplicationListPage from "../pages/student/application-list.page";
 
 const generalRoutes = [
     {
@@ -44,6 +45,10 @@ const generalRoutes = [
         path: "/chuong-trinh-tuyen-sinh",
         element: <RecruitmentPostSearchPage />,
     },
+    {
+        path: "danh-sach-ung-tuyen",
+        element: <ApplicationListPage />,
+    }
 ];
 
 export default generalRoutes;

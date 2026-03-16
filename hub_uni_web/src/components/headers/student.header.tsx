@@ -35,7 +35,7 @@ function StudentHeader() {
         navigate("/sign-out");
     };
 
-     const handleOpenUserMenu = (event) => {
+    const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
     };
 
@@ -68,13 +68,6 @@ function StudentHeader() {
     const handleNavigateImageOffice = () => {
         window.open("https://vanphong.hubgroup.vn/", "_blank");
     }
-    const handleNavigateLogin = () => {
-        navigate("/dang-nhap");
-    }
-
-    const handleNavigateSignUp = () => {
-        navigate("/dang-ky");
-    }
 
     const handleNavigateOrganization = () => {
         navigate("/tim-kiem-truong");
@@ -84,9 +77,10 @@ function StudentHeader() {
         navigate("/chuong-trinh-tuyen-sinh");
     }
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    const handleNavigateApplicationList = () => {
+        navigate("/danh-sach-ung-tuyen");
+    }
+
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpenDrawer(newOpen);
     };
@@ -367,6 +361,16 @@ function StudentHeader() {
                                         }
                                     >
                                         Thông tin tài khoản
+                                    </Typography>
+                                </MenuItem>
+                                <MenuItem onClick={handleCloseUserMenu}>
+                                    <Typography
+                                        sx={{ textAlign: "center" }}
+                                        onClick={() =>
+                                            handleNavigateApplicationList()
+                                        }
+                                    >
+                                        Danh sách ứng tuyển
                                     </Typography>
                                 </MenuItem>
                                 <MenuItem onClick={handleSignOut}>

@@ -1,4 +1,4 @@
-import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, People, Person } from "@mui/icons-material";
+import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, MoveToInbox, People, Person } from "@mui/icons-material";
 import { createTheme, GlobalStyles, Grid } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -31,6 +31,11 @@ const NAVIGATION: NavigationItem[] = [
                 segment: "create-recruitment-post",
                 title: "Thêm chương trình tuyển sinh",
                 icon: <AddBox />,
+            },
+            {
+                segment: "manage-application",
+                title: "Quản lý đơn ứng tuyển",
+                icon: <MoveToInbox />,
             },
         ],
     },

@@ -643,7 +643,7 @@ const RecruitmentPostSearchPage = () => {
                                                     {post.Professions && post.Professions.length > 0 && (
                                                         <Stack direction="row" flexWrap="wrap" gap={0.5}>
                                                             {post.Professions.slice(0, 3).map((profession) => (
-                                                                <Chip key={profession.ProfessionId} label={profession.ProfessionName} size="small" variant="outlined"
+                                                                <Chip key={profession.Id} label={profession.Name} size="small" variant="outlined"
                                                                     sx={{
                                                                         height: 20, fontSize: "0.65rem", borderColor: "primary.light", color: "primary.main",
                                                                         "& .MuiChip-label": { px: 0.75 }

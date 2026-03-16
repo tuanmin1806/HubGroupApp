@@ -4,6 +4,8 @@ import OrganizationInforPage from "../pages/admin/organization-infor.page"
 import CreateRecruitmentPostPage from "../pages/admin/create-recruitment-post.page"
 import ManageRecruitmentPostPage from "../pages/admin/manage-recruitment-post.page"
 import PersonalInforPage from "../pages/staff/personal-infor.page"
+import ProtectedRoute from "../components/protected-route"
+import ManageApplicationPage from "../pages/admin/manage-application.page"
 
 const adminRoutes = [
     {
@@ -14,7 +16,11 @@ const adminRoutes = [
         children: [
             {
                 path: "manage-recruitment-post",
-                element: <ManageRecruitmentPostPage />,
+                element: (
+                    <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
+                        <ManageRecruitmentPostPage />
+                    </ProtectedRoute>
+                ),
             },
         ],
     },
@@ -28,11 +34,25 @@ const adminRoutes = [
     },
     {
         path: "manage-staff-account",
-        element: <ManageStaffAccountPage />,
+        element: (
+            <ProtectedRoute permissionGroup="MANAGE_STAFF_ACCOUNT">
+                <ManageStaffAccountPage />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "manage-application",
+        element: (
+            <ManageApplicationPage />
+        ),
     },
     {
         path: "create-recruitment-post",
-        element: <CreateRecruitmentPostPage />,
+        element: (
+            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST">
+                <CreateRecruitmentPostPage />
+            </ProtectedRoute>
+        ),
     },
 ]
 
