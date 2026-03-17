@@ -170,13 +170,13 @@ export default function ProfessionRecruitmentTabs() {
                             disabled={isFetching}
                             sx={{
                                 fontSize: 11,
-                                color: "#faa11b",
+                                color: "#ff5722",
                                 textTransform: "none",
                                 minWidth: 70,
-                                "&:hover": { bgcolor: "#fff8e1" },
+                                "&:hover": { bgcolor: "#f7e7e2ff" },
                             }}
                         >
-                            {isFetching ? (<CircularProgress size={12} sx={{ color: "#faa11b" }} />) : ("Xem thêm")}
+                            {isFetching ? (<CircularProgress size={12} sx={{ color: "#ff5722" }} />) : ("Xem thêm")}
                         </Button>
                     ) : (
                         <Box sx={{ minWidth: 70 }} />
@@ -188,10 +188,10 @@ export default function ProfessionRecruitmentTabs() {
                             position: "absolute",
                             right: 8,
                             fontSize: 11,
-                            color: "text.secondary",
+                            color: "#ff5722",
                             textTransform: "none",
                             minWidth: 0,
-                            "&:hover": { color: "#faa11b", bgcolor: "transparent" },
+                            "&:hover": { bgcolor: "#f7e7e2ff" },
                         }}
                     >
                         Xem tất cả →

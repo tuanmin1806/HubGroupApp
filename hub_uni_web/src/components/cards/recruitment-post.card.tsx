@@ -81,21 +81,21 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 title={
                   <Box sx={{ p: 1, width: 350, maxHeight: 450, overflowY: "auto", overflowX: "hidden" }}>
                     <Typography fontWeight="bold" gutterBottom> {rcp.Name}</Typography>
-                    <Chip label={rcp.Organization.Name} size="small" variant="outlined" sx={{ height: "auto", fontSize: "0.8rem", borderColor: "#f3522a", color: "#f3522a", "& .MuiChip-label": { px: 0.7, whiteSpace: "normal" },}}/>
+                    <Chip label={rcp.Organization.Name} size="small" variant="outlined" sx={{ height: "auto", fontSize: "0.8rem", borderColor: "#f3522a", color: "#f3522a", "& .MuiChip-label": { px: 0.7, whiteSpace: "normal" }, }} />
 
                     <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5}>
-                      <PeopleAlt sx={{ fontSize: 14, color: "text.secondary" }} />
+                      <PeopleAlt sx={{ fontSize: 14, color: "#faa11b" }} />
                       <Typography variant="body2">{rcp.Quantity} chỉ tiêu</Typography>
                     </Stack>
 
                     <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5}>
-                      <LocationOn sx={{ fontSize: 14, color: "text.secondary" }} />
+                      <LocationOn sx={{ fontSize: 14, color: "#faa11b" }} />
                       <Typography variant="body2">{rcp.Province}</Typography>
                     </Stack>
 
                     <Stack direction="row" spacing={0.5} alignItems="center" mt={0.5} mb={2}>
-                      <CalendarToday sx={{ fontSize: 13, color: "text.secondary" }} />
-                      <Typography variant="body2">{formatDate(rcp.RecruitmentToDate)}</Typography>
+                      <AccessTime sx={{ fontSize: 13, color: getRecruitmentStatus(rcp.RecruitmentToDate).color }} />
+                      <Typography variant="body2" sx={{ color: getRecruitmentStatus(rcp.RecruitmentToDate).color }}>{formatDate(rcp.RecruitmentToDate)}</Typography>
                     </Stack>
 
                     <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>

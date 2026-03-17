@@ -77,8 +77,8 @@ function StudentHeader() {
         navigate("/chuong-trinh-tuyen-sinh");
     }
 
-    const handleNavigateApplicationList = () => {
-        navigate("/danh-sach-ung-tuyen");
+    const handleNavigateAccountInfo = () => {
+        navigate("/thong-tin-tai-khoan");
     }
 
     const toggleDrawer = (newOpen: boolean) => () => {
@@ -360,17 +360,17 @@ function StudentHeader() {
                                             setOpenProfileDialog(true)
                                         }
                                     >
-                                        Thông tin tài khoản
+                                        Thông tin cá nhân
                                     </Typography>
                                 </MenuItem>
                                 <MenuItem onClick={handleCloseUserMenu}>
                                     <Typography
                                         sx={{ textAlign: "center" }}
                                         onClick={() =>
-                                            handleNavigateApplicationList()
+                                            handleNavigateAccountInfo()
                                         }
                                     >
-                                        Danh sách ứng tuyển
+                                        Thông tin tài khoản
                                     </Typography>
                                 </MenuItem>
                                 <MenuItem onClick={handleSignOut}>

@@ -290,6 +290,51 @@ const RecruitmentPostSearchPage = () => {
 
                                 <Divider sx={{ mb: 2 }} />
 
+                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
+                                        <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
+                                        Loại hình Visa
+                                    </FormLabel>
+                                    <Box sx={{ maxHeight: showAllVisaTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                                        {isLoadingVisaTypes && allVisaTypes.length === 0 ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                                            </Box>
+                                        ) : (
+                                            <RadioGroup
+                                                value={filters.visaTypeId}
+                                                onChange={(e) => handleFilterChange("visaTypeId", e.target.value)}
+                                            >
+                                                <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
+                                                {(showAllVisaTypes ? allVisaTypes : allVisaTypes.slice(0, 5)).map((visaType) => (
+                                                    <FormControlLabel
+                                                        key={visaType.Id}
+                                                        value={visaType.Id}
+                                                        control={<Radio size="small" />}
+                                                        label={<Typography variant="body2">{visaType.Name}</Typography>}
+                                                    />
+                                                ))}
+                                            </RadioGroup>
+                                        )}
+                                        {(hasMoreVisaTypes || allVisaTypes.length > 5) && (
+                                            <Button
+                                                size="small"
+                                                onClick={handleToggleVisaTypes}
+                                                disabled={isLoadingVisaTypes}
+                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                                            >
+                                                {isLoadingVisaTypes
+                                                    ? <CircularProgress size={16} />
+                                                    : (showAllVisaTypes && !hasMoreVisaTypes) ? "Thu gọn" : "Xem thêm"
+                                                }
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </FormControl>
+
+                                <Divider sx={{ mb: 2 }} />
+
                                 {/* Ngành nghề */}
                                 <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
                                     <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
@@ -365,51 +410,6 @@ const RecruitmentPostSearchPage = () => {
                                             <Button size="small" onClick={() => setShowAllProvinces(!showAllProvinces)}
                                                 sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
                                                 {showAllProvinces ? "Thu gọn" : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
-                                        <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Loại hình Visa
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllVisaTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingVisaTypes && allVisaTypes.length === 0 ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.visaTypeId}
-                                                onChange={(e) => handleFilterChange("visaTypeId", e.target.value)}
-                                            >
-                                                <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
-                                                {(showAllVisaTypes ? allVisaTypes : allVisaTypes.slice(0, 5)).map((visaType) => (
-                                                    <FormControlLabel
-                                                        key={visaType.Id}
-                                                        value={visaType.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{visaType.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {(hasMoreVisaTypes || allVisaTypes.length > 5) && (
-                                            <Button
-                                                size="small"
-                                                onClick={handleToggleVisaTypes}
-                                                disabled={isLoadingVisaTypes}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
-                                            >
-                                                {isLoadingVisaTypes
-                                                    ? <CircularProgress size={16} />
-                                                    : (showAllVisaTypes && !hasMoreVisaTypes) ? "Thu gọn" : "Xem thêm"
-                                                }
                                             </Button>
                                         )}
                                     </Box>
@@ -620,11 +620,11 @@ const RecruitmentPostSearchPage = () => {
                                                                         {post.Quantity} Chỉ tiêu
                                                                     </Typography>
                                                                 </Stack>
-                                                                {(post.MinCost || post.MaxCost || post.MinCost != 0 || post.MaxCost != 0) && (
+                                                                {(post.MinCost || post.MaxCost) && (
                                                                     <Stack direction="row" spacing={0.4} alignItems="center">
                                                                         <AttachMoney sx={{ fontSize: 14, color: "#faa11b" }} />
                                                                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem", whiteSpace: "nowrap" }}>
-                                                                            {post.MinCost && post.MaxCost ? `${formatCurrency(post.MinCost)} - ${formatCurrency(post.MaxCost)} ${post.Currency ?? ""}` : formatCurrency(post.MinCost)}
+                                                                            {post.MinCost && post.MaxCost && post.MinCost !== post.MaxCost ? `${formatCurrency(post.MinCost)} - ${formatCurrency(post.MaxCost)} ${post.Currency ?? ""}` : `${formatCurrency(post.MinCost || post.MaxCost)} ${post.Currency ?? ""}`}
                                                                         </Typography>
                                                                     </Stack>
                                                                 )}
@@ -667,10 +667,12 @@ const RecruitmentPostSearchPage = () => {
                                                                         {post.Requirement.Gender === Gender.Male ? "Nam" : post.Requirement.Gender === Gender.Female ? "Nữ" : "Không yêu cầu"}
                                                                     </Typography>
                                                                 )}
-                                                                {post.Requirement.FromAge && post.Requirement.ToAge && (
+                                                                {post.Requirement.FromAge != null && post.Requirement.ToAge != null && (
                                                                     <Typography variant="caption" color="text.secondary"
                                                                         sx={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 0.5 }}>
-                                                                        <Cake sx={{ fontSize: "0.8rem" }} /> {post.Requirement.FromAge} đến {post.Requirement.ToAge} tuổi
+                                                                        <Cake sx={{ fontSize: "0.8rem" }} />  {post.Requirement.FromAge === post.Requirement.ToAge
+                                                                            ? `${post.Requirement.FromAge} tuổi`
+                                                                            : `${post.Requirement.FromAge} đến ${post.Requirement.ToAge} tuổi`}
                                                                     </Typography>
                                                                 )}
                                                                 {post.Requirement.Experience && (

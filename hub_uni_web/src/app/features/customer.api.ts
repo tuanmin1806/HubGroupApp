@@ -1,5 +1,5 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse, UpdateCustomerRequest } from "../models/customer.model";
+import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse, UpdateCustomerRequest, UpdatePasswordRequest } from "../models/customer.model";
 import baseApi from "./base.api";
 
 const buildQueryString = (params?: CustomerFilterParams): string => {
@@ -45,6 +45,14 @@ const customerApi = baseApi.injectEndpoints({
             query: (body) => ({
                 url: "customer/update",
                 method: "PUT",
+                body,
+            }),
+        }),
+
+        updatePassword: builder.mutation<void, UpdatePasswordRequest>({
+            query: (body) => ({
+                url: "customer/updatepassword",
+                method: "POST",
                 body,
             }),
         }),
