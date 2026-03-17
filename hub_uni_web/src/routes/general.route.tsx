@@ -5,13 +5,13 @@ import SignOutPage from "../pages/general/auth-page/sign-out.page";
 import ArticleDetailPage from "../pages/general/detail-page/article-detail.page";
 import RecruitmentPostDetailPage from "../pages/general/detail-page/recruitment-post-detail.page";
 import RecruitmentPostSearchPage from "../pages/general/search-page/recruitment-post-search.page";
-import RootRedirect from "../components/auth/root-redirect";
-import ApplicationListPage from "../pages/student/application-list.page";
+import { HomePage } from "../pages/general";
+import AccountInfoPage from "../pages/student/account-info.page";
 
 const generalRoutes = [
     {
         path: '/',
-        element: <RootRedirect />,
+        element: <HomePage />,
     },
     {
         path: 'sign-out',
@@ -46,8 +46,8 @@ const generalRoutes = [
         element: <RecruitmentPostSearchPage />,
     },
     {
-        path: "danh-sach-ung-tuyen",
-        element: <ApplicationListPage />,
+        path: "thong-tin-tai-khoan",
+        element: <AccountInfoPage />,
     }
 ];
 

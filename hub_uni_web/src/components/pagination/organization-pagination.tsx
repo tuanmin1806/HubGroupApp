@@ -28,10 +28,10 @@ const OrganizationPagination = ({
                 onClick={onPrev}
                 disabled={page <= 1}
             >
-                <ArrowBackIosNew fontSize="small" />
+                <ArrowBackIosNew fontSize="small" sx={{ color: "#ff5722" }} />
             </IconButton>
 
-            <Typography>
+            <Typography sx={{ color: "#ff5722" }}>
                 <strong>{page}</strong> / {totalPages}
             </Typography>
 
@@ -39,7 +39,7 @@ const OrganizationPagination = ({
                 onClick={onNext}
                 disabled={page >= totalPages}
             >
-                <ArrowForwardIos fontSize="small" />
+                <ArrowForwardIos fontSize="small" sx={{ color: "#ff5722" }} />
             </IconButton>
         </Box>
     );

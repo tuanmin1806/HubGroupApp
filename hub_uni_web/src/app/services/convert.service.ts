@@ -255,8 +255,8 @@ export class ConvertService {
 
     static convertGenderFromString(genderString: string | null | undefined | Gender): Gender {
         return genderString !== null && genderString !== undefined
-            ? this.REVERSE_GENDER_MAP[genderString] || Gender.Male
-            : Gender.Male;
+            ? this.REVERSE_GENDER_MAP[genderString] || Gender.Undefined
+            : Gender.Undefined;
     }
 
     static convertEducationLevel(educationLevel: EducationLevel | null | undefined): string {

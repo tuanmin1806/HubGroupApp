@@ -1,7 +1,19 @@
 import { Department } from "./department.model";
-import { AccountStatus, AccountType, Gender } from "./enums.model";
+import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } from "./enums.model";
 import { Position } from "./position.model";
 import { RoleResponse } from "./role.model copy";
+
+export interface ProfileInfo {
+    DateOfBirth: string;
+    Experience: JobExperience;
+    EducationLevel: EducationLevel;
+    GraduationYear: number;
+    Gpa: number;
+    Gender: Gender;
+    ProvinceId: string;
+    CommuneId: string;
+    Address: string;
+}
 
 export interface CustomerResponse {
     Id: string;
@@ -22,6 +34,7 @@ export interface CustomerResponse {
     Roles: RoleResponse[];
     Departments: Department[];
     AccountStatus: AccountStatus;
+    ProfileInfo?: ProfileInfo;
 }
 
 export interface CreateCustomerRequest {
@@ -39,12 +52,20 @@ export interface CreateCustomerRequest {
 export interface UpdateCustomerRequest {
     Id: string;
     FullName: string;
+    UserName?: string;
     Email: string;
     PhoneNumber: string | null;
     Gender: Gender;
-    AccountType: AccountType;
-    RoleIds: string[];
-    AccountStatus: AccountStatus;
+    AccountType?: AccountType;
+    RoleIds?: string[];
+    AccountStatus?: AccountStatus;
+    ProfileInfo?: ProfileInfo;
+}
+
+export interface UpdatePasswordRequest {
+    CurrentPassword: string;
+    NewPassword: string;
+    ConfirmPassword: string;
 }
 
 export interface CustomerFilterParams {

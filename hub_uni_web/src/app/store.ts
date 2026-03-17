@@ -11,7 +11,6 @@ const initializeAuth = (store: any) => {
     }
 };
 
-
 const store = configureStore({
     reducer: {
         [baseApi.reducerPath]: baseApi.reducer,

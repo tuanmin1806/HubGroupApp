@@ -51,10 +51,11 @@ const OrganizationSearchPage = () => {
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
+    const initialNameSearch = searchParams.get('search') || '';
 
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filters, setFilters] = useState<OrganizationFilterParams>({
-        nameSearch: '',
+        nameSearch: initialNameSearch,
         organizationTypeId: '',
         professionId: '',
         provinceId: '',
