@@ -7,6 +7,8 @@ import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api"
 import { Province } from "../../app/models/province.model";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
 
+const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
+
 const initialState = {
     UserName: "",
     Password: "",
@@ -101,7 +103,7 @@ const StudentSignupForm = () => {
 
     return (
         <Box sx={{ maxWidth: 600, mx: "auto", px: { xs: 0.5, sm: 0.5 }, py: { xs: 0.5, sm: 0.5 } }}>
-            <Typography variant="h5" fontWeight={700} textAlign="center" color="#faa11b" mb={0.5}> Đăng ký thông tin </Typography>
+            <Typography variant="h5" fontWeight={700} textAlign="center" color="#faa11b" mb={0.5}> Đăng ký tài khoản </Typography>
             <Typography variant="body2" color="text.secondary" textAlign="center" mb={1}> Vui lòng điền đầy đủ thông tin để tạo tài khoản </Typography>
 
             {error && (<Alert severity="error" sx={{ mb: 1 }} onClose={() => setError("")}>{error}</Alert>)}
@@ -112,18 +114,18 @@ const StudentSignupForm = () => {
                         <Box>
                             <Typography variant="subtitle2" fontWeight={600} color="#faa11b" mb={1}> Thông tin tài khoản </Typography>
                             <Grid container spacing={2.5}>
-                                <Grid size={{ xs: 12 }}> <TextField label="Tên đăng nhập *" size="small" fullWidth value={form.UserName} onChange={(e) => set("UserName", e.target.value)} /> </Grid>
-                                <Grid size={{ xs: 12 }}> <TextField label="Mật khẩu *" type="password" size="small" fullWidth value={form.Password} onChange={(e) => set("Password", e.target.value)} /></Grid>
-                                <Grid size={{ xs: 12 }}> <TextField label="Xác nhận mật khẩu *" type="password" size="small" fullWidth value={form.ConfirmPassword} onChange={(e) => set("ConfirmPassword", e.target.value)} error={!!form.ConfirmPassword && form.Password !== form.ConfirmPassword} helperText={form.ConfirmPassword && form.Password !== form.ConfirmPassword ? "Mật khẩu không khớp" : ""} /></Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<>Tên đăng nhập <RequiredStar /></>} size="small" fullWidth value={form.UserName} onChange={(e) => set("UserName", e.target.value)} /> </Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<>Mật khẩu <RequiredStar /></>} type="password" size="small" fullWidth value={form.Password} onChange={(e) => set("Password", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<>Xác nhận mật khẩu <RequiredStar /></>} type="password" size="small" fullWidth value={form.ConfirmPassword} onChange={(e) => set("ConfirmPassword", e.target.value)} error={!!form.ConfirmPassword && form.Password !== form.ConfirmPassword} helperText={form.ConfirmPassword && form.Password !== form.ConfirmPassword ? "Mật khẩu không khớp" : ""} /></Grid>
                             </Grid>
                         </Box>
 
                         <Box>
                             <Typography variant="subtitle2" fontWeight={600} color="#faa11b" mb={1}> Thông tin cá nhân </Typography>
                             <Grid container spacing={2.5}>
-                                <Grid size={{ xs: 12 }}> <TextField label="Họ và tên *" size="small" fullWidth value={form.FullName} onChange={(e) => set("FullName", e.target.value)} /></Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Email *" type="email" size="small" fullWidth value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Số điện thoại" size="small" fullWidth value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<>Họ và tên <RequiredStar /></>} size="small" fullWidth value={form.FullName} onChange={(e) => set("FullName", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Email" type="email" size="small" fullWidth value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label={<>Số điện thoại <RequiredStar /></>} size="small" fullWidth value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField select label="Giới tính" size="small" fullWidth value={form.Gender} onChange={(e) => set("Gender", e.target.value)}>
                                     <MenuItem value={Gender.Undefined}>Không yêu cầu</MenuItem>
                                     <MenuItem value={Gender.Male}>Nam</MenuItem>
@@ -171,9 +173,9 @@ const StudentSignupForm = () => {
                             fullWidth
                             disabled={submitting}
                             startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
-                            sx={{ py: 1 , backgroundColor: "#faa11b", borderRadius: 2}}
+                            sx={{ backgroundColor: "#faa11b", borderRadius: 1}}
                         >
-                            {submitting ? "Đang xử lý..." : "Đăng ký học sinh"}
+                            {submitting ? "Đang xử lý..." : "Đăng ký"}
                         </Button>
                        
                         <Typography
@@ -181,7 +183,7 @@ const StudentSignupForm = () => {
                             textAlign="center"
                             sx={{ color: "text.secondary" }}
                         >
-                            Bạn là Admin? Đăng ký
+                            Bạn muốn tạo tài khoản trường? Đăng ký
                             <Link
                                 href="/dang-ky/admin"
                                 sx={{ ml: 0.5, }}
