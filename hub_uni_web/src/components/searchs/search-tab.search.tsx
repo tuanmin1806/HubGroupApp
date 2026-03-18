@@ -7,10 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/date.utils";
 import { getRecruitmentStatus } from "../../utils/recruitment-post.utils";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export default function ProfessionRecruitmentTabs() {
     const [selected, setSelected] = React.useState(0);
+    const listRef = React.useRef<HTMLDivElement | null>(null);
     const [page, setPage] = React.useState(1);
     const [allPosts, setAllPosts] = React.useState<any[]>([]);
     const [total, setTotal] = React.useState(0);
@@ -35,7 +36,21 @@ export default function ProfessionRecruitmentTabs() {
 
     const hasMore = allPosts.length < total;
 
-    const handleLoadMore = () => { if (!isFetching && hasMore) setPage((p) => p + 1); };
+    React.useEffect(() => {
+        const el = listRef.current;
+        if (!el) return;
+
+        const handleScroll = () => {
+            const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50;
+
+            if (nearBottom && hasMore && !isFetching) {
+                setPage((p) => p + 1);
+            }
+        };
+
+        el.addEventListener("scroll", handleScroll);
+        return () => el.removeEventListener("scroll", handleScroll);
+    }, [hasMore, isFetching]);
 
     return (
         <Box
@@ -86,6 +101,7 @@ export default function ProfessionRecruitmentTabs() {
 
             <Box sx={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
                 <Box
+                    ref={listRef}
                     sx={{
                         flex: 1,
                         overflowY: "auto",
@@ -163,24 +179,6 @@ export default function ProfessionRecruitmentTabs() {
                         flexShrink: 0,
                     }}
                 >
-                    {hasMore ? (
-                        <Button
-                            size="small"
-                            onClick={handleLoadMore}
-                            disabled={isFetching}
-                            sx={{
-                                fontSize: 11,
-                                color: "#ff5722",
-                                textTransform: "none",
-                                minWidth: 70,
-                                "&:hover": { bgcolor: "#f7e7e2ff" },
-                            }}
-                        >
-                            {isFetching ? (<CircularProgress size={12} sx={{ color: "#ff5722" }} />) : ("Xem thêm")}
-                        </Button>
-                    ) : (
-                        <Box sx={{ minWidth: 70 }} />
-                    )}
                     <Button
                         size="small"
                         onClick={() => navigate("/chuong-trinh-tuyen-sinh")}

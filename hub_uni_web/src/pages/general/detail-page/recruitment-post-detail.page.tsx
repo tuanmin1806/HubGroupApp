@@ -204,43 +204,65 @@ const RecruitmentPostDetailPage = () => {
                     <Grid size={{ xs: 12, md: 8 }}>
                         <Stack spacing={1}>
                             {recruitmentPost.Highlights && recruitmentPost.Highlights.length > 0 && (
-                                <Card
-                                    elevation={0}
+                                <Box
                                     sx={{
-                                        borderRadius: 2,
-                                        border: '1px solid #ffe0b2',
-                                        background: 'linear-gradient(135deg, #fff8f0 0%, #fff3e0 100%)',
-                                        overflow: 'hidden',
+                                        mt: 1.5,
+                                        p: 1.5,
+                                        borderRadius: 1.5,
+                                        background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)',
+                                        border: '1px solid #bbdefb',
                                     }}
                                 >
-                                    <CardContent sx={{ p: 1 }}>
-                                        <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                                            <Star sx={{ fontSize: 16, color: '#f59e0b' }} />
-                                            <Typography variant="h6" fontWeight={700} color="primary.main">Điểm nổi bật</Typography>
-                                        </Stack>
-                                        <Stack spacing={1}>
-                                            {recruitmentPost.Highlights.map((highlight, index) => (
-                                                <Stack
-                                                    key={index}
-                                                    direction="row"
-                                                    spacing={1}
-                                                    alignItems="flex-start"
+                                    <Stack direction="row" spacing={0.75} alignItems="center" mb={1}>
+                                        <Star sx={{ fontSize: 16, color: '#f59e0b' }} />
+                                        <Typography
+                                            variant="caption"
+                                            fontWeight={700}
+                                            color="primary.main"
+                                            sx={{
+                                                letterSpacing: 0.5,
+                                                textTransform: 'uppercase',
+                                                fontSize: '0.7rem'
+                                            }}
+                                        >
+                                            Điểm nổi bật
+                                        </Typography>
+                                    </Stack>
+
+                                    <Stack spacing={0.75}>
+                                        {recruitmentPost.Highlights.map((item, idx) => (
+                                            <Stack
+                                                key={idx}
+                                                direction="row"
+                                                spacing={1}
+                                                alignItems="center"
+                                            >
+                                                <Box
                                                     sx={{
-                                                        p: 1,
-                                                        borderRadius: 1.5,
-                                                        bgcolor: 'rgba(255,255,255,0.7)',
-                                                        border: '1px solid rgba(255,224,178,0.8)',
-                                                        alignItems: 'center',
+                                                        width: 6,
+                                                        height: 6,
+                                                        borderRadius: "50%",
+                                                        bgcolor: "#1976d2",
+                                                        mt: "6px",
+                                                        flexShrink: 0,
+                                                    }}
+                                                />
+
+                                                <Typography
+                                                    variant="body2"
+                                                    color="text.primary"
+                                                    lineHeight={1.55}
+                                                    fontSize="0.82rem"
+                                                    sx={{
+                                                        wordBreak: "break-word",
                                                     }}
                                                 >
-                                                    <Typography variant="body2" fontWeight={500} color="text.primary" sx={{ lineHeight: 1.2 }}>
-                                                        {highlight}
-                                                    </Typography>
-                                                </Stack>
-                                            ))}
-                                        </Stack>
-                                    </CardContent>
-                                </Card>
+                                                    {item}
+                                                </Typography>
+                                            </Stack>
+                                        ))}
+                                    </Stack>
+                                </Box>
                             )}
                             <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid #e0e0e0' }}>
                                 <CardContent sx={{ p: 2 }}>
@@ -322,7 +344,7 @@ const RecruitmentPostDetailPage = () => {
                                             sx={{
                                                 px: 2.5,
                                                 py: 1.5,
-                                                background: 'linear-gradient(135deg, #faa11b 0%, #f5c33cff 100%)',
+                                                background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 60%, #42a5f5 100%)',
                                             }}
                                         >
                                             <Typography variant="h6" fontWeight={700} color="white" sx={{ fontSize: '1rem' }}>Yêu cầu ứng viên</Typography>

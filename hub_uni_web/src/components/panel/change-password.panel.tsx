@@ -23,8 +23,8 @@ export default function ChangePasswordPanel() {
             return;
         }
 
-        if (form.newPassword.length < 6) {
-            setError("Mật khẩu mới phải có ít nhất 6 ký tự.");
+        if (form.newPassword.length < 4) {
+            setError("Mật khẩu mới phải có ít nhất 4 ký tự.");
             return;
         }
 

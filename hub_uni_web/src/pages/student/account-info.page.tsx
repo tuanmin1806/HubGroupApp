@@ -6,6 +6,7 @@ import AccountInfoPanel from "../../components/panel/account-info.panel";
 import ApplicationListPanel from "../../components/panel/application-list.panel";
 import ChangePasswordPanel from "../../components/panel/change-password.panel";
 import { useGetCustomerByIdQuery } from "../../app/features/customer.api";
+import StudentLogoUploadDialog from "../../components/dialogs/student/student-logo-upload.dialog";
 
 type TabKey = "info" | "password" | "applications" | "logout" | "saved-applications" | "saved-organizations";
 
@@ -19,6 +20,7 @@ const MENU_ITEMS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function AccountInfoPage() {
+    const [logoDialogOpen, setLogoDialogOpen] = useState(false);
     const userInfo = getUserInfo();
     const [activeTab, setActiveTab] = useState<TabKey>("info");
 
@@ -68,7 +70,7 @@ export default function AccountInfoPage() {
                                         justifyContent: "center", cursor: "pointer",
                                         boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
                                         "&:hover": { bgcolor: "#f5f5f5" },
-                                    }}>
+                                    }} onClick={() => setLogoDialogOpen(true)}>
                                         <CameraAlt sx={{ fontSize: 14, color: "#f36730" }} />
                                     </Box>
                                 </Box>
@@ -139,6 +141,7 @@ export default function AccountInfoPage() {
                     </Box>
                 </Stack>
             </Container>
+            <StudentLogoUploadDialog open={logoDialogOpen} onClose={() => setLogoDialogOpen(false)} currentLogoUrl={account?.AvatarUrl ?? ""} />
         </Box>
     );
 }

@@ -11,6 +11,8 @@ import { CommuneResponse } from "../../app/models/commune.model";
 import { CustomerResponse } from "../../app/models/customer.model";
 import { EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
 import ConfirmDialog from "../dialogs/general/confirm.dialog";
+import { ConvertService } from "../../app/services/convert.service";
+import StudentLogoUploadDialog from "../dialogs/student/student-logo-upload.dialog";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: Gender.Undefined, label: "Không yêu cầu" },
@@ -58,20 +60,48 @@ interface EditableForm {
 
 function buildForm(account: CustomerResponse): EditableForm {
     const p = account.ProfileInfo;
+
     return {
         UserName: account.UserName ?? "",
         FullName: account.FullName ?? "",
-        Gender: account.Gender ?? Gender.Undefined,
+        Gender: ConvertService.convertGenderFromString(p?.Gender ?? account.Gender),
         Email: account.Email ?? "",
         PhoneNumber: account.PhoneNumber ?? "",
         DateOfBirth: p?.DateOfBirth?.substring(0, 10) ?? "",
-        Experience: p?.Experience ?? JobExperience.Undefined,
-        EducationLevel: p?.EducationLevel ?? EducationLevel.Undefined,
+        Experience: ConvertService.convertJobExperienceFromString(p?.Experience),
+        EducationLevel: ConvertService.convertEducationLevelFromString(p?.EducationLevel),
         GraduationYear: p?.GraduationYear || "",
         Gpa: p?.Gpa || "",
         ProvinceId: p?.ProvinceId ?? "",
         CommuneId: p?.CommuneId ?? "",
         Address: p?.Address ?? "",
+    };
+}
+
+function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
+    return {
+        Id: account.Id,
+        UserName: form.UserName,
+        FullName: form.FullName,
+        Gender: form.Gender,
+        Email: form.Email,
+        PhoneNumber: form.PhoneNumber,
+
+        AccountType: account.AccountType,
+        AccountStatus: account.AccountStatus,
+        RoleIds: account.Roles?.map(r => r.Id) ?? [],
+
+        ProfileInfo: {
+            DateOfBirth: form.DateOfBirth,
+            Gender: form.Gender,
+            Experience: form.Experience,
+            EducationLevel: form.EducationLevel,
+            GraduationYear: Number(form.GraduationYear) || 0,
+            Gpa: Number(form.Gpa) || 0,
+            ProvinceId: form.ProvinceId,
+            CommuneId: form.CommuneId,
+            Address: form.Address,
+        },
     };
 }
 
@@ -90,31 +120,12 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
     const selectedCommune = communes.find(c => c.Id === form.CommuneId) ?? null;
 
     const set = (field: keyof EditableForm) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: e.target.value }));
-    const setEnum = <K extends keyof EditableForm>(field: K) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: e.target.value as EditableForm[K] }));
-
+    const setEnum = <K extends keyof EditableForm>(field: K) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: Number(e.target.value) }));
     const handleCancel = () => { setIsEditing(false); setForm(buildForm(account)); };
 
     const handleConfirm = async () => {
         try {
-            await updateCustomer({
-                Id: userInfo?.Id ?? account.Id,
-                UserName: form.UserName,
-                FullName: form.FullName,
-                Gender: form.Gender,
-                Email: form.Email,
-                PhoneNumber: form.PhoneNumber,
-                ProfileInfo: {
-                    DateOfBirth: form.DateOfBirth,
-                    Gender: form.Gender,
-                    Experience: form.Experience,
-                    EducationLevel: form.EducationLevel,
-                    GraduationYear: Number(form.GraduationYear) || 0,
-                    Gpa: Number(form.Gpa) || 0,
-                    ProvinceId: form.ProvinceId,
-                    CommuneId: form.CommuneId,
-                    Address: form.Address,
-                },
-            }).unwrap();
+            await updateCustomer(buildUpdatePayload(account, form)).unwrap();
             setConfirmOpen(false);
             setIsEditing(false);
         } catch (err) { }
@@ -148,8 +159,8 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                         size="small" fullWidth label="Tên đăng nhập"
-                        value={form.UserName} onChange={set("UserName")}
-                        disabled={!isEditing}
+                        value={form.UserName}
+                        disabled={true}
                         sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Badge sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
@@ -221,14 +232,12 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                        select size="small" fullWidth label="Năm tốt nghiệp"
+                        size="small" fullWidth label="Năm tốt nghiệp"
                         value={form.GraduationYear} onChange={set("GraduationYear")}
                         disabled={!isEditing}
                         sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><CalendarMonth sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    >
-                        {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i).map(y => (<MenuItem key={y} value={y} sx={{ fontSize: "0.875rem" }}>{y}</MenuItem>))}
-                    </TextField>
+                    />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField

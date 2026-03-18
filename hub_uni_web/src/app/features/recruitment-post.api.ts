@@ -50,15 +50,15 @@ const recruitmentPostApi = baseApi.injectEndpoints({
             }),
         }),
 
-        getRecruitmentPostsByOrganizationWithPage: builder.query<ApiPaginationResponse<RecruitmentPostResponse[]>, string>({
+        getRecruitmentPostsByOrganizationWithPage: builder.query<ApiPaginationResponse<RecruitmentPostDetailResponse[]>, string>({
             query: (organizationSeo) => ({
                 url: `recruitmentpost/getbyorganizationseo/${organizationSeo}`,
                 method: "GET",
             }),
             transformResponse: (responseData: {
-                Items: RecruitmentPostResponse[];
+                Items: RecruitmentPostDetailResponse[];
                 Total: number;
-            }): ApiPaginationResponse<RecruitmentPostResponse[]> => ({
+            }): ApiPaginationResponse<RecruitmentPostDetailResponse[]> => ({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),

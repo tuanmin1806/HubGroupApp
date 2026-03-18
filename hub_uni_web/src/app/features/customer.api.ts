@@ -1,6 +1,7 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse, UpdateCustomerRequest, UpdatePasswordRequest } from "../models/customer.model";
+import { CreateCustomerRequest, CustomerFilterParams, CustomerResponse, UpdateCustomerAvatarRequest, UpdateCustomerRequest, UpdatePasswordRequest } from "../models/customer.model";
 import baseApi from "./base.api";
+import { TAG_TYPES } from "./tags";
 
 const buildQueryString = (params?: CustomerFilterParams): string => {
     if (!params) return "";
@@ -31,6 +32,7 @@ const customerApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.CUSTOMER],
         }),
 
         createCollabAccount: builder.mutation<void, CreateCustomerRequest>({
@@ -39,6 +41,7 @@ const customerApi = baseApi.injectEndpoints({
                 method: "POST",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.CUSTOMER],
         }),
 
         updateCustomer: builder.mutation<void, UpdateCustomerRequest>({
@@ -47,6 +50,7 @@ const customerApi = baseApi.injectEndpoints({
                 method: "PUT",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.CUSTOMER],
         }),
 
         updatePassword: builder.mutation<void, UpdatePasswordRequest>({
@@ -55,6 +59,7 @@ const customerApi = baseApi.injectEndpoints({
                 method: "POST",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.CUSTOMER],
         }),
 
         getCustomerInfor: builder.query<CustomerResponse, string>({
@@ -62,6 +67,7 @@ const customerApi = baseApi.injectEndpoints({
                 url: `customer/getbyid?id=${id}`,
                 method: 'GET',
             }),
+            providesTags: [TAG_TYPES.CUSTOMER],
         }),
 
         getCustomerById: builder.query<CustomerResponse, string>({
@@ -69,10 +75,20 @@ const customerApi = baseApi.injectEndpoints({
                 url: `customer/getbyid?id=${id}`,
                 method: 'GET',
             }),
+            providesTags: [TAG_TYPES.CUSTOMER],
+        }),
+
+        updateCustomerAvatar: builder.mutation<void, FormData>({
+            query: (formData) => ({
+                url: `customer/updateavatar`,
+                method: "POST",
+                body: formData,
+            }),
+            invalidatesTags: [TAG_TYPES.CUSTOMER],
         }),
     }),
 });
 
 export const {
-    useGetCustomerByOrganizationWithPageQuery, useCreateCollabAccountMutation, useGetCustomerInforQuery, useGetCustomerByIdQuery, useUpdateCustomerMutation
+    useGetCustomerByOrganizationWithPageQuery, useCreateCollabAccountMutation, useGetCustomerInforQuery, useGetCustomerByIdQuery, useUpdateCustomerMutation, useUpdateCustomerAvatarMutation
 } = customerApi;

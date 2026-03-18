@@ -1,6 +1,7 @@
 import { ApiPaginationResponse } from "../models/api.model";
 import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse, UpdateOrganizationLogoRequest, UpdateOrganizationRequest } from "../models/organization.model";
 import baseApi from "./base.api";
+import { TAG_TYPES } from "./tags";
 
 const buildQueryString = (params?: OrganizationFilterParams): string => {
     if (!params) return "";
@@ -31,6 +32,7 @@ const organizationApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
         organizationsGetByPageNoAuthen: builder.query<ApiPaginationResponse<OrganizationResponse[]>, OrganizationFilterParams>({
@@ -48,6 +50,7 @@ const organizationApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
         organizationsNameSearch: builder.query<ApiPaginationResponse<OrganizationResponse[]>, OrganizationFilterParams>({
@@ -65,6 +68,7 @@ const organizationApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
         getOrganizationBySeo: builder.query<OrganizationDetailResponse, string>({
@@ -72,6 +76,7 @@ const organizationApi = baseApi.injectEndpoints({
                 url: `organization/getbyseourl/${seo}`,
                 method: 'GET',
             }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
         getOrganizationById: builder.query<OrganizationDetailResponse, string>({
@@ -79,6 +84,7 @@ const organizationApi = baseApi.injectEndpoints({
                 url: `organization/getbyid?id=${id}`,
                 method: 'GET',
             }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
         updateOrganization: builder.mutation<void, UpdateOrganizationRequest>({
@@ -87,14 +93,16 @@ const organizationApi = baseApi.injectEndpoints({
                 method: "PUT",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
         updateOrganizationLogo: builder.mutation<void, UpdateOrganizationLogoRequest>({
             query: ({ Id, formData }) => ({
                 url: `organization/updatelogo?organizationId=${Id}`,
-                method: "PUT",
+                method: "POST",
                 body: formData,
             }),
+            invalidatesTags: [TAG_TYPES.ORGANIZATION],
         }),
     }),
 });

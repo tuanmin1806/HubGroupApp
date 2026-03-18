@@ -45,13 +45,35 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                   bgcolor: "#f3522a",
                   color: "#fafafa",
                   fontSize: "0.7rem",
-                  fontWeight: 500,
-                  px: 0.75,
-                  py: 0.25,
+                  fontWeight: 600,
+                  px: 0.5,
+                  py: 0.15,
                   borderRadius: 1,
+
+                  animation: 'hotShake 1.8s ease-in-out infinite, hotPulse 1.8s ease-in-out infinite',
+
+                  '@keyframes hotShake': {
+                    '0%': { transform: 'rotate(0deg) scale(1)' },
+                    '10%': { transform: 'rotate(-12deg) scale(1.15)' },
+                    '20%': { transform: 'rotate(12deg) scale(1.15)' },
+                    '30%': { transform: 'rotate(-10deg) scale(1.12)' },
+                    '40%': { transform: 'rotate(10deg) scale(1.12)' },
+                    '50%': { transform: 'rotate(-6deg) scale(1.08)' },
+                    '60%': { transform: 'rotate(6deg) scale(1.08)' },
+                    '70%': { transform: 'rotate(-3deg) scale(1.03)' },
+                    '80%': { transform: 'rotate(3deg) scale(1.03)' },
+                    '100%': { transform: 'rotate(0deg) scale(1)' },
+                  },
+
+                  '@keyframes hotPulse': {
+                    '0%, 100%': { bgcolor: '#f3522a' },
+                    '25%': { bgcolor: '#ff6b47' },
+                    '50%': { bgcolor: '#f3522a' },
+                    '75%': { bgcolor: '#ff6b47' },
+                  },
                 }}
               >
-                Nổi bật
+                HOT
               </Box>
             )}
 

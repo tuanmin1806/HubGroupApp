@@ -49,15 +49,44 @@ function HighlightsInline({ highlights }: { highlights: string[] }) {
                     variant="caption"
                     fontWeight={700}
                     color="primary.main"
-                    sx={{ letterSpacing: 0.5, textTransform: 'uppercase', fontSize: '0.7rem' }}
+                    sx={{
+                        letterSpacing: 0.5,
+                        textTransform: 'uppercase',
+                        fontSize: '0.7rem'
+                    }}
                 >
                     Điểm nổi bật
                 </Typography>
             </Stack>
+
             <Stack spacing={0.75}>
                 {highlights.map((item, idx) => (
-                    <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
-                        <Typography variant="body2" color="text.primary" lineHeight={1.55} fontSize="0.82rem">
+                    <Stack
+                        key={idx}
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                    >
+                        <Box
+                            sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: "50%",
+                                background: "linear-gradient(135deg, #42a5f5, #1976d2)",
+                                mt: "6px",
+                                flexShrink: 0,
+                            }}
+                        />
+
+                        <Typography
+                            variant="body2"
+                            color="text.primary"
+                            lineHeight={1.55}
+                            fontSize="0.82rem"
+                            sx={{
+                                wordBreak: "break-word",
+                            }}
+                        >
                             {item}
                         </Typography>
                     </Stack>
@@ -381,27 +410,6 @@ const OrganizationDetailPage = () => {
                                             <Typography variant="body2" color="text.secondary" lineHeight={1}> {organization.Summary} </Typography>
                                         </Box>
                                     ) : null}
-
-                                    <Box sx={{
-                                        display: 'grid',
-                                        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-                                        gap: 2, mt: 2,
-                                    }}>
-                                        <Stack direction="row" spacing={1} alignItems="center">
-                                            <LocationOn fontSize="small" color="primary" />
-                                            <Typography variant="body2">{organization.Province || 'Chưa cập nhật'}</Typography>
-                                        </Stack>
-                                        <Stack direction="row" spacing={1} alignItems="center">
-                                            <Category fontSize="small" color="primary" />
-                                            <Typography variant="body2">{organization.OrganizationType || 'Chưa cập nhật'}</Typography>
-                                        </Stack>
-                                        {organization.ManagedBy && (
-                                            <Stack direction="row" spacing={1} alignItems="center">
-                                                <AccountBalance fontSize="small" color="primary" />
-                                                <Typography variant="body2">{organization.ManagedBy}</Typography>
-                                            </Stack>
-                                        )}
-                                    </Box>
                                 </CardContent>
                             </Card>
 
@@ -411,22 +419,50 @@ const OrganizationDetailPage = () => {
                                     <Tabs
                                         value={tabValue}
                                         onChange={handleTabChange}
+                                        variant="fullWidth"
                                         sx={{
-                                            minHeight: 50,
+                                            minHeight: 48,
+                                            bgcolor: '#f8fafc',
+                                            '& .MuiTabs-indicator': {
+                                                height: 2,
+                                                borderRadius: '3px 3px 0 0',
+                                                background: 'linear-gradient(90deg, #086bdbff, #2a97f0ff)',
+                                            },
                                             '& .MuiTab-root': {
                                                 textTransform: 'none',
                                                 fontWeight: 600,
                                                 fontSize: '1rem',
-                                                minHeight: 50,
-                                                gap: 0.5,
-                                                '&.Mui-selected': { color: 'primary.main' },
+                                                minHeight: 48,
+                                                gap: 0.25,
+                                                color: 'text.secondary',
+                                                transition: 'all 0.25s ease',
+                                                '&:hover': {
+                                                    color: 'primary.main',
+                                                    bgcolor: 'rgba(80, 151, 233, 0.06)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    color: 'primary.main',
+                                                    bgcolor: 'rgba(21, 101, 192, 0.08)',
+                                                    fontWeight: 700,
+                                                },
                                             },
-                                            '& .MuiTab-iconWrapper': { fontSize: 25 },
                                         }}
                                     >
-                                        <Tab label="Giới thiệu" icon={<Info sx={{ fontSize: 18 }} />} iconPosition="start" />
-                                        <Tab label="Tin tuyển sinh" icon={<NotificationsActive sx={{ fontSize: 18 }} />} iconPosition="start" />
-                                        <Tab label="Học phí" icon={<School sx={{ fontSize: 18 }} />} iconPosition="start" />
+                                        <Tab
+                                            label="Giới thiệu"
+                                            icon={<Info sx={{ fontSize: 20 }} />}
+                                            iconPosition="start"
+                                        />
+                                        <Tab
+                                            label="Tin tuyển sinh"
+                                            icon={<NotificationsActive sx={{ fontSize: 20 }} />}
+                                            iconPosition="start"
+                                        />
+                                        <Tab
+                                            label="Học phí"
+                                            icon={<School sx={{ fontSize: 20 }} />}
+                                            iconPosition="start"
+                                        />
                                     </Tabs>
                                 </Box>
 
@@ -522,8 +558,8 @@ const OrganizationDetailPage = () => {
                                                                         <Stack direction="row" flexWrap="wrap" gap={0.5} mb={0.75}>
                                                                             {post.Professions.slice(0, 3).map((p) => (
                                                                                 <Chip
-                                                                                    key={p.ProfessionId}
-                                                                                    label={p.ProfessionName}
+                                                                                    key={p.Id}
+                                                                                    label={p.Name}
                                                                                     size="small"
                                                                                     variant="outlined"
                                                                                     sx={{
@@ -867,6 +903,12 @@ const OrganizationDetailPage = () => {
                                             <Box>
                                                 <Typography variant="caption" color="text.secondary">Khu vực:</Typography>
                                                 <Typography variant="body2">{organization.Commune}, {organization.Province}</Typography>
+                                            </Box>
+                                        )}
+                                        {organization.ManagedBy && (
+                                            <Box>
+                                                <Typography variant="caption" color="text.secondary">Quản lý bởi:</Typography>
+                                                <Typography variant="body2">{organization.ManagedBy}</Typography>
                                             </Box>
                                         )}
                                     </Stack>

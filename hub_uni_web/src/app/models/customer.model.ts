@@ -68,6 +68,10 @@ export interface UpdatePasswordRequest {
     ConfirmPassword: string;
 }
 
+export interface UpdateCustomerAvatarRequest {
+    formData: FormData;
+}
+
 export interface CustomerFilterParams {
     page?: number;
     size?: number;
