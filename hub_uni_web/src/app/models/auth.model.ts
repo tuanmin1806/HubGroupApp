@@ -30,6 +30,7 @@ export interface StudentRegisterRequestBody {
     ProfileInfo: {
         DateOfBirth: string;
         Gender: Gender;
+        CountryId: string;
         ProvinceId: string;
         CommuneId: string;
         Address: string;

@@ -1,13 +1,18 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetRecruitmentPostBySeoQuery, useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
-import { LocationOn, BookmarkBorder, Share, AccessTime, Work, AttachMoney, School, Cake, Wc, Business, CheckCircle, PeopleAlt, Star, RunningWithErrors } from "@mui/icons-material";
-import { Box, Typography, Button, Stack, Card, CardContent, Chip, Divider, Container, Avatar, Grid } from "@mui/material";
+import { LocationOn, BookmarkBorder, Share, AccessTime, Work, AttachMoney, School, Cake, Wc, Business, CheckCircle, PeopleAlt, Star, RunningWithErrors, Bookmark } from "@mui/icons-material";
+import { Box, Typography, Button, Stack, Card, CardContent, Chip, Divider, Container, Avatar, Grid, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import ApplyConfirmDialog from "../../../components/dialogs/general/apply-confirm-dialog.dialog";
 import { useAuthGuard } from "../../../hooks/useAuthGuard";
 import { formatDate } from "../../../utils/date.utils";
 import { ConvertService } from "../../../app/services/convert.service";
 import { formatCurrency } from "../../../utils/recruitment-post.utils";
+import { useCreateFavouriteMutation, useDeleteFavouriteMutation } from "../../../app/features/favourite.api";
+import { getUserInfo } from "../../../app/services/auth.service";
+import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
+import { AppDispatch } from "../../../app/store";
+import { useDispatch } from "react-redux";
 
 const RequirementRow = ({ icon, label, value, color, }: { icon: React.ReactNode; label: string; value: string; color: string; }) => (
     <Stack direction="row" alignItems="center" spacing={1.5} sx={{ p: 1.25, borderRadius: 1.5, bgcolor: color, border: '1px solid', borderColor: 'rgba(0,0,0,0.06)', }}>
@@ -21,14 +26,40 @@ const RequirementRow = ({ icon, label, value, color, }: { icon: React.ReactNode;
 
 const RecruitmentPostDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const checkAuth = useAuthGuard();
     const [applyDialogOpen, setApplyDialogOpen] = useState(false);
+    const [createFavourite, { isLoading: isSaving }] = useCreateFavouriteMutation();
+    const [deleteFavourite, { isLoading: isDeleting }] = useDeleteFavouriteMutation();
+    const [isSaved, setIsSaved] = useState(false);
+    const userInfo = getUserInfo();
 
     const { data: recruitmentPost, isLoading, error } = useGetRecruitmentPostBySeoQuery(seoUrl!, { skip: !seoUrl, });
     const { data: relatedPosts, isLoading: isLoadingRelated } = useGetRecruitmentPostsByPageQuery({ page: 1, size: 6, });
 
     useEffect(() => { if (recruitmentPost?.Name) document.title = `${recruitmentPost?.Name} | duhochan.hubgroup.vn`; }, [recruitmentPost?.Name]);
+    useEffect(() => { if (recruitmentPost?.IsSaved !== undefined) { setIsSaved(recruitmentPost.IsSaved); } }, [recruitmentPost?.IsSaved]);
+
+    const handleSaveToggle = async () => {
+        if (!checkAuth()) return;
+        try {
+            if (isSaved) {
+                await deleteFavourite(recruitmentPost?.SaveId || "").unwrap();
+                setIsSaved(false);
+                dispatch(showSnackbar({ message: "Đã hủy lưu tin tuyển sinh!", severity: "info" }));
+            } else {
+                await createFavourite({
+                    CustomerId: userInfo?.Id || "",
+                    RecruitPostId: recruitmentPost?.Id || "",
+                }).unwrap();
+                setIsSaved(true);
+                dispatch(showSnackbar({ message: "Đã lưu tin tuyển sinh thành công!", severity: "success" }));
+            }
+        } catch (err) {
+            dispatch(showSnackbar({ message: isSaved ? "Hủy lưu tin thất bại, vui lòng thử lại!" : "Lưu tin thất bại, vui lòng thử lại!", severity: "error" }));
+        }
+    };
 
     if (isLoading) {
         return (
@@ -282,17 +313,18 @@ const RecruitmentPostDetailPage = () => {
 
                                     <Stack
                                         direction={{ xs: 'column', sm: 'row' }}
-                                        spacing={2}
+                                        spacing={1.5}
                                         justifyContent="left"
                                     >
                                         <Button
                                             variant="contained"
-                                            size="large"
+                                            size="small"
                                             onClick={handleApplyClick}
                                             sx={{
                                                 bgcolor: '#ff5722',
                                                 fontWeight: 600,
-                                                px: 2, '&:hover': { bgcolor: '#e64a19', transform: 'translateY(-2px)' },
+                                                fontSize: 11,
+                                                px: 1, '&:hover': { bgcolor: '#e64a19', transform: 'translateY(-2px)' },
                                                 transition: 'all 0.3s ease'
                                             }}
                                         >
@@ -300,30 +332,33 @@ const RecruitmentPostDetailPage = () => {
                                         </Button>
 
                                         <Button
-                                            variant="outlined"
-                                            size="large"
-                                            startIcon={<BookmarkBorder />}
+                                            variant={isSaved ? "contained" : "outlined"}
+                                            size="small"
+                                            startIcon={isSaving || isDeleting ? <CircularProgress size={18} color="inherit" /> : isSaved ? <Bookmark /> : <BookmarkBorder />}
+                                            onClick={handleSaveToggle}
+                                            disabled={isSaving || isDeleting}
                                             sx={{
-                                                borderColor: '#ff5722',
-                                                color: '#ff5722',
                                                 fontWeight: 600,
-                                                px: 2,
-                                                '&:hover': { bgcolor: '#ff5722', color: 'white' }
+                                                px: 1,
+                                                fontSize: 11,
+                                                transition: 'all 0.25s ease',
+                                                ...(isSaved ? { bgcolor: '#ff5722', borderColor: '#ff5722', color: 'white', '&:hover': { bgcolor: '#c62828', borderColor: '#c62828', color: 'white', }, } : { borderColor: '#ff5722', color: '#ff5722', '&:hover': { bgcolor: '#ff5722', color: 'white', }, }),
                                             }}
                                         >
-                                            Lưu tin
+                                            {isSaving ? 'Đang lưu...' : isDeleting ? 'Đang hủy...' : isSaved ? 'Đã lưu' : 'Lưu tin'}
                                         </Button>
 
                                         <Button
                                             variant="outlined"
-                                            size="large"
+                                            size="small"
                                             startIcon={<Share />}
                                             onClick={handleShare}
                                             sx={{
                                                 borderColor: '#ff5722',
                                                 color: '#ff5722',
                                                 fontWeight: 600,
-                                                px: 2,
+                                                fontSize: 11,
+                                                px: 1,
                                                 '&:hover': { bgcolor: '#ff5722', color: 'white' }
                                             }}
                                         >

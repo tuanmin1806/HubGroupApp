@@ -314,11 +314,11 @@ function StudentHeader() {
                             </div>
                         </Box>
                         <Box sx={{ flexGrow: 0 }}>
-                            <Tooltip title="cài đặt">
+                            <Tooltip title="Thông tin tài khoản">
                                 <Box
-                                    sx={{ display: "flex" }}
+                                    sx={{ display: "flex", alignItems: "center" }}
                                     style={{ cursor: "pointer" }}
-                                    onClick={handleOpenUserMenu}
+                                    onClick={handleNavigateAccountInfo}
                                 >
                                     <Person3Icon sx={{ p: 0, fontSize: { xs: 'medium', md: 'large' } }} />
                                     <Link
@@ -333,52 +333,10 @@ function StudentHeader() {
                                         variant="body1"
                                         underline="hover"
                                     >
-                                        {user?.UserName}
+                                        {user?.FullName}
                                     </Link>
                                 </Box>
                             </Tooltip>
-                            <Menu
-                                sx={{ mt: "45px" }}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
-                            >
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography
-                                        sx={{ textAlign: "center" }}
-                                        onClick={() =>
-                                            setOpenProfileDialog(true)
-                                        }
-                                    >
-                                        Thông tin cá nhân
-                                    </Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography
-                                        sx={{ textAlign: "center" }}
-                                        onClick={() =>
-                                            handleNavigateAccountInfo()
-                                        }
-                                    >
-                                        Thông tin tài khoản
-                                    </Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleSignOut}>
-                                    <Typography sx={{ textAlign: "center" }}>
-                                        Đăng xuất
-                                    </Typography>
-                                </MenuItem>
-                            </Menu>
                         </Box>
                     </Toolbar>
                 </Container>

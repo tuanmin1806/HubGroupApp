@@ -3,9 +3,12 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useStudentRegisterMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
 import { AccountStatus, AccountType, EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
-import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
+import { useGetProvinceByCountryQuery } from "../../app/features/province.api";
 import { Province } from "../../app/models/province.model";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
+import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
+import { Country } from "../../app/models/country.model";
+import { useNavigate } from "react-router-dom";
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 
@@ -20,6 +23,7 @@ const initialState = {
     DateOfBirth: "",
     Experience: JobExperience.LessThan1Year,
     EducationLevel: EducationLevel.Undefined,
+    CountryId: "",
     ProvinceId: "",
     CommuneId: "",
     Address: ""
@@ -27,15 +31,18 @@ const initialState = {
 
 const StudentSignupForm = () => {
     const [registerStudent] = useStudentRegisterMutation();
+    const navigate = useNavigate();
 
     const [form, setForm] = useState(initialState);
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
 
+    const [selectedCountrySeo, setSelectedCountrySeo] = useState("");
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState("");
 
-    const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
+    const { data: countries = [] } = useGetAllCountryNoAuthenQuery();
+    const { data: provinces = [] } = useGetProvinceByCountryQuery(selectedCountrySeo, { skip: !selectedCountrySeo, });
     const { data: communes = [] } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo, });
 
     const set = (field: string, value: any) => setForm((prev) => ({ ...prev, [field]: value }));
@@ -57,6 +64,14 @@ const StudentSignupForm = () => {
         setSelectedProvinceSeo(province?.SeoUrl ?? "");
     };
 
+    const handleCountryChange = (countryId: string) => {
+        const country = countries.find((c: Country) => c.Id === countryId);
+        set("CountryId", countryId);
+        set("ProvinceId", "");
+        set("CommuneId", "");
+        setSelectedCountrySeo(country?.SeoUrl ?? "");
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const err = validate();
@@ -76,6 +91,7 @@ const StudentSignupForm = () => {
                 ProfileInfo: {
                     DateOfBirth: form.DateOfBirth,
                     Gender: form.Gender,
+                    CountryId: form.CountryId,
                     ProvinceId: form.ProvinceId,
                     CommuneId: form.CommuneId,
                     Address: form.Address,
@@ -93,14 +109,13 @@ const StudentSignupForm = () => {
 
     if (submitSuccess) {
         return (
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "50vh", gap: 2, px: 2 }}>
-                <CheckCircleIcon sx={{ fontSize: 72, color: "success.main" }} />
-                <Typography variant="h5" fontWeight={700} color="#faa11b">Đăng ký thành công!</Typography>
-                <Typography color="#faa11b" textAlign="center">Tài khoản của bạn đang chờ phê duyệt.</Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "40vh", gap: 2 }}>
+                <CheckCircleIcon sx={{ fontSize: 72, color: "#008631" }} />
+                <Typography variant="h5" fontWeight={700} color="#008631">Tài khoản đã đăng ký thành công!</Typography>
+                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#faa11b", px: 3, fontWeight: 600, "&:hover": { backgroundColor: "#fcb448ff" } }}> Đăng nhập </Button>
             </Box>
         );
     }
-
     return (
         <Box sx={{ maxWidth: 600, mx: "auto", px: { xs: 0.5, sm: 0.5 }, py: { xs: 0.5, sm: 0.5 } }}>
             <Typography variant="h5" fontWeight={700} textAlign="center" color="#faa11b" mb={0.5}> Đăng ký tài khoản </Typography>
@@ -134,8 +149,9 @@ const StudentSignupForm = () => {
                                 </TextField>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Ngày sinh" type="date" value={form.DateOfBirth} onChange={(e) => set("DateOfBirth", e.target.value)} fullWidth size="small" InputLabelProps={{ shrink: true }} /></Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Tỉnh / Thành phố" value={form.ProvinceId} onChange={(e) => handleProvinceChange(e.target.value)} fullWidth size="small">{provinces.map((p: Province) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}</TextField></Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Quận / Xã" value={form.CommuneId} onChange={(e) => set("CommuneId", e.target.value)} fullWidth size="small" disabled={!selectedProvinceSeo}>{communes.map((c) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}</TextField></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Quốc gia" value={form.CountryId} onChange={(e) => handleCountryChange(e.target.value)} fullWidth size="small">{countries.map((c: Country) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}</TextField></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Tỉnh / Thành phố" value={form.ProvinceId} onChange={(e) => handleProvinceChange(e.target.value)} fullWidth size="small" disabled={!selectedCountrySeo}>{provinces.map((p: Province) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}</TextField></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Xã / Phường" value={form.CommuneId} onChange={(e) => set("CommuneId", e.target.value)} fullWidth size="small" disabled={!selectedProvinceSeo}>{communes.map((c) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}</TextField></Grid>
                                 <Grid size={{ xs: 12 }}><TextField label="Địa chỉ" value={form.Address} onChange={(e) => set("Address", e.target.value)} fullWidth size="small" /></Grid>
                             </Grid>
                         </Box>
@@ -173,11 +189,11 @@ const StudentSignupForm = () => {
                             fullWidth
                             disabled={submitting}
                             startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
-                            sx={{ backgroundColor: "#faa11b", borderRadius: 1}}
+                            sx={{ backgroundColor: "#faa11b", borderRadius: 1 }}
                         >
                             {submitting ? "Đang xử lý..." : "Đăng ký"}
                         </Button>
-                       
+
                         <Typography
                             variant="body2"
                             textAlign="center"

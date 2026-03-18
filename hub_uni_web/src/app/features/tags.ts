@@ -4,4 +4,7 @@ export const TAG_TYPES = {
     USER: 'User',
     CUSTOMER: 'Customer',
     ORGANIZATION: 'Organization',
+    COUNTRY: 'Country',
+    FAVOURITE: 'Favourite',
+    RECRUITMENT_POST: 'RecruitmentPost',
 } as const;

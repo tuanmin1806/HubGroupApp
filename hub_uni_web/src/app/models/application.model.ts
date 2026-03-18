@@ -1,5 +1,5 @@
 import { ApplicationStatus, EducationLevel, Gender, JobExperience } from "./enums.model";
-import { RecruitmentPostResponse } from "./recruitment-post.model";
+import { RecruitmentPostDetailResponse, RecruitmentPostResponse } from "./recruitment-post.model";
 
 export interface Customer {
     FullName: string;
@@ -24,7 +24,7 @@ export interface ApplicationRequest {
 export interface ApplicationResponse {
     Id: string;
     Customer: Customer;
-    RecruitmentPost: RecruitmentPostResponse;
+    RecruitmentPost: RecruitmentPostDetailResponse;
     ApplicationStatus: ApplicationStatus;
     CreatedAt: string;
     UpdatedAt: string;
@@ -38,6 +38,7 @@ export interface UpdateApplicationRequest {
 export interface ApplicationFilterParams {
     customerId?: string;
     searchValue?: string;
+    status?: ApplicationStatus;
     page?: number;
     size?: number;
 }

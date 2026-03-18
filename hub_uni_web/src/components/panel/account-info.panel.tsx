@@ -3,7 +3,7 @@ import { Box, Stack, Typography, Divider, Grid, TextField, MenuItem, Button, Cir
 import { useState, useEffect } from "react";
 import { AccountResponse } from "../../app/models/account.model";
 import { useUpdateCustomerMutation } from "../../app/features/customer.api";
-import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
+import { useGetAllProvinceNoAuthenQuery, useGetProvinceByCountryQuery } from "../../app/features/province.api";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
 import { getUserInfo } from "../../app/services/auth.service";
 import { Province } from "../../app/models/province.model";
@@ -12,7 +12,8 @@ import { CustomerResponse } from "../../app/models/customer.model";
 import { EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
 import ConfirmDialog from "../dialogs/general/confirm.dialog";
 import { ConvertService } from "../../app/services/convert.service";
-import StudentLogoUploadDialog from "../dialogs/student/student-logo-upload.dialog";
+import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
+import { Country } from "../../app/models/country.model";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: Gender.Undefined, label: "Không yêu cầu" },
@@ -53,6 +54,7 @@ interface EditableForm {
     EducationLevel: EducationLevel;
     GraduationYear: number | "";
     Gpa: number | "";
+    CountryId: string;
     ProvinceId: string;
     CommuneId: string;
     Address: string;
@@ -72,6 +74,7 @@ function buildForm(account: CustomerResponse): EditableForm {
         EducationLevel: ConvertService.convertEducationLevelFromString(p?.EducationLevel),
         GraduationYear: p?.GraduationYear || "",
         Gpa: p?.Gpa || "",
+        CountryId: p?.CountryId ?? "",
         ProvinceId: p?.ProvinceId ?? "",
         CommuneId: p?.CommuneId ?? "",
         Address: p?.Address ?? "",
@@ -86,7 +89,6 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
         Gender: form.Gender,
         Email: form.Email,
         PhoneNumber: form.PhoneNumber,
-
         AccountType: account.AccountType,
         AccountStatus: account.AccountStatus,
         RoleIds: account.Roles?.map(r => r.Id) ?? [],
@@ -98,6 +100,7 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
             EducationLevel: form.EducationLevel,
             GraduationYear: Number(form.GraduationYear) || 0,
             Gpa: Number(form.Gpa) || 0,
+            CountryId: form.CountryId,
             ProvinceId: form.ProvinceId,
             CommuneId: form.CommuneId,
             Address: form.Address,
@@ -113,7 +116,9 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
 
     useEffect(() => { setForm(buildForm(account)); }, [account]);
 
-    const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
+    const { data: countries = [] } = useGetAllCountryNoAuthenQuery();
+    const selectedCountry = countries.find(c => c.Id === form.CountryId);
+    const { data: provinces = [], isFetching: provincesLoading } = useGetProvinceByCountryQuery(selectedCountry?.SeoUrl ?? "", { skip: !selectedCountry });
     const selectedProvince = provinces.find(p => p.Id === form.ProvinceId);
     const { data: communes = [], isFetching: communesLoading } = useGetCommunesByProvinceQuery(selectedProvince?.SeoUrl ?? "", { skip: !selectedProvince });
     const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
@@ -255,6 +260,25 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Autocomplete
+                        options={countries}
+                        disabled={!isEditing}
+                        getOptionLabel={(o: Country) => o.Name ?? ""}
+                        value={selectedCountry ?? null}
+                        onChange={(_, val: Country | null) => setForm(prev => ({ ...prev, CountryId: val?.Id ?? "", ProvinceId: "", CommuneId: "" }))}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Quốc gia"
+                                size="small"
+                                fullWidth
+                                sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                                InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <Public sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
+                            />
+                        )}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                    <Autocomplete
                         options={provinces}
                         disabled={!isEditing}
                         getOptionLabel={(o: Province) => o.Name ?? ""}
@@ -266,7 +290,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                                 label="Tỉnh / Thành phố"
                                 size="small"
                                 sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" } }}
-                                InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <Public sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
+                                InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
                             />
                         )}
                     />
@@ -290,7 +314,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         )}
                     />
                 </Grid>
-                <Grid size={{ xs: 12 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                         size="small" fullWidth label="Địa chỉ cụ thể"
                         value={form.Address} onChange={set("Address")}

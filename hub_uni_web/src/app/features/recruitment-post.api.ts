@@ -1,6 +1,7 @@
 import { ApiPaginationResponse } from "../models/api.model";
 import { CreateRecruitmentPostRequest, RecruitmentPostDetailResponse, RecruitmentPostFilterParams, RecruitmentPostResponse, UpdateRecruitmentPostRequest } from "../models/recruitment-post.model";
 import baseApi from "./base.api";
+import { TAG_TYPES } from "./tags";
 
 const buildQueryString = (params?: RecruitmentPostFilterParams): string => {
     if (!params) return "";
@@ -86,6 +87,7 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 url: `recruitmentpost/getbyseourl/${seo}`,
                 method: 'GET',
             }),
+            providesTags: [TAG_TYPES.RECRUITMENT_POST, TAG_TYPES.FAVOURITE],
         }),
 
         getRecruitmentPostById: builder.query<RecruitmentPostResponse, string>({

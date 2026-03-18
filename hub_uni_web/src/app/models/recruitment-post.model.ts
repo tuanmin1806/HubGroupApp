@@ -89,6 +89,8 @@ export interface RecruitmentPostResponse {
     CreatedAt: string;
     UpdatedAt: string;
     UpdatedBy: string;
+    IsSaved: boolean;
+    SaveId: string;
 }
 
 export interface CreateRecruitmentPostRequest {

@@ -1,8 +1,5 @@
-import { CalendarToday, LocationOn, School, WorkOutline } from "@mui/icons-material";
-import {
-    Box, Paper, Chip, CircularProgress,
-    Stack, Typography, Button
-} from "@mui/material";
+import { CalendarToday, FilterList, LocationOn, School, WorkOutline } from "@mui/icons-material";
+import { Box, Paper, Chip, CircularProgress, Stack, Typography, Button, SelectChangeEvent, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetByCustomerQuery } from "../../app/features/application.api";
@@ -10,9 +7,27 @@ import { ApplicationResponse } from "../../app/models/application.model";
 import { getUserInfo } from "../../app/services/auth.service";
 import { formatDate } from "../../utils/date.utils";
 import ApplicationDetailDialog from "../dialogs/student/application-detail.dialog";
+import { ApplicationStatus } from "../../app/models/enums.model";
+import { ConvertService } from "../../app/services/convert.service";
+
+const STATUS_OPTIONS = [
+    { value: "", label: "Tất cả" },
+    { value: ApplicationStatus.Pending, label: ConvertService.convertApplicationStatus(ApplicationStatus.Pending) },
+    { value: ApplicationStatus.Accepted, label: ConvertService.convertApplicationStatus(ApplicationStatus.Accepted) },
+    { value: ApplicationStatus.Rejected, label: ConvertService.convertApplicationStatus(ApplicationStatus.Rejected) },
+];
+
+const STATUS_CHIP_STYLE: Record<ApplicationStatus, { bgcolor: string; color: string; borderColor: string }> = {
+    [ApplicationStatus.Undefined]: { bgcolor: "#f5f5f5", color: "#757575", borderColor: "#e0e0e0" },
+    [ApplicationStatus.Pending]: { bgcolor: "#fff8e1", color: "#f59e0b", borderColor: "#fde68a" },
+    [ApplicationStatus.Accepted]: { bgcolor: "#e8f5e9", color: "#388e3c", borderColor: "#c8e6c9" },
+    [ApplicationStatus.Rejected]: { bgcolor: "#ffebee", color: "#c62828", borderColor: "#ffcdd2" },
+};
 
 function ApplicationCard({ app, onClick }: { app: ApplicationResponse; onClick: () => void }) {
     const post = app.RecruitmentPost;
+    const status = ConvertService.convertApplicationStatusFromString(app.ApplicationStatus);
+    const chipStyle = STATUS_CHIP_STYLE[status] ?? STATUS_CHIP_STYLE[ApplicationStatus.Undefined];
     return (
         <Paper
             elevation={0}
@@ -91,12 +106,28 @@ function ApplicationCard({ app, onClick }: { app: ApplicationResponse; onClick: 
                             </Stack>
                         </Stack>
                     </Box>
+                    <Chip
+                        label={ConvertService.convertApplicationStatus(status)}
+                        size="small"
+                        sx={{
+                            flexShrink: 0,
+                            alignSelf: "flex-start",
+                            height: 22,
+                            fontSize: "0.65rem",
+                            fontWeight: 600,
+                            bgcolor: chipStyle.bgcolor,
+                            color: chipStyle.color,
+                            border: "1px solid",
+                            borderColor: chipStyle.borderColor,
+                            "& .MuiChip-label": { px: 1 },
+                        }}
+                    />
                 </Stack>
 
                 {post?.Professions && post.Professions.length > 0 && (
                     <Stack direction="row" flexWrap="wrap" gap={0.5}>
                         {post.Professions.slice(0, 3).map((profession) => (
-                            <Chip key={profession.ProfessionId} label={profession.ProfessionName} size="small" variant="outlined"
+                            <Chip key={profession.Id} label={profession.Name} size="small" variant="outlined"
                                 sx={{
                                     height: 20, fontSize: "0.65rem",
                                     borderColor: "primary.light", color: "primary.main",
@@ -133,28 +164,58 @@ function ApplicationCard({ app, onClick }: { app: ApplicationResponse; onClick: 
 export default function ApplicationListPanel() {
     const navigate = useNavigate();
     const userInfo = getUserInfo();
-    const { data, isLoading, isError } = useGetByCustomerQuery({ customerId: userInfo?.Id ?? "" });
+    const [selectedStatus, setSelectedStatus] = useState<ApplicationStatus | "">("");
+    const { data, isLoading, isError } = useGetByCustomerQuery({ customerId: userInfo?.Id ?? "", status: selectedStatus !== "" ? selectedStatus : undefined, });
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
-    if (isLoading) return (
-        <Box sx={{ textAlign: "center", py: 8 }}>
-            <CircularProgress size={36} sx={{ color: "#f36730" }} />
-        </Box>
-    );
+    const handleStatusChange = (e: SelectChangeEvent) => {
+        const val = e.target.value;
+        setSelectedStatus(val === "" ? "" : Number(val) as ApplicationStatus);
+    };
 
-    if (isError) return (
-        <Box sx={{ textAlign: "center", py: 6 }}>
-            <Typography color="error" fontWeight={600}>Đã xảy ra lỗi khi tải dữ liệu</Typography>
-        </Box>
-    );
+    if (isLoading) return (<Box sx={{ textAlign: "center", py: 8 }}><CircularProgress size={36} sx={{ color: "#f36730" }} /></Box>);
+    if (isError) return (<Box sx={{ textAlign: "center", py: 6 }}><Typography color="error" fontWeight={600}>Đã xảy ra lỗi khi tải dữ liệu</Typography></Box>);
+
 
     return (
         <>
             <Box>
-                <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5, fontSize: "1rem" }}>
-                    Danh sách tin đã ứng tuyển
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.8rem" }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} mb={0.5}>
+                    <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>
+                        Danh sách tin đã ứng tuyển
+                    </Typography>
+
+                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                        <Select
+                            value={String(selectedStatus)}
+                            onChange={handleStatusChange}
+                            displayEmpty
+                            sx={{
+                                fontSize: "0.8rem",
+                                borderRadius: 1.5,
+                                "& .MuiOutlinedInput-notchedOutline": { borderColor: "#e0e0e0" },
+                                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#f36730" },
+                                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#f36730" },
+                            }}
+                        >
+                            {STATUS_OPTIONS.map((opt) => (
+                                <MenuItem key={String(opt.value)} value={String(opt.value)} sx={{ fontSize: "0.8rem" }}>
+                                    {opt.value !== "" ? (
+                                        <Stack direction="row" alignItems="center" spacing={1}>
+                                            <Box sx={{
+                                                width: 8, height: 8, borderRadius: "50%",
+                                                bgcolor: STATUS_CHIP_STYLE[opt.value as ApplicationStatus]?.color,
+                                                flexShrink: 0,
+                                            }} />
+                                            <span>{opt.label}</span>
+                                        </Stack>
+                                    ) : opt.label}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Stack>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: "0.8rem" }}>
                     {data?.Items?.length ?? 0} đơn ứng tuyển
                 </Typography>
 
