@@ -13,6 +13,7 @@ import { getUserInfo } from "../../../app/services/auth.service";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { AppDispatch } from "../../../app/store";
 import { useDispatch } from "react-redux";
+import { useDeleteApplicationMutation } from "../../../app/features/application.api";
 
 const RequirementRow = ({ icon, label, value, color, }: { icon: React.ReactNode; label: string; value: string; color: string; }) => (
     <Stack direction="row" alignItems="center" spacing={1.5} sx={{ p: 1.25, borderRadius: 1.5, bgcolor: color, border: '1px solid', borderColor: 'rgba(0,0,0,0.06)', }}>
@@ -32,6 +33,7 @@ const RecruitmentPostDetailPage = () => {
     const [applyDialogOpen, setApplyDialogOpen] = useState(false);
     const [createFavourite, { isLoading: isSaving }] = useCreateFavouriteMutation();
     const [deleteFavourite, { isLoading: isDeleting }] = useDeleteFavouriteMutation();
+    const [deleteApplication, { isLoading: isDeletingApply }] = useDeleteApplicationMutation();
     const [isSaved, setIsSaved] = useState(false);
     const userInfo = getUserInfo();
 
@@ -58,6 +60,21 @@ const RecruitmentPostDetailPage = () => {
             }
         } catch (err) {
             dispatch(showSnackbar({ message: isSaved ? "Hủy lưu tin thất bại, vui lòng thử lại!" : "Lưu tin thất bại, vui lòng thử lại!", severity: "error" }));
+        }
+    };
+
+    const handleApplyClick = async () => {
+        if (!checkAuth()) return;
+
+        try {
+            if (recruitmentPost?.Applied) {
+                await deleteApplication(recruitmentPost?.ApplicationId || "").unwrap();
+                dispatch(showSnackbar({ message: "Đã hủy ứng tuyển!", severity: "info" }));
+            } else {
+                setApplyDialogOpen(true);
+            }
+        } catch (err) {
+            dispatch(showSnackbar({ message: "Hủy ứng tuyển thất bại, vui lòng thử lại!", severity: "error" }));
         }
     };
 
@@ -94,11 +111,6 @@ const RecruitmentPostDetailPage = () => {
             navigator.clipboard.writeText(window.location.href);
             alert('Đã copy link vào clipboard!');
         }
-    };
-
-    const handleApplyClick = () => {
-        if (!checkAuth()) return;
-        setApplyDialogOpen(true);
     };
 
     return (
@@ -320,15 +332,19 @@ const RecruitmentPostDetailPage = () => {
                                             variant="contained"
                                             size="small"
                                             onClick={handleApplyClick}
+                                            disabled={isDeletingApply}
+                                            startIcon={isDeletingApply ? <CircularProgress size={16} color="inherit" /> : recruitmentPost.Applied ? <CheckCircle sx={{ fontSize: 16 }} /> : undefined}
                                             sx={{
-                                                bgcolor: '#ff5722',
                                                 fontWeight: 600,
                                                 fontSize: 11,
-                                                px: 1, '&:hover': { bgcolor: '#e64a19', transform: 'translateY(-2px)' },
-                                                transition: 'all 0.3s ease'
+                                                px: 1,
+                                                bgcolor: recruitmentPost.Applied ? '#9e9e9e' : '#ff5722',
+                                                color: 'white',
+                                                cursor: isDeletingApply ? 'not-allowed' : 'pointer',
+                                                '&:hover': { bgcolor: recruitmentPost.Applied ? '#757575' : '#e64a19', transform: 'translateY(-2px)' }
                                             }}
                                         >
-                                            Ứng tuyển ngay
+                                            {isDeletingApply ? 'Đang hủy...' : recruitmentPost.Applied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
                                         </Button>
 
                                         <Button

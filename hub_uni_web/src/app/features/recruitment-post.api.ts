@@ -87,7 +87,7 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 url: `recruitmentpost/getbyseourl/${seo}`,
                 method: 'GET',
             }),
-            providesTags: [TAG_TYPES.RECRUITMENT_POST, TAG_TYPES.FAVOURITE],
+            providesTags: [TAG_TYPES.RECRUITMENT_POST, TAG_TYPES.FAVOURITE, TAG_TYPES.APPLICATION],
         }),
 
         getRecruitmentPostById: builder.query<RecruitmentPostResponse, string>({

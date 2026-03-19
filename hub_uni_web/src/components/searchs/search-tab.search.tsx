@@ -139,7 +139,29 @@ export default function ProfessionRecruitmentTabs() {
 
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Stack direction="row" alignItems="center" spacing={0.5} mb={0.25}>
-                                        {post.IsTop && (<Box component="span" sx={{ bgcolor: "#faa11b", color: "white", fontSize: 9, fontWeight: 700, px: 0.5, borderRadius: 0.5, lineHeight: 1.6, flexShrink: 0, }}> HOT </Box>)}
+                                        {post.IsTop && (<Box component="span" sx={{
+                                            bgcolor: "#faa11b", color: "white", fontSize: 8, fontWeight: 700, px: 0.3, py: 0.12, borderRadius: 0.8, flexShrink: 0, animation: 'hotShake 1.8s ease-in-out infinite, hotPulse 1.8s ease-in-out infinite',
+
+                                            '@keyframes hotShake': {
+                                                '0%': { transform: 'rotate(0deg) scale(1)' },
+                                                '10%': { transform: 'rotate(-12deg) scale(1.15)' },
+                                                '20%': { transform: 'rotate(12deg) scale(1.15)' },
+                                                '30%': { transform: 'rotate(-10deg) scale(1.12)' },
+                                                '40%': { transform: 'rotate(10deg) scale(1.12)' },
+                                                '50%': { transform: 'rotate(-6deg) scale(1.08)' },
+                                                '60%': { transform: 'rotate(6deg) scale(1.08)' },
+                                                '70%': { transform: 'rotate(-3deg) scale(1.03)' },
+                                                '80%': { transform: 'rotate(3deg) scale(1.03)' },
+                                                '100%': { transform: 'rotate(0deg) scale(1)' },
+                                            },
+
+                                            '@keyframes hotPulse': {
+                                                '0%, 100%': { bgcolor: '#f3522a' },
+                                                '25%': { bgcolor: '#ff6b47' },
+                                                '50%': { bgcolor: '#f3522a' },
+                                                '75%': { bgcolor: '#ff6b47' },
+                                            },
+                                        }}> HOT </Box>)}
                                         <Typography sx={{ fontSize: 14, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, }}>{post.Name}</Typography>
                                     </Stack>
 

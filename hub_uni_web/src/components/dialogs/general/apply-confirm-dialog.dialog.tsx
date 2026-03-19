@@ -64,7 +64,7 @@ const ApplyConfirmDialog = ({
         <Dialog
             open={open}
             onClose={handleClose}
-            maxWidth="sm"
+            maxWidth="md"
             fullWidth
         >
             {/* Header */}
@@ -72,17 +72,17 @@ const ApplyConfirmDialog = ({
                 sx={{
                     background: "linear-gradient(135deg, #fc7248 0%, #ff9800 100%)",
                     color: "white",
-                    py: 2.5,
-                    px: 3,
+                    py: 2,
+                    px: 2,
                     position: "relative",
                 }}
             >
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={1} alignItems="center">
                     <Avatar
                         src={organizationLogo || undefined}
                         sx={{
-                            width: 52,
-                            height: 52,
+                            width: 72,
+                            height: 72,
                             bgcolor: "rgba(255,255,255,0.25)",
                             border: "2px solid rgba(255,255,255,0.5)",
                             fontSize: "1.25rem",
@@ -102,7 +102,7 @@ const ApplyConfirmDialog = ({
                                 fontSize: "0.7rem",
                             }}
                         >
-                            Xác nhận ứng tuyển tại
+                            Xác nhận ứng tuyển
                         </Typography>
                         <Typography
                             variant="h6"
@@ -112,7 +112,7 @@ const ApplyConfirmDialog = ({
                                 fontSize: { xs: "1rem", sm: "1.15rem" },
                             }}
                         >
-                            {organizationName}
+                            {jobTitle}
                         </Typography>
                         <Typography
                             variant="body2"
@@ -126,7 +126,7 @@ const ApplyConfirmDialog = ({
                                 overflow: "hidden",
                             }}
                         >
-                            {jobTitle}
+                            {organizationName}
                         </Typography>
                     </Box>
                     <IconButton
@@ -144,9 +144,8 @@ const ApplyConfirmDialog = ({
                 </Stack>
             </DialogTitle>
 
-            <DialogContent sx={{ p: 3, paddingTop: "24px !important" }}>
-                <Stack spacing={2.5}>
-                    {/* Warning Notice */}
+            <DialogContent sx={{ p: 2, paddingTop: "18px !important" }}>
+                <Stack spacing={1}>
                     <Paper
                         elevation={0}
                         sx={{
@@ -174,44 +173,29 @@ const ApplyConfirmDialog = ({
                                     gutterBottom
                                     sx={{ fontSize: "0.85rem" }}
                                 >
-                                    Lưu ý quan trọng từ HUBUNI
+                                    Lưu ý quan trọng từ HubGroup
                                 </Typography>
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
                                     sx={{ lineHeight: 1.7, fontSize: "0.82rem" }}
                                 >
-                                    HUBUNI khuyên tất cả các bạn hãy luôn cẩn trọng trong quá
-                                    trình tìm việc và chủ động nghiên cứu về thông tin công ty,
-                                    vị trí việc làm trước khi ứng tuyển. Ứng viên cần có trách
-                                    nhiệm với hành vi ứng tuyển của mình. Nếu bạn gặp phải tin
-                                    tuyển dụng hoặc nhận được liên lạc đáng ngờ của nhà tuyển
-                                    dụng, hãy báo cáo ngay cho HUBUNI qua email{" "}
+                                    HubGroup khuyến cáo tất cả các bạn hãy luôn cẩn trọng trong quá
+                                    trình tìm chương trình tuyển sinh phù hợp và chủ động nghiên cứu về thông tin trường trước khi ứng tuyển, ứng viên cần có trách
+                                    nhiệm với hành vi ứng tuyển của mình. Nếu bạn gặp phải tin tuyển sinh hoặc nhận được liên lạc đáng ngờ của nhà trường hãy báo cáo ngay
+                                    HubGroup qua email {" "}
                                     <Link
-                                        href="mailto:hotro@hubuni.vn"
+                                        href="mailto:contact@hubgroup.vn"
                                         sx={{
                                             color: "#ff5722",
                                             fontWeight: 600,
                                             textDecorationColor: "#ff5722",
                                         }}
                                     >
-                                        hotro@hubuni.vn
+                                        contact@hubgroup.vn
                                     </Link>{" "}
                                     để được hỗ trợ kịp thời.
                                 </Typography>
-                                <Link
-                                    href="#"
-                                    sx={{
-                                        color: "#ff5722",
-                                        fontWeight: 600,
-                                        fontSize: "0.82rem",
-                                        display: "inline-block",
-                                        mt: 1,
-                                        textDecorationColor: "#ff5722",
-                                    }}
-                                >
-                                    Tìm hiểu thêm kinh nghiệm phòng tránh lừa đảo tại đây →
-                                </Link>
                             </Box>
                         </Stack>
                     </Paper>
@@ -226,39 +210,35 @@ const ApplyConfirmDialog = ({
                                     checked={agreed}
                                     onChange={(e) => setAgreed(e.target.checked)}
                                     disabled={isLoading}
-                                    sx={{
-                                        color: "#ff5722",
-                                        "&.Mui-checked": { color: "#ff5722" },
-                                        pt: 0.5,
-                                        alignSelf: "flex-start",
-                                    }}
+                                    sx={{ color: "#ff5722", "&.Mui-checked": { color: "#ff5722" } }}
                                 />
                             }
                             label={
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
-                                    sx={{ lineHeight: 1.6, fontSize: "0.85rem" }}
+                                    sx={{ fontSize: "0.85rem" }}
                                 >
                                     Tôi đã đọc và đồng ý với{" "}
                                     <Link
-                                        href="#"
+                                        href="https://hubgroup.vn/dieu-khoan-su-dung"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         sx={{
                                             color: "#ff5722",
                                             fontWeight: 600,
                                             textDecorationColor: "#ff5722",
                                         }}
                                     >
-                                        "Thoả thuận sử dụng dữ liệu cá nhân"
+                                        Thoả thuận sử dụng dữ liệu cá nhân
                                     </Link>{" "}
-                                    của Nhà tuyển dụng
+                                    của HubGroup
                                 </Typography>
                             }
-                            sx={{ alignItems: "flex-start", mx: 0 }}
+                            sx={{ alignItems: "center" }}
                         />
                     </Box>
 
-                    {/* Error message */}
                     {errorMsg && (
                         <Alert severity="error" sx={{ borderRadius: 2 }}>
                             {errorMsg}
@@ -267,7 +247,7 @@ const ApplyConfirmDialog = ({
                 </Stack>
             </DialogContent>
 
-            <DialogActions sx={{ px: 3, pb: 3, pt: 0, gap: 1.5 }}>
+            <DialogActions sx={{ px: 2, pb: 2, pt: 0, gap: 1.5 }}>
                 <Button
                     variant="outlined"
                     onClick={handleClose}
@@ -277,7 +257,7 @@ const ApplyConfirmDialog = ({
                         borderColor: "#e0e0e0",
                         color: "text.secondary",
                         fontWeight: 600,
-                        py: 1.25,
+                        py: 0.75,
                         borderRadius: 2,
                         "&:hover": {
                             borderColor: "#bdbdbd",
@@ -292,36 +272,18 @@ const ApplyConfirmDialog = ({
                     onClick={handleConfirm}
                     disabled={!agreed || isLoading}
                     fullWidth
-                    startIcon={
-                        isLoading ? (
-                            <CircularProgress size={18} sx={{ color: "white" }} />
-                        ) : agreed ? (
-                            <CheckCircle />
-                        ) : undefined
-                    }
+                    startIcon={isLoading ? (<CircularProgress size={18} sx={{ color: "white" }} />) : agreed ? (<CheckCircle />) : undefined}
                     sx={{
                         fontWeight: 700,
-                        py: 1.25,
+                        py: 0.75,
                         borderRadius: 2,
                         fontSize: "0.95rem",
-                        background:
-                            agreed && !isLoading
-                                ? "linear-gradient(135deg, #fc7248 0%, #ff9800 100%)"
-                                : undefined,
-                        boxShadow:
-                            agreed && !isLoading
-                                ? "0 4px 15px rgba(252,114,72,0.4)"
-                                : "none",
+                        background: agreed && !isLoading ? "linear-gradient(135deg, #fc7248 0%, #ff9800 100%)" : undefined,
+                        boxShadow: agreed && !isLoading ? "0 4px 15px rgba(252,114,72,0.4)" : "none",
                         transition: "all 0.3s ease",
                         "&:hover": {
-                            background:
-                                agreed && !isLoading
-                                    ? "linear-gradient(135deg, #e64a19 0%, #f57c00 100%)"
-                                    : undefined,
-                            boxShadow:
-                                agreed && !isLoading
-                                    ? "0 6px 20px rgba(252,114,72,0.5)"
-                                    : "none",
+                            background: agreed && !isLoading ? "linear-gradient(135deg, #e64a19 0%, #f57c00 100%)" : undefined,
+                            boxShadow: agreed && !isLoading ? "0 6px 20px rgba(252,114,72,0.5)" : "none",
                         },
                         "&.Mui-disabled": {
                             background: "#e0e0e0",

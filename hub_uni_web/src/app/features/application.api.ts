@@ -1,6 +1,7 @@
 import { ApiPaginationResponse } from "../models/api.model";
 import { ApplicationFilterParams, ApplicationRequest, ApplicationResponse, UpdateApplicationRequest } from "../models/application.model";
 import baseApi from "./base.api";
+import { TAG_TYPES } from "./tags";
 
 const buildQueryString = (params?: ApplicationFilterParams): string => {
     if (!params) return "";
@@ -56,6 +57,7 @@ const applicationApi = baseApi.injectEndpoints({
                 method: "POST",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.RECRUITMENT_POST],
         }),
 
         updateApplication: builder.mutation<void, UpdateApplicationRequest>({
@@ -64,6 +66,14 @@ const applicationApi = baseApi.injectEndpoints({
                 method: "PUT",
                 body,
             }),
+        }),
+
+        deleteApplication: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `application/delete/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [TAG_TYPES.APPLICATION, TAG_TYPES.RECRUITMENT_POST],
         }),
 
         getApplicationById: builder.query<ApplicationResponse, string>({
@@ -80,5 +90,6 @@ export const {
     useGetApplicationByOrganizationQuery,
     useUpdateApplicationMutation,
     useGetApplicationByIdQuery,
-    useGetByCustomerQuery
+    useGetByCustomerQuery,
+    useDeleteApplicationMutation
 } = applicationApi;

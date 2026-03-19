@@ -36,6 +36,7 @@ export interface CustomerResponse {
     Departments: Department[];
     AccountStatus: AccountStatus;
     ProfileInfo?: ProfileInfo;
+    OrganizationName?: string;
 }
 
 export interface CreateCustomerRequest {

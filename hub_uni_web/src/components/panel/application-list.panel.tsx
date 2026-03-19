@@ -130,7 +130,7 @@ function ApplicationCard({ app, onClick }: { app: ApplicationResponse; onClick: 
                             <Chip key={profession.Id} label={profession.Name} size="small" variant="outlined"
                                 sx={{
                                     height: 20, fontSize: "0.65rem",
-                                    borderColor: "primary.light", color: "primary.main",
+                                    borderColor: "#f36730", color: "#f36730",
                                     "& .MuiChip-label": { px: 0.75 },
                                 }} />
                         ))}

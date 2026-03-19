@@ -26,10 +26,7 @@ export default function AccountInfoPage() {
     const userInfo = getUserInfo();
     const [activeTab, setActiveTab] = useState<TabKey>("info");
 
-    const handleSignOut = async () => {
-        navigate("/sign-out");
-    };
-
+    const handleSignOut = async () => { navigate("/sign-out"); };
     const { data: account, isLoading } = useGetCustomerByIdQuery(userInfo?.Id ?? "", { skip: !userInfo?.Id });
 
     return (
