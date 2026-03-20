@@ -3,7 +3,7 @@ import { Box, Stack, Typography, Divider, Grid, TextField, MenuItem, Button, Cir
 import { useState, useEffect } from "react";
 import { AccountResponse } from "../../app/models/account.model";
 import { useUpdateCustomerMutation } from "../../app/features/customer.api";
-import { useGetAllProvinceNoAuthenQuery, useGetProvinceByCountryQuery } from "../../app/features/province.api";
+import { useGetProvinceByCountryQuery } from "../../app/features/province.api";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
 import { getUserInfo } from "../../app/services/auth.service";
 import { Province } from "../../app/models/province.model";
@@ -14,6 +14,8 @@ import ConfirmDialog from "../dialogs/general/confirm.dialog";
 import { ConvertService } from "../../app/services/convert.service";
 import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
 import { Country } from "../../app/models/country.model";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: Gender.Undefined, label: "Không yêu cầu" },
@@ -23,7 +25,7 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
 ];
 
 const EXPERIENCE_OPTIONS: { value: JobExperience; label: string }[] = [
-    { value: JobExperience.Undefined, label: "Không yêu cầu" },
+    { value: JobExperience.Undefined, label: "Không có" },
     { value: JobExperience.LessThan1Year, label: "< 1 năm" },
     { value: JobExperience.From1To2Years, label: "1-2 năm" },
     { value: JobExperience.From2To3Years, label: "2-3 năm" },
@@ -88,7 +90,7 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
         Id: account.Id,
         UserName: form.UserName,
         FullName: form.FullName,
-        AvatarUrl: account.AvatarUrl,
+        AvatarUrl: account.AvatarUrl ?? "",
         Gender: form.Gender,
         Email: form.Email,
         PhoneNumber: form.PhoneNumber,
@@ -113,6 +115,7 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
 
 export default function AccountInfoPanel({ account }: { account: AccountResponse }) {
     const userInfo = getUserInfo();
+    const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [form, setForm] = useState<EditableForm>(() => buildForm(account));
@@ -133,9 +136,12 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
     const handleConfirm = async () => {
         try {
             await updateCustomer(buildUpdatePayload(account, form)).unwrap();
+            dispatch(showSnackbar({ message: "Cập nhật thông tin thành công", severity: "success" }));
             setConfirmOpen(false);
             setIsEditing(false);
-        } catch (err) { }
+        } catch (err) {
+            dispatch(showSnackbar({ message: "Cập nhật thông tin thất bại", severity: "error" }));
+        }
     };
 
     return (

@@ -7,6 +7,7 @@ import RecruitmentPostDetailPage from "../pages/general/detail-page/recruitment-
 import RecruitmentPostSearchPage from "../pages/general/search-page/recruitment-post-search.page";
 import { HomePage } from "../pages/general";
 import AccountInfoPage from "../pages/student/account-info.page";
+import ProtectedRoute from "../components/protected-route";
 
 const generalRoutes = [
     {
@@ -47,8 +48,12 @@ const generalRoutes = [
     },
     {
         path: "thong-tin-tai-khoan",
-        element: <AccountInfoPage />,
-    }
+        element: (
+            <ProtectedRoute allowedAccountTypes={["Student"]}>
+                <AccountInfoPage />
+            </ProtectedRoute>
+        ),
+    },
 ];
 
 export default generalRoutes;

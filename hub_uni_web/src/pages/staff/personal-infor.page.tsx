@@ -21,11 +21,13 @@ const GENDER_OPTIONS = [
 ];
 
 interface EditableForm {
+    AvatarUrl: string;
+    UserName: string;
     FullName: string;
     Email: string;
     PhoneNumber: string;
     Gender: Gender;
-    DateOfBirth: string;
+    DateOfBirth: string | null;
     Experience: JobExperience;
     EducationLevel: EducationLevel;
     GraduationYear: number | "";
@@ -39,11 +41,13 @@ interface EditableForm {
 function buildForm(data: CustomerResponse): EditableForm {
     const p = data.ProfileInfo;
     return {
+        UserName: data.UserName ?? "",
         FullName: data.FullName ?? "",
         Email: data.Email ?? "",
         PhoneNumber: data.PhoneNumber ?? "",
         Gender: ConvertService.convertGenderFromString(p?.Gender ?? data.Gender),
-        DateOfBirth: p?.DateOfBirth?.substring(0, 10) ?? "",
+        DateOfBirth: p?.DateOfBirth?.substring(0, 10) ?? null,
+        AvatarUrl: data.AvatarFullUrl ?? "",
         Experience: ConvertService.convertJobExperienceFromString(p?.Experience),
         EducationLevel: ConvertService.convertEducationLevelFromString(p?.EducationLevel),
         GraduationYear: p?.GraduationYear || "",
@@ -58,15 +62,17 @@ function buildForm(data: CustomerResponse): EditableForm {
 function buildPayload(data: CustomerResponse, form: EditableForm): UpdateCustomerRequest {
     return {
         Id: data.Id,
+        UserName: form.UserName,
         FullName: form.FullName,
         Email: form.Email,
+        AvatarUrl: form.AvatarUrl,
         PhoneNumber: form.PhoneNumber || null,
         Gender: form.Gender,
         AccountType: data.AccountType,
         AccountStatus: ConvertService.convertAccountStatusFromString(data.AccountStatus),
         RoleIds: data.Roles?.map(r => r.Id) ?? [],
         ProfileInfo: {
-            DateOfBirth: form.DateOfBirth,
+            DateOfBirth: form.DateOfBirth || null,
             Gender: form.Gender,
             Experience: form.Experience,
             EducationLevel: form.EducationLevel,

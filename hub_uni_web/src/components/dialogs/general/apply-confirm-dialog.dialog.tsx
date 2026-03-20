@@ -3,6 +3,9 @@ import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Typography, 
 import { Close, Warning, CheckCircle, Business } from "@mui/icons-material";
 import { useCreateApplicationMutation } from "../../../app/features/application.api";
 import { getUserInfo } from "../../../app/services/auth.service";
+import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
+import { AppDispatch } from "../../../app/store";
+import { useDispatch } from "react-redux";
 
 interface ApplyConfirmDialogProps {
     open: boolean;
@@ -24,6 +27,7 @@ const ApplyConfirmDialog = ({
     recruitmentPostId,
 }: ApplyConfirmDialogProps) => {
     const [agreed, setAgreed] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const [createApplication, { isLoading }] = useCreateApplicationMutation();
@@ -50,13 +54,11 @@ const ApplyConfirmDialog = ({
                 CustomerId: userInfo.Id,
                 RecruitmentPostId: recruitmentPostId,
             }).unwrap();
-
+            dispatch(showSnackbar({ message: "Ứng tuyển thành công", severity: "success" }));
             handleClose();
             onSuccess?.();
         } catch (err: any) {
-            setErrorMsg(
-                err?.data?.message || "Ứng tuyển thất bại. Vui lòng thử lại sau."
-            );
+            dispatch(showSnackbar({ message: "Ứng tuyển thất bại. Vui lòng thử lại sau.", severity: "error" }));
         }
     };
 

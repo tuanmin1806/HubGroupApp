@@ -114,7 +114,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               }}
             >
               <Typography
-                variant="subtitle2"
+                variant="subtitle1"
                 fontWeight="bold"
                 sx={{
                   cursor: "pointer",
@@ -159,7 +159,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
                   {[org.Province, org.Commune].filter(Boolean).join(", ") || "—"}
                 </Typography>
               </Box>
-            )}   
+            )}
 
             {org.WebsiteUrl && (
               <Box sx={{ height: 20, display: "flex", alignItems: "center", minWidth: 0 }}>

@@ -4,7 +4,7 @@ import { Position } from "./position.model";
 import { RoleResponse } from "./role.model copy";
 
 export interface ProfileInfo {
-    DateOfBirth: string;
+    DateOfBirth: string | null;
     Experience: JobExperience;
     EducationLevel: EducationLevel;
     GraduationYear: number;
@@ -56,6 +56,7 @@ export interface CreateCustomerRequest {
 export interface UpdateCustomerRequest {
     Id: string;
     FullName: string;
+    AvatarUrl?: string;
     UserName?: string;
     Email: string;
     PhoneNumber: string | null;

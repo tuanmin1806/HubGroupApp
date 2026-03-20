@@ -42,7 +42,7 @@ const UnauthorizedPage = () => {
                         variant="contained"
                         color="primary"
                         size="large"
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate("/sign-out")}
                         sx={{ px: 4 }}
                     >
                         Quay về trang chủ

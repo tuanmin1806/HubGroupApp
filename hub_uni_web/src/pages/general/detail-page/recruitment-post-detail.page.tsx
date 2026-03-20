@@ -49,7 +49,7 @@ const RecruitmentPostDetailPage = () => {
             if (isSaved) {
                 await deleteFavourite(recruitmentPost?.SaveId || "").unwrap();
                 setIsSaved(false);
-                dispatch(showSnackbar({ message: "Đã hủy lưu tin tuyển sinh!", severity: "info" }));
+                dispatch(showSnackbar({ message: "Đã hủy lưu tin tuyển sinh!", severity: "success" }));
             } else {
                 await createFavourite({
                     CustomerId: userInfo?.Id || "",
@@ -69,7 +69,7 @@ const RecruitmentPostDetailPage = () => {
         try {
             if (recruitmentPost?.Applied) {
                 await deleteApplication(recruitmentPost?.ApplicationId || "").unwrap();
-                dispatch(showSnackbar({ message: "Đã hủy ứng tuyển!", severity: "info" }));
+                dispatch(showSnackbar({ message: "Đã hủy ứng tuyển!", severity: "success" }));
             } else {
                 setApplyDialogOpen(true);
             }

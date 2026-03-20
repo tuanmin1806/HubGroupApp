@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
-import { Person3 } from "@mui/icons-material";
+import { AccountCircle, Logout, Person3 } from "@mui/icons-material";
 import LogoImage from "../../assets/hub_logo.png"
 import { ConvertService } from "../../app/services/convert.service";
 
@@ -84,8 +84,14 @@ function AdminHeader() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <MenuItem onClick={handleCloseUserMenu}><Typography sx={{ textAlign: "center" }}> Thông tin tài khoản </Typography></MenuItem>
-                            <MenuItem onClick={handleSignOut}><Typography sx={{ textAlign: "center" }}> Đăng xuất </Typography></MenuItem>
+                            <MenuItem onClick={handleCloseUserMenu}>
+                                <AccountCircle sx={{ mr: 1, fontSize: 20 }} />
+                                <Typography sx={{ textAlign: "center" }}> Thông tin tài khoản </Typography>
+                            </MenuItem>
+                            <MenuItem onClick={handleSignOut}>
+                                <Logout sx={{ mr: 1, fontSize: 20, color: "red" }} />
+                                <Typography sx={{ textAlign: "center", color: "red" }}> Đăng xuất </Typography>
+                            </MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>

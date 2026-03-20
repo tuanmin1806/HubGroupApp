@@ -1,4 +1,4 @@
-import { Person3 } from "@mui/icons-material";
+import { AccountCircle, Logout, Person3 } from "@mui/icons-material";
 import { AppBar, Avatar, Box, Container, Menu, MenuItem, Stack, Toolbar, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -84,8 +84,14 @@ function StaffHeader() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            <MenuItem onClick={handleCloseUserMenu}><Typography sx={{ textAlign: "center" }}> Thông tin tài khoản </Typography></MenuItem>
-                            <MenuItem onClick={handleSignOut}><Typography sx={{ textAlign: "center" }}> Đăng xuất </Typography></MenuItem>
+                            <MenuItem onClick={handleCloseUserMenu}>
+                                <AccountCircle sx={{ mr: 1, fontSize: 20 }} />
+                                <Typography sx={{ textAlign: "center" }}> Thông tin tài khoản </Typography>
+                            </MenuItem>
+                            <MenuItem onClick={handleSignOut}>
+                                <Logout sx={{ mr: 1, fontSize: 20, color: "red" }} />
+                                <Typography sx={{ textAlign: "center", color: "red" }}> Đăng xuất </Typography>
+                            </MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>

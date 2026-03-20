@@ -185,7 +185,7 @@ const StudentSignupForm = () => {
                         <Button
                             type="submit"
                             variant="contained"
-                            size="small"
+                            size="medium"
                             fullWidth
                             disabled={submitting}
                             startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
