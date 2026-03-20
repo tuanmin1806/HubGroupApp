@@ -16,7 +16,7 @@ export interface AccountResponse {
     Address: string;
     ProvinceId: string;
     CommuneId: string;
-    AvatarUrl: string;
+    AvatarUrl: string | null;
     AvatarFullUrl: string;
     Position: Position;
     Roles: RoleResponse[];
