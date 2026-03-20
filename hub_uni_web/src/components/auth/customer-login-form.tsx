@@ -152,7 +152,7 @@ const CustomerLoginForm = () => {
             >
               Chưa có tài khoản?
               <Link
-                sx={{ ml: 0.5, }}
+                sx={{ ml: 0.5, textDecoration: "none" }}
                 onClick={() => setLoginDialogOpen(true)}
               >
                 Đăng ký ngay

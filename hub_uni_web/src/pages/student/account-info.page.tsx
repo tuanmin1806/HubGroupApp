@@ -15,8 +15,8 @@ type TabKey = "info" | "password" | "applications" | "logout" | "favourite-recru
 const MENU_ITEMS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
     { key: "info", label: "Thông tin tài khoản", icon: <Person sx={{ fontSize: 18 }} /> },
     { key: "password", label: "Thay đổi mật khẩu", icon: <Lock sx={{ fontSize: 18 }} /> },
-    { key: "applications", label: "Tin đã ứng tuyển", icon: <WorkOutline sx={{ fontSize: 18 }} /> },
-    { key: "favourite-recruitposts", label: "Tin đã lưu", icon: <TurnedInNot sx={{ fontSize: 18 }} /> },
+    { key: "applications", label: "Chương trình đã ứng tuyển", icon: <WorkOutline sx={{ fontSize: 18 }} /> },
+    { key: "favourite-recruitposts", label: "Chương trình đã lưu", icon: <TurnedInNot sx={{ fontSize: 18 }} /> },
     { key: "saved-organizations", label: "Trường đã lưu", icon: <School sx={{ fontSize: 18 }} /> },
 ];
 
@@ -96,8 +96,8 @@ export default function AccountInfoPage() {
                                         alignItems="center"
                                         onClick={() => setActiveTab(item.key)}
                                         sx={{
-                                            px: 1.5, py: 1.25, borderRadius: 1.5,
-                                            cursor: "pointer", mb: 0.25,
+                                            px: 1, py: 1.25, borderRadius: 1.5,
+                                            cursor: "pointer",
                                             bgcolor: activeTab === item.key ? "#fff3e0" : "transparent",
                                             color: activeTab === item.key ? "#f36730" : "text.secondary",
                                             fontWeight: activeTab === item.key ? 700 : 400,
@@ -105,7 +105,7 @@ export default function AccountInfoPage() {
                                             "&:hover": { bgcolor: activeTab === item.key ? "#fff3e0" : "#f5f5f5" },
                                         }}
                                     >
-                                        <Box sx={{ color: activeTab === item.key ? "#f36730" : "#9e9e9e" }}>{item.icon}</Box>
+                                        <Box sx={{ color: activeTab === item.key ? "#f36730" : "#9e9e9e", alignItems: "center", display: "flex", flexShrink: 0, }}>{item.icon}</Box>
                                         <Typography variant="body2" fontWeight={activeTab === item.key ? 700 : 500} sx={{ fontSize: "0.85rem" }}>{item.label}</Typography>
                                     </Stack>
                                 ))}
@@ -120,12 +120,12 @@ export default function AccountInfoPage() {
                                         px: 1, py: 1,
                                         cursor: "pointer", mb: 0.25,
                                         bgcolor: activeTab === "logout" ? "#fff3e0" : "transparent",
-                                        color: activeTab === "logout" ? "#f36730" : "text.secondary",
+                                        color: "#f36730",
                                         fontWeight: activeTab === "logout" ? 700 : 400,
                                         "&:hover": { bgcolor: activeTab === "logout" ? "#fff3e0" : "#f5f5f5" },
                                     }}
                                 >
-                                    <Box sx={{ color: activeTab === "logout" ? "#f36730" : "#9e9e9e" }}><Logout sx={{ fontSize: 18 }} /></Box>
+                                    <Box sx={{ color: "#f36730", alignItems: "center", display: "flex", flexShrink: 0, }}><Logout sx={{ fontSize: 18 }} /></Box>
                                     <Typography variant="body2" fontWeight={activeTab === "logout" ? 700 : 500} sx={{ fontSize: "0.85rem" }}>Đăng xuất</Typography>
                                     {activeTab === "logout" && (<Box sx={{ ml: "auto", width: 4, height: 4, borderRadius: "50%", bgcolor: "#f36730" }} />)}
                                 </Stack>
@@ -152,7 +152,7 @@ export default function AccountInfoPage() {
                     </Box>
                 </Stack>
             </Container>
-            <StudentLogoUploadDialog open={logoDialogOpen} onClose={() => setLogoDialogOpen(false)} currentLogoUrl={account?.AvatarUrl ?? ""} />
+            <StudentLogoUploadDialog open={logoDialogOpen} onClose={() => setLogoDialogOpen(false)} currentLogoUrl={account?.AvatarFullUrl ?? ""} />
         </Box>
     );
 }

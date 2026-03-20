@@ -15,11 +15,11 @@ const provinceApi = baseApi.injectEndpoints({
 
         getProvinceByCountry: builder.query<Province[], string>({
             query: (seo) => ({
-                url: `province/getbycountryseourl/${seo}`,
+                url: `province/getbycountryseourl?countrySeoUrl=${seo}`,
                 method: "GET",
             }),
-            transformResponse: (response: { Total: number; Items: Province[] }): Province[] => {
-                return response.Items || [];
+            transformResponse: (response: Province[]): Province[] => {
+                return response;
             },
         }),
     })

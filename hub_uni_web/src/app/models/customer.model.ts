@@ -10,6 +10,8 @@ export interface ProfileInfo {
     GraduationYear: number;
     Gpa: number;
     Gender: Gender;
+    CountrySeoUrl?: string;
+    ProvinceSeoUrl?: string;
     CountryId?: string;
     ProvinceId: string;
     CommuneId: string;

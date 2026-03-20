@@ -47,6 +47,7 @@ interface EditableForm {
     UserName: string;
     FullName: string;
     Gender: Gender;
+    AvatarUrl: string;
     Email: string;
     PhoneNumber: string;
     DateOfBirth: string;
@@ -68,6 +69,7 @@ function buildForm(account: CustomerResponse): EditableForm {
         FullName: account.FullName ?? "",
         Gender: ConvertService.convertGenderFromString(p?.Gender ?? account.Gender),
         Email: account.Email ?? "",
+        AvatarUrl: account.AvatarUrl ?? "",
         PhoneNumber: account.PhoneNumber ?? "",
         DateOfBirth: p?.DateOfBirth?.substring(0, 10) ?? "",
         Experience: ConvertService.convertJobExperienceFromString(p?.Experience),
@@ -86,6 +88,7 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
         Id: account.Id,
         UserName: form.UserName,
         FullName: form.FullName,
+        AvatarUrl: account.AvatarUrl,
         Gender: form.Gender,
         Email: form.Email,
         PhoneNumber: form.PhoneNumber,
@@ -123,7 +126,6 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
     const { data: communes = [], isFetching: communesLoading } = useGetCommunesByProvinceQuery(selectedProvince?.SeoUrl ?? "", { skip: !selectedProvince });
     const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
     const selectedCommune = communes.find(c => c.Id === form.CommuneId) ?? null;
-
     const set = (field: keyof EditableForm) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: e.target.value }));
     const setEnum = <K extends keyof EditableForm>(field: K) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: Number(e.target.value) }));
     const handleCancel = () => { setIsEditing(false); setForm(buildForm(account)); };
@@ -281,8 +283,10 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                     <Autocomplete
                         options={provinces}
                         disabled={!isEditing}
+                        loading={provincesLoading}
                         getOptionLabel={(o: Province) => o.Name ?? ""}
                         value={selectedProvince ?? null}
+                        isOptionEqualToValue={(option, value) => option.Id === value.Id}
                         onChange={(_, val: Province | null) => setForm(prev => ({ ...prev, ProvinceId: val?.Id ?? "", CommuneId: "" }))}
                         renderInput={(params) => (
                             <TextField
@@ -301,6 +305,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         disabled={!isEditing}
                         loading={communesLoading}
                         getOptionLabel={(o: CommuneResponse) => o.Name ?? ""}
+                        isOptionEqualToValue={(option, value) => option.Id === value.Id}
                         value={selectedCommune}
                         onChange={(_, val: CommuneResponse | null) => setForm(prev => ({ ...prev, CommuneId: val?.Id ?? "" }))}
                         renderInput={(params) => (
