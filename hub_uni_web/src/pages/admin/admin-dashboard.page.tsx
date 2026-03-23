@@ -1,11 +1,11 @@
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
-import { Dashboard, PendingActions, CheckCircle } from "@mui/icons-material";
+import { Dashboard, PendingActions, CheckCircle, Person, People } from "@mui/icons-material";
 
 export default function AdminDashboardPage() {
     return (
         <Box>
             <Typography variant="h5" fontWeight={600} gutterBottom>
-               Tổng quan
+                Tổng quan
             </Typography>
 
             <Typography variant="body2" color="text.secondary" mb={3}>
@@ -13,7 +13,7 @@ export default function AdminDashboardPage() {
             </Typography>
 
             <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     <Card sx={{ borderRadius: 3 }}>
                         <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                             <Dashboard color="primary" fontSize="large" />
@@ -29,13 +29,29 @@ export default function AdminDashboardPage() {
                     </Card>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     <Card sx={{ borderRadius: 3 }}>
                         <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <PendingActions color="warning" fontSize="large" />
+                            <People color="warning" fontSize="large" />
                             <Box>
                                 <Typography variant="body2" color="text.secondary">
                                     Số lượng nhân viên
+                                </Typography>
+                                <Typography variant="h6" fontWeight={600}>
+                                    0
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 4 }}>
+                    <Card sx={{ borderRadius: 3 }}>
+                        <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                            <PendingActions color="info" fontSize="large" />
+                            <Box>
+                                <Typography variant="body2" color="text.secondary">
+                                    Số lượng bài tuyển sinh
                                 </Typography>
                                 <Typography variant="h6" fontWeight={600}>
                                     0

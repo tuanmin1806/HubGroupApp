@@ -35,7 +35,7 @@ const adminRoutes = [
     {
         path: "manage-staff-account",
         element: (
-            <ProtectedRoute permissionGroup="MANAGE_STAFF_ACCOUNT" allowedAccountTypes={["Admin"]}>
+            <ProtectedRoute permissionGroup="MANAGE_STAFF_ACCOUNT" allowedAccountTypes={["Manager"]}>
                 <ManageStaffAccountPage />
             </ProtectedRoute>
         ),
@@ -49,7 +49,7 @@ const adminRoutes = [
     {
         path: "create-recruitment-post",
         element: (
-            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Admin"]}>
+            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Manager"]}>
                 <CreateRecruitmentPostPage />
             </ProtectedRoute>
         ),
