@@ -1,14 +1,21 @@
 import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
-import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Tooltip, TablePagination, Button, CircularProgress, Box, Typography } from "@mui/material";
+import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Chip } from "@mui/material";
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
-import { useGetRecruitmentPostsByCurrentCustomerQuery, useGetRecruitmentPostsByOrganizationQuery } from "../../app/features/recruitment-post.api";
+import { useGetRecruitmentPostsByOrganizationQuery } from "../../app/features/recruitment-post.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { useNavigate } from "react-router-dom";
 import UpdateRecruitmentPostDialog from "../../components/dialogs/staff/update-recruitment-post.dialog";
 import { formatDate } from "../../utils/date.utils";
 import { getUserInfo } from "../../app/services/auth.service";
+
+const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
+    Active: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },
+    Inactive: { bgcolor: "#fff3e0", color: "#e65100", border: "#ffcc80" },
+    Closed: { bgcolor: "#fce4ec", color: "#c62828", border: "#ef9a9a" },
+    Draft: { bgcolor: "#f5f5f5", color: "#757575", border: "#e0e0e0" },
+};
 
 export default function ManageRecruitmentPostPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -68,7 +75,24 @@ export default function ManageRecruitmentPostPage() {
                 <TableCell>{post.Province ?? "—"}</TableCell>
                 <TableCell>{post.Quantity}</TableCell>
                 <TableCell>{formatDate(post.RecruitmentToDate)}</TableCell>
-                <TableCell>{ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(post.RecruitPostStatus))}</TableCell>
+                <TableCell>
+                    {(() => {
+                        const style = STATUS_STYLE[post.RecruitPostStatus] ?? STATUS_STYLE.Draft;
+                        return (
+                            <Chip
+                                label={ConvertService.convertPostStatus(ConvertService.convertPostStatusFromString(post.RecruitPostStatus))}
+                                size="small"
+                                sx={{
+                                    bgcolor: style.bgcolor,
+                                    color: style.color,
+                                    fontWeight: 600,
+                                    fontSize: 12,
+                                    border: `1px solid ${style.border}`,
+                                }}
+                            />
+                        );
+                    })()}
+                </TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
                     <Tooltip title="Cập nhật">
@@ -109,7 +133,7 @@ export default function ManageRecruitmentPostPage() {
                         variant="contained"
                         color="primary"
                         startIcon={<Add />}
-                        onClick={() => navigate("/staff/create-recruitment-post")}
+                        onClick={() => navigate("/admin/create-recruitment-post")}
                     >
                         Thêm
                     </Button>

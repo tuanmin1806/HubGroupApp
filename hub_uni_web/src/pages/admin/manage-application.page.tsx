@@ -7,6 +7,13 @@ import { useGetApplicationByOrganizationQuery } from "../../app/features/applica
 import { ConvertService } from "../../app/services/convert.service";
 import UpdateApplicationDialog from "../../components/dialogs/admin/application/update-application.dialog";
 
+const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
+    Accepted: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },
+    Rejected: { bgcolor: "#fff3e0", color: "#e65100", border: "#ffcc80" },
+    Pending: { bgcolor: "#fce4ec", color: "#c62828", border: "#ef9a9a" },
+    Undefined: { bgcolor: "#f5f5f5", color: "#757575", border: "#e0e0e0" },
+};
+
 export default function ManageApplicationPage() {
     const [inputValue, setInputValue] = useState("");
     const [searchValue, setSearchValue] = useState("");
@@ -88,9 +95,26 @@ export default function ManageApplicationPage() {
             <TableRow key={application.Id} hover>
                 <TableCell>{application.Customer.FullName ?? "—"}</TableCell>
                 <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(application.Customer.ProfileInfo.Gender)) ?? "—"}</TableCell>
-                <TableCell>{application.Customer.ProfileInfo.DateOfBirth ?? "—"}</TableCell>
+                <TableCell>{ConvertService.formatDateToddMMyyyy(application.Customer.ProfileInfo.DateOfBirth) ?? "—"}</TableCell>
                 <TableCell>{application.RecruitmentPost.Name ?? "—"}</TableCell>
-                <TableCell>{ConvertService.convertApplicationStatus(ConvertService.convertApplicationStatusFromString(application.ApplicationStatus)) ?? "—"}</TableCell>
+                <TableCell>
+                    {(() => {
+                        const style = STATUS_STYLE[application.ApplicationStatus] ?? STATUS_STYLE.Undefined;
+                        return (
+                            <Chip
+                                label={ConvertService.convertApplicationStatus(ConvertService.convertApplicationStatusFromString(application.ApplicationStatus))}
+                                size="small"
+                                sx={{
+                                    bgcolor: style.bgcolor,
+                                    color: style.color,
+                                    fontWeight: 600,
+                                    fontSize: 12,
+                                    border: `1px solid ${style.border}`,
+                                }}
+                            />
+                        );
+                    })()}
+                </TableCell>
                 <TableCell align="center">
                     <Tooltip title="Xem chi tiết">
                         <IconButton size="small" color="primary">

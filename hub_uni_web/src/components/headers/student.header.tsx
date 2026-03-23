@@ -1,7 +1,7 @@
-import { Close } from "@mui/icons-material";
+import { Close, Person } from "@mui/icons-material";
 import Person3Icon from "@mui/icons-material/Person3";
 import MenuIcon from "@mui/icons-material/Menu";
-import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography, useMediaQuery, Menu, Button, Fade } from "@mui/material";
+import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography, useMediaQuery, Menu, Button, Fade, Avatar } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -320,7 +320,7 @@ function StudentHeader() {
                                     style={{ cursor: "pointer" }}
                                     onClick={handleNavigateAccountInfo}
                                 >
-                                    <Person3Icon sx={{ p: 0, fontSize: { xs: 'medium', md: 'large' } }} />
+                                    <Person sx={{ p: 0, fontSize: { xs: '1.5rem', md: '1.6rem' } }} />
                                     <Link
                                         sx={{
                                             ml: 1,

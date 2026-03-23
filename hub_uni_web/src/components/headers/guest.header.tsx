@@ -10,6 +10,7 @@ import Link from "@mui/material/Link";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import hub_logo from "../../assets/hub_logo.png";
+import { Person } from "@mui/icons-material";
 
 const theme = createTheme({
     palette: {
@@ -283,7 +284,7 @@ function GuestHeader() {
                                 gap: { xs: 0.5, md: 1 },
                             }}
                         >
-                            <Person3Icon
+                            <Person
                                 sx={{
                                     p: 0,
                                     fontSize: { xs: "1.25rem", md: "1.5rem" },
@@ -291,7 +292,6 @@ function GuestHeader() {
                             />
                             <Link
                                 sx={{
-                                    ml: 1,
                                     textAlign: "center",
                                     fontWeight: "bold",
                                     fontSize: { xs: "0.75rem", md: "1rem" },

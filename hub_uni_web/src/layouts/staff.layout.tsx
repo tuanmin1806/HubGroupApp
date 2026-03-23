@@ -1,4 +1,4 @@
-import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, Person } from "@mui/icons-material";
+import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, Person, School } from "@mui/icons-material";
 import { createTheme, GlobalStyles, Grid } from "@mui/material";
 import { AppProvider, NavigationItem } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
@@ -14,24 +14,19 @@ const NAVIGATION: NavigationItem[] = [
         title: "Danh mục",
     },
     {
-        segment: "/staff",
+        segment: "staff",
         title: "Trang chủ",
         icon: <Dashboard />,
     },
     {
         title: "Quản lý tuyển sinh",
-        icon: <ManageSearch />,
+        icon: <School />,
         children: [
             {
-                segment: "manage-recruitment-post",
+                segment: "staff/manage-recruitment-post",
                 title: "Quản lý chương trình tuyển sinh",
                 icon: <MenuBook />,
-            },
-            {
-                segment: "create-recruitment-post",
-                title: "Thêm chương trình tuyển sinh",
-                icon: <AddBox />,
-            },
+            }
         ],
     },
     {
@@ -39,14 +34,14 @@ const NAVIGATION: NavigationItem[] = [
         icon: <Info />,
         children: [
             {
-                segment: "personal-information",
-                title: "Thông tin cá nhân",
-                icon: <Person />,
+                segment: "staff/organization-info",
+                title: "Thông tin trường",
+                icon: <CorporateFare />,
             },
             {
-                segment: "organization-info",
-                title: "Thông tin tổ chức",
-                icon: <CorporateFare />,
+                segment: "staff/personal-information",
+                title: "Thông tin tài khoản",
+                icon: <Person />,
             },
         ],
     },
@@ -85,7 +80,7 @@ export default function StaffLayout() {
     const router = {
         pathname: location.pathname,
         searchParams: new URLSearchParams(location.search),
-        navigate: handleNavigation,
+        navigate: (path: string | URL) => { navigate(`/${path}`); },
     };
 
     return (

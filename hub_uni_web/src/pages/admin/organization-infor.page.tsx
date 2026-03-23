@@ -1,7 +1,7 @@
 import { Box, Container, Typography, Stack, Grid, Chip, CircularProgress, Divider, Button, IconButton, Tooltip } from "@mui/material";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetOrganizationByIdQuery } from "../../app/features/organization.api";
-import { Edit, LocationOn, Email, Language, Business, School, Phone, AccountBalance, Star, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, Bed, CameraAlt } from "@mui/icons-material";
+import { Edit, LocationOn, Email, Language, Business, School, Phone, AccountBalance, Star, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, Bed, CameraAlt, Info } from "@mui/icons-material";
 import { useState } from "react";
 import UpdateOrganizationDialog from "../../components/dialogs/admin/organization/update-organization.dialog";
 import { ConvertService } from "../../app/services/convert.service";
@@ -139,7 +139,7 @@ export default function OrganizationInforPage() {
                                     variant="h5"
                                     sx={{
                                         color: "#fff",
-                                        fontWeight: 800,
+                                        fontWeight: 600,
                                         fontSize: { xs: 16, sm: 22, md: 28 },
                                         lineHeight: 1.2,
                                         textShadow: "0 1px 4px rgba(0,0,0,0.4)",
@@ -211,7 +211,7 @@ export default function OrganizationInforPage() {
                         <Stack spacing={0.5}>
 
                             {data.Summary && (
-                                <SectionCard title="Giới thiệu" icon={<School sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title="Giới thiệu" icon={<Info sx={{ color: "#1975d1" }} />}>
                                     <Typography
                                         color="text.secondary"
                                         sx={{ lineHeight: 1.8, fontSize: 15 }}
@@ -296,7 +296,7 @@ export default function OrganizationInforPage() {
 
                             {/* Contact info */}
                             <SectionCard title="Thông tin liên hệ" icon={<Phone sx={{ color: "#1975d1" }} />}>
-                                <Stack spacing={1.5}>
+                                <Stack spacing={2}>
                                     {[
                                         { icon: <LocationOn sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.Province },
                                         data.PhoneNumber && { icon: <Phone sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.PhoneNumber },
@@ -305,8 +305,8 @@ export default function OrganizationInforPage() {
                                         data.ManagedBy && { icon: <AccountBalance sx={{ fontSize: 16, color: "#1975d1" }} />, label: `Quản lý: ${data.ManagedBy}` },
                                     ].filter(Boolean).map((item: any, i) => (
                                         item && (
-                                            <Stack key={i} direction="row" spacing={1} alignItems="flex-start">
-                                                <Box mt="2px" flexShrink={0}>{item.icon}</Box>
+                                            <Stack key={i} direction="row" spacing={1} alignItems="center">
+                                                <Box display="flex" flexShrink={0}>{item.icon}</Box>
                                                 {item.href ? (
                                                     <Typography
                                                         component="a"

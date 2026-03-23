@@ -131,7 +131,7 @@ export default function CreateRecruitmentPostPage() {
                     OtherReqs: requirement.OtherReqs.filter(r => r.trim()),
                 },
             }).unwrap();
-            navigate("/staff/manage-recruitment-post");
+            navigate("/admin/manage-recruitment-post");
         } catch (error) {
             console.error("Failed to create recruitment post:", error);
         }

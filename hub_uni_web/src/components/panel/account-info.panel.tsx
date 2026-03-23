@@ -16,6 +16,7 @@ import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
 import { Country } from "../../app/models/country.model";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+import { fieldSx } from "../../styles/fieldSx";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: Gender.Undefined, label: "Không yêu cầu" },
@@ -119,6 +120,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
     const [isEditing, setIsEditing] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [form, setForm] = useState<EditableForm>(() => buildForm(account));
+    const fs = fieldSx(isEditing);
 
     useEffect(() => { setForm(buildForm(account)); }, [account]);
 
@@ -165,7 +167,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         size="small" fullWidth label="Họ và tên"
                         value={form.FullName} onChange={set("FullName")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Person sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -174,7 +176,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         size="small" fullWidth label="Tên đăng nhập"
                         value={form.UserName}
                         disabled={true}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Badge sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -183,7 +185,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         size="small" fullWidth label="Email" type="email"
                         value={form.Email} onChange={set("Email")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Email sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -192,7 +194,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         size="small" fullWidth label="Số điện thoại"
                         value={form.PhoneNumber} onChange={set("PhoneNumber")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Phone sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -202,7 +204,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         value={form.DateOfBirth} onChange={set("DateOfBirth")}
                         disabled={!isEditing}
                         InputLabelProps={{ shrink: true }}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Cake sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -211,7 +213,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         select size="small" fullWidth label="Giới tính"
                         value={form.Gender} onChange={setEnum("Gender")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><Wc sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     >
                         {GENDER_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
@@ -226,7 +228,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         select size="small" fullWidth label="Trình độ học vấn"
                         value={form.EducationLevel} onChange={setEnum("EducationLevel")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><School sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     >
                         {EDUCATION_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
@@ -237,7 +239,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         select size="small" fullWidth label="Kinh nghiệm"
                         value={form.Experience} onChange={setEnum("Experience")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><WorkHistory sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     >
                         {EXPERIENCE_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
@@ -248,7 +250,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         size="small" fullWidth label="Năm tốt nghiệp"
                         value={form.GraduationYear} onChange={set("GraduationYear")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><CalendarMonth sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -258,7 +260,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         value={form.Gpa} onChange={set("Gpa")}
                         disabled={!isEditing}
                         inputProps={{ min: 0, max: 4, step: 0.01 }}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><TrendingUp sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>
@@ -279,7 +281,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                                 label="Quốc gia"
                                 size="small"
                                 fullWidth
-                                sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                                sx={fs}
                                 InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <Public sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
                             />
                         )}
@@ -299,7 +301,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                                 {...params}
                                 label="Tỉnh / Thành phố"
                                 size="small"
-                                sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" } }}
+                                sx={fs}
                                 InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
                             />
                         )}
@@ -319,7 +321,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                                 {...params}
                                 label="Quận / Huyện / Xã"
                                 size="small"
-                                sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" } }}
+                                sx={fs}
                                 InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), endAdornment: (<> {communesLoading && <CircularProgress color="inherit" size={14} />}{params.InputProps.endAdornment}</>), }}
                             />
                         )}
@@ -330,7 +332,7 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
                         size="small" fullWidth label="Địa chỉ cụ thể"
                         value={form.Address} onChange={set("Address")}
                         disabled={!isEditing}
-                        sx={{ "& .MuiOutlinedInput-root": { bgcolor: isEditing ? "white" : "#fafafa", fontSize: "0.875rem" }, "& .MuiInputLabel-root": { fontSize: "0.8rem" }, }}
+                        sx={fs}
                         InputProps={{ startAdornment: (<InputAdornment position="start"><LocationOn sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
                     />
                 </Grid>

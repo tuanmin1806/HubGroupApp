@@ -1,4 +1,4 @@
-import { AddBox, CorporateFare, Dashboard, Info, ManageAccounts, ManageSearch, MenuBook, MoveToInbox, People, Person } from "@mui/icons-material";
+import { CorporateFare, Dashboard, Hail, Info, ManageAccounts, MenuBook, PermContactCalendar, Person, School } from "@mui/icons-material";
 import { createTheme, GlobalStyles, Grid } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -14,33 +14,28 @@ const NAVIGATION: NavigationItem[] = [
         title: "Danh mục",
     },
     {
-        segment: "/admin",
+        segment: "admin",
         title: "Trang chủ",
         icon: <Dashboard />,
     },
     {
         title: "Quản lý tuyển sinh",
-        icon: <ManageSearch />,
+        icon: <School />,
         children: [
             {
-                segment: "manage-recruitment-post",
-                title: "Quản lý chương trình tuyển sinh",
+                segment: "admin/manage-recruitment-post",
+                title: "Quản lý chương trình",
                 icon: <MenuBook />,
             },
             {
-                segment: "create-recruitment-post",
-                title: "Thêm chương trình tuyển sinh",
-                icon: <AddBox />,
-            },
-            {
-                segment: "manage-application",
-                title: "Quản lý đơn ứng tuyển",
-                icon: <MoveToInbox />,
+                segment: "admin/manage-application",
+                title: "Quản lý ứng viên",
+                icon: <PermContactCalendar fontSize="medium" />,
             },
         ],
     },
     {
-        segment: "manage-staff-account",
+        segment: "admin/manage-staff-account",
         title: "Quản lý tài khoản",
         icon: <ManageAccounts />,
     },
@@ -49,14 +44,14 @@ const NAVIGATION: NavigationItem[] = [
         icon: <Info />,
         children: [
             {
-                segment: "personal-information",
-                title: "Thông tin cá nhân",
-                icon: <Person />,
+                segment: "admin/organization-info",
+                title: "Thông tin trường",
+                icon: <CorporateFare />,
             },
             {
-                segment: "organization-info",
-                title: "Thông tin tổ chức",
-                icon: <CorporateFare />,
+                segment: "admin/personal-information",
+                title: "Thông tin tài khoản",
+                icon: <Person />,
             },
         ],
     },
@@ -72,9 +67,9 @@ const getPageTitle = (pathname: string, schoolName?: string) => {
     const name = schoolName || "trường";
     switch (pathname) {
         case "/admin":
-            return `Quản lý tin tuyển sinh ${name} | duhochan.hubgroup.vn`;
+            return `Quản lý thông tin ${name} | duhochan.hubgroup.vn`;
         default:
-            return `Quản lý tin tuyển sinh ${name} | duhochan.hubgroup.vn`;
+            return `Quản lý thông tin ${name} | duhochan.hubgroup.vn`;
     }
 };
 
@@ -88,14 +83,10 @@ export default function AdminLayout() {
         document.title = getPageTitle(location.pathname, schoolName);
     }, [location.pathname, user]);
 
-    const handleNavigation = (path) => {
-        navigate(`/admin/${path}`);
-    };
-
     const router = {
         pathname: location.pathname,
         searchParams: new URLSearchParams(location.search),
-        navigate: handleNavigation,
+        navigate: (path: string | URL) => { navigate(`/${path}`); },
     };
 
     return (
@@ -116,10 +107,10 @@ export default function AdminLayout() {
                 }}
             />
             <DashboardLayout>
-                <div style={{ padding: "8px 16px" }}>
+                <div style={{ padding: "4px 8px" }}>
                     <AdminHeader />
                     <Grid container spacing={1}>
-                        <Grid size={12} sx={{ mt: 2 }}>
+                        <Grid size={12} sx={{ mt: 1 }}>
                             <Outlet />
                         </Grid>
                     </Grid>
