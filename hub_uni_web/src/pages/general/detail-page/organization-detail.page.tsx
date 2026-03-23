@@ -436,7 +436,7 @@ const OrganizationDetailPage = () => {
                                                         cursor: "pointer",
                                                         position: "relative",
                                                         bgcolor: isSelected ? "#fff" : "transparent",
-                                                        border: isSelected ? "1px solid #e0e0e0" : "1px solid transparent",
+                                                        border: "1px solid #e0e0e0",
                                                         color: isSelected ? "primary.main" : "text.secondary",
                                                         fontWeight: isSelected ? 700 : 500,
                                                         "&:hover": {
@@ -465,20 +465,6 @@ const OrganizationDetailPage = () => {
                                                     >
                                                         {tab.label}
                                                     </Typography>
-
-                                                    {isSelected && (
-                                                        <Box
-                                                            sx={{
-                                                                position: "absolute",
-                                                                bottom: -2,
-                                                                left: "50%",
-                                                                transform: "translateX(-50%)",
-                                                                width: "100%",
-                                                                height: 3,
-                                                                bgcolor: "primary.main",
-                                                            }}
-                                                        />
-                                                    )}
                                                 </Box>
                                             );
                                         })}
