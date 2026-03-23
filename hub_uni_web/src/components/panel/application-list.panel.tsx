@@ -182,7 +182,7 @@ export default function ApplicationListPanel() {
             <Box>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} mb={0.5}>
                     <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>
-                        Danh sách tin đã ứng tuyển
+                        Danh sách chương trình đã ứng tuyển
                     </Typography>
 
                     <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -216,7 +216,7 @@ export default function ApplicationListPanel() {
                     </FormControl>
                 </Stack>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: "0.8rem" }}>
-                    {data?.Items?.length ?? 0} đơn ứng tuyển
+                    {data?.Items?.length ?? 0} chương trình đã ứng tuyển
                 </Typography>
 
                 {!data?.Items?.length ? (

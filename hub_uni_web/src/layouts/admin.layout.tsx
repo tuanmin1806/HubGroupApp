@@ -36,7 +36,7 @@ const NAVIGATION: NavigationItem[] = [
     },
     {
         segment: "admin/manage-staff-account",
-        title: "Quản lý tài khoản",
+        title: "Quản lý nhân viên",
         icon: <ManageAccounts />,
     },
     {

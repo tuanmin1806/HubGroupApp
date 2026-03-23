@@ -253,10 +253,10 @@ export default function FavouriteRecruitPostListPanel() {
         <>
             <Box>
                 <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5, fontSize: "1rem" }}>
-                    Danh sách tin đã lưu
+                    Danh sách chương trình tuyển sinh đã lưu
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.8rem" }}>
-                    {data?.Items?.length ?? 0} đơn ứng tuyển
+                    {data?.Items?.length ?? 0} chương trình đã lưu
                 </Typography>
 
                 {!data?.Items?.length ? (

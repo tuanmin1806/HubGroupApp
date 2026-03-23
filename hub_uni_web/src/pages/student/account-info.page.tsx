@@ -17,7 +17,6 @@ const MENU_ITEMS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
     { key: "password", label: "Thay đổi mật khẩu", icon: <Lock sx={{ fontSize: 18 }} /> },
     { key: "applications", label: "Chương trình đã ứng tuyển", icon: <WorkOutline sx={{ fontSize: 18 }} /> },
     { key: "favourite-recruitposts", label: "Chương trình đã lưu", icon: <TurnedInNot sx={{ fontSize: 18 }} /> },
-    { key: "saved-organizations", label: "Trường đã lưu", icon: <School sx={{ fontSize: 18 }} /> },
 ];
 
 export default function AccountInfoPage() {

@@ -96,7 +96,7 @@ function AdminHeader() {
                                     sx={{ display: { xs: "none", sm: "flex" } }}
                                 >
                                     <Typography variant="body1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                                        {user?.UserName}
+                                        {user?.FullName}
                                     </Typography>
                                     <Typography variant="caption">
                                         {ConvertService.convertAccountType(ConvertService.convertAccountTypeFromString(user?.AccountType))}
