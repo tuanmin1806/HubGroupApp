@@ -413,57 +413,77 @@ const OrganizationDetailPage = () => {
                                 </CardContent>
                             </Card>
 
-                            {/* Tabs Section */}
                             <Card>
-                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                    <Tabs
-                                        value={tabValue}
-                                        onChange={handleTabChange}
-                                        variant="fullWidth"
-                                        sx={{
-                                            minHeight: 48,
-                                            bgcolor: '#f8fafc',
-                                            '& .MuiTabs-indicator': {
-                                                height: 2,
-                                                borderRadius: '3px 3px 0 0',
-                                                background: 'linear-gradient(90deg, #086bdbff, #2a97f0ff)',
-                                            },
-                                            '& .MuiTab-root': {
-                                                textTransform: 'none',
-                                                fontWeight: 600,
-                                                fontSize: '1rem',
-                                                minHeight: 48,
-                                                gap: 0.25,
-                                                color: 'text.secondary',
-                                                transition: 'all 0.25s ease',
-                                                '&:hover': {
-                                                    color: 'primary.main',
-                                                    bgcolor: 'rgba(80, 151, 233, 0.06)',
-                                                },
-                                                '&.Mui-selected': {
-                                                    color: 'primary.main',
-                                                    bgcolor: 'rgba(21, 101, 192, 0.08)',
-                                                    fontWeight: 700,
-                                                },
-                                            },
-                                        }}
-                                    >
-                                        <Tab
-                                            label="Giới thiệu"
-                                            icon={<Info sx={{ fontSize: 20 }} />}
-                                            iconPosition="start"
-                                        />
-                                        <Tab
-                                            label="Tin tuyển sinh"
-                                            icon={<NotificationsActive sx={{ fontSize: 20 }} />}
-                                            iconPosition="start"
-                                        />
-                                        <Tab
-                                            label="Học phí"
-                                            icon={<School sx={{ fontSize: 20 }} />}
-                                            iconPosition="start"
-                                        />
-                                    </Tabs>
+                                <Box sx={{ px: 2, pt: 1, pb: 0, bgcolor: '#fff' }}>
+                                    <Stack direction="row">
+                                        {[
+                                            { label: "Giới thiệu", icon: <Info sx={{ fontSize: 17 }} /> },
+                                            { label: "Chương trình tuyển sinh", icon: <NotificationsActive sx={{ fontSize: 17 }} /> },
+                                            { label: "Học phí", icon: <School sx={{ fontSize: 17 }} /> },
+                                        ].map((tab, idx) => {
+                                            const isSelected = tabValue === idx;
+                                            return (
+                                                <Box
+                                                    key={idx}
+                                                    onClick={() => handleTabChange(null as any, idx)}
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 0.75,
+                                                        px: 2,
+                                                        py: 1,
+                                                        borderRadius: "5px 5px 0 0",
+                                                        cursor: "pointer",
+                                                        position: "relative",
+                                                        bgcolor: isSelected ? "#fff" : "transparent",
+                                                        border: isSelected ? "1px solid #e0e0e0" : "1px solid transparent",
+                                                        color: isSelected ? "primary.main" : "text.secondary",
+                                                        fontWeight: isSelected ? 700 : 500,
+                                                        "&:hover": {
+                                                            bgcolor: isSelected ? "#fff" : "rgba(21,101,192,0.04)",
+                                                            color: "primary.main",
+                                                        },
+                                                    }}
+                                                >
+                                                    <Box
+                                                        sx={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            color: isSelected ? "primary.main" : "text.disabled",
+                                                            transition: "color 0.2s",
+                                                        }}
+                                                    >
+                                                        {tab.icon}
+                                                    </Box>
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                                                            fontWeight: "inherit",
+                                                            lineHeight: 1,
+                                                            whiteSpace: "nowrap",
+                                                        }}
+                                                    >
+                                                        {tab.label}
+                                                    </Typography>
+
+                                                    {isSelected && (
+                                                        <Box
+                                                            sx={{
+                                                                position: "absolute",
+                                                                bottom: -2,
+                                                                left: "50%",
+                                                                transform: "translateX(-50%)",
+                                                                width: "100%",
+                                                                height: 3,
+                                                                bgcolor: "primary.main",
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Box>
+                                            );
+                                        })}
+                                    </Stack>
+                                    <Divider />
                                 </Box>
 
                                 <TabPanel value={tabValue} index={0}>
