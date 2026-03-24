@@ -10,6 +10,8 @@ import { CreateRecruitmentPostRequest, Requirement } from "../../app/models/recr
 import { useGetProfessionsByPageQuery } from "../../app/features/professtion.api";
 import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "../../app/models/enums.model";
 import { ConvertService } from "../../app/services/convert.service";
+import { getUserInfo } from "../../app/services/auth.service";
+import { useGetProfessionsByOrganizationQuery } from "../../app/features/organization.api";
 
 const defaultRequirement: Requirement = {
     FromAge: undefined,
@@ -31,38 +33,30 @@ const STATUS_OPTIONS = [
 ];
 
 export default function CreateRecruitmentPostPage() {
+    const userInfo = getUserInfo();
     const navigate = useNavigate();
     const [createRecruitmentPost, { isLoading: isSubmitting }] = useCreateRecruitmentPostMutation();
     const { data: provinces, isLoading: provincesLoading } = useGetAllProvinceNoAuthenQuery();
     const { data: visaTypesData } = useGetAllVisaTypesQuery();
+    const organizationId = userInfo?.OrganizationId ?? "";
 
     const visaTypeOptions = useMemo(
         () => visaTypesData?.map((v: { Id: string; Name: string }) => ({ value: v.Id, label: v.Name })) ?? [],
         [visaTypesData]
     );
 
-    const [professionPage, setProfessionPage] = useState(1);
-    const [allProfessions, setAllProfessions] = useState<{ Id: string; Name: string }[]>([]);
-    const [hasMoreProfessions, setHasMoreProfessions] = useState(true);
+    const { data: professionData = [], isLoading: professionsLoading } =
+        useGetProfessionsByOrganizationQuery(organizationId, {
+            skip: !organizationId,
+        });
 
-    const { data: professionData, isFetching: professionsFetching } = useGetProfessionsByPageQuery({ page: professionPage, size: 10 });
-
-    useEffect(() => {
-        if (professionData?.Items) {
-            setAllProfessions(prev => {
-                const existingIds = new Set(prev.map(p => p.Id));
-                const newItems = professionData.Items.filter((p: { Id: string }) => !existingIds.has(p.Id));
-                return [...prev, ...newItems];
-            });
-            if (professionData.Items.length < 10) setHasMoreProfessions(false);
-        }
-    }, [professionData]);
-
-    const handleProfessionScroll = useCallback((event: React.UIEvent<HTMLUListElement>) => {
-        const list = event.currentTarget;
-        if (list.scrollTop + list.clientHeight >= list.scrollHeight - 10 && !professionsFetching && hasMoreProfessions)
-            setProfessionPage(prev => prev + 1);
-    }, [professionsFetching, hasMoreProfessions]);
+    const professionOptions = useMemo(
+        () => professionData.map((p) => ({
+            Id: p.ProfessionId,
+            Name: p.ProfessionName || "",
+        })),
+        [professionData]
+    );
 
     const [form, setForm] = useState<Omit<CreateRecruitmentPostRequest, "Requirement">>({
         RecruitPostStatus: RecruitPostStatus.Active,
@@ -177,20 +171,40 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <Autocomplete
-                                    multiple options={allProfessions}
+                                    multiple
+                                    options={professionOptions}
                                     getOptionLabel={(option) => option.Name}
-                                    value={allProfessions.filter(p => form.ProfessionIds.includes(p.Id))}
-                                    onChange={(_, newValue) => handleChange("ProfessionIds", newValue.map(v => v.Id))}
-                                    loading={professionsFetching}
-                                    ListboxProps={{ onScroll: handleProfessionScroll, style: { maxHeight: 240 } }}
+                                    value={professionOptions.filter(p => form.ProfessionIds.includes(p.Id))}
+                                    onChange={(_, newValue) =>
+                                        handleChange("ProfessionIds", newValue.map(v => v.Id))
+                                    }
+                                    loading={professionsLoading}
                                     renderInput={(params) => (
-                                        <TextField {...params} label="Ngành nghề *" size="small"
-                                            error={!!errors.ProfessionIds} helperText={errors.ProfessionIds}
-                                            InputProps={{ ...params.InputProps, endAdornment: (<>{professionsFetching && <CircularProgress size={14} />}{params.InputProps.endAdornment}</>) }}
+                                        <TextField
+                                            {...params}
+                                            label="Ngành nghề *"
+                                            size="small"
+                                            error={!!errors.ProfessionIds}
+                                            helperText={errors.ProfessionIds}
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                endAdornment: (
+                                                    <>
+                                                        {professionsLoading && <CircularProgress size={14} />}
+                                                        {params.InputProps.endAdornment}
+                                                    </>
+                                                ),
+                                            }}
                                         />
                                     )}
                                     renderTags={(value, getTagProps) =>
-                                        value.map((option, index) => <Chip label={option.Name} size="small" {...getTagProps({ index })} />)
+                                        value.map((option, index) => (
+                                            <Chip
+                                                label={option.Name}
+                                                size="small"
+                                                {...getTagProps({ index })}
+                                            />
+                                        ))
                                     }
                                 />
                             </Grid>
@@ -380,7 +394,6 @@ export default function CreateRecruitmentPostPage() {
                     </Paper>
                 </Grid>
 
-                {/* ── MÔ TẢ ── */}
                 <Grid size={12}>
                     <Paper elevation={1} sx={{ p: 2 }}>
                         <Typography sx={{ ...sectionLabelSx, mb: 1 }}>Mô tả *</Typography>

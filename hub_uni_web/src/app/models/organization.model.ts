@@ -61,6 +61,7 @@ export interface OrganizationDetailResponse {
 export interface OrganizationResponse {
     Id: string;
     Name: string;
+    InternationalName: string;
     SeoUrl: string;
     Code: string;
     TaxCode: string;
@@ -77,6 +78,7 @@ export interface OrganizationResponse {
     IsTop: boolean;
     Highlights: string[];
     WebsiteUrl: string;
+    DormCost: number;
 }
 
 export interface UpdateOrganizationRequest {

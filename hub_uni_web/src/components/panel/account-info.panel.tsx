@@ -9,7 +9,7 @@ import { getUserInfo } from "../../app/services/auth.service";
 import { Province } from "../../app/models/province.model";
 import { CommuneResponse } from "../../app/models/commune.model";
 import { CustomerResponse } from "../../app/models/customer.model";
-import { EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
+import { AccountType, EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
 import ConfirmDialog from "../dialogs/general/confirm.dialog";
 import { ConvertService } from "../../app/services/convert.service";
 import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
@@ -17,6 +17,7 @@ import { Country } from "../../app/models/country.model";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { fieldSx } from "../../styles/fieldSx";
+import { hasAccountType } from "../../utils/auth.utils";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: Gender.Undefined, label: "Không yêu cầu" },
@@ -115,7 +116,6 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
 }
 
 export default function AccountInfoPanel({ account }: { account: AccountResponse }) {
-    const userInfo = getUserInfo();
     const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -150,12 +150,14 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
         <Box>
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
                 <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>Thông tin tài khoản</Typography>
-                {isEditing ? (
-                    <Stack direction="row" spacing={1}>
-                        <Button size="small" startIcon={<Cancel sx={{ fontSize: 16 }} />} onClick={handleCancel} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "text.secondary" }}>Hủy</Button>
-                        <Button variant="contained" size="small" startIcon={<Save sx={{ fontSize: 16 }} />} onClick={() => setConfirmOpen(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", bgcolor: "#f36730", "&:hover": { bgcolor: "#e05520" }, }}>Cập nhật</Button>
-                    </Stack>
-                ) : (<Button variant="outlined" size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditing(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "#f36730", borderColor: "#f36730", "&:hover": { bgcolor: "#fff3e0", borderColor: "#f36730" }, }}>Chỉnh sửa</Button>)}
+                {hasAccountType(AccountType.Student) && (
+                    isEditing ? (
+                        <Stack direction="row" spacing={1}>
+                            <Button size="small" startIcon={<Cancel sx={{ fontSize: 16 }} />} onClick={handleCancel} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "text.secondary" }}>Hủy</Button>
+                            <Button variant="contained" size="small" startIcon={<Save sx={{ fontSize: 16 }} />} onClick={() => setConfirmOpen(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", bgcolor: "#f36730", "&:hover": { bgcolor: "#e05520" }, }}>Cập nhật</Button>
+                        </Stack>
+                    ) : (<Button variant="outlined" size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditing(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "#f36730", borderColor: "#f36730", "&:hover": { bgcolor: "#fff3e0", borderColor: "#f36730" }, }}>Chỉnh sửa</Button>))
+                }
             </Stack>
 
             <Divider sx={{ mb: 1 }} />

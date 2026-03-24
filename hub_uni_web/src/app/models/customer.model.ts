@@ -4,18 +4,18 @@ import { Position } from "./position.model";
 import { RoleResponse } from "./role.model copy";
 
 export interface ProfileInfo {
-    DateOfBirth: string | null;
-    Experience: JobExperience;
-    EducationLevel: EducationLevel;
-    GraduationYear: number;
-    Gpa: number;
-    Gender: Gender;
+    DateOfBirth?: string | null;
+    Experience?: JobExperience;
+    EducationLevel?: EducationLevel;
+    GraduationYear?: number;
+    Gpa?: number;
     CountrySeoUrl?: string;
     ProvinceSeoUrl?: string;
     CountryId?: string;
-    ProvinceId: string;
-    CommuneId: string;
-    Address: string;
+    ProvinceId?: string;
+    CommuneId?: string;
+    Address?: string;
+    Gender?: Gender;
 }
 
 export interface CustomerResponse {
@@ -39,6 +39,7 @@ export interface CustomerResponse {
     AccountStatus: AccountStatus;
     ProfileInfo?: ProfileInfo;
     OrganizationName?: string;
+    OrganizationId?: string;
 }
 
 export interface CreateCustomerRequest {
@@ -48,23 +49,24 @@ export interface CreateCustomerRequest {
     Email: string;
     PhoneNumber: string | null;
     Gender: Gender | undefined;
-    AccountType: AccountType;
     AccountStatus: AccountStatus;
-    RoleIds: string[];
+    RoleIds?: string[];
+    ProfileInfo: ProfileInfo;
 }
 
 export interface UpdateCustomerRequest {
     Id: string;
     FullName: string;
-    AvatarUrl?: string;
-    UserName?: string;
     Email: string;
     PhoneNumber: string | null;
     Gender: Gender;
+    UserName?: string;
     AccountType?: AccountType;
-    RoleIds?: string[];
     AccountStatus?: AccountStatus;
-    ProfileInfo?: ProfileInfo;
+    RoleIds?: string[];
+    ProfileInfo: ProfileInfo;
+    AvatarUrl?: string;
+    OrganizationId?: string;
 }
 
 export interface UpdatePasswordRequest {

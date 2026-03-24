@@ -32,6 +32,7 @@ const applicationApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.APPLICATION],
         }),
 
         getByCustomer: builder.query<ApiPaginationResponse<ApplicationResponse[]>, ApplicationFilterParams>({
@@ -49,6 +50,7 @@ const applicationApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.APPLICATION],
         }),
 
         createApplication: builder.mutation<void, ApplicationRequest>({
@@ -57,7 +59,7 @@ const applicationApi = baseApi.injectEndpoints({
                 method: "POST",
                 body,
             }),
-            invalidatesTags: [TAG_TYPES.RECRUITMENT_POST],
+            invalidatesTags: [TAG_TYPES.RECRUITMENT_POST, TAG_TYPES.APPLICATION],
         }),
 
         updateApplication: builder.mutation<void, UpdateApplicationRequest>({
@@ -66,6 +68,7 @@ const applicationApi = baseApi.injectEndpoints({
                 method: "PUT",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.APPLICATION],
         }),
 
         deleteApplication: builder.mutation<void, string>({
@@ -91,5 +94,6 @@ export const {
     useUpdateApplicationMutation,
     useGetApplicationByIdQuery,
     useGetByCustomerQuery,
-    useDeleteApplicationMutation
+    useDeleteApplicationMutation,
+    useLazyGetApplicationByIdQuery
 } = applicationApi;

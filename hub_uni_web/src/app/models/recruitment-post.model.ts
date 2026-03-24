@@ -11,6 +11,7 @@ export interface Requirement {
     MaxYearsSinceGrad?: number;
     MaxAbsence?: number;
     VisaTypeId?: string;
+    VisaType?: string;
     OtherReqs: string[];
 }
 

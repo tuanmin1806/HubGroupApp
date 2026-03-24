@@ -13,6 +13,8 @@ export interface Customer {
         Experience: JobExperience;
         EducationLevel: EducationLevel;
         Gpa: string;
+        GraduationYear: string;
+        Address: string;
     }
 }
 

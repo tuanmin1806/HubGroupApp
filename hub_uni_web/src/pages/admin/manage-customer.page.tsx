@@ -1,13 +1,17 @@
-import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
+import { Add, ChangeCircle, Clear, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Avatar } from "@mui/material";
 import { useState, useCallback } from "react";
 import { CustomerResponse, CustomerFilterParams } from "../../app/models/customer.model";
-import { useGetCustomerByOrganizationWithPageQuery } from "../../app/features/customer.api";
+import { useDeleteCustomerMutation, useGetCustomerByOrganizationWithPageQuery } from "../../app/features/customer.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
 import { AccountStatus } from "../../app/models/enums.model";
 import CreateCustomerAccountDialog from "../../components/dialogs/admin/create-customer-account.dialog";
 import UpdateCustomerAccountDialog from "../../components/dialogs/admin/update-customer-account.dialog";
+import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../app/store";
+import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 
 export default function ManageStaffAccountPage() {
     const [inputValue, setInputValue] = useState("");
@@ -17,6 +21,10 @@ export default function ManageStaffAccountPage() {
     const [openDialog, setOpenDialog] = useState(false);
     const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
     const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deleteCustomerId, setDeleteCustomerId] = useState<string | null>(null);
 
     const userInfo = getUserInfo();
     const organizationId = userInfo?.OrganizationId ?? "";
@@ -28,6 +36,10 @@ export default function ManageStaffAccountPage() {
     };
 
     const { data, isLoading, isError } = useGetCustomerByOrganizationWithPageQuery(queryParams, { skip: !organizationId });
+    const [deleteCustomer, { isLoading: isDeleting }] = useDeleteCustomerMutation();
+
+    const handleOpenDelete = useCallback((id: string) => { setDeleteCustomerId(id); setOpenDeleteDialog(true); }, []);
+    const handleCloseDelete = useCallback(() => { setOpenDeleteDialog(false); setDeleteCustomerId(null); }, []);
 
     const handleSearch = useCallback(() => {
         setSearchValue(inputValue);
@@ -52,9 +64,20 @@ export default function ManageStaffAccountPage() {
         setPage(0);
     }, []);
 
+    const handleConfirmDelete = useCallback(async () => {
+        if (!deleteCustomerId) return;
+        try {
+            await deleteCustomer(deleteCustomerId).unwrap();
+            dispatch(showSnackbar({ message: "Xóa tài khoản thành công!", severity: "success" }));
+            handleCloseDelete();
+        } catch {
+            dispatch(showSnackbar({ message: "Xóa tài khoản thất bại. Vui lòng thử lại!", severity: "error" }));
+        }
+    }, [deleteCustomerId, deleteCustomer, dispatch, handleCloseDelete]);
+
     const renderTableContent = () => {
-        if (isLoading) { return (<TableRow> <TableCell colSpan={8} align="center"><Box sx={{ py: 4 }}><CircularProgress size={32} /></Box> </TableCell></TableRow>); }
-        if (isError) { return (<TableRow> <TableCell colSpan={8} align="center"> <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography></TableCell></TableRow>); }
+        if (isLoading) { return (<TableRow><TableCell colSpan={8} align="center"><Box sx={{ py: 4 }}><CircularProgress size={32} /></Box></TableCell></TableRow>); }
+        if (isError) { return (<TableRow><TableCell colSpan={8} align="center"> <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography></TableCell></TableRow>); }
         if (!data?.Items?.length) { return (<TableRow><TableCell colSpan={8} align="center"><Typography sx={{ py: 4 }}>Không có dữ liệu.</Typography></TableCell></TableRow>); }
 
         return data.Items.map((staff: CustomerResponse) => (
@@ -81,12 +104,23 @@ export default function ManageStaffAccountPage() {
                 <TableCell>{staff.Email ?? "—"}</TableCell>
                 <TableCell>{staff.PhoneNumber ?? "—"}</TableCell>
                 <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(staff.Gender))}</TableCell>
-                <TableCell><Chip label={ConvertService.convertAccountStatus(ConvertService.convertAccountStatusFromString(staff.AccountStatus))} size="small" color={ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Activated ? "success" : staff.AccountStatus === AccountStatus.Locked ? "error" : "default"} variant="outlined" />
-                </TableCell>
+                <TableCell><Chip label={ConvertService.convertAccountStatus(ConvertService.convertAccountStatusFromString(staff.AccountStatus))} size="small" color={ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Activated ? "success" : staff.AccountStatus === AccountStatus.Locked ? "error" : "default"} variant="outlined" /></TableCell>
                 <TableCell align="center">
-                    <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Chỉnh sửa"><IconButton size="small" color="primary" onClick={() => handleOpenUpdate(staff.Id)}><Edit fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Thay đổi trạng thái"><IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                        <IconButton size="small" color="primary" onClick={() => handleOpenUpdate(staff.Id)}>
+                            <Edit fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Xóa">
+                        <IconButton
+                            size="small"
+                            color="error"
+                            disabled={isDeleting && deleteCustomerId === staff.Id}
+                            onClick={() => handleOpenDelete(staff.Id)}
+                        >
+                            {isDeleting && deleteCustomerId === staff.Id ? <CircularProgress size={16} color="error" /> : <Delete fontSize="small" />}
+                        </IconButton>
+                    </Tooltip>
                 </TableCell>
             </TableRow>
         ));
@@ -154,6 +188,13 @@ export default function ManageStaffAccountPage() {
                 open={openUpdateDialog}
                 customerId={selectedCustomerId}
                 onClose={() => { setOpenUpdateDialog(false); setSelectedCustomerId(null); }}
+            />
+            <ConfirmDialog
+                open={openDeleteDialog}
+                onClose={handleCloseDelete}
+                onConfirm={handleConfirmDelete}
+                title="Xác nhận xóa"
+                message="Bạn có chắc chắn muốn xóa tài khoản nhân viên này không? Hành động này không thể hoàn tác."
             />
         </>
     );

@@ -9,6 +9,8 @@ import { useGetCustomerByIdQuery } from "../../app/features/customer.api";
 import StudentLogoUploadDialog from "../../components/dialogs/student/student-logo-upload.dialog";
 import { useNavigate } from "react-router-dom";
 import FavouriteRecruitPostListPanel from "../../components/panel/favourite-recruitposts.panel";
+import { hasAccountType } from "../../utils/auth.utils";
+import { AccountType } from "../../app/models/enums.model";
 
 type TabKey = "info" | "password" | "applications" | "logout" | "favourite-recruitposts" | "saved-organizations";
 
@@ -65,16 +67,18 @@ export default function AccountInfoPage() {
                                             {account?.FullName?.charAt(0) ?? userInfo?.FullName?.charAt(0) ?? "?"}
                                         </Avatar>
                                     )}
-                                    <Box sx={{
-                                        position: "absolute", bottom: 0, right: 0,
-                                        width: 26, height: 26, borderRadius: "50%",
-                                        bgcolor: "white", display: "flex", alignItems: "center",
-                                        justifyContent: "center", cursor: "pointer",
-                                        boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-                                        "&:hover": { bgcolor: "#f5f5f5" },
-                                    }} onClick={() => setLogoDialogOpen(true)}>
-                                        <CameraAlt sx={{ fontSize: 14, color: "#f36730" }} />
-                                    </Box>
+                                    {hasAccountType(AccountType.Student) && (
+                                        <Box sx={{
+                                            position: "absolute", bottom: 0, right: 0,
+                                            width: 26, height: 26, borderRadius: "50%",
+                                            bgcolor: "white", display: "flex", alignItems: "center",
+                                            justifyContent: "center", cursor: "pointer",
+                                            boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                                            "&:hover": { bgcolor: "#f5f5f5" },
+                                        }} onClick={() => setLogoDialogOpen(true)}>
+                                            <CameraAlt sx={{ fontSize: 14, color: "#f36730" }} />
+                                        </Box>
+                                    )}
                                 </Box>
                                 <Typography fontWeight={700} color="white" sx={{ mt: 1.5, fontSize: "0.95rem", lineHeight: 1.3 }}>
                                     {account?.FullName ?? userInfo?.FullName ?? "—"}
@@ -87,27 +91,124 @@ export default function AccountInfoPage() {
                             <Divider />
 
                             <Box sx={{ p: 1 }}>
-                                {MENU_ITEMS.map((item) => (
+                                {/* Thông tin tài khoản */}
+                                <Stack
+                                    direction="row"
+                                    spacing={1.25}
+                                    alignItems="center"
+                                    onClick={() => setActiveTab("info")}
+                                    sx={{
+                                        px: 1,
+                                        py: 1.25,
+                                        borderRadius: 1.5,
+                                        cursor: "pointer",
+                                        bgcolor: activeTab === "info" ? "#fff3e0" : "transparent",
+                                        color: activeTab === "info" ? "#f36730" : "text.secondary",
+                                        fontWeight: activeTab === "info" ? 700 : 400,
+                                        transition: "all .15s ease",
+                                        "&:hover": {
+                                            bgcolor: activeTab === "info" ? "#fff3e0" : "#f5f5f5",
+                                        },
+                                    }}
+                                >
+                                    <Box sx={{ color: activeTab === "info" ? "#f36730" : "#9e9e9e", display: "flex" }}>
+                                        <Person sx={{ fontSize: 18 }} />
+                                    </Box>
+                                    <Typography variant="body2" fontWeight={activeTab === "info" ? 700 : 500} sx={{ fontSize: "0.85rem" }}>
+                                        Thông tin tài khoản
+                                    </Typography>
+                                </Stack>
+
+                                {/* Đổi mật khẩu */}
+                                {hasAccountType(AccountType.Student) && (
                                     <Stack
-                                        key={item.key}
                                         direction="row"
                                         spacing={1.25}
                                         alignItems="center"
-                                        onClick={() => setActiveTab(item.key)}
+                                        onClick={() => setActiveTab("password")}
                                         sx={{
-                                            px: 1, py: 1.25, borderRadius: 1.5,
+                                            px: 1,
+                                            py: 1.25,
+                                            borderRadius: 1.5,
                                             cursor: "pointer",
-                                            bgcolor: activeTab === item.key ? "#fff3e0" : "transparent",
-                                            color: activeTab === item.key ? "#f36730" : "text.secondary",
-                                            fontWeight: activeTab === item.key ? 700 : 400,
+                                            bgcolor: activeTab === "password" ? "#fff3e0" : "transparent",
+                                            color: activeTab === "password" ? "#f36730" : "text.secondary",
+                                            fontWeight: activeTab === "password" ? 700 : 400,
                                             transition: "all .15s ease",
-                                            "&:hover": { bgcolor: activeTab === item.key ? "#fff3e0" : "#f5f5f5" },
+                                            "&:hover": {
+                                                bgcolor: activeTab === "password" ? "#fff3e0" : "#f5f5f5",
+                                            },
                                         }}
                                     >
-                                        <Box sx={{ color: activeTab === item.key ? "#f36730" : "#9e9e9e", alignItems: "center", display: "flex", flexShrink: 0, }}>{item.icon}</Box>
-                                        <Typography variant="body2" fontWeight={activeTab === item.key ? 700 : 500} sx={{ fontSize: "0.85rem" }}>{item.label}</Typography>
+                                        <Box sx={{ color: activeTab === "password" ? "#f36730" : "#9e9e9e", display: "flex" }}>
+                                            <Lock sx={{ fontSize: 18 }} />
+                                        </Box>
+                                        <Typography variant="body2" fontWeight={activeTab === "password" ? 700 : 500} sx={{ fontSize: "0.85rem" }}>
+                                            Thay đổi mật khẩu
+                                        </Typography>
                                     </Stack>
-                                ))}
+                                )}
+
+                                {/* Đã ứng tuyển */}
+                                {hasAccountType(AccountType.Student) && (
+                                    <Stack
+                                        direction="row"
+                                        spacing={1.25}
+                                        alignItems="center"
+                                        onClick={() => setActiveTab("applications")}
+                                        sx={{
+                                            px: 1,
+                                            py: 1.25,
+                                            borderRadius: 1.5,
+                                            cursor: "pointer",
+                                            bgcolor: activeTab === "applications" ? "#fff3e0" : "transparent",
+                                            color: activeTab === "applications" ? "#f36730" : "text.secondary",
+                                            fontWeight: activeTab === "applications" ? 700 : 400,
+                                            transition: "all .15s ease",
+                                            "&:hover": {
+                                                bgcolor: activeTab === "applications" ? "#fff3e0" : "#f5f5f5",
+                                            },
+                                        }}
+                                    >
+                                        <Box sx={{ color: activeTab === "applications" ? "#f36730" : "#9e9e9e", display: "flex" }}>
+                                            <WorkOutline sx={{ fontSize: 18 }} />
+                                        </Box>
+                                        <Typography variant="body2" fontWeight={activeTab === "applications" ? 700 : 500} sx={{ fontSize: "0.85rem" }}>
+                                            Chương trình đã ứng tuyển
+                                        </Typography>
+                                    </Stack>
+                                )}
+
+
+                                {/* Đã lưu */}
+                                {hasAccountType(AccountType.Student) && (
+                                    <Stack
+                                        direction="row"
+                                        spacing={1.25}
+                                        alignItems="center"
+                                        onClick={() => setActiveTab("favourite-recruitposts")}
+                                        sx={{
+                                            px: 1,
+                                            py: 1.25,
+                                            borderRadius: 1.5,
+                                            cursor: "pointer",
+                                            bgcolor: activeTab === "favourite-recruitposts" ? "#fff3e0" : "transparent",
+                                            color: activeTab === "favourite-recruitposts" ? "#f36730" : "text.secondary",
+                                            fontWeight: activeTab === "favourite-recruitposts" ? 700 : 400,
+                                            transition: "all .15s ease",
+                                            "&:hover": {
+                                                bgcolor: activeTab === "favourite-recruitposts" ? "#fff3e0" : "#f5f5f5",
+                                            },
+                                        }}
+                                    >
+                                        <Box sx={{ color: activeTab === "favourite-recruitposts" ? "#f36730" : "#9e9e9e", display: "flex" }}>
+                                            <TurnedInNot sx={{ fontSize: 18 }} />
+                                        </Box>
+                                        <Typography variant="body2" fontWeight={activeTab === "favourite-recruitposts" ? 700 : 500} sx={{ fontSize: "0.85rem" }}>
+                                            Chương trình đã lưu
+                                        </Typography>
+                                    </Stack>
+                                )}
                             </Box>
                             <Box sx={{ p: 1, borderTop: "1px solid #e5e7eb" }}>
                                 <Stack

@@ -140,22 +140,6 @@ function ApplicationCard({ app, onClick }: { app: ApplicationResponse; onClick: 
                         )}
                     </Stack>
                 )}
-
-                <Stack direction="row" alignItems="center" justifyContent="flex-end">
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={(e) => { e.stopPropagation(); }}
-                        sx={{
-                            borderColor: "#f36730", color: "#f36730", borderRadius: 1.5,
-                            fontSize: "0.72rem", px: 1.5, height: 30,
-                            textTransform: "none", fontWeight: 600,
-                            "&:hover": { bgcolor: "#fff3e0", borderColor: "#e05520" },
-                        }}
-                    >
-                        Xem chi tiết
-                    </Button>
-                </Stack>
             </Stack>
         </Paper>
     );

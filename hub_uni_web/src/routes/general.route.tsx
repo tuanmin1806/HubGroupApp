@@ -48,11 +48,7 @@ const generalRoutes = [
     },
     {
         path: "thong-tin-tai-khoan",
-        element: (
-            <ProtectedRoute allowedAccountTypes={["Student"]}>
-                <AccountInfoPage />
-            </ProtectedRoute>
-        ),
+        element: <AccountInfoPage />,
     },
 ];
 

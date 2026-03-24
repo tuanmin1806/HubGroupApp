@@ -1,14 +1,19 @@
-import { Add, ChangeCircle, Clear, Edit, Search, Visibility } from "@mui/icons-material";
+import { Add, ChangeCircle, Clear, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Chip } from "@mui/material";
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
-import { useGetRecruitmentPostsByOrganizationQuery } from "../../app/features/recruitment-post.api";
+import { useDeleteRecruitmentPostMutation, useGetRecruitmentPostsByOrganizationQuery } from "../../app/features/recruitment-post.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { useNavigate } from "react-router-dom";
 import UpdateRecruitmentPostDialog from "../../components/dialogs/staff/update-recruitment-post.dialog";
 import { formatDate } from "../../utils/date.utils";
 import { getUserInfo } from "../../app/services/auth.service";
+import ViewRecruitmentPostDialog from "../../components/dialogs/admin/view-recruitment-post-detail.dialog";
+import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../app/store";
+import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 
 const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
     Active: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },
@@ -24,14 +29,20 @@ export default function ManageRecruitmentPostPage() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZE);
     const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+    const [openViewDialog, setOpenViewDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deletePostId, setDeletePostId] = useState<string | null>(null);
+    const [viewPostId, setViewPostId] = useState<string | null>(null);
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     const navigate = useNavigate();
     const userInfo = getUserInfo();
+    const dispatch = useDispatch<AppDispatch>();
     const organizationId = userInfo?.OrganizationId ?? "";
 
     const queryParams: RecruitmentPostFilterParams = { page: page + 1, size: rowsPerPage, searchValue: searchValue || undefined, ...filterParams, organizationId: organizationId };
 
     const { data, isLoading, isError } = useGetRecruitmentPostsByOrganizationQuery(queryParams);
+    const [deleteRecruitmentPost, { isLoading: isDeleting }] = useDeleteRecruitmentPostMutation();
 
     const handleSearch = useCallback(() => {
         setSearchValue(inputValue);
@@ -54,17 +65,32 @@ export default function ManageRecruitmentPostPage() {
         setSelectedPostId(null);
     }, []);
 
+
+    const handleOpenView = useCallback((id: string) => { setViewPostId(id); setOpenViewDialog(true); }, []);
+    const handleCloseView = useCallback(() => { setOpenViewDialog(false); setViewPostId(null); }, []);
+
+    const handleOpenDelete = useCallback((id: string) => { setDeletePostId(id); setOpenDeleteDialog(true); }, []);
+    const handleCloseDelete = useCallback(() => { setOpenDeleteDialog(false); setDeletePostId(null); }, []);
+
     const handlePageChange = useCallback((_: unknown, newPage: number) => { setPage(newPage); }, []);
 
     const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); }, []);
+    const handleConfirmDelete = useCallback(async () => {
+        if (!deletePostId) return;
+        try {
+            await deleteRecruitmentPost(deletePostId).unwrap();
+            dispatch(showSnackbar({ message: "Xóa bài tuyển sinh thành công!", severity: "success" }));
+            handleCloseDelete();
+        } catch {
+            dispatch(showSnackbar({ message: "Xóa bài tuyển sinh thất bại. Vui lòng thử lại!", severity: "error" }));
+        }
+    }, [deletePostId, deleteRecruitmentPost, dispatch, handleCloseDelete]);
+
 
     const renderTableContent = () => {
         if (isLoading) { return (<TableRow><TableCell colSpan={8} align="center"> <Box sx={{ py: 4 }}><CircularProgress size={32} /></Box> </TableCell></TableRow>); }
         if (isError) { return (<TableRow> <TableCell colSpan={8} align="center"> <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography></TableCell></TableRow>); }
-        if (!data?.Items?.length) {
-            return (<TableRow> <TableCell colSpan={8} align="center"> <Typography sx={{ py: 4 }}>Không có dữ liệu.</Typography> </TableCell> </TableRow>
-            );
-        }
+        if (!data?.Items?.length) { return (<TableRow> <TableCell colSpan={8} align="center"> <Typography sx={{ py: 4 }}>Không có dữ liệu.</Typography> </TableCell> </TableRow>); }
         return data.Items.map((post: RecruitmentPostResponse) => (
             <TableRow
                 key={post.Id}
@@ -94,13 +120,29 @@ export default function ManageRecruitmentPostPage() {
                     })()}
                 </TableCell>
                 <TableCell align="center">
-                    <Tooltip title="Xem chi tiết"><IconButton size="small" color="primary"><Visibility fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Xem chi tiết">
+                        <IconButton size="small" color="primary" onClick={() => handleOpenView(post.Id)}>
+                            <Visibility fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Cập nhật">
                         <IconButton size="small" color="primary" onClick={() => handleOpenUpdate(post.Id)}>
                             <Edit fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Thay đổi trạng thái"><IconButton size="small" color="error"><ChangeCircle fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Xóa">
+                        <IconButton
+                            size="small"
+                            color="error"
+                            disabled={isDeleting && deletePostId === post.Id}
+                            onClick={() => handleOpenDelete(post.Id)}
+                        >
+                            {isDeleting && deletePostId === post.Id
+                                ? <CircularProgress size={16} color="error" />
+                                : <Delete fontSize="small" />
+                            }
+                        </IconButton>
+                    </Tooltip>
                 </TableCell>
             </TableRow>
         ));
@@ -170,6 +212,18 @@ export default function ManageRecruitmentPostPage() {
                 open={openUpdateDialog}
                 postId={selectedPostId}
                 onClose={handleCloseUpdate}
+            />
+            <ViewRecruitmentPostDialog
+                open={openViewDialog}
+                postId={viewPostId}
+                onClose={handleCloseView}
+            />
+            <ConfirmDialog
+                open={openDeleteDialog}
+                onClose={handleCloseDelete}
+                onConfirm={handleConfirmDelete}
+                title="Xác nhận xóa"
+                message="Bạn có chắc chắn muốn xóa chương trình tuyển sinh này không? Hành động này không thể hoàn tác."
             />
         </>
     );

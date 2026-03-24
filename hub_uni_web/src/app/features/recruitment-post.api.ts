@@ -80,6 +80,7 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
+            providesTags: [TAG_TYPES.RECRUITMENT_POST],
         }),
 
         getRecruitmentPostBySeo: builder.query<RecruitmentPostResponse, string>({
@@ -112,6 +113,14 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 body,
             })
         }),
+
+        deleteRecruitmentPost: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `recruitmentpost/delete/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [TAG_TYPES.RECRUITMENT_POST],
+        }),
     }),
 });
 
@@ -124,5 +133,6 @@ export const {
     useGetRecruitmentPostByIdQuery,
     useUpdateRecruitmentPostMutation,
     useLazyGetRecruitmentPostByIdQuery,
-    useGetRecruitmentPostsByOrganizationQuery
+    useGetRecruitmentPostsByOrganizationQuery,
+    useDeleteRecruitmentPostMutation
 } = recruitmentPostApi;

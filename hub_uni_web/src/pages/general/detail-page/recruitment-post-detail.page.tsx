@@ -14,6 +14,8 @@ import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { AppDispatch } from "../../../app/store";
 import { useDispatch } from "react-redux";
 import { useDeleteApplicationMutation } from "../../../app/features/application.api";
+import { hasAccountType } from "../../../utils/auth.utils";
+import { AccountType } from "../../../app/models/enums.model";
 
 const RequirementRow = ({ icon, label, value, color, }: { icon: React.ReactNode; label: string; value: string; color: string; }) => (
     <Stack direction="row" alignItems="center" spacing={1.5} sx={{ p: 1.25, borderRadius: 1.5, bgcolor: color, border: '1px solid', borderColor: 'rgba(0,0,0,0.06)', }}>
@@ -328,41 +330,46 @@ const RecruitmentPostDetailPage = () => {
                                         spacing={1.5}
                                         justifyContent="left"
                                     >
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            onClick={handleApplyClick}
-                                            disabled={isDeletingApply}
-                                            startIcon={isDeletingApply ? <CircularProgress size={16} color="inherit" /> : recruitmentPost.Applied ? <CheckCircle sx={{ fontSize: 16 }} /> : undefined}
-                                            sx={{
-                                                fontWeight: 600,
-                                                fontSize: 11,
-                                                px: 1,
-                                                bgcolor: recruitmentPost.Applied ? '#9e9e9e' : '#ff5722',
-                                                color: 'white',
-                                                cursor: isDeletingApply ? 'not-allowed' : 'pointer',
-                                                '&:hover': { bgcolor: recruitmentPost.Applied ? '#757575' : '#e64a19', transform: 'translateY(-2px)' }
-                                            }}
-                                        >
-                                            {isDeletingApply ? 'Đang hủy...' : recruitmentPost.Applied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
-                                        </Button>
-
-                                        <Button
-                                            variant={isSaved ? "contained" : "outlined"}
-                                            size="small"
-                                            startIcon={isSaving || isDeleting ? <CircularProgress size={18} color="inherit" /> : isSaved ? <Bookmark /> : <BookmarkBorder />}
-                                            onClick={handleSaveToggle}
-                                            disabled={isSaving || isDeleting}
-                                            sx={{
-                                                fontWeight: 600,
-                                                px: 1,
-                                                fontSize: 11,
-                                                transition: 'all 0.25s ease',
-                                                ...(isSaved ? { bgcolor: '#ff5722', borderColor: '#ff5722', color: 'white', '&:hover': { bgcolor: '#c62828', borderColor: '#c62828', color: 'white', }, } : { borderColor: '#ff5722', color: '#ff5722', '&:hover': { bgcolor: '#ff5722', color: 'white', }, }),
-                                            }}
-                                        >
-                                            {isSaving ? 'Đang lưu...' : isDeleting ? 'Đang hủy...' : isSaved ? 'Đã lưu' : 'Lưu tin'}
-                                        </Button>
+                                        {hasAccountType(AccountType.Student) && (
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                onClick={handleApplyClick}
+                                                disabled={isDeletingApply}
+                                                startIcon={isDeletingApply ? <CircularProgress size={16} color="inherit" /> : recruitmentPost.Applied ? <CheckCircle sx={{ fontSize: 16 }} /> : undefined}
+                                                sx={{
+                                                    fontWeight: 600,
+                                                    fontSize: 12,
+                                                    px: 2,
+                                                    py: 0.5,
+                                                    bgcolor: recruitmentPost.Applied ? '#9e9e9e' : '#ff5722',
+                                                    color: 'white',
+                                                    cursor: isDeletingApply ? 'not-allowed' : 'pointer',
+                                                    '&:hover': { bgcolor: recruitmentPost.Applied ? '#757575' : '#e64a19', transform: 'translateY(-2px)' }
+                                                }}
+                                            >
+                                                {isDeletingApply ? 'Đang hủy...' : recruitmentPost.Applied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
+                                            </Button>
+                                        )}
+                                        {hasAccountType(AccountType.Student) && (
+                                            <Button
+                                                variant={isSaved ? "contained" : "outlined"}
+                                                size="small"
+                                                startIcon={isSaving || isDeleting ? <CircularProgress size={18} color="inherit" /> : isSaved ? <Bookmark /> : <BookmarkBorder />}
+                                                onClick={handleSaveToggle}
+                                                disabled={isSaving || isDeleting}
+                                                sx={{
+                                                    fontWeight: 600,
+                                                    px: 2,
+                                                    py: 0.5,
+                                                    fontSize: 12,
+                                                    transition: 'all 0.25s ease',
+                                                    ...(isSaved ? { bgcolor: '#ff5722', borderColor: '#ff5722', color: 'white', '&:hover': { bgcolor: '#c62828', borderColor: '#c62828', color: 'white', }, } : { borderColor: '#ff5722', color: '#ff5722', '&:hover': { bgcolor: '#ff5722', color: 'white', }, }),
+                                                }}
+                                            >
+                                                {isSaving ? 'Đang lưu...' : isDeleting ? 'Đang hủy...' : isSaved ? 'Đã lưu' : 'Lưu tin'}
+                                            </Button>
+                                        )}
 
                                         <Button
                                             variant="outlined"
@@ -373,8 +380,9 @@ const RecruitmentPostDetailPage = () => {
                                                 borderColor: '#ff5722',
                                                 color: '#ff5722',
                                                 fontWeight: 600,
-                                                fontSize: 11,
-                                                px: 1,
+                                                fontSize: 12,
+                                                px: 2,
+                                                py: 0.5,
                                                 '&:hover': { bgcolor: '#ff5722', color: 'white' }
                                             }}
                                         >

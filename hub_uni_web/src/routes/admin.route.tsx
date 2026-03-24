@@ -10,7 +10,11 @@ import ManageApplicationPage from "../pages/admin/manage-application.page"
 const adminRoutes = [
     {
         index: true,
-        element: <AdminDashboardPage />,
+        element: (
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <AdminDashboardPage />
+            </ProtectedRoute>
+        ),
     },
     {
         children: [
@@ -26,11 +30,19 @@ const adminRoutes = [
     },
     {
         path: "organization-info",
-        element: <OrganizationInforPage />,
+        element: (
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <OrganizationInforPage />
+            </ProtectedRoute>
+        ),
     },
     {
         path: "personal-information",
-        element: <PersonalInforPage />,
+        element: (
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <PersonalInforPage />
+            </ProtectedRoute>
+        ),
     },
     {
         path: "manage-staff-account",
@@ -43,7 +55,9 @@ const adminRoutes = [
     {
         path: "manage-application",
         element: (
-            <ManageApplicationPage />
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <ManageApplicationPage />
+            </ProtectedRoute>
         ),
     },
     {

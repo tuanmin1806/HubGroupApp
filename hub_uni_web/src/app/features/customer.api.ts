@@ -86,9 +86,23 @@ const customerApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: [TAG_TYPES.CUSTOMER],
         }),
+
+        deleteCustomer: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `customer/delete/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [TAG_TYPES.CUSTOMER],
+        }),
     }),
 });
 
 export const {
-    useGetCustomerByOrganizationWithPageQuery, useCreateCollabAccountMutation, useGetCustomerInforQuery, useGetCustomerByIdQuery, useUpdateCustomerMutation, useUpdateCustomerAvatarMutation
+    useGetCustomerByOrganizationWithPageQuery,
+    useCreateCollabAccountMutation,
+    useGetCustomerInforQuery,
+    useGetCustomerByIdQuery,
+    useUpdateCustomerMutation,
+    useUpdateCustomerAvatarMutation,
+    useDeleteCustomerMutation
 } = customerApi;

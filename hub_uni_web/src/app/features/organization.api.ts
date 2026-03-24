@@ -1,5 +1,6 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse, UpdateOrganizationLogoRequest, UpdateOrganizationRequest } from "../models/organization.model";
+import { OrganizationDetailResponse, OrganizationFilterParams, OrganizationResponse, Profession, UpdateOrganizationLogoRequest, UpdateOrganizationRequest } from "../models/organization.model";
+import { ProfessionResponse } from "../models/profession.model";
 import baseApi from "./base.api";
 import { TAG_TYPES } from "./tags";
 
@@ -87,6 +88,14 @@ const organizationApi = baseApi.injectEndpoints({
             providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
+        getProfessionsByOrganization: builder.query<Profession[], string>({
+            query: (id) => ({
+                url: `organization/getprofessions?organizationId=${id}`,
+                method: 'GET',
+            }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
+        }),
+
         updateOrganization: builder.mutation<void, UpdateOrganizationRequest>({
             query: (body) => ({
                 url: "organization/update",
@@ -116,5 +125,6 @@ export const {
     useLazyGetOrganizationByIdQuery,
     useLazyOrganizationsNameSearchQuery,
     useLazyGetOrganizationBySeoQuery,
-    useUpdateOrganizationLogoMutation
+    useUpdateOrganizationLogoMutation,
+    useGetProfessionsByOrganizationQuery,
 } = organizationApi;

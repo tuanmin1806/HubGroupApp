@@ -493,22 +493,21 @@ const OrganizationDetailPage = () => {
                                         ) : (<Typography color="text.secondary">Chưa có thông tin giới thiệu chi tiết</Typography>)}
 
                                         <Box sx={{ mt: 3 }}>
-                                            <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                                            <Stack direction="row" flexWrap="wrap" gap={1}>
                                                 <Button
                                                     variant="contained"
-                                                    size="medium"
+                                                    size="small"
                                                     startIcon={<Language />}
                                                     component="a"
                                                     href={normalizeUrl(organization.WebsiteUrl)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     disabled={!organization.WebsiteUrl}
-                                                    sx={{ textTransform: 'none' }}
+                                                    sx={{ textTransform: 'none', fontSize: 12, px: 2, py: 0.5 }}
                                                 >
                                                     Truy cập website
                                                 </Button>
-                                                <Button variant="outlined" size="medium" startIcon={<BookmarkBorder />} sx={{ textTransform: 'none' }}> Lưu tin </Button>
-                                                <Button variant="outlined" size="medium" startIcon={<Share />} onClick={handleShare} sx={{ textTransform: 'none' }}> Chia sẻ </Button>
+                                                <Button variant="outlined" size="small" startIcon={<Share />} onClick={handleShare} sx={{ textTransform: 'none', fontSize: 12, px: 2, py: 0.5 }}> Chia sẻ </Button>
                                             </Stack>
                                         </Box>
                                     </CardContent>

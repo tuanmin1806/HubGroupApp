@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
-import { useGetRecruitmentPostByIdQuery, useLazyGetRecruitmentPostByIdQuery, useUpdateRecruitmentPostMutation } from "../../../app/features/recruitment-post.api";
-import { useGetOrganizationByIdQuery } from "../../../app/features/organization.api";
+import { useLazyGetRecruitmentPostByIdQuery, useUpdateRecruitmentPostMutation } from "../../../app/features/recruitment-post.api";
+import { useGetOrganizationByIdQuery, useGetProfessionsByOrganizationQuery } from "../../../app/features/organization.api";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { RecruitPostStatus, Gender, JobExperience, EducationLevel } from "../../../app/models/enums.model";
 import { Province } from "../../../app/models/province.model";
@@ -101,115 +101,121 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
     const [selectedProfessions, setSelectedProfessions] = useState<Profession[]>([]);
     const [orgChangedManually, setOrgChangedManually] = useState(false);
 
-    const [professionPage, setProfessionPage] = useState(1);
-    const [professionList, setProfessionList] = useState<Profession[]>([]);
-    const [hasMoreProfessions, setHasMoreProfessions] = useState(true);
-    const professionSyncedRef = useRef(false);
-    const professionListboxRef = useRef<HTMLUListElement | null>(null);
-
     const [fetchRecruitmentPost, { data: postData, isFetching: isFetchingPost }] = useLazyGetRecruitmentPostByIdQuery();
-    const { data: professionData, isFetching: isFetchingProfessions } = useGetProfessionsByPageQuery({ page: professionPage, size: 10 }, { skip: !open });
     const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery(undefined, { skip: !open });
     const { data: visaTypesData } = useGetAllVisaTypesQuery(undefined, { skip: !open });
     const { data: organizationDetail, isFetching: isOrgDetailFetching } = useGetOrganizationByIdQuery(form.OrganizationId, { skip: !form.OrganizationId || !orgChangedManually });
     const [updateRecruitmentPost, { isLoading: isUpdating }] = useUpdateRecruitmentPostMutation();
 
+    const { data: professionData, isFetching: isFetchingProfessions } =
+        useGetProfessionsByOrganizationQuery(form.OrganizationId, {
+            skip: !form.OrganizationId || !open,
+        });
+
+    const [professionList, setProfessionList] = useState<Profession[]>([]);
+
     const visaTypeOptions = useMemo(() => visaTypesData?.map((v: { Id: string; Name: string }) => ({ value: v.Id, label: v.Name })) ?? [], [visaTypesData]);
 
     useEffect(() => {
-        if (!professionData?.Items) return;
-        setProfessionList((prev) => {
-            const existingIds = new Set(prev.map((p) => p.ProfessionId));
-            const newItems: Profession[] = professionData.Items
-                .filter((p: { Id: string }) => !existingIds.has(p.Id))
-                .map((p: { Id: string; Name: string }) => ({
-                    ProfessionId: p.Id,
-                    ProfessionName: p.Name,
-                    ProfessionSeoUrl: "",
-                    Cost: 0,
-                }));
-            return [...prev, ...newItems];
-        });
-        if (professionData.Items.length < 10) setHasMoreProfessions(false);
+        if (!open || !postId) return;
+
+        setSelectedProfessions([]);
+        setProfessionList([]);
+        setOrgChangedManually(false);
+        setForm(defaultForm);
+        setErrors({});
+
+        fetchRecruitmentPost(postId, false)
+            .unwrap()
+            .then((data) => {
+                if (!data) return;
+                setForm({
+                    Id: data.Id,
+                    RecruitPostStatus: ConvertService.convertPostStatusFromString(data.RecruitPostStatus),
+                    Name: data.Name ?? "",
+                    OrganizationId: data.OrganizationId ?? "",
+                    ProfessionIds: data.ProfessionIds ?? [],
+                    Quantity: data.Quantity ?? 1,
+                    Description: data.Description ?? "",
+                    ProvinceId: data.ProvinceId ?? "",
+                    Requirement: {
+                        FromAge: data.Requirement?.FromAge ?? undefined,
+                        ToAge: data.Requirement?.ToAge ?? undefined,
+                        Gender: ConvertService.convertGenderFromString(data.Requirement?.Gender),
+                        Experience: ConvertService.convertJobExperienceFromString(data.Requirement?.Experience),
+                        EducationLevel: ConvertService.convertEducationLevelFromString(data.Requirement?.EducationLevel),
+                        MinimumGpa: data.Requirement?.MinimumGpa ?? 0,
+                        MaxYearsSinceGrad: data.Requirement?.MaxYearsSinceGrad ?? 0,
+                        MaxAbsence: data.Requirement?.MaxAbsence ?? 0,
+                        VisaTypeId: data.Requirement?.VisaTypeId ?? "",
+                        OtherReqs: data.Requirement?.OtherReqs?.length > 0
+                            ? data.Requirement.OtherReqs
+                            : [""],
+                    },
+                    RecruitmentFromDate: data.RecruitmentFromDate ?? null,
+                    RecruitmentToDate: data.RecruitmentToDate ?? null,
+                    IsTop: data.IsTop ?? false,
+                    Highlights: data.Highlights?.length > 0 ? data.Highlights : [],
+                });
+            });
+    }, [open, postId]);
+
+
+
+    useEffect(() => {
+        if (!professionData) return;
+
+        const mapped: Profession[] = professionData.map((p: any) => ({
+            ProfessionId: p.Id,
+            ProfessionName: p.Name,
+            ProfessionSeoUrl: p.SeoUrl ?? "",
+            Cost: 0,
+        }));
+
+        setProfessionList(mapped);
     }, [professionData]);
 
     useEffect(() => {
-        if (!postData || professionSyncedRef.current) return;
+        if (!postData || professionList.length === 0) return;
 
-        const idsToResolve: string[] = postData.Professions?.length > 0 ? postData.Professions.map((p: { ProfessionId: string }) => p.ProfessionId) : (postData.ProfessionIds ?? []);
+        const ids = postData.Professions?.map((p: Profession) => p.ProfessionId) ?? [];
 
-        if (idsToResolve.length === 0) { professionSyncedRef.current = true; return; }
+        const matched = professionList.filter((p) =>
+            ids.includes(p.ProfessionId)
+        );
 
-        const matched = idsToResolve.map((id) => professionList.find((p) => p.ProfessionId === id)).filter((p): p is Profession => p !== undefined);
+        setSelectedProfessions(matched);
 
-        if (matched.length === idsToResolve.length || !hasMoreProfessions) {
-            setSelectedProfessions(matched);
-            setForm((prev) => ({ ...prev, ProfessionIds: matched.map((p) => p.ProfessionId) }));
-            professionSyncedRef.current = true;
-        }
-    }, [postData, professionList, hasMoreProfessions]);
+        setForm((prev) => ({
+            ...prev,
+            ProfessionIds: matched.map((p) => p.ProfessionId),
+        }));
+
+    }, [postData, professionList]);
 
     useEffect(() => {
         if (!organizationDetail || !orgChangedManually) return;
 
-        if (organizationDetail.ProvinceId) setForm((prev) => ({ ...prev, ProvinceId: organizationDetail.ProvinceId }));
+        if (organizationDetail.ProvinceId) {
+            setForm((prev) => ({ ...prev, ProvinceId: organizationDetail.ProvinceId }));
+        }
 
         const allIds: string[] = [];
-        if (organizationDetail.MainProfession?.ProfessionId) allIds.push(organizationDetail.MainProfession.ProfessionId);
+        if (organizationDetail.MainProfession?.ProfessionId) {
+            allIds.push(organizationDetail.MainProfession.ProfessionId);
+        }
         organizationDetail.Professions?.forEach((p: { ProfessionId: string }) => {
             if (p.ProfessionId && !allIds.includes(p.ProfessionId)) allIds.push(p.ProfessionId);
         });
 
         if (allIds.length > 0) {
-            const matched = allIds.map((id) => professionList.find((p) => p.ProfessionId === id)).filter((p): p is Profession => p !== undefined);
+            const matched = allIds
+                .map((id) => professionList.find((p) => p.ProfessionId === id))
+                .filter((p): p is Profession => p !== undefined);
             setSelectedProfessions(matched);
             setForm((prev) => ({ ...prev, ProfessionIds: allIds }));
         }
     }, [organizationDetail, orgChangedManually]);
-
-    useEffect(() => { if (open) professionSyncedRef.current = false; }, [open, postId]);
-
-    useEffect(() => {
-        if (!postData) return;
-        setOrgChangedManually(false);
-        setForm({
-            Id: postData.Id,
-            RecruitPostStatus: ConvertService.convertPostStatusFromString(postData.RecruitPostStatus),
-            Name: postData.Name ?? "",
-            OrganizationId: postData.OrganizationId ?? "",
-            ProfessionIds: postData.ProfessionIds ?? [],
-            Quantity: postData.Quantity ?? 1,
-            Description: postData.Description ?? "",
-            ProvinceId: postData.ProvinceId ?? "",
-            Requirement: {
-                FromAge: postData.Requirement?.FromAge ?? undefined,
-                ToAge: postData.Requirement?.ToAge ?? undefined,
-                Gender: ConvertService.convertGenderFromString(postData.Requirement?.Gender),
-                Experience: ConvertService.convertJobExperienceFromString(postData.Requirement?.Experience),
-                EducationLevel: ConvertService.convertEducationLevelFromString(postData.Requirement?.EducationLevel),
-                MinimumGpa: postData.Requirement?.MinimumGpa ?? 0,
-                MaxYearsSinceGrad: postData.Requirement?.MaxYearsSinceGrad ?? 0,
-                MaxAbsence: postData.Requirement?.MaxAbsence ?? 0,
-                VisaTypeId: postData.Requirement?.VisaTypeId ?? "",
-                OtherReqs: postData.Requirement?.OtherReqs?.length > 0 ? postData.Requirement.OtherReqs : [""],
-            },
-            RecruitmentFromDate: postData.RecruitmentFromDate ?? null,
-            RecruitmentToDate: postData.RecruitmentToDate ?? null,
-            IsTop: postData.IsTop ?? false,
-            Highlights: postData.Highlights?.length > 0 ? postData.Highlights : [],
-        });
-    }, [postData]);
-
-    useEffect(() => {
-        if (open && postId) {
-            fetchRecruitmentPost(postId);
-        }
-    }, [open, postId, fetchRecruitmentPost]);
-
-    const handleProfessionScroll = useCallback((event: React.UIEvent<HTMLUListElement>) => {
-        const list = event.currentTarget;
-        if (list.scrollTop + list.clientHeight >= list.scrollHeight - 30 && hasMoreProfessions && !isFetchingProfessions) setProfessionPage((prev) => prev + 1);
-    }, [hasMoreProfessions, isFetchingProfessions]);
 
     const handleChange = <K extends keyof UpdateRecruitmentPostRequest>(field: K, value: UpdateRecruitmentPostRequest[K]) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -253,11 +259,6 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
         setForm(defaultForm);
         setErrors({});
         setSelectedProfessions([]);
-        setProfessionPage(1);
-        setProfessionList([]);
-        setHasMoreProfessions(true);
-        setOrgChangedManually(false);
-        professionSyncedRef.current = false;
         onClose();
     };
 
@@ -285,7 +286,7 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth PaperProps={{ sx: { maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography variant="h6" fontWeight={600}>Chỉnh sửa bài tuyển sinh</Typography>
+                <Typography fontWeight={600}>Chỉnh sửa bài tuyển sinh</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />
@@ -297,7 +298,7 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
                         <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tên bài đăng" required value={form.Name} onChange={(e) => handleChange("Name", e.target.value)} error={!!errors.Name} helperText={errors.Name} /></Grid>
                         <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Trạng thái" value={form.RecruitPostStatus} onChange={(e) => handleChange("RecruitPostStatus", Number(e.target.value) as RecruitPostStatus)}>{POST_STATUS_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
                         <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Province> {...tf} options={provinces} getOptionLabel={(opt) => opt.Name ?? ""} isOptionEqualToValue={(opt, val) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label="Tỉnh / Thành phố" required error={!!errors.ProvinceId} helperText={errors.ProvinceId} />} /></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Profession, true> multiple {...tf} options={professionList} getOptionLabel={(opt) => opt.ProfessionName ?? opt.ProfessionId} value={selectedProfessions} onChange={handleProfessionChange} isOptionEqualToValue={(opt, val) => opt.ProfessionId === val.ProfessionId} loading={isFetchingProfessions || isOrgDetailFetching} ListboxProps={{ onScroll: handleProfessionScroll, ref: professionListboxRef, style: { maxHeight: 220 } }} renderTags={(value, getTagProps) => value.map((opt, index) => { const { key, ...tagProps } = getTagProps({ index }); return <Chip key={opt.ProfessionId} label={opt.ProfessionName ?? opt.ProfessionId} size="small" {...tagProps} />; })} renderInput={(params) => (<TextField {...params} label="Ngành nghề" required placeholder={selectedProfessions.length === 0 ? "Chọn ngành nghề..." : ""} error={!!errors.ProfessionIds} helperText={errors.ProfessionIds} InputProps={{ ...params.InputProps, endAdornment: (<> {(isFetchingProfessions || isOrgDetailFetching) && <CircularProgress size={16} />} {params.InputProps.endAdornment}</>) }} />)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Profession, true> multiple {...tf} options={professionList} getOptionLabel={(opt) => opt.ProfessionName ?? opt.ProfessionId} value={selectedProfessions} onChange={handleProfessionChange} isOptionEqualToValue={(opt, val) => opt.ProfessionId === val.ProfessionId} loading={isFetchingProfessions || isOrgDetailFetching} renderTags={(value, getTagProps) => value.map((opt, index) => { const { key, ...tagProps } = getTagProps({ index }); return <Chip key={opt.ProfessionId} label={opt.ProfessionName ?? opt.ProfessionId} size="small" {...tagProps} />; })} renderInput={(params) => (<TextField {...params} label="Ngành nghề" required placeholder={selectedProfessions.length === 0 ? "Chọn ngành nghề..." : ""} error={!!errors.ProfessionIds} helperText={errors.ProfessionIds} InputProps={{ ...params.InputProps, endAdornment: (<> {(isFetchingProfessions || isOrgDetailFetching) && <CircularProgress size={16} />} {params.InputProps.endAdornment}</>) }} />)} /></Grid>
                         <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Số lượng tuyển" type="number" required value={form.Quantity} onChange={(e) => handleChange("Quantity", Number(e.target.value))} error={!!errors.Quantity} helperText={errors.Quantity} inputProps={{ min: 1 }} /></Grid>
                         <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tuyển từ ngày" type="date" value={form.RecruitmentFromDate ?? ""} onChange={(e) => handleChange("RecruitmentFromDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
                         <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tuyển đến ngày" type="date" value={form.RecruitmentToDate ?? ""} onChange={(e) => handleChange("RecruitmentToDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
