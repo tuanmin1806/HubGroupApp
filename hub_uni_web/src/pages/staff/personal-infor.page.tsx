@@ -13,8 +13,8 @@ import { Country } from "../../app/models/country.model";
 import { Province } from "../../app/models/province.model";
 import { CommuneResponse } from "../../app/models/commune.model";
 import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
+
 const GENDER_OPTIONS = [
-    { value: Gender.Undefined, label: "Không xác định" },
     { value: Gender.Male, label: "Nam" },
     { value: Gender.Female, label: "Nữ" },
     { value: Gender.Other, label: "Khác" },
@@ -36,6 +36,7 @@ interface EditableForm {
     ProvinceId: string;
     CommuneId: string;
     Address: string;
+    OrganizationId: string;
 }
 
 function buildForm(data: CustomerResponse): EditableForm {
@@ -56,6 +57,7 @@ function buildForm(data: CustomerResponse): EditableForm {
         ProvinceId: p?.ProvinceId ?? "",
         CommuneId: p?.CommuneId ?? "",
         Address: p?.Address ?? "",
+        OrganizationId: data.OrganizationId ?? "",
     };
 }
 
@@ -71,6 +73,7 @@ function buildPayload(data: CustomerResponse, form: EditableForm): UpdateCustome
         AccountType: data.AccountType,
         AccountStatus: ConvertService.convertAccountStatusFromString(data.AccountStatus),
         RoleIds: data.Roles?.map(r => r.Id) ?? [],
+        OrganizationId: form.OrganizationId,
         ProfileInfo: {
             DateOfBirth: form.DateOfBirth || null,
             Gender: form.Gender,

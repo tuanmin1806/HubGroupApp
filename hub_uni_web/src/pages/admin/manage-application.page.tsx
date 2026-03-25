@@ -36,6 +36,7 @@ export default function ManageApplicationPage() {
     const queryParams: ApplicationFilterParams = {
         page: page + 1,
         size: rowsPerPage,
+        searchValue: searchValue || undefined,
     };
     const handleOpenView = useCallback((id: string) => { setViewApplicationId(id); setOpenViewDialog(true); }, []);
     const handleCloseView = useCallback(() => { setOpenViewDialog(false); setViewApplicationId(null); }, []);

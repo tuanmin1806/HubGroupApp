@@ -24,7 +24,6 @@ const GENDER_OPTIONS = [
     { value: Gender.Male, label: "Nam" },
     { value: Gender.Female, label: "Nữ" },
     { value: Gender.Other, label: "Khác" },
-    { value: Gender.Undefined, label: "Không xác định" },
 ];
 
 const ACCOUNT_STATUS_OPTIONS = [

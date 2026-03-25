@@ -83,4 +83,5 @@ export interface CustomerFilterParams {
     page?: number;
     size?: number;
     organizationId?: string;
+    searchValue?: string;
 }

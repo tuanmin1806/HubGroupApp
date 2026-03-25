@@ -102,6 +102,7 @@ export const {
     useCreateCollabAccountMutation,
     useGetCustomerInforQuery,
     useGetCustomerByIdQuery,
+    useLazyGetCustomerByIdQuery,
     useUpdateCustomerMutation,
     useUpdateCustomerAvatarMutation,
     useDeleteCustomerMutation

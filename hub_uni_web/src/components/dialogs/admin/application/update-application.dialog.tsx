@@ -12,8 +12,7 @@ import { ConvertService } from "../../../../app/services/convert.service";
 const APPLICATION_STATUS_OPTIONS = [
     { value: ApplicationStatus.Pending, label: "Chờ xử lý" },
     { value: ApplicationStatus.Accepted, label: "Đã chấp nhận" },
-    { value: ApplicationStatus.Rejected, label: "Đã từ chối" },
-    { value: ApplicationStatus.Undefined, label: "Không xác định" },
+    { value: ApplicationStatus.Rejected, label: "Đã từ chối" }
 ];
 
 const defaultForm: UpdateApplicationRequest = {
@@ -29,21 +28,21 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
     const [fetchApplication, { data: applicationData, isFetching }] = useLazyGetApplicationByIdQuery();
 
     useEffect(() => {
-        if (open && applicationId) {
-            fetchApplication(applicationId);
-        }
-    }, [open, applicationId]);
+        if (!open || !applicationId) return;
 
-    useEffect(() => {
-        if (applicationData) {
-            setForm({
-                ApplicationId: applicationData.Id,
-                ApplicationStatus: ConvertService.convertApplicationStatusFromString(
-                    applicationData.ApplicationStatus
-                ),
+        setForm(defaultForm);
+
+        fetchApplication(applicationId, false)
+            .unwrap()
+            .then((data) => {
+                if (!data) return;
+
+                setForm({
+                    ApplicationId: data.Id,
+                    ApplicationStatus: ConvertService.convertApplicationStatusFromString(data.ApplicationStatus),
+                });
             });
-        }
-    }, [applicationData]);
+    }, [open, applicationId]);
 
     const handleChange = (value: number) => {
         setForm((prev) => ({ ...prev, ApplicationStatus: value }));
@@ -118,6 +117,7 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
                             label="Trạng thái ứng viên"
                             fullWidth
                             size="small"
+                            disabled={isFetching}
                             value={form.ApplicationStatus}
                             onChange={(e) => handleChange(Number(e.target.value))}
                             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2, bgcolor: "#fafafa" } }}

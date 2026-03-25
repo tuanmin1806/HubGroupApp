@@ -10,6 +10,33 @@ import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
 import { Country } from "../../app/models/country.model";
 import { useNavigate } from "react-router-dom";
 
+const GENDER_OPTIONS = [
+    { value: Gender.Male, label: "Nam" },
+    { value: Gender.Female, label: "Nữ" },
+    { value: Gender.Other, label: "Khác" },
+];
+
+const jobExperienceOptions = [
+    { value: JobExperience.Undefined, label: "Không có" },
+    { value: JobExperience.LessThan1Year, label: "< 1 năm" },
+    { value: JobExperience.From1To2Years, label: "1-2 năm" },
+    { value: JobExperience.From2To3Years, label: "2-3 năm" },
+    { value: JobExperience.From3To5Years, label: "3-5 năm" },
+    { value: JobExperience.From5To10Years, label: "5-10 năm" },
+    { value: JobExperience.Above10Years, label: "> 10 năm" },
+];
+
+const educationLevelOptions = [
+    { value: EducationLevel.Undefined, label: "Không có" },
+    { value: EducationLevel.PrimarySchool, label: "Tiểu học" },
+    { value: EducationLevel.MiddleSchool, label: "THCS" },
+    { value: EducationLevel.HighSchool, label: "THPT" },
+    { value: EducationLevel.VocationalSchool, label: "Trung cấp" },
+    { value: EducationLevel.College, label: "Cao đẳng" },
+    { value: EducationLevel.University, label: "Đại học" },
+    { value: EducationLevel.Postgraduate, label: "Sau đại học" },
+];
+
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 
 const initialState = {
@@ -17,11 +44,11 @@ const initialState = {
     Password: "",
     ConfirmPassword: "",
     FullName: "",
-    Gender: Gender.Male,
+    Gender: Gender.Other,
     Email: "",
     PhoneNumber: "",
     DateOfBirth: "",
-    Experience: JobExperience.LessThan1Year,
+    Experience: JobExperience.Undefined,
     EducationLevel: EducationLevel.Undefined,
     CountryId: "",
     ProvinceId: "",
@@ -142,10 +169,11 @@ const StudentSignupForm = () => {
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Email" type="email" size="small" fullWidth value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label={<>Số điện thoại <RequiredStar /></>} size="small" fullWidth value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField select label="Giới tính" size="small" fullWidth value={form.Gender} onChange={(e) => set("Gender", e.target.value)}>
-                                    <MenuItem value={Gender.Undefined}>Không yêu cầu</MenuItem>
-                                    <MenuItem value={Gender.Male}>Nam</MenuItem>
-                                    <MenuItem value={Gender.Female}>Nữ</MenuItem>
-                                    <MenuItem value={Gender.Other}>Khác</MenuItem>
+                                    {GENDER_OPTIONS.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
                                 </TextField>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}> <TextField label="Ngày sinh" type="date" value={form.DateOfBirth} onChange={(e) => set("DateOfBirth", e.target.value)} fullWidth size="small" InputLabelProps={{ shrink: true }} /></Grid>
@@ -161,22 +189,20 @@ const StudentSignupForm = () => {
                             <Grid container spacing={1.5}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField select label="Trình độ học vấn" size="small" fullWidth value={form.EducationLevel} onChange={(e) => set("EducationLevel", e.target.value)}>
-                                        <MenuItem value={EducationLevel.Undefined}>Không xác định</MenuItem>
-                                        <MenuItem value={EducationLevel.HighSchool}>Trung học phổ thông</MenuItem>
-                                        <MenuItem value={EducationLevel.College}>Cao đẳng</MenuItem>
-                                        <MenuItem value={EducationLevel.University}>Đại học</MenuItem>
-                                        <MenuItem value={EducationLevel.Postgraduate}>Sau đại học</MenuItem>
+                                        {educationLevelOptions.map((option) => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
                                     </TextField>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField select label="Kinh nghiệm" size="small" fullWidth value={form.Experience} onChange={(e) => set("Experience", e.target.value)}>
-                                        <MenuItem value={JobExperience.Undefined}>Không xác định</MenuItem>
-                                        <MenuItem value={JobExperience.LessThan1Year}>Dưới 1 năm</MenuItem>
-                                        <MenuItem value={JobExperience.From1To2Years}>Từ 1 - 2 năm</MenuItem>
-                                        <MenuItem value={JobExperience.From2To3Years}>Từ 2 - 3 năm</MenuItem>
-                                        <MenuItem value={JobExperience.From3To5Years}>Từ 3 - 5 năm</MenuItem>
-                                        <MenuItem value={JobExperience.From5To10Years}>Từ 5 - 10 năm</MenuItem>
-                                        <MenuItem value={JobExperience.Above10Years}>Trên 10 năm</MenuItem>
+                                        {jobExperienceOptions.map((option) => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
                                     </TextField>
                                 </Grid>
                             </Grid>

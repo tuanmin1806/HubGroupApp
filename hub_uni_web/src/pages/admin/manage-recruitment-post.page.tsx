@@ -1,4 +1,4 @@
-import { Add, ChangeCircle, Clear, Delete, Edit, Search, Visibility } from "@mui/icons-material";
+import { Add, Clear, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Chip } from "@mui/material";
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
@@ -45,7 +45,7 @@ export default function ManageRecruitmentPostPage() {
     const [deleteRecruitmentPost, { isLoading: isDeleting }] = useDeleteRecruitmentPostMutation();
 
     const handleSearch = useCallback(() => {
-        setSearchValue(inputValue);
+        setSearchValue(inputValue.trim());
         setPage(0);
     }, [inputValue]);
 

@@ -107,20 +107,35 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
     const { data: organizationDetail, isFetching: isOrgDetailFetching } = useGetOrganizationByIdQuery(form.OrganizationId, { skip: !form.OrganizationId || !orgChangedManually });
     const [updateRecruitmentPost, { isLoading: isUpdating }] = useUpdateRecruitmentPostMutation();
 
-    const { data: professionData, isFetching: isFetchingProfessions } =
-        useGetProfessionsByOrganizationQuery(form.OrganizationId, {
-            skip: !form.OrganizationId || !open,
-        });
+    const { data: professionData, isFetching: isFetchingProfessions } = useGetProfessionsByOrganizationQuery(form.OrganizationId, { skip: !form.OrganizationId || !open });
 
     const [professionList, setProfessionList] = useState<Profession[]>([]);
 
     const visaTypeOptions = useMemo(() => visaTypesData?.map((v: { Id: string; Name: string }) => ({ value: v.Id, label: v.Name })) ?? [], [visaTypesData]);
+    useEffect(() => {
+        if (!professionData) return;
 
+        const mapped: Profession[] = professionData.map((p: any) => ({
+            ProfessionId: p.ProfessionId,
+            ProfessionName: p.ProfessionName,
+            ProfessionSeoUrl: p.ProfessionSeoUrl ?? "",
+            Cost: 0,
+        }));
+
+        const merged = [
+            ...mapped,
+            ...selectedProfessions.filter(
+                (sp) => !mapped.some((m) => m.ProfessionId === sp.ProfessionId)
+            ),
+        ];
+
+        setProfessionList(merged);
+
+    }, [professionData, selectedProfessions]);
     useEffect(() => {
         if (!open || !postId) return;
 
         setSelectedProfessions([]);
-        setProfessionList([]);
         setOrgChangedManually(false);
         setForm(defaultForm);
         setErrors({});
@@ -161,37 +176,24 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
     }, [open, postId]);
 
 
-
     useEffect(() => {
-        if (!professionData) return;
+        if (!postData || !open) return;
 
-        const mapped: Profession[] = professionData.map((p: any) => ({
-            ProfessionId: p.Id,
-            ProfessionName: p.Name,
-            ProfessionSeoUrl: p.SeoUrl ?? "",
-            Cost: 0,
-        }));
+        const mapped: Profession[] = postData.Professions?.map((p) => ({
+            ProfessionId: p.ProfessionId,
+            ProfessionName: p.ProfessionName ?? "",
+            ProfessionSeoUrl: p.ProfessionSeoUrl ?? "",
+            Cost: p.Cost ?? 0,
+        })) ?? [];
 
-        setProfessionList(mapped);
-    }, [professionData]);
-
-    useEffect(() => {
-        if (!postData || professionList.length === 0) return;
-
-        const ids = postData.Professions?.map((p: Profession) => p.ProfessionId) ?? [];
-
-        const matched = professionList.filter((p) =>
-            ids.includes(p.ProfessionId)
-        );
-
-        setSelectedProfessions(matched);
+        setSelectedProfessions(mapped);
 
         setForm((prev) => ({
             ...prev,
-            ProfessionIds: matched.map((p) => p.ProfessionId),
+            ProfessionIds: mapped.map((p) => p.ProfessionId),
         }));
 
-    }, [postData, professionList]);
+    }, [postData, open]);
 
     useEffect(() => {
         if (!organizationDetail || !orgChangedManually) return;

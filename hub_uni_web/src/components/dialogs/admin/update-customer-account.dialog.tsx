@@ -6,7 +6,7 @@ import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { ProfileInfo, UpdateCustomerRequest } from "../../../app/models/customer.model";
 import { Gender, AccountType, AccountStatus } from "../../../app/models/enums.model";
 import { AppDispatch } from "../../../app/store";
-import { useGetCustomerByIdQuery, useUpdateCustomerMutation } from "../../../app/features/customer.api";
+import { useGetCustomerByIdQuery, useLazyGetCustomerByIdQuery, useUpdateCustomerMutation } from "../../../app/features/customer.api";
 import { ConvertService } from "../../../app/services/convert.service";
 import { useGetAllCountryNoAuthenQuery } from "../../../app/features/country.api";
 import { useGetProvinceByCountryQuery } from "../../../app/features/province.api";
@@ -104,17 +104,10 @@ export default function UpdateCustomerAccountDialog({
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState("");
     const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
 
-    const { data: customerData, isFetching } = useGetCustomerByIdQuery(customerId ?? "", { skip: !customerId || !open });
+    const [fetchCustomer, { data: customerData, isFetching }] = useLazyGetCustomerByIdQuery();
     const { data: countries = [] } = useGetAllCountryNoAuthenQuery();
-    const { data: provinces = [] } = useGetProvinceByCountryQuery(
-        selectedCountrySeo,
-        { skip: !selectedCountrySeo }
-    );
-
-    const { data: communes = [] } = useGetCommunesByProvinceQuery(
-        selectedProvinceSeo,
-        { skip: !selectedProvinceSeo }
-    );
+    const { data: provinces = [] } = useGetProvinceByCountryQuery(selectedCountrySeo, { skip: !selectedCountrySeo });
+    const { data: communes = [] } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo });
 
     const handleCountryChange = (countryId: string) => {
         const country = countries.find((c: Country) => c.Id === countryId);
@@ -159,28 +152,38 @@ export default function UpdateCustomerAccountDialog({
     };
 
     useEffect(() => {
-        if (customerData) {
-            setForm({
-                Id: customerData.Id,
-                FullName: customerData.FullName ?? "",
-                Email: customerData.Email ?? "",
-                PhoneNumber: customerData.PhoneNumber ?? "",
-                Gender: ConvertService.convertGenderFromString(customerData.Gender),
-                AccountStatus: ConvertService.convertAccountStatusFromString(customerData.AccountStatus),
-                AccountType: ConvertService.convertAccountTypeFromString(customerData.AccountType),
-                RoleIds: (customerData.Roles ?? []).map(r => r.Id),
-                UserName: customerData.UserName ?? "",
-                OrganizationId: customerData.OrganizationId ?? "",
-                ProfileInfo: {
-                    DateOfBirth: customerData.ProfileInfo?.DateOfBirth ?? "",
-                    CountryId: customerData.ProfileInfo?.CountryId ?? "",
-                    ProvinceId: customerData.ProfileInfo?.ProvinceId ?? "",
-                    CommuneId: customerData.ProfileInfo?.CommuneId ?? "",
-                    Address: customerData.ProfileInfo?.Address ?? "",
-                }
+        if (!open || !customerId) return;
+        setForm(defaultForm);
+        setErrors({});
+        setSelectedCountrySeo("");
+        setSelectedProvinceSeo("");
+
+        fetchCustomer(customerId, false)
+            .unwrap()
+            .then((data) => {
+                if (!data) return;
+
+                setForm({
+                    Id: data.Id,
+                    FullName: data.FullName ?? "",
+                    Email: data.Email ?? "",
+                    PhoneNumber: data.PhoneNumber ?? "",
+                    Gender: ConvertService.convertGenderFromString(data.Gender),
+                    AccountStatus: ConvertService.convertAccountStatusFromString(data.AccountStatus),
+                    AccountType: ConvertService.convertAccountTypeFromString(data.AccountType),
+                    RoleIds: (data.Roles ?? []).map(r => r.Id),
+                    UserName: data.UserName ?? "",
+                    OrganizationId: data.OrganizationId ?? "",
+                    ProfileInfo: {
+                        DateOfBirth: data.ProfileInfo?.DateOfBirth ?? "",
+                        CountryId: data.ProfileInfo?.CountryId ?? "",
+                        ProvinceId: data.ProfileInfo?.ProvinceId ?? "",
+                        CommuneId: data.ProfileInfo?.CommuneId ?? "",
+                        Address: data.ProfileInfo?.Address ?? "",
+                    }
+                });
             });
-        }
-    }, [customerData]);
+    }, [open, customerId]);
 
     useEffect(() => {
         if (form.ProfileInfo.CountryId && countries.length > 0) {
@@ -257,133 +260,142 @@ export default function UpdateCustomerAccountDialog({
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />
+            <DialogContent>
+                {isFetching ? (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <>
+                        <Paper sx={{ p: 2, mb: 2 }}>
+                            <SectionHeader icon={<PersonOutlined />} title="Thông tin tài khoản" />
 
-            <Paper sx={{ p: 2, mb: 2 }}>
-                <SectionHeader icon={<PersonOutlined />} title="Thông tin tài khoản" />
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12 }}>
+                                    <TextField
+                                        label="Họ và tên"
+                                        fullWidth
+                                        size="small"
+                                        value={form.FullName}
+                                        onChange={(e) => handleChange("FullName", e.target.value)}
+                                    />
+                                </Grid>
 
-                <Grid container spacing={2}>
-                    <Grid size={{ xs: 12 }}>
-                        <TextField
-                            label="Họ và tên"
-                            fullWidth
-                            size="small"
-                            value={form.FullName}
-                            onChange={(e) => handleChange("FullName", e.target.value)}
-                        />
-                    </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Email"
+                                        fullWidth
+                                        size="small"
+                                        value={form.Email}
+                                        onChange={(e) => handleChange("Email", e.target.value)}
+                                    />
+                                </Grid>
 
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            label="Email"
-                            fullWidth
-                            size="small"
-                            value={form.Email}
-                            onChange={(e) => handleChange("Email", e.target.value)}
-                        />
-                    </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Số điện thoại"
+                                        fullWidth
+                                        size="small"
+                                        value={form.PhoneNumber ?? ""}
+                                        onChange={(e) => handleChange("PhoneNumber", e.target.value)}
+                                    />
+                                </Grid>
 
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            label="Số điện thoại"
-                            fullWidth
-                            size="small"
-                            value={form.PhoneNumber ?? ""}
-                            onChange={(e) => handleChange("PhoneNumber", e.target.value)}
-                        />
-                    </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        type="date"
+                                        label="Ngày sinh"
+                                        fullWidth
+                                        size="small"
+                                        InputLabelProps={{ shrink: true }}
+                                        value={form.ProfileInfo.DateOfBirth ?? ""}
+                                        onChange={(e) => handleProfileChange("DateOfBirth", e.target.value)}
+                                    />
+                                </Grid>
 
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            type="date"
-                            label="Ngày sinh"
-                            fullWidth
-                            size="small"
-                            InputLabelProps={{ shrink: true }}
-                            value={form.ProfileInfo.DateOfBirth ?? ""}
-                            onChange={(e) => handleProfileChange("DateOfBirth", e.target.value)}
-                        />
-                    </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        select
+                                        label="Giới tính"
+                                        fullWidth
+                                        size="small"
+                                        value={form.Gender}
+                                        onChange={(e) => handleChange("Gender", Number(e.target.value))}
+                                    >
+                                        {GENDER_OPTIONS.map(opt => (
+                                            <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
+                            </Grid>
+                        </Paper>
 
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            select
-                            label="Giới tính"
-                            fullWidth
-                            size="small"
-                            value={form.Gender}
-                            onChange={(e) => handleChange("Gender", Number(e.target.value))}
-                        >
-                            {GENDER_OPTIONS.map(opt => (
-                                <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                </Grid>
-            </Paper>
+                        <Divider />
+                        <Paper sx={{ p: 2 }}>
+                            <SectionHeader icon={<LocationOn />} title="Địa chỉ" />
 
-            <Divider />
-            <Paper sx={{ p: 2 }}>
-                <SectionHeader icon={<LocationOn />} title="Địa chỉ" />
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        select
+                                        label="Quốc gia"
+                                        value={form.ProfileInfo.CountryId}
+                                        onChange={(e) => handleCountryChange(e.target.value)}
+                                        fullWidth
+                                        size="small"
+                                    >
+                                        {countries.map(c => (
+                                            <MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
 
-                <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            select
-                            label="Quốc gia"
-                            value={form.ProfileInfo.CountryId}
-                            onChange={(e) => handleCountryChange(e.target.value)}
-                            fullWidth
-                            size="small"
-                        >
-                            {countries.map(c => (
-                                <MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        select
+                                        label="Tỉnh / Thành phố"
+                                        value={form.ProfileInfo.ProvinceId}
+                                        onChange={(e) => handleProvinceChange(e.target.value)}
+                                        fullWidth
+                                        size="small"
+                                        disabled={!selectedCountrySeo}
+                                    >
+                                        {provinces.map(p => (
+                                            <MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
 
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            select
-                            label="Tỉnh / Thành phố"
-                            value={form.ProfileInfo.ProvinceId}
-                            onChange={(e) => handleProvinceChange(e.target.value)}
-                            fullWidth
-                            size="small"
-                            disabled={!selectedCountrySeo}
-                        >
-                            {provinces.map(p => (
-                                <MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        select
+                                        label="Xã / Phường"
+                                        value={form.ProfileInfo.CommuneId}
+                                        onChange={(e) => handleCommuneChange(e.target.value)}
+                                        fullWidth
+                                        size="small"
+                                        disabled={!selectedProvinceSeo}
+                                    >
+                                        {communes.map(c => (
+                                            <MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
 
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            select
-                            label="Xã / Phường"
-                            value={form.ProfileInfo.CommuneId}
-                            onChange={(e) => handleCommuneChange(e.target.value)}
-                            fullWidth
-                            size="small"
-                            disabled={!selectedProvinceSeo}
-                        >
-                            {communes.map(c => (
-                                <MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                            label="Địa chỉ cụ thể"
-                            fullWidth
-                            size="small"
-                            value={form.ProfileInfo.Address ?? ""}
-                            onChange={(e) => handleProfileChange("Address", e.target.value)}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label="Địa chỉ cụ thể"
+                                        fullWidth
+                                        size="small"
+                                        value={form.ProfileInfo.Address ?? ""}
+                                        onChange={(e) => handleProfileChange("Address", e.target.value)}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    </>
+                )}
+            </DialogContent>
             <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
                 <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}>
                     Hủy

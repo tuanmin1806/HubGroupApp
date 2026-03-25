@@ -20,7 +20,6 @@ import { fieldSx } from "../../styles/fieldSx";
 import { hasAccountType } from "../../utils/auth.utils";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-    { value: Gender.Undefined, label: "Không yêu cầu" },
     { value: Gender.Male, label: "Nam" },
     { value: Gender.Female, label: "Nữ" },
     { value: Gender.Other, label: "Khác" },
@@ -37,7 +36,7 @@ const EXPERIENCE_OPTIONS: { value: JobExperience; label: string }[] = [
 ];
 
 const EDUCATION_OPTIONS: { value: EducationLevel; label: string }[] = [
-    { value: EducationLevel.Undefined, label: "Không yêu cầu" },
+    { value: EducationLevel.Undefined, label: "Không có" },
     { value: EducationLevel.PrimarySchool, label: "Tiểu học" },
     { value: EducationLevel.MiddleSchool, label: "THCS" },
     { value: EducationLevel.HighSchool, label: "THPT" },

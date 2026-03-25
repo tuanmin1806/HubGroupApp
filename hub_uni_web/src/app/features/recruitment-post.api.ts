@@ -104,6 +104,7 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 method: "POST",
                 body,
             }),
+            invalidatesTags: [TAG_TYPES.RECRUITMENT_POST],
         }),
 
         updateRecruitmentPost: builder.mutation<void, UpdateRecruitmentPostRequest>({
@@ -111,7 +112,8 @@ const recruitmentPostApi = baseApi.injectEndpoints({
                 url: "recruitmentpost/update",
                 method: "PUT",
                 body,
-            })
+            }),
+            invalidatesTags: [TAG_TYPES.RECRUITMENT_POST],
         }),
 
         deleteRecruitmentPost: builder.mutation<void, string>({

@@ -33,6 +33,7 @@ export default function ManageStaffAccountPage() {
         page: page + 1,
         size: rowsPerPage,
         organizationId,
+        searchValue: searchValue || undefined,
     };
 
     const { data, isLoading, isError } = useGetCustomerByOrganizationWithPageQuery(queryParams, { skip: !organizationId });

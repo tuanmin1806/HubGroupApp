@@ -1,13 +1,12 @@
 import { Box, Button, Chip, CircularProgress, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, Autocomplete, SelectChangeEvent, IconButton } from "@mui/material";
 import { Save, Add, Remove } from "@mui/icons-material";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import RichTextEditorComponent from "../../components/editor";
 import { useCreateRecruitmentPostMutation } from "../../app/features/recruitment-post.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
 import { useGetAllVisaTypesQuery } from "../../app/features/visa-type.api";
 import { CreateRecruitmentPostRequest, Requirement } from "../../app/models/recruitment-post.model";
-import { useGetProfessionsByPageQuery } from "../../app/features/professtion.api";
 import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "../../app/models/enums.model";
 import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
@@ -145,7 +144,6 @@ export default function CreateRecruitmentPostPage() {
                     <Paper elevation={1} sx={{ p: 2 }}>
                         <Grid container spacing={2.5}>
 
-                            {/* ── THÔNG TIN CƠ BẢN ── */}
                             <Grid size={12}><Typography sx={sectionLabelSx}>Thông tin cơ bản</Typography></Grid>
 
                             <Grid size={{ xs: 12, sm: 6 }}>
@@ -249,7 +247,6 @@ export default function CreateRecruitmentPostPage() {
                                 </FormControl>
                             </Grid>
 
-                            {/* ── YÊU CẦU ỨNG VIÊN ── */}
                             <Grid size={12} sx={{ mt: 1 }}><Typography sx={sectionLabelSx}>Yêu cầu ứng viên</Typography></Grid>
 
                             <Grid size={{ xs: 12, sm: 6 }}>
