@@ -69,7 +69,6 @@ function buildPayload(data: CustomerResponse, form: EditableForm): UpdateCustome
         Email: form.Email,
         AvatarUrl: form.AvatarUrl,
         PhoneNumber: form.PhoneNumber || null,
-        Gender: form.Gender,
         AccountType: data.AccountType,
         AccountStatus: ConvertService.convertAccountStatusFromString(data.AccountStatus),
         RoleIds: data.Roles?.map(r => r.Id) ?? [],
