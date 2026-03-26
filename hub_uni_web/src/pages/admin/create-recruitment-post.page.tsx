@@ -12,16 +12,18 @@ import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetProfessionsByOrganizationQuery } from "../../app/features/organization.api";
 
+const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
+
 const defaultRequirement: Requirement = {
     FromAge: undefined,
     ToAge: undefined,
-    Gender: Gender.Undefined,
     Experience: JobExperience.Undefined,
     EducationLevel: EducationLevel.Undefined,
     MinimumGpa: undefined,
     MaxYearsSinceGrad: undefined,
     MaxAbsence: undefined,
-    VisaTypeId: "",
+    VisaTypeId: undefined,
+    Gender: Gender.Undefined,
     OtherReqs: [],
 };
 
@@ -61,7 +63,7 @@ export default function CreateRecruitmentPostPage() {
         RecruitPostStatus: RecruitPostStatus.Active,
         Name: "",
         ProfessionIds: [],
-        Quantity: 1,
+        Quantity: null,
         Description: "",
         ProvinceId: "",
         RecruitmentFromDate: null,
@@ -107,11 +109,14 @@ export default function CreateRecruitmentPostPage() {
         if (!form.Name.trim()) newErrors.Name = "Tên chương trình tuyển sinh không được để trống";
         if (!form.ProvinceId) newErrors.ProvinceId = "Vui lòng chọn tỉnh/thành phố";
         if (form.ProfessionIds.length === 0) newErrors.ProfessionIds = "Vui lòng chọn ít nhất một ngành nghề";
-        if (!form.RecruitmentToDate) newErrors.RecruitmentToDate = "Vui lòng chọn ngày hết hạn";
-        if (form.Quantity < 1) newErrors.Quantity = "Số lượng phải lớn hơn 0";
         if (!form.Description.trim()) newErrors.Description = "Mô tả không được để trống";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    const isSaveDisabled = (): boolean => {
+        const requiredFieldsInvalid: boolean = !form.Name.trim() || !form.ProvinceId || form.ProfessionIds.length === 0 || !form.Description.trim() || !form.RecruitPostStatus || form.Quantity === null;
+        return requiredFieldsInvalid;
     };
 
     const handleSubmit = async () => {
@@ -148,7 +153,8 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
-                                    label="Tên chương trình tuyển sinh *" fullWidth size="small"
+                                    label={<>Tên chương trình tuyển sinh <RequiredStar /></>}
+                                    fullWidth size="small"
                                     value={form.Name} onChange={e => handleChange("Name", e.target.value)}
                                     error={!!errors.Name} helperText={errors.Name}
                                 />
@@ -156,8 +162,8 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth size="small" error={!!errors.ProvinceId}>
-                                    <InputLabel>Tỉnh/Thành phố *</InputLabel>
-                                    <Select value={form.ProvinceId} label="Tỉnh/Thành phố *"
+                                    <InputLabel>{<>Tỉnh/Thành phố <RequiredStar /></>}</InputLabel>
+                                    <Select value={form.ProvinceId} label={<>Tỉnh/Thành phố <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent) => handleChange("ProvinceId", e.target.value)}>
                                         {provincesLoading
                                             ? <MenuItem disabled><CircularProgress size={16} /></MenuItem>
@@ -180,7 +186,7 @@ export default function CreateRecruitmentPostPage() {
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
-                                            label="Ngành nghề *"
+                                            label={<>Ngành nghề <RequiredStar /></>}
                                             size="small"
                                             error={!!errors.ProfessionIds}
                                             helperText={errors.ProfessionIds}
@@ -209,8 +215,8 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
-                                    label="Số lượng" fullWidth type="number" size="small"
-                                    value={form.Quantity} onChange={e => handleChange("Quantity", parseInt(e.target.value) || 1)}
+                                    label={<>Số lượng <RequiredStar /></>} fullWidth type="number" size="small"
+                                    value={form.Quantity} onChange={e => handleChange("Quantity", parseInt(e.target.value) || null)}
                                     error={!!errors.Quantity} helperText={errors.Quantity}
                                 />
                             </Grid>
@@ -236,10 +242,10 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth size="small">
-                                    <InputLabel>Trạng thái *</InputLabel>
+                                    <InputLabel>{<>Trạng thái <RequiredStar /></>}</InputLabel>
                                     <Select
                                         value={form.RecruitPostStatus ?? RecruitPostStatus.Inactive}
-                                        label="Trạng thái *"
+                                        label={<>Trạng thái <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent<number>) => handleChange("RecruitPostStatus", e.target.value as RecruitPostStatus)}
                                     >
                                         {STATUS_OPTIONS.map(s => <MenuItem key={s} value={s}>{ConvertService.convertPostStatus(s)}</MenuItem>)}
@@ -337,7 +343,7 @@ export default function CreateRecruitmentPostPage() {
                                     getOptionLabel={(opt) => opt.label}
                                     isOptionEqualToValue={(opt, val) => opt.value === val?.value}
                                     value={selectedVisaType}
-                                    onChange={(_, opt) => handleRequirementChange("VisaTypeId", opt?.value ?? "")}
+                                    onChange={(_, opt) => handleRequirementChange("VisaTypeId", opt?.value ?? undefined)}
                                     renderInput={(params) => <TextField {...params} label="Loại visa" size="small" />}
                                 />
                             </Grid>
@@ -393,7 +399,7 @@ export default function CreateRecruitmentPostPage() {
 
                 <Grid size={12}>
                     <Paper elevation={1} sx={{ p: 2 }}>
-                        <Typography sx={{ ...sectionLabelSx, mb: 1 }}>Mô tả *</Typography>
+                        <Typography sx={{ ...sectionLabelSx, mb: 1 }}>{<>Mô tả <RequiredStar /></>}</Typography>
                         <RichTextEditorComponent value={form.Description} onChange={(value: string) => handleChange("Description", value)} />
                         {errors.Description && <FormHelperText error sx={{ mt: 1 }}>{errors.Description}</FormHelperText>}
                     </Paper>
@@ -402,9 +408,9 @@ export default function CreateRecruitmentPostPage() {
                 <Grid size={12}>
                     <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
                         <Button variant="outlined" onClick={() => navigate("/staff/manage-recruitment-post")}>Hủy</Button>
-                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isSubmitting}
+                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isSubmitting || isSaveDisabled()}
                             startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <Save />}>
-                            {isSubmitting ? "Đang lưu..." : "Lưu chương trình tuyển sinh"}
+                            {isSubmitting ? "Đang lưu..." : "Lưu"}
                         </Button>
                     </Box>
                 </Grid>

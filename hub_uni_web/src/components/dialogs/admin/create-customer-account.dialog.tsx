@@ -11,8 +11,9 @@ import { useGetAllCountryNoAuthenQuery } from "../../../app/features/country.api
 import { useGetProvinceByCountryQuery } from "../../../app/features/province.api";
 import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
 import { Province } from "../../../app/models/province.model";
-import { CommuneResponse } from "../../../app/models/commune.model";
 import { Country } from "../../../app/models/country.model";
+
+const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 
 interface CreateCustomerAccountDialogProps {
     open: boolean;
@@ -141,7 +142,6 @@ export default function CreateCustomerAccountDialog({
         if (!form.UserName.trim()) newErrors.UserName = "Tên đăng nhập không được để trống";
         if (!form.Password.trim()) newErrors.Password = "Mật khẩu không được để trống";
         else if (form.Password.length < 3) newErrors.Password = "Mật khẩu phải có ít nhất 3 ký tự";
-        if (!form.Email.trim()) newErrors.Email = "Email không được để trống";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email)) newErrors.Email = "Email không hợp lệ";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -162,11 +162,11 @@ export default function CreateCustomerAccountDialog({
                 UserName: form.UserName,
                 Password: form.Password,
                 FullName: form.FullName,
-                Gender: form.Gender,
                 Email: form.Email,
                 PhoneNumber: form.PhoneNumber,
                 AccountStatus: AccountStatus.Activated,
                 RoleIds: [""],
+                Gender: form.Gender,
                 ProfileInfo: {
                     DateOfBirth: form.DateOfBirth,
                     CountryId: form.CountryId,
@@ -180,6 +180,11 @@ export default function CreateCustomerAccountDialog({
         } catch {
             dispatch(showSnackbar({ message: "Thêm nhân viên thất bại!", severity: "error" }));
         }
+    };
+
+    const isSaveDisabled = (): boolean => {
+        const requiredFieldsInvalid: boolean = !form.UserName.trim() || !form.Password.trim() || !form.FullName.trim() || !form.DateOfBirth || !form.Gender || !form.CountryId || !form.ProvinceId || !form.CommuneId || !form.AccountStatus;
+        return requiredFieldsInvalid;
     };
 
     return (
@@ -208,10 +213,9 @@ export default function CreateCustomerAccountDialog({
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label="Tên đăng nhập"
+                                label={<> Tên đăng nhập <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
-                                required
                                 value={form.UserName}
                                 onChange={(e) => handleChange("UserName", e.target.value)}
                                 error={!!errors.UserName}
@@ -221,11 +225,10 @@ export default function CreateCustomerAccountDialog({
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label="Mật khẩu"
+                                label={<> Mật khẩu <RequiredStar /> </>}
                                 type={showPassword ? "text" : "password"}
                                 fullWidth
                                 size="small"
-                                required
                                 value={form.Password}
                                 onChange={(e) => handleChange("Password", e.target.value)}
                                 error={!!errors.Password}
@@ -255,10 +258,9 @@ export default function CreateCustomerAccountDialog({
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
                             <TextField
-                                label="Họ và tên"
+                                label={<> Họ và tên <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
-                                required
                                 value={form.FullName}
                                 onChange={(e) => handleChange("FullName", e.target.value)}
                                 error={!!errors.FullName}
@@ -271,7 +273,6 @@ export default function CreateCustomerAccountDialog({
                                 label="Email"
                                 fullWidth
                                 size="small"
-                                required
                                 value={form.Email}
                                 onChange={(e) => handleChange("Email", e.target.value)}
                                 error={!!errors.Email}
@@ -291,7 +292,7 @@ export default function CreateCustomerAccountDialog({
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label="Ngày sinh"
+                                label={<> Ngày sinh <RequiredStar /> </>}
                                 type="date"
                                 value={form.DateOfBirth}
                                 onChange={(e) => set("DateOfBirth", e.target.value)}
@@ -303,11 +304,11 @@ export default function CreateCustomerAccountDialog({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 select
-                                label="Giới tính"
+                                label={<> Giới tính <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
                                 value={form.Gender}
-                                onChange={(e) => handleChange("Gender", Number(e.target.value))}
+                                onChange={(e) => set("Gender", Number(e.target.value))}
                             >
                                 {GENDER_OPTIONS.map((opt) => (
                                     <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
@@ -315,17 +316,17 @@ export default function CreateCustomerAccountDialog({
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Quốc gia" value={form.CountryId}
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> Quốc gia <RequiredStar /> </>} value={form.CountryId}
                             onChange={(e) => handleCountryChange(e.target.value)}
                             fullWidth size="small">
                             {countries.map((c: Country) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}
                         </TextField></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Tỉnh / Thành phố" value={form.ProvinceId}
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> Tỉnh / Thành phố <RequiredStar /> </>} value={form.ProvinceId}
                             onChange={(e) => handleProvinceChange(e.target.value)}
                             fullWidth size="small" disabled={!selectedCountrySeo}>
                             {provinces.map((p: Province) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}
                         </TextField></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label="Xã / Phường" value={form.CommuneId}
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> Xã / Phường <RequiredStar /> </>} value={form.CommuneId}
                             onChange={(e) => set("CommuneId", e.target.value)}
                             fullWidth size="small" disabled={!selectedProvinceSeo}>
                             {communes.map((c) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}
@@ -347,7 +348,7 @@ export default function CreateCustomerAccountDialog({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 select
-                                label="Trạng thái"
+                                label={<> Trạng thái <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
                                 value={form.AccountStatus}
@@ -371,10 +372,10 @@ export default function CreateCustomerAccountDialog({
                     onClick={handleSubmit}
                     variant="contained"
                     color="primary"
-                    disabled={isLoading}
+                    disabled={isLoading || isSaveDisabled()}
                     startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}
                 >
-                    {isLoading ? "Đang tạo..." : "Tạo tài khoản"}
+                    {isLoading ? "Đang tạo..." : "Lưu"}
                 </Button>
             </DialogActions>
         </Dialog>

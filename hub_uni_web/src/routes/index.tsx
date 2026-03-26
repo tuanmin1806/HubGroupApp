@@ -11,6 +11,7 @@ import NotFoundPage from "../pages/general/auth-page/not-found.page";
 import CustomerLogin from "../pages/general/auth-page/customer-login.page";
 import StudentRegister from "../pages/general/auth-page/student-register.page";
 import AdminRegister from "../pages/general/auth-page/admin-register.page";
+import ProtectedRoute from "../components/protected-route";
 
 const router = createBrowserRouter(
     [
@@ -41,7 +42,10 @@ const router = createBrowserRouter(
         },
         {
             path: "/admin",
-            element: <AdminLayout />,
+            element:
+                <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                    <AdminLayout />
+                </ProtectedRoute>,
             children: [
                 ...adminRoutes,
             ],

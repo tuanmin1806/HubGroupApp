@@ -120,9 +120,9 @@ export default function ManageApplicationPage() {
 
         return data.Items.map((application: ApplicationResponse) => (
             <TableRow key={application.Id} hover>
-                <TableCell>{application.Customer.FullName ?? "—"}</TableCell>
-                <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(application.Customer.ProfileInfo.Gender)) ?? "—"}</TableCell>
-                <TableCell>{ConvertService.formatDateToddMMyyyy(application.Customer.ProfileInfo.DateOfBirth) ?? "—"}</TableCell>
+                <TableCell>{application.Customer?.FullName ?? "—"}</TableCell>
+                <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(application.Customer?.ProfileInfo?.Gender)) ?? "—"}</TableCell>
+                <TableCell>{ConvertService.formatDateToddMMyyyy(application.Customer?.ProfileInfo?.DateOfBirth) ?? "—"}</TableCell>
                 <TableCell>{application.RecruitmentPost.Name ?? "—"}</TableCell>
                 <TableCell>
                     {(() => {

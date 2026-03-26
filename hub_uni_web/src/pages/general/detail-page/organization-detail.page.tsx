@@ -1,5 +1,5 @@
-import { LocationOn, Category, AccountBalance, Language, BookmarkBorder, Share, Info, Phone, Business, School, Email, WorkOutline, PeopleAlt, CalendarToday, Star, PhotoLibrary, ChevronRight, ChevronLeft, NotificationsActive } from "@mui/icons-material";
-import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, Tabs, Tab, CircularProgress } from "@mui/material";
+import { LocationOn, Language, Share, Info, Phone, Business, School, Email, WorkOutline, PeopleAlt, CalendarToday, Star, PhotoLibrary, ChevronRight, ChevronLeft, NotificationsActive, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, AccessTime } from "@mui/icons-material";
+import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, CircularProgress, Tooltip, IconButton } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetOrganizationBySeoQuery } from "../../../app/features/organization.api";
 import { useGetRecruitmentPostsByOrganizationWithPageQuery } from "../../../app/features/recruitment-post.api";
@@ -35,13 +35,7 @@ function HighlightsInline({ highlights }: { highlights: string[] }) {
     if (!highlights || highlights.length === 0) return null;
     return (
         <Box
-            sx={{
-                mt: 1.5,
-                p: 1.5,
-                borderRadius: 1.5,
-                background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)',
-                border: '1px solid #bbdefb',
-            }}
+            sx={{ mt: 1.5, p: 1.5, borderRadius: 1.5, background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)', border: '1px solid #bbdefb', }}
         >
             <Stack direction="row" spacing={0.75} alignItems="center" mb={1}>
                 <Star sx={{ fontSize: 16, color: '#f59e0b' }} />
@@ -49,11 +43,7 @@ function HighlightsInline({ highlights }: { highlights: string[] }) {
                     variant="caption"
                     fontWeight={700}
                     color="primary.main"
-                    sx={{
-                        letterSpacing: 0.5,
-                        textTransform: 'uppercase',
-                        fontSize: '0.7rem'
-                    }}
+                    sx={{ letterSpacing: 0.5, textTransform: 'uppercase', fontSize: '0.7rem' }}
                 >
                     Điểm nổi bật
                 </Typography>
@@ -67,25 +57,14 @@ function HighlightsInline({ highlights }: { highlights: string[] }) {
                         spacing={1}
                         alignItems="center"
                     >
-                        <Box
-                            sx={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: "50%",
-                                background: "linear-gradient(135deg, #42a5f5, #1976d2)",
-                                mt: "6px",
-                                flexShrink: 0,
-                            }}
-                        />
+                        <Box sx={{ width: 6, height: 6, borderRadius: "50%", background: "linear-gradient(135deg, #42a5f5, #1976d2)", mt: "6px", flexShrink: 0, }} />
 
                         <Typography
                             variant="body2"
                             color="text.primary"
                             lineHeight={1.55}
                             fontSize="0.82rem"
-                            sx={{
-                                wordBreak: "break-word",
-                            }}
+                            sx={{ wordBreak: "break-word", }}
                         >
                             {item}
                         </Typography>
@@ -114,30 +93,16 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                         <Typography fontWeight={600} variant="subtitle2"> Hình ảnh ({images.length}) </Typography>
                     </Stack>
 
-                    {/* Hero image */}
                     <Box
                         onClick={() => setSelected(images[0])}
-                        sx={{
-                            width: '100%',
-                            height: 160,
-                            borderRadius: 1.5,
-                            overflow: 'hidden',
-                            cursor: 'pointer',
-                            mb: thumbnails.length > 0 ? 0.75 : 0,
-                            '&:hover img': { transform: 'scale(1.04)', filter: 'brightness(0.88)' },
-                        }}
+                        sx={{ width: '100%', height: 160, borderRadius: 1.5, overflow: 'hidden', cursor: 'pointer', mb: thumbnails.length > 0 ? 0.75 : 0, '&:hover img': { transform: 'scale(1.04)', filter: 'brightness(0.88)' }, }}
                     >
                         <Box
                             component="img"
                             src={images[0]}
                             alt="featured-0"
                             loading="lazy"
-                            sx={{
-                                width: '100%', height: '100%',
-                                objectFit: 'cover',
-                                transition: 'transform 0.3s ease, filter 0.3s ease',
-                                display: 'block',
-                            }}
+                            sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease, filter 0.3s ease', display: 'block', }}
                         />
                     </Box>
 
@@ -150,46 +115,18 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                                     <Box
                                         key={idx}
                                         onClick={() => showOverlay ? setSelected(images[MAX_VISIBLE]) : setSelected(url)}
-                                        sx={{
-                                            position: 'relative',
-                                            height: 90,
-                                            borderRadius: 1.5,
-                                            overflow: 'hidden',
-                                            cursor: 'pointer',
-                                            '&:hover img': { transform: 'scale(1.06)', filter: showOverlay ? 'none' : 'brightness(0.86)' },
-                                        }}
+                                        sx={{ position: 'relative', height: 90, borderRadius: 1.5, overflow: 'hidden', cursor: 'pointer', '&:hover img': { transform: 'scale(1.06)', filter: showOverlay ? 'none' : 'brightness(0.86)' }, }}
                                     >
                                         <Box
                                             component="img"
                                             src={url}
                                             alt={`featured-${idx + 1}`}
                                             loading="lazy"
-                                            sx={{
-                                                width: '100%', height: '100%',
-                                                objectFit: 'cover',
-                                                transition: 'transform 0.3s ease, filter 0.3s ease',
-                                                display: 'block',
-                                            }}
+                                            sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease, filter 0.3s ease', display: 'block', }}
                                         />
-                                        {/* +N overlay on last thumbnail */}
                                         {showOverlay && (
-                                            <Box sx={{
-                                                position: 'absolute', inset: 0,
-                                                bgcolor: 'rgba(0,0,0,0.52)',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                borderRadius: 1.5,
-                                                transition: 'bgcolor 0.2s',
-                                                '&:hover': { bgcolor: 'rgba(0,0,0,0.65)' },
-                                            }}>
-                                                <Typography
-                                                    sx={{
-                                                        color: '#fff',
-                                                        fontWeight: 700,
-                                                        fontSize: '1.15rem',
-                                                        letterSpacing: 0.5,
-                                                        userSelect: 'none',
-                                                    }}
-                                                >
+                                            <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0,0,0,0.52)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 1.5, transition: 'bgcolor 0.2s', '&:hover': { bgcolor: 'rgba(0,0,0,0.65)' }, }}>
+                                                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '1.15rem', letterSpacing: 0.5, userSelect: 'none', }}>
                                                     +{extraCount}
                                                 </Typography>
                                             </Box>
@@ -202,7 +139,6 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                 </CardContent>
             </Card>
 
-            {/* Lightbox */}
             {selected && (() => {
                 const currentIdx = images.indexOf(selected);
                 const hasPrev = currentIdx > 0;
@@ -210,57 +146,20 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                 return (
                     <Box
                         onClick={() => setSelected(null)}
-                        sx={{
-                            position: 'fixed', inset: 0,
-                            bgcolor: 'rgba(0,0,0,0.88)',
-                            zIndex: 9999,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            p: 2,
-                        }}
+                        sx={{ position: 'fixed', inset: 0, bgcolor: 'rgba(0,0,0,0.88)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2, }}
                     >
-                        {/* Close button */}
                         <Box
                             onClick={(e) => { e.stopPropagation(); setSelected(null); }}
-                            sx={{
-                                position: 'absolute', top: 16, right: 16,
-                                width: 36, height: 36, borderRadius: '50%',
-                                bgcolor: 'rgba(255,255,255,0.15)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                cursor: 'pointer', color: '#fff', fontSize: 20, fontWeight: 300,
-                                transition: 'bgcolor 0.2s',
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
-                                userSelect: 'none',
-                            }}
+                            sx={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff', fontSize: 20, fontWeight: 300, transition: 'bgcolor 0.2s', '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' }, userSelect: 'none', }}
                         >
                             ✕
                         </Box>
-
-                        {/* Prev button */}
                         <Box
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (hasPrev) setSelected(images[currentIdx - 1]);
-                            }}
-                            sx={{
-                                position: "absolute",
-                                left: { xs: 8, md: 24 },
-                                width: { xs: 36, md: 44 },
-                                height: { xs: 36, md: 44 },
-                                borderRadius: "50%",
-                                bgcolor: hasPrev ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.05)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                cursor: hasPrev ? "pointer" : "default",
-                                color: hasPrev ? "#fff" : "rgba(255,255,255,0.25)",
-                                transition: "all 0.2s", "&:hover": hasPrev ? { bgcolor: "rgba(255,255,255,0.30)", transform: "scale(1.08)", } : {},
-                                userSelect: "none",
-                            }}
+                            onClick={(e) => { e.stopPropagation(); if (hasPrev) setSelected(images[currentIdx - 1]); }}
+                            sx={{ position: "absolute", left: { xs: 8, md: 24 }, width: { xs: 36, md: 44 }, height: { xs: 36, md: 44 }, borderRadius: "50%", bgcolor: hasPrev ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", cursor: hasPrev ? "pointer" : "default", color: hasPrev ? "#fff" : "rgba(255,255,255,0.25)", transition: "all 0.2s", "&:hover": hasPrev ? { bgcolor: "rgba(255,255,255,0.30)", transform: "scale(1.08)", } : {}, userSelect: "none", }}
                         >
                             <ChevronLeft sx={{ fontSize: { xs: 20, md: 26 }, }} />
                         </Box>
-
-                        {/* Image */}
                         <Box
                             onClick={(e) => e.stopPropagation()}
                             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}
@@ -269,37 +168,12 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                                 component="img"
                                 src={selected}
                                 alt="preview"
-                                sx={{
-                                    maxWidth: '80vw', maxHeight: '82vh',
-                                    borderRadius: 2,
-                                    boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
-                                    objectFit: 'contain',
-                                    display: 'block',
-                                }}
+                                sx={{ maxWidth: '80vw', maxHeight: '82vh', borderRadius: 2, boxShadow: '0 24px 80px rgba(0,0,0,0.6)', objectFit: 'contain', display: 'block', }}
                             />
                         </Box>
-
-                        {/* Next button */}
                         <Box
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (hasNext) setSelected(images[currentIdx + 1]);
-                            }}
-                            sx={{
-                                position: "absolute",
-                                right: { xs: 8, md: 24 },
-                                width: { xs: 36, md: 44 },
-                                height: { xs: 36, md: 44 },
-                                borderRadius: "50%",
-                                bgcolor: hasNext ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.05)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                cursor: hasNext ? "pointer" : "default",
-                                color: hasNext ? "#fff" : "rgba(255,255,255,0.25)",
-                                transition: "all 0.2s", "&:hover": hasNext ? { bgcolor: "rgba(255,255,255,0.30)", transform: "scale(1.08)", } : {},
-                                userSelect: "none",
-                            }}
+                            onClick={(e) => { e.stopPropagation(); if (hasNext) setSelected(images[currentIdx + 1]); }}
+                            sx={{ position: "absolute", right: { xs: 8, md: 24 }, width: { xs: 36, md: 44 }, height: { xs: 36, md: 44 }, borderRadius: "50%", bgcolor: hasNext ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", cursor: hasNext ? "pointer" : "default", color: hasNext ? "#fff" : "rgba(255,255,255,0.25)", transition: "all 0.2s", "&:hover": hasNext ? { bgcolor: "rgba(255,255,255,0.30)", transform: "scale(1.08)", } : {}, userSelect: "none", }}
                         >
                             <ChevronRight sx={{ fontSize: { xs: 20, md: 26 }, }} />
                         </Box>
@@ -323,6 +197,15 @@ const OrganizationDetailPage = () => {
             document.title = `${organization?.Name} | duhochan.hubgroup.vn`;
         }
     }, [organization?.Name]);
+
+    const socialLinks = [
+        { icon: <Facebook />, url: organization?.FacebookUrl, label: "Facebook" },
+        { icon: <LinkedIn />, url: organization?.LinkedinUrl, label: "LinkedIn" },
+        { icon: <YouTube />, url: organization?.YoutubeUrl, label: "YouTube" },
+        { icon: <Twitter />, url: organization?.TwitterUrl, label: "Twitter" },
+        { icon: <Instagram />, url: organization?.InstagramUrl, label: "Instagram" },
+        { icon: <Map />, url: organization?.GoogleMapUrl, label: "Google Maps" },
+    ].filter((s) => s.url);
 
     if (isLoading) {
         return (
@@ -357,21 +240,9 @@ const OrganizationDetailPage = () => {
 
     return (
         <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-            {/* Wallpaper/Banner */}
             {organization.WallpaperFullUrl && (
                 <Box sx={{ p: { xs: 1, md: 1 }, maxWidth: 1200, mx: 'auto' }}>
-                    <Box
-                        sx={{
-                            maxWidth: 1200, mx: 'auto',
-                            height: { xs: 200, md: 300 },
-                            backgroundImage: `url(${organization.WallpaperFullUrl})`,
-                            backgroundSize: 'contain',
-                            backgroundPosition: 'center',
-                            backgroundRepeat: 'no-repeat',
-                            borderRadius: 2,
-                            boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
-                        }}
-                    />
+                    <Box sx={{ maxWidth: 1200, mx: 'auto', height: { xs: 200, md: 300 }, backgroundImage: `url(${organization.WallpaperFullUrl})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', borderRadius: 2, boxShadow: '0 6px 24px rgba(0,0,0,0.12)', }} />
                 </Box>
             )}
 
@@ -380,7 +251,6 @@ const OrganizationDetailPage = () => {
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Stack spacing={1}>
 
-                            {/* Header Card */}
                             <Card>
                                 <CardContent>
                                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
@@ -389,18 +259,29 @@ const OrganizationDetailPage = () => {
                                                 component="img"
                                                 src={organization.LogoFullUrl}
                                                 alt={organization.Name}
-                                                sx={{
-                                                    width: 80, height: 80,
-                                                    borderRadius: 2,
-                                                    objectFit: 'cover',
-                                                    border: '1px solid #e0e0e0',
-                                                    flexShrink: 0,
-                                                }}
+                                                sx={{ width: 80, height: 80, borderRadius: 2, objectFit: 'cover', border: '1px solid #e0e0e0', flexShrink: 0, }}
                                             />
                                         )}
-                                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                                            <Typography variant="h5" fontWeight={600} gutterBottom> {organization.Name} </Typography>
-                                            {organization.IsTop && (<Chip label="Danh sách trường nổi bật" color="primary" size="small" />)}
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, }}>
+                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.1rem', sm: '1.5rem' }, lineHeight: 1.3, }}> {organization.Name} </Typography>
+
+                                                <Box sx={{ mt: 0.5 }}>
+                                                    <Chip
+                                                        label={organization.MainProfession?.ProfessionName}
+                                                        size="small"
+                                                        sx={{ fontWeight: 600, fontSize: '0.75rem', height: 22, bgcolor: '#e3f2fd', color: '#1976d2', maxWidth: '100%', '& .MuiChip-label': { px: 1, overflow: 'hidden', textOverflow: 'ellipsis', }, }}
+                                                    />
+                                                </Box>
+                                            </Box>
+
+                                            {organization.IsTop && (
+                                                <Chip
+                                                    label="Nổi bật"
+                                                    size="small"
+                                                    sx={{ flexShrink: 0, fontWeight: 700, fontSize: '0.6rem', height: 22, bgcolor: '#1975d1', color: '#fff' }}
+                                                />
+                                            )}
                                         </Box>
                                     </Box>
 
@@ -426,43 +307,12 @@ const OrganizationDetailPage = () => {
                                                 <Box
                                                     key={idx}
                                                     onClick={() => handleTabChange(null as any, idx)}
-                                                    sx={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: 0.75,
-                                                        px: 2,
-                                                        py: 1,
-                                                        borderRadius: "5px 5px 0 0",
-                                                        cursor: "pointer",
-                                                        position: "relative",
-                                                        bgcolor: isSelected ? "#fff" : "transparent",
-                                                        border: "1px solid #e0e0e0",
-                                                        color: isSelected ? "primary.main" : "text.secondary",
-                                                        fontWeight: isSelected ? 700 : 500,
-                                                        "&:hover": {
-                                                            bgcolor: isSelected ? "#fff" : "rgba(21,101,192,0.04)",
-                                                            color: "primary.main",
-                                                        },
-                                                    }}
+                                                    sx={{ display: "flex", alignItems: "center", gap: 0.75, px: 2, py: 1, borderRadius: "5px 5px 0 0", cursor: "pointer", position: "relative", bgcolor: isSelected ? "#fff" : "transparent", border: "1px solid #e0e0e0", color: isSelected ? "primary.main" : "text.secondary", fontWeight: isSelected ? 700 : 500, "&:hover": { bgcolor: isSelected ? "#fff" : "rgba(21,101,192,0.04)", color: "primary.main", }, }}
                                                 >
-                                                    <Box
-                                                        sx={{
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            color: isSelected ? "primary.main" : "text.disabled",
-                                                            transition: "color 0.2s",
-                                                        }}
-                                                    >
+                                                    <Box sx={{ display: "flex", alignItems: "center", color: isSelected ? "primary.main" : "text.disabled", transition: "color 0.2s", }}>
                                                         {tab.icon}
                                                     </Box>
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize: { xs: "0.78rem", sm: "0.875rem" },
-                                                            fontWeight: "inherit",
-                                                            lineHeight: 1,
-                                                            whiteSpace: "nowrap",
-                                                        }}
-                                                    >
+                                                    <Typography sx={{ fontSize: { xs: "0.78rem", sm: "0.875rem" }, fontWeight: "inherit", lineHeight: 1, whiteSpace: "nowrap", }}>
                                                         {tab.label}
                                                     </Typography>
                                                 </Box>
@@ -474,9 +324,7 @@ const OrganizationDetailPage = () => {
 
                                 <TabPanel value={tabValue} index={0}>
                                     <CardContent>
-                                        <Typography variant="h6" fontWeight={600} gutterBottom>
-                                            Giới thiệu chi tiết
-                                        </Typography>
+                                        <Typography variant="h6" fontWeight={600} gutterBottom> Giới thiệu chi tiết </Typography>
                                         <Divider sx={{ mb: 2 }} />
                                         {organization.Description ? (
                                             <Box
@@ -521,42 +369,18 @@ const OrganizationDetailPage = () => {
                                                     <Card
                                                         key={post.Id}
                                                         variant="outlined"
-                                                        sx={{
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.2s',
-                                                            position: 'relative',
-                                                            '&:hover': { transform: 'translateY(-2px)' },
-                                                        }}
+                                                        sx={{ cursor: 'pointer', transition: 'all 0.2s', position: 'relative', '&:hover': { transform: 'translateY(-2px)' }, }}
                                                         onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`)}
                                                     >
                                                         {post.IsTop && (
-                                                            <Box sx={{
-                                                                position: 'absolute', top: 8, right: 8,
-                                                                bgcolor: '#f3522a', color: '#fafafa',
-                                                                fontSize: '0.7rem', fontWeight: 500,
-                                                                px: 0.75, py: 0.25, borderRadius: 0.75,
-                                                                letterSpacing: 0.4, lineHeight: 1.5, zIndex: 1,
-                                                            }}>
+                                                            <Box sx={{ position: 'absolute', top: 8, right: 8, bgcolor: '#f3522a', color: '#fafafa', fontSize: '0.7rem', fontWeight: 500, px: 0.75, py: 0.25, borderRadius: 0.75, letterSpacing: 0.4, lineHeight: 1.5, zIndex: 1, }}>
                                                                 Nổi bật
                                                             </Box>
                                                         )}
                                                         <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                                                             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                                                                 <Box sx={{ flex: 1, minWidth: 0, pr: post.IsTop ? 6 : 0 }}>
-                                                                    <Typography
-                                                                        variant="body1"
-                                                                        fontWeight={600}
-                                                                        sx={{
-                                                                            fontSize: { xs: '0.875rem', sm: '0.95rem' },
-                                                                            lineHeight: 1.35,
-                                                                            WebkitLineClamp: 2,
-                                                                            WebkitBoxOrient: 'vertical',
-                                                                            overflow: 'hidden',
-                                                                            mb: 0.75,
-                                                                            '&:hover': { color: 'primary.main' },
-                                                                            transition: 'color 0.2s',
-                                                                        }}
-                                                                    >
+                                                                    <Typography variant="body1" fontWeight={600} sx={{ fontSize: { xs: '0.875rem', sm: '0.95rem' }, lineHeight: 1.35, WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 0.75, '&:hover': { color: 'primary.main' }, transition: 'color 0.2s', }}>
                                                                         {post.Name}
                                                                     </Typography>
                                                                     {post.Professions && post.Professions.length > 0 && (
@@ -567,13 +391,7 @@ const OrganizationDetailPage = () => {
                                                                                     label={p.Name}
                                                                                     size="small"
                                                                                     variant="outlined"
-                                                                                    sx={{
-                                                                                        height: 20,
-                                                                                        fontSize: '0.65rem',
-                                                                                        borderColor: 'primary.light',
-                                                                                        color: 'primary.main',
-                                                                                        '& .MuiChip-label': { px: 0.75 },
-                                                                                    }}
+                                                                                    sx={{ height: 20, fontSize: '0.65rem', borderColor: 'primary.light', color: 'primary.main', '& .MuiChip-label': { px: 0.75 }, }}
                                                                                 />
                                                                             ))}
                                                                             {post.Professions.length > 3 && (
@@ -599,7 +417,7 @@ const OrganizationDetailPage = () => {
                                                                         )}
                                                                         {post.RecruitmentToDate && (
                                                                             <Stack direction="row" spacing={0.4} alignItems="center">
-                                                                                <CalendarToday sx={{ fontSize: 13, color: 'primary.main' }} />
+                                                                                <AccessTime sx={{ fontSize: 13, color: 'primary.main' }} />
                                                                                 <Typography variant="caption" sx={{ fontSize: '0.72rem' }}>{formatDate(post.RecruitmentToDate)}</Typography>
                                                                             </Stack>
                                                                         )}
@@ -624,11 +442,7 @@ const OrganizationDetailPage = () => {
                                         {/* Header */}
                                         <Box sx={{ mb: 2 }}>
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <Box sx={{
-                                                    width: 36, height: 36, borderRadius: '10px',
-                                                    background: 'linear-gradient(135deg, #1565c0 0%, #42a5f5 100%)',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                }}>
+                                                <Box sx={{ width: 36, height: 36, borderRadius: '10px', background: 'linear-gradient(135deg, #1565c0 0%, #42a5f5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
                                                     <School sx={{ fontSize: 20, color: '#fff' }} />
                                                 </Box>
                                                 <Typography variant="h6" fontWeight={700}>
@@ -641,13 +455,7 @@ const OrganizationDetailPage = () => {
 
                                             {/* Main Profession */}
                                             {organization.MainProfession && (
-                                                <Box sx={{
-                                                    position: 'relative',
-                                                    borderRadius: 2.5,
-                                                    background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 60%, #42a5f5 100%)',
-                                                    p: { xs: 1, md: 1.5 },
-                                                    overflow: 'hidden',
-                                                }}>
+                                                <Box sx={{ position: 'relative', borderRadius: 2.5, background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 60%, #42a5f5 100%)', p: { xs: 1, md: 1.5 }, overflow: 'hidden', }}>
                                                     {/* Decorative circles */}
                                                     <Box sx={{
                                                         position: 'absolute', top: -20, right: -20,
@@ -662,28 +470,13 @@ const OrganizationDetailPage = () => {
 
                                                     <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1} sx={{ position: 'relative', zIndex: 1 }}>
                                                         <Box>
-                                                            <Chip
-                                                                label="Ngành thế mạnh"
-                                                                size="small"
-                                                                sx={{
-                                                                    mb: 1,
-                                                                    bgcolor: 'rgba(255,255,255,0.18)',
-                                                                    color: '#fff',
-                                                                    fontWeight: 600,
-                                                                    fontSize: '0.68rem',
-                                                                }}
-                                                            />
+                                                            <Chip label="Ngành thế mạnh" size="small" sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.18)', color: '#fff', fontWeight: 600, fontSize: '0.68rem', }} />
                                                             <Typography variant="subtitle1" fontWeight={700} color="#fff" lineHeight={1.3}>
                                                                 {organization.MainProfession.ProfessionName}
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{
-                                                            bgcolor: 'rgba(255,255,255,0.15)',
-                                                            border: '1px solid rgba(255,255,255,0.25)',
-                                                            borderRadius: 2,
-                                                            px: 2, py: 1,
-                                                            textAlign: { xs: 'left', sm: 'right' },
-                                                            flexShrink: 0,
+                                                            bgcolor: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 2, px: 2, py: 1, textAlign: { xs: 'left', sm: 'right' }, flexShrink: 0,
                                                         }}>
                                                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', display: 'block', fontSize: '0.68rem' }}>
                                                                 Học phí
@@ -699,7 +492,6 @@ const OrganizationDetailPage = () => {
                                                 </Box>
                                             )}
 
-                                            {/* Other Professions */}
                                             {organization.Professions && organization.Professions.length > 0 && (
                                                 <Box>
                                                     <Typography variant="caption" fontWeight={700} sx={{ mb: 1, display: 'block' }}>
@@ -709,30 +501,9 @@ const OrganizationDetailPage = () => {
                                                         {organization.Professions.map((p, idx) => (
                                                             <Box
                                                                 key={p.ProfessionId}
-                                                                sx={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'space-between',
-                                                                    px: { xs: 1, md: 1.5 },
-                                                                    py: 1,
-                                                                    borderRadius: 2,
-                                                                    border: '1px solid',
-                                                                    borderColor: 'divider',
-                                                                    bgcolor: '#fafafa',
-                                                                    transition: 'all 0.18s',
-                                                                    '&:hover': {
-                                                                        borderColor: 'primary.light',
-                                                                        bgcolor: '#f0f7ff',
-                                                                        transform: 'translateX(3px)',
-                                                                    },
-                                                                    gap: 1,
-                                                                }}
-                                                            >
+                                                                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: { xs: 1, md: 1.5 }, py: 1, borderRadius: 2, border: '1px solid', borderColor: 'divider', bgcolor: '#fafafa', transition: 'all 0.18s', '&:hover': { borderColor: 'primary.light', bgcolor: '#f0f7ff', transform: 'translateX(3px)', }, gap: 1, }}>
                                                                 <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
-                                                                    <Box sx={{
-                                                                        width: 5, height: 5, borderRadius: '50%',
-                                                                        bgcolor: 'primary.main', flexShrink: 0,
-                                                                    }} />
+                                                                    <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: 'primary.main', flexShrink: 0, }} />
                                                                     <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', lineHeight: 1.4 }}>
                                                                         {p.ProfessionName}
                                                                     </Typography>
@@ -754,36 +525,17 @@ const OrganizationDetailPage = () => {
                                                 </Box>
                                             )}
 
-                                            {/* Dorm Cost */}
                                             {organization.DormCost && (
-                                                <Box sx={{
-                                                    borderRadius: 2,
-                                                    border: '1px dashed',
-                                                    borderColor: 'primary.light',
-                                                    bgcolor: '#f8fbff',
-                                                    p: { xs: 0.5, md: 1 },
-                                                }}>
+                                                <Box sx={{ borderRadius: 2, border: '1px dashed', borderColor: 'primary.light', bgcolor: '#f8fbff', p: { xs: 0.5, md: 1 }, }}>
                                                     <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                                                        <Box sx={{
-                                                            width: 28, height: 28, borderRadius: '8px',
-                                                            bgcolor: '#e3f2fd',
-                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        }}>
+                                                        <Box sx={{ width: 28, height: 28, borderRadius: '8px', bgcolor: '#e3f2fd', display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
                                                             <Business sx={{ fontSize: 16, color: 'primary.main' }} />
                                                         </Box>
                                                         <Typography variant="subtitle2" fontWeight={700} color="text.primary">
                                                             Phí ký túc xá
                                                         </Typography>
                                                     </Stack>
-                                                    <Box sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'space-between',
-                                                        bgcolor: '#fff',
-                                                        borderRadius: 1.5,
-                                                        px: 2, py: 1.25,
-                                                        border: '1px solid #e3f2fd',
-                                                    }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#fff', borderRadius: 1.5, px: 2, py: 1.25, border: '1px solid #e3f2fd', }}>
                                                         <Typography variant="body2" color="text.secondary">Chi phí ký túc xá</Typography>
                                                         <Typography variant="body1" fontWeight={700} color="primary.dark">
                                                             {ConvertService.formatCurrencyVND(organization.DormCost)}
@@ -795,7 +547,6 @@ const OrganizationDetailPage = () => {
                                                 </Box>
                                             )}
 
-                                            {/* Empty state */}
                                             {!organization.MainProfession && (!organization.Professions || organization.Professions.length === 0) && !organization.DormCost && (
                                                 <Box sx={{ textAlign: 'center', py: 6 }}>
                                                     <School sx={{ fontSize: 48, color: 'text.disabled', mb: 1.5 }} />
@@ -808,7 +559,6 @@ const OrganizationDetailPage = () => {
                                 </TabPanel>
                             </Card>
 
-                            {/* Professions */}
                             {organization.Professions && organization.Professions.length > 0 && (
                                 <Card>
                                     <CardContent>
@@ -829,7 +579,6 @@ const OrganizationDetailPage = () => {
                                 </Card>
                             )}
 
-                            {/* Related Organizations */}
                             <Card>
                                 <CardContent>
                                     <Typography variant="h6" fontWeight={600} gutterBottom> Danh sách trường liên quan </Typography>
@@ -880,11 +629,30 @@ const OrganizationDetailPage = () => {
                                                 </MuiLink>
                                             </Stack>
                                         )}
+                                        {socialLinks.length > 0 && (
+                                            <>
+                                                <Divider sx={{ my: 1 }} />
+                                                <Stack direction="row" spacing={0.5} flexWrap="wrap">
+                                                    {socialLinks.map((s, i) => (
+                                                        <Tooltip key={i} title={s.label}>
+                                                            <IconButton
+                                                                component="a"
+                                                                href={s.url!}
+                                                                target="_blank"
+                                                                rel="noopener"
+                                                                size="small"
+                                                                sx={{ color: "text.secondary", "&:hover": { color: "#1975d1", bgcolor: "rgba(107, 223, 243, 0.08)" }, }}>
+                                                                {s.icon}
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    ))}
+                                                </Stack>
+                                            </>
+                                        )}
                                     </Stack>
                                 </CardContent>
                             </Card>
 
-                            {/* General Info */}
                             <Card>
                                 <CardContent>
                                     <Stack direction="row" spacing={1} alignItems="center" mb={2}>

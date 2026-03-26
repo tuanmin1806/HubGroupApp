@@ -48,9 +48,9 @@ export interface CreateCustomerRequest {
     FullName: string;
     Email: string;
     PhoneNumber: string | null;
-    Gender: Gender | undefined;
     AccountStatus: AccountStatus;
     RoleIds?: string[];
+    Gender: Gender;
     ProfileInfo: ProfileInfo;
 }
 
@@ -59,7 +59,6 @@ export interface UpdateCustomerRequest {
     FullName: string;
     Email: string;
     PhoneNumber: string | null;
-    Gender: Gender;
     UserName?: string;
     AccountType?: AccountType;
     AccountStatus?: AccountStatus;

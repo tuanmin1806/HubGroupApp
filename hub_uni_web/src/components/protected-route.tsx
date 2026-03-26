@@ -19,7 +19,7 @@ export default function ProtectedRoute({ children, permissionGroup, allowedAccou
 
     if (allowedAccountTypes && allowedAccountTypes.length > 0) {
         const hasValidAccountType = allowedAccountTypes.includes(user.AccountType as AccountTypeKey);
-        if (!hasValidAccountType) return <Navigate to="/sign-out" replace />;
+        if (!hasValidAccountType) return <Navigate to={user?.Roles[0]?.DefaultPage ?? "/unauthorized"} replace />;
     }
 
     if (permissionGroup) {

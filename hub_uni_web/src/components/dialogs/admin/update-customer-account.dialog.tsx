@@ -1,12 +1,12 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Grid, IconButton, CircularProgress, Typography, Divider, Box, Paper } from "@mui/material";
-import { Close, LocationOn, PersonOutlined } from "@mui/icons-material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Grid, IconButton, CircularProgress, Typography, Divider, Box, Paper, InputAdornment } from "@mui/material";
+import { Close, LocationOn, LockOutlined, PersonOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { ProfileInfo, UpdateCustomerRequest } from "../../../app/models/customer.model";
-import { Gender, AccountType, AccountStatus } from "../../../app/models/enums.model";
+import { Gender, AccountStatus } from "../../../app/models/enums.model";
 import { AppDispatch } from "../../../app/store";
-import { useGetCustomerByIdQuery, useLazyGetCustomerByIdQuery, useUpdateCustomerMutation } from "../../../app/features/customer.api";
+import { useLazyGetCustomerByIdQuery, useUpdateCustomerMutation } from "../../../app/features/customer.api";
 import { ConvertService } from "../../../app/services/convert.service";
 import { useGetAllCountryNoAuthenQuery } from "../../../app/features/country.api";
 import { useGetProvinceByCountryQuery } from "../../../app/features/province.api";
@@ -14,6 +14,13 @@ import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api
 import { Province } from "../../../app/models/province.model";
 import { Country } from "../../../app/models/country.model";
 
+const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
+
+const ACCOUNT_STATUS_OPTIONS = [
+    { value: AccountStatus.Activated, label: "Đã kích hoạt" },
+    { value: AccountStatus.NotActivated, label: "Chưa kích hoạt" },
+    { value: AccountStatus.Locked, label: "Đã khóa" },
+];
 
 interface SectionHeaderProps {
     icon: React.ReactNode;
@@ -75,7 +82,6 @@ const defaultForm: UpdateCustomerRequest = {
     FullName: "",
     Email: "",
     PhoneNumber: "",
-    Gender: Gender.Other,
     AccountStatus: AccountStatus.Undefined,
     RoleIds: [],
     ProfileInfo: {
@@ -84,6 +90,7 @@ const defaultForm: UpdateCustomerRequest = {
         ProvinceId: "",
         CommuneId: "",
         Address: "",
+        Gender: Gender.Other,
     },
 };
 
@@ -102,6 +109,7 @@ export default function UpdateCustomerAccountDialog({
     const [errors, setErrors] = useState<FormErrors>({});
     const [selectedCountrySeo, setSelectedCountrySeo] = useState("");
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
 
     const [fetchCustomer, { data: customerData, isFetching }] = useLazyGetCustomerByIdQuery();
@@ -168,7 +176,6 @@ export default function UpdateCustomerAccountDialog({
                     FullName: data.FullName ?? "",
                     Email: data.Email ?? "",
                     PhoneNumber: data.PhoneNumber ?? "",
-                    Gender: ConvertService.convertGenderFromString(data.Gender),
                     AccountStatus: ConvertService.convertAccountStatusFromString(data.AccountStatus),
                     AccountType: ConvertService.convertAccountTypeFromString(data.AccountType),
                     RoleIds: (data.Roles ?? []).map(r => r.Id),
@@ -180,6 +187,7 @@ export default function UpdateCustomerAccountDialog({
                         ProvinceId: data.ProfileInfo?.ProvinceId ?? "",
                         CommuneId: data.ProfileInfo?.CommuneId ?? "",
                         Address: data.ProfileInfo?.Address ?? "",
+                        Gender: ConvertService.convertGenderFromString(data.Gender),
                     }
                 });
             });
@@ -253,6 +261,11 @@ export default function UpdateCustomerAccountDialog({
 
     const isLoading = isFetching || isUpdating;
 
+    const isSaveDisabled = (): boolean => {
+        const requiredFieldsInvalid: boolean = !form.FullName.trim() || !form.ProfileInfo.DateOfBirth || !form.ProfileInfo.Gender || !form.ProfileInfo.CountryId || !form.ProfileInfo.ProvinceId || !form.ProfileInfo.CommuneId || !form.AccountStatus;
+        return requiredFieldsInvalid;
+    };
+
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
@@ -267,13 +280,33 @@ export default function UpdateCustomerAccountDialog({
                     </Box>
                 ) : (
                     <>
+                        <Paper
+                            variant="outlined"
+                            sx={{ p: 2, mb: 2.5, borderRadius: 2 }}
+                        >
+                            <SectionHeader
+                                icon={<LockOutlined sx={{ fontSize: 16 }} />}
+                                title="Thông tin đăng nhập"
+                            />
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        label={<> Tên đăng nhập <RequiredStar /> </>}
+                                        fullWidth
+                                        disabled
+                                        size="small"
+                                        value={form.UserName}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Paper>
                         <Paper sx={{ p: 2, mb: 2 }}>
                             <SectionHeader icon={<PersonOutlined />} title="Thông tin tài khoản" />
 
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12 }}>
                                     <TextField
-                                        label="Họ và tên"
+                                        label={<> Họ và tên <RequiredStar /></>}
                                         fullWidth
                                         size="small"
                                         value={form.FullName}
@@ -304,7 +337,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         type="date"
-                                        label="Ngày sinh"
+                                        label={<> Ngày sinh <RequiredStar /></>}
                                         fullWidth
                                         size="small"
                                         InputLabelProps={{ shrink: true }}
@@ -316,29 +349,21 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label="Giới tính"
+                                        label={<> Giới tính <RequiredStar /></>}
                                         fullWidth
                                         size="small"
-                                        value={form.Gender}
-                                        onChange={(e) => handleChange("Gender", Number(e.target.value))}
+                                        value={form.ProfileInfo.Gender}
+                                        onChange={(e) => handleProfileChange("Gender", Number(e.target.value))}
                                     >
                                         {GENDER_OPTIONS.map(opt => (
                                             <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
                                         ))}
                                     </TextField>
                                 </Grid>
-                            </Grid>
-                        </Paper>
-
-                        <Divider />
-                        <Paper sx={{ p: 2 }}>
-                            <SectionHeader icon={<LocationOn />} title="Địa chỉ" />
-
-                            <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label="Quốc gia"
+                                        label={<> Quốc gia <RequiredStar /></>}
                                         value={form.ProfileInfo.CountryId}
                                         onChange={(e) => handleCountryChange(e.target.value)}
                                         fullWidth
@@ -353,7 +378,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label="Tỉnh / Thành phố"
+                                        label={<> Tỉnh / Thành phố <RequiredStar /></>}
                                         value={form.ProfileInfo.ProvinceId}
                                         onChange={(e) => handleProvinceChange(e.target.value)}
                                         fullWidth
@@ -369,7 +394,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label="Xã / Phường"
+                                        label={<> Xã / Phường <RequiredStar /></>}
                                         value={form.ProfileInfo.CommuneId}
                                         onChange={(e) => handleCommuneChange(e.target.value)}
                                         fullWidth
@@ -391,6 +416,21 @@ export default function UpdateCustomerAccountDialog({
                                         onChange={(e) => handleProfileChange("Address", e.target.value)}
                                     />
                                 </Grid>
+
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <TextField
+                                        select
+                                        label={<> Trạng thái <RequiredStar /> </>}
+                                        fullWidth
+                                        size="small"
+                                        value={form.AccountStatus}
+                                        onChange={(e) => handleChange("AccountStatus", Number(e.target.value))}
+                                    >
+                                        {ACCOUNT_STATUS_OPTIONS.map((opt) => (
+                                            <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
                             </Grid>
                         </Paper>
                     </>
@@ -404,10 +444,10 @@ export default function UpdateCustomerAccountDialog({
                     onClick={handleSubmit}
                     variant="contained"
                     color="primary"
-                    disabled={isLoading}
+                    disabled={isLoading || isSaveDisabled()}
                     startIcon={isUpdating ? <CircularProgress size={16} color="inherit" /> : null}
                 >
-                    {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
+                    {isUpdating ? "Đang lưu..." : "Lưu"}
                 </Button>
             </DialogActions>
         </Dialog>

@@ -27,6 +27,8 @@ const SectionHeader = ({ title }: { title: string }) => (
     </Grid>
 );
 
+const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
+
 function ImageUploadBox({ label, previewUrl, onFileChange, onRemove, required }: {
     label: string;
     previewUrl: string | null;
@@ -254,12 +256,12 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                     <Grid container spacing={2}>
 
                         <SectionHeader title="Thông tin cơ bản" />
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Tên trường" value={form.Name} onChange={(e) => set("Name", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> Tên trường <RequiredStar /> </>} value={form.Name} onChange={(e) => set("Name", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Tên quốc tế" value={form.InternationalName} onChange={(e) => set("InternationalName", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Mã số thuế" value={form.TaxCode} onChange={(e) => set("TaxCode", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Quản lý bởi" value={form.ManagedBy} onChange={(e) => set("ManagedBy", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField {...tf} label="Trạng thái" select value={form.OrgStatus} onChange={(e) => set("OrgStatus", e.target.value)}>
+                            <TextField {...tf} label={<> Trạng thái <RequiredStar /> </>} select value={form.OrgStatus} onChange={(e) => set("OrgStatus", e.target.value)}>
                                 <MenuItem value={OrgStatus.Undefined}>Không xác định</MenuItem>
                                 <MenuItem value={OrgStatus.Active}>Hoạt động</MenuItem>
                                 <MenuItem value={OrgStatus.Inactive}>Dừng hoạt động</MenuItem>
@@ -347,10 +349,10 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                         <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Email" type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Số điện thoại" value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Website" value={form.WebsiteUrl} onChange={(e) => set("WebsiteUrl", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={provinces} getOptionLabel={(opt: Province) => opt.Name ?? ""} isOptionEqualToValue={(opt: Province, val: Province) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label="Tỉnh / Thành phố" />} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={communes} getOptionLabel={(opt: CommuneResponse) => opt.Name ?? ""} isOptionEqualToValue={(opt: CommuneResponse, val: CommuneResponse) => opt.Id === val?.Id} value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedProvinceSeo} noOptionsText={selectedProvinceSeo ? "Không có dữ liệu" : "Vui lòng chọn tỉnh trước"} renderInput={(params) => <TextField {...params} label="Xã/Phường" placeholder={!selectedProvinceSeo ? "Chọn tỉnh trước" : ""} />} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={provinces} getOptionLabel={(opt: Province) => opt.Name ?? ""} isOptionEqualToValue={(opt: Province, val: Province) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label={<> Tỉnh / Thành phố <RequiredStar /> </>} />} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={communes} getOptionLabel={(opt: CommuneResponse) => opt.Name ?? ""} isOptionEqualToValue={(opt: CommuneResponse, val: CommuneResponse) => opt.Id === val?.Id} value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedProvinceSeo} noOptionsText={selectedProvinceSeo ? "Không có dữ liệu" : "Vui lòng chọn tỉnh trước"} renderInput={(params) => <TextField {...params} label={<> Xã/Phường <RequiredStar /> </>} placeholder={!selectedProvinceSeo ? "Chọn tỉnh trước" : ""} />} /> </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Địa chỉ" value={form.Address} onChange={(e) => set("Address", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> Địa chỉ <RequiredStar /> </>} value={form.Address} onChange={(e) => set("Address", e.target.value)} /> </Grid>
 
                         <SectionHeader title="Mạng xã hội" />
                         {[
@@ -422,7 +424,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                         </Grid>
                         <Grid size={{ xs: 12 }}>
                             <Paper sx={{ p: 1, borderRadius: 2 }}>
-                                <Typography variant="body2" fontWeight={600} mb={1}>Mô tả chi tiết</Typography>
+                                <Typography variant="body2" fontWeight={600} mb={1}>{<> Mô tả chi tiết <RequiredStar /> </>}</Typography>
                                 <RichTextEditorComponent value={form.Description} onChange={(val: string) => set("Description", val)} />
                             </Paper>
                         </Grid>

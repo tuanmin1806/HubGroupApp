@@ -99,7 +99,7 @@ export interface CreateRecruitmentPostRequest {
     RecruitPostStatus: RecruitPostStatus | undefined;
     Name: string;
     ProfessionIds: string[];
-    Quantity: number;
+    Quantity: number | null;
     Description: string;
     ProvinceId: string;
     Requirement: Requirement;
