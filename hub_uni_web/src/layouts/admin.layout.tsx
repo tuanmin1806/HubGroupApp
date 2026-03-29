@@ -107,7 +107,7 @@ export default function AdminLayout() {
                 }}
             />
             <DashboardLayout>
-                <div style={{ padding: "4px 8px" }}>
+                <div style={{ padding: "3px 6px" }}>
                     <AdminHeader />
                     <Grid container spacing={1}>
                         <Grid size={12} sx={{ mt: 1 }}>

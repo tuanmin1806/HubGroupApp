@@ -1,5 +1,5 @@
-import { Person, Phone, Email, Cake, Wc, LocationOn, Badge, Edit, Save, Cancel, Public, Business } from "@mui/icons-material";
-import { Avatar, Box, Chip, CircularProgress, Divider, Grid, Stack, Typography, TextField, MenuItem, Button, Autocomplete, InputAdornment, Paper } from "@mui/material";
+import { Person, Phone, Email, Cake, Wc, LocationOn, Badge, Edit, Save, Cancel, Public, Business, Lock, CameraAlt } from "@mui/icons-material";
+import { Avatar, Box, Chip, CircularProgress, Divider, Grid, Stack, Typography, TextField, MenuItem, Button, Autocomplete, InputAdornment, Paper, Tooltip } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useGetCustomerInforQuery, useUpdateCustomerMutation } from "../../app/features/customer.api";
 import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
@@ -13,6 +13,9 @@ import { Country } from "../../app/models/country.model";
 import { Province } from "../../app/models/province.model";
 import { CommuneResponse } from "../../app/models/commune.model";
 import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
+import ChangePasswordDialog from "../../components/dialogs/admin/change-password.dialog";
+import { useNavigate } from "react-router-dom";
+import AdminLogoUploadDialog from "../../components/dialogs/admin/admin-logo-upload.dialog";
 
 const GENDER_OPTIONS = [
     { value: Gender.Male, label: "Nam" },
@@ -104,6 +107,7 @@ const SectionLabel = ({ children }: { children: React.ReactNode }) => (
 
 export default function PersonalInforPage() {
     const userInfo = getUserInfo();
+    const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
     const { data, isLoading, isError } = useGetCustomerInforQuery(userInfo?.Id ?? "");
 
     if (isLoading) return (<Box display="flex" justifyContent="center" py={8}><CircularProgress sx={{ color: BLUE }} /></Box>);
@@ -115,7 +119,38 @@ export default function PersonalInforPage() {
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 3 }}>
                     <Paper elevation={1} sx={{ p: 3, textAlign: "center", position: { md: "sticky" }, top: { md: 80 } }}>
-                        <Avatar src={data.AvatarFullUrl ?? undefined} sx={{ width: 100, height: 100, fontSize: 36, mx: "auto", mb: 2, bgcolor: BLUE }}>{data.FullName?.[0] ?? "?"}</Avatar>
+                           <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+                            <Avatar
+                                src={data.AvatarFullUrl ?? undefined}
+                                sx={{ width: 100, height: 100, fontSize: 36, bgcolor: BLUE }}
+                            >
+                                {data.FullName?.[0] ?? "?"}
+                            </Avatar>
+                            <Tooltip title="Cập nhật ảnh đại diện">
+                                <Box
+                                    onClick={() => setAvatarDialogOpen(true)}
+                                    sx={{
+                                        position: "absolute",
+                                        bottom: 0,
+                                        right: 0,
+                                        width: 28,
+                                        height: 28,
+                                        borderRadius: "50%",
+                                        bgcolor: "white",
+                                        border: "1px solid #e0e0e0",
+                                        boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        cursor: "pointer",
+                                        transition: "all .15s",
+                                        "&:hover": { bgcolor: "#e3f2fd", borderColor: BLUE },
+                                    }}
+                                >
+                                    <CameraAlt sx={{ fontSize: 14, color: BLUE }} />
+                                </Box>
+                            </Tooltip>
+                        </Box>
                         <Typography fontWeight={700} fontSize="0.95rem">{data.FullName}</Typography>
                         <Typography variant="body2" color="text.secondary" mb={2}>@{data.UserName}</Typography>
 
@@ -154,13 +189,20 @@ export default function PersonalInforPage() {
                     <Paper elevation={1} sx={{ p: 3 }}><EditForm data={data} /></Paper>
                 </Grid>
             </Grid>
+            <AdminLogoUploadDialog
+                open={avatarDialogOpen}
+                onClose={() => setAvatarDialogOpen(false)}
+                currentLogoUrl={data.AvatarFullUrl ?? ""}
+            />
         </Box>
     );
 }
 
 function EditForm({ data }: { data: CustomerResponse }) {
+    const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [changePasswordOpen, setChangePasswordOpen] = useState(false);
     const [form, setForm] = useState<EditableForm>(() => buildForm(data));
 
     useEffect(() => { setForm(buildForm(data)); }, [data]);
@@ -186,18 +228,41 @@ function EditForm({ data }: { data: CustomerResponse }) {
         } catch { }
     };
 
+    const handleLogout = () => {
+        navigate("/sign-out");
+    };
+
     const editing = isEditing;
 
     return (
         <Box>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={0.5}>
                 <Typography variant="h6" fontWeight={700} fontSize="1rem">Thông tin tài khoản</Typography>
-                {editing ? (
-                    <Stack direction="row" spacing={1}>
-                        <Button size="small" startIcon={<Cancel sx={{ fontSize: 16 }} />} onClick={handleCancel} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "text.secondary" }}>Hủy</Button>
-                        <Button variant="contained" size="small" startIcon={<Save sx={{ fontSize: 16 }} />} onClick={() => setConfirmOpen(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", bgcolor: BLUE, "&:hover": { bgcolor: "#1975d1" } }}>Cập nhật</Button>
-                    </Stack>
-                ) : (<Button variant="outlined" size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditing(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: BLUE, borderColor: BLUE, "&:hover": { bgcolor: "#f2f4f7ff", borderColor: BLUE } }}>Chỉnh sửa</Button>)}
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<Lock sx={{ fontSize: 15 }} />}
+                        onClick={() => setChangePasswordOpen(true)}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            fontSize: "0.8rem",
+                            color: "#64748b",
+                            borderColor: "#e2e8f0",
+                            borderRadius: 1.5,
+                            "&:hover": { borderColor: "#cbd5e1", bgcolor: "#f8fafc" },
+                        }}
+                    >
+                        Đổi mật khẩu
+                    </Button>
+                    {editing ? (
+                        <Stack direction="row" spacing={1}>
+                            <Button size="small" startIcon={<Cancel sx={{ fontSize: 16 }} />} onClick={handleCancel} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "text.secondary" }}>Hủy</Button>
+                            <Button variant="contained" size="small" startIcon={<Save sx={{ fontSize: 16 }} />} onClick={() => setConfirmOpen(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", bgcolor: BLUE, "&:hover": { bgcolor: "#1975d1" } }}>Cập nhật</Button>
+                        </Stack>
+                    ) : (<Button variant="outlined" size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditing(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: BLUE, borderColor: BLUE, "&:hover": { bgcolor: "#f2f4f7ff", borderColor: BLUE } }}>Chỉnh sửa</Button>)}
+                </Stack>
             </Stack>
             <Divider sx={{ mb: 1 }} />
             <SectionLabel>Thông tin cơ bản</SectionLabel>
@@ -308,6 +373,12 @@ function EditForm({ data }: { data: CustomerResponse }) {
                 onConfirm={handleConfirm}
                 title="Xác nhận cập nhật"
                 message="Bạn có chắc chắn muốn lưu thay đổi? Thông tin sẽ được cập nhật ngay lập tức."
+            />
+
+            <ChangePasswordDialog
+                open={changePasswordOpen}
+                onClose={() => setChangePasswordOpen(false)}
+                onLogout={handleLogout}
             />
         </Box>
     );

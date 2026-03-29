@@ -1,4 +1,4 @@
-import { Close, Person } from "@mui/icons-material";
+import { Close, Person, Person3 } from "@mui/icons-material";
 import Person3Icon from "@mui/icons-material/Person3";
 import MenuIcon from "@mui/icons-material/Menu";
 import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography, useMediaQuery, Menu, Button, Fade, Avatar } from "@mui/material";
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import hub_logo from "../../assets/hub_logo.png";
 import { RootState } from "../../app/store";
-import ProfileDialog from "../dialogs/general/profile.dialog";
 
 const theme = createTheme({
     palette: {
@@ -176,10 +175,6 @@ function StudentHeader() {
 
     return (
         <ThemeProvider theme={theme}>
-            <ProfileDialog
-                open={openProfileDialog}
-                setOpen={setOpenProfileDialog}
-            ></ProfileDialog>
             <AppBar position="fixed" sx={{
                 color: '#242424',
                 backgroundColor: '#fff'
@@ -320,7 +315,12 @@ function StudentHeader() {
                                     style={{ cursor: "pointer" }}
                                     onClick={handleNavigateAccountInfo}
                                 >
-                                    <Person sx={{ p: 0, fontSize: { xs: '1.5rem', md: '1.6rem' } }} />
+                                    <Avatar
+                                        src={user?.AvatarFullUrl ?? undefined}
+                                        sx={{ width: { xs: 36, sm: 42 }, height: { xs: 36, sm: 42 }, fontSize: { xs: 16, sm: 18 }, border: "2px solid #fff", boxShadow: "0 2px 6px rgba(0.15,0.15,0.15,0.15)", objectFit: "contain"}}
+                                    >
+                                        {user?.AvatarFullUrl ? null : (user?.FullName?.[0] ?? <Person3 />)}
+                                    </Avatar>
                                     <Link
                                         sx={{
                                             ml: 1,
@@ -331,7 +331,7 @@ function StudentHeader() {
                                         component="button"
                                         color="inherit"
                                         variant="body1"
-                                        underline="hover"
+                                        underline="none"
                                     >
                                         {user?.FullName}
                                     </Link>

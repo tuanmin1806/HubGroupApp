@@ -101,7 +101,7 @@ export default function StaffLayout() {
                 }}
             />
             <DashboardLayout>
-                <div style={{ padding: "8px 16px" }}>
+                <div style={{ padding: "3px 6px" }}>
                     <StaffHeader />
                     <Grid container spacing={1}>
                         <Grid size={12} sx={{ mt: 2 }}>

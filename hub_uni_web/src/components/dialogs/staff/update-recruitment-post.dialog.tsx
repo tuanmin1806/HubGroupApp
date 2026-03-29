@@ -273,11 +273,11 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
                 Highlights: form.Highlights.filter((h) => h.trim()),
                 Requirement: { ...form.Requirement, OtherReqs: form.Requirement.OtherReqs.filter((r) => r.trim()) },
             }).unwrap();
-            dispatch(showSnackbar({ message: "Cập nhật bài tuyển sinh thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: "Cập nhật chương trình tuyển sinh thành công!", severity: "success" }));
             onSuccess?.();
             handleClose();
         } catch {
-            dispatch(showSnackbar({ message: "Cập nhật bài tuyển sinh thất bại. Vui lòng thử lại!", severity: "error" }));
+            dispatch(showSnackbar({ message: "Cập nhật chương trình tuyển sinh thất bại. Vui lòng thử lại!", severity: "error" }));
         }
     };
 
@@ -294,7 +294,7 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth PaperProps={{ sx: { maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography fontWeight={600}>Chỉnh sửa bài tuyển sinh</Typography>
+                <Typography fontWeight={600}>Chỉnh sửa chương trình tuyển sinh</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />

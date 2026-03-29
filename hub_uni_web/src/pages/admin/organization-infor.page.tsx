@@ -7,6 +7,8 @@ import UpdateOrganizationDialog from "../../components/dialogs/admin/organizatio
 import { ConvertService } from "../../app/services/convert.service";
 import { Profession } from "../../app/models/organization.model";
 import LogoUploadDialog from "../../components/dialogs/admin/logo-upload.dialog";
+import { hasAccountType } from "../../utils/auth.utils";
+import { AccountType } from "../../app/models/enums.model";
 
 export default function OrganizationInforPage() {
     const userInfo = getUserInfo();
@@ -56,24 +58,26 @@ export default function OrganizationInforPage() {
                 />
 
                 <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 3 }}>
-                    <Button
-                        variant="contained"
-                        startIcon={<Edit />}
-                        onClick={() => setOpen(true)}
-                        size="small"
-                        sx={{
-                            bgcolor: "#1975d1",
-                            backdropFilter: "blur(8px)",
-                            border: "1px solid rgba(255,255,255,0.3)",
-                            color: "#fff",
-                            fontWeight: 600,
-                            borderRadius: 2,
-                            textTransform: "none",
-                            "&:hover": { bgcolor: "rgba(255,255,255,0.25)" },
-                        }}
-                    >
-                        Cập nhật thông tin
-                    </Button>
+                    {hasAccountType(AccountType.Admin) && (
+                        <Button
+                            variant="contained"
+                            startIcon={<Edit />}
+                            onClick={() => setOpen(true)}
+                            size="small"
+                            sx={{
+                                bgcolor: "#1975d1",
+                                backdropFilter: "blur(8px)",
+                                border: "1px solid rgba(255,255,255,0.3)",
+                                color: "#fff",
+                                fontWeight: 600,
+                                borderRadius: 2,
+                                textTransform: "none",
+                                "&:hover": { bgcolor: "rgba(255,255,255,0.25)" },
+                            }}
+                        >
+                            Cập nhật thông tin
+                        </Button>
+                    )}
                 </Box>
 
                 <Container
@@ -114,7 +118,6 @@ export default function OrganizationInforPage() {
                                     sx={{ width: "100%", height: "100%", objectFit: "contain", p: 0.5 }}
                                 />
                             </Box>
-
                             <Box
                                 className="logo-overlay"
                                 sx={{
@@ -149,13 +152,13 @@ export default function OrganizationInforPage() {
                                 </Typography>
                                 {data.IsTop && (
                                     <Chip
-                                        icon={<Star sx={{ fontSize: 14, color: "#1975d1 !important" }} />}
+                                        icon={<Star sx={{ fontSize: 14, color: "#ffffff !important" }} />}
                                         label="TOP"
                                         size="small"
                                         sx={{
-                                            bgcolor: "rgba(250,161,27,0.2)",
+                                            bgcolor: "#1975d1",
                                             border: "1px solid #1975d1",
-                                            color: "#1975d1",
+                                            color: "#ffffff",
                                             fontWeight: 700,
                                             fontSize: 11,
                                             height: 22,

@@ -16,3 +16,11 @@ export const getAccountType = (): AccountType => {
 export const hasAccountType = (...types: AccountType[]): boolean => {
     return types.includes(getAccountType());
 };
+
+export const getCurrentUserId = (): string => {
+    return getUserInfo()?.Id ?? "";
+};
+
+export const isSelf = (id: string): boolean => {
+    return !!id && id === getCurrentUserId();
+};

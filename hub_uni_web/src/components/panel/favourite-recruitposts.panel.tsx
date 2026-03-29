@@ -1,6 +1,6 @@
 import { AccessTime, AttachMoney, Business, Cake, Female, LocationOn, Male, PeopleAlt, School, Transgender, Work } from "@mui/icons-material";
 import { Box, Paper, Chip, CircularProgress, Stack, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { href, useNavigate } from "react-router-dom";
 import { getUserInfo } from "../../app/services/auth.service";
 import { formatDate } from "../../utils/date.utils";
 import { useGetFavouriteRecruitPostByCustomerQuery } from "../../app/features/favourite.api";
@@ -213,10 +213,7 @@ function FavouriteRecruitPostCard({ app }: { app: FavouriteResponse }) {
                         <Button
                             variant="contained"
                             size="small"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/chuong-trinh-tuyen-sinh/${post?.SeoUrl}`);
-                            }}
+                            onClick={() => window.open(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`, "_blank")}
                             sx={{
                                 backgroundColor: BACK_GROUND_BUTTON_COLOR,
                                 borderRadius: 1.5, fontSize: "0.72rem",
@@ -267,7 +264,7 @@ export default function FavouriteRecruitPostListPanel() {
                         }}>
                             <School sx={{ fontSize: 30, color: "#f36730" }} />
                         </Box>
-                        <Typography fontWeight={700} sx={{ mb: 0.5 }}>Chưa có tin tuyển sinh nào được lưu</Typography>
+                        <Typography fontWeight={700} sx={{ mb: 0.5 }}>Chưa có chương trình tuyển sinh nào được lưu</Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 280, mx: "auto", mb: 2.5 }}>
                             Hãy khám phá các chương trình tuyển sinh và lưu lại ngay!
                         </Typography>

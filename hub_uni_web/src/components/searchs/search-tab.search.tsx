@@ -113,7 +113,7 @@ export default function ProfessionRecruitmentTabs() {
                     }}
                 >
                     {loadingPosts && page === 1 ? (<Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}><CircularProgress size={20} sx={{ color: "#faa11b" }} /></Box>) : allPosts.length === 0 ? (
-                        <Box sx={{ textAlign: "center", pt: 4 }}><Typography sx={{ fontSize: 12, color: "text.secondary" }}> Chưa có tin tuyển sinh </Typography></Box>
+                        <Box sx={{ textAlign: "center", pt: 4 }}><Typography sx={{ fontSize: 12, color: "text.secondary" }}> Chưa có chương trình tuyển sinh </Typography></Box>
                     ) : (
                         allPosts.map((post) => (
                             <Box

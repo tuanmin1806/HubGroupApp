@@ -1,4 +1,4 @@
-import { Add, ChangeCircle, Clear, Delete, Edit, Search, Visibility } from "@mui/icons-material";
+import { Add, Clear, Delete, Edit, Search } from "@mui/icons-material";
 import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Avatar } from "@mui/material";
 import { useState, useCallback } from "react";
 import { CustomerResponse, CustomerFilterParams } from "../../app/models/customer.model";
@@ -12,6 +12,7 @@ import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+import { isSelf } from "../../utils/auth.utils";
 
 export default function ManageStaffAccountPage() {
     const [inputValue, setInputValue] = useState("");
@@ -107,21 +108,29 @@ export default function ManageStaffAccountPage() {
                 <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(staff.Gender))}</TableCell>
                 <TableCell><Chip label={ConvertService.convertAccountStatus(ConvertService.convertAccountStatusFromString(staff.AccountStatus))} size="small" color={ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Activated ? "success" : staff.AccountStatus === AccountStatus.Locked ? "error" : "default"} variant="outlined" /></TableCell>
                 <TableCell align="center">
-                    <Tooltip title="Chỉnh sửa">
-                        <IconButton size="small" color="primary" onClick={() => handleOpenUpdate(staff.Id)}>
-                            <Edit fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Xóa">
-                        <IconButton
-                            size="small"
-                            color="error"
-                            disabled={isDeleting && deleteCustomerId === staff.Id}
-                            onClick={() => handleOpenDelete(staff.Id)}
-                        >
-                            {isDeleting && deleteCustomerId === staff.Id ? <CircularProgress size={16} color="error" /> : <Delete fontSize="small" />}
-                        </IconButton>
-                    </Tooltip>
+                    {isSelf(staff.Id) ? (
+                        <Tooltip title="Không thể tự chỉnh sửa hoặc xóa tài khoản của chính mình">
+                            <Typography variant="caption" color="text.disabled">—</Typography>
+                        </Tooltip>
+                    ) : (
+                        <>
+                            <Tooltip title="Chỉnh sửa">
+                                <IconButton size="small" color="primary" onClick={() => handleOpenUpdate(staff.Id)}>
+                                    <Edit fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Xóa">
+                                <IconButton
+                                    size="small"
+                                    color="error"
+                                    disabled={isDeleting && deleteCustomerId === staff.Id}
+                                    onClick={() => handleOpenDelete(staff.Id)}
+                                >
+                                    {isDeleting && deleteCustomerId === staff.Id ? <CircularProgress size={16} color="error" /> : <Delete fontSize="small" />}
+                                </IconButton>
+                            </Tooltip>
+                        </>
+                    )}
                 </TableCell>
             </TableRow>
         ));

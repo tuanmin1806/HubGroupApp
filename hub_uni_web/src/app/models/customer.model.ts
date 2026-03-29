@@ -69,7 +69,7 @@ export interface UpdateCustomerRequest {
 }
 
 export interface UpdatePasswordRequest {
-    CurrentPassword: string;
+    OldPassword: string;
     NewPassword: string;
     ConfirmPassword: string;
 }

@@ -184,7 +184,7 @@ const ApplyConfirmDialog = ({
                                 >
                                     HubGroup khuyến cáo tất cả các bạn hãy luôn cẩn trọng trong quá
                                     trình tìm chương trình tuyển sinh phù hợp và chủ động nghiên cứu về thông tin trường trước khi ứng tuyển, ứng viên cần có trách
-                                    nhiệm với hành vi ứng tuyển của mình. Nếu bạn gặp phải tin tuyển sinh hoặc nhận được liên lạc đáng ngờ của nhà trường hãy báo cáo ngay
+                                    nhiệm với hành vi ứng tuyển của mình. Nếu bạn gặp phải chương trình tuyển sinh hoặc nhận được liên lạc đáng ngờ của nhà trường hãy báo cáo ngay
                                     HubGroup qua email {" "}
                                     <Link
                                         href="mailto:contact@hubgroup.vn"

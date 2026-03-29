@@ -105,5 +105,6 @@ export const {
     useLazyGetCustomerByIdQuery,
     useUpdateCustomerMutation,
     useUpdateCustomerAvatarMutation,
-    useDeleteCustomerMutation
+    useDeleteCustomerMutation,
+    useUpdatePasswordMutation
 } = customerApi;

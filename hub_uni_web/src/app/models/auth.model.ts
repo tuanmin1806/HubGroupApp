@@ -98,6 +98,7 @@ export interface AuthLoginRequestBody {
 export interface AuthInfo {
     Id: string,
     UserName: string,
+    AvatarFullUrl?: string,
     Email: string,
     FullName: string,
     DateOfBirth: string,

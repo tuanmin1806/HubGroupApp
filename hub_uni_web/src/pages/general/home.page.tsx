@@ -115,7 +115,7 @@ const HomePage = () => {
                         position: "relative", zIndex: 1,
                         color: 'white', fontSize: 28, fontWeight: 'bold', mb: 2
                     }}>
-                        Tra cứu thông tin tuyển sinh du học Hàn Quốc nhanh chóng và chính xác
+                        Tra cứu thông chương trình tuyển sinh du học Hàn Quốc nhanh chóng và chính xác
                     </Box>
 
                     <Box sx={{

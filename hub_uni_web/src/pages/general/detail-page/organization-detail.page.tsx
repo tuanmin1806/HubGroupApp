@@ -431,7 +431,7 @@ const OrganizationDetailPage = () => {
                                         ) : (
                                             <Box sx={{ textAlign: 'center', py: 4 }}>
                                                 <WorkOutline sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-                                                <Typography color="text.secondary">Chưa có tin tuyển sinh</Typography>
+                                                <Typography color="text.secondary">Chưa chương trình tuyển sinh</Typography>
                                             </Box>
                                         )}
                                     </CardContent>

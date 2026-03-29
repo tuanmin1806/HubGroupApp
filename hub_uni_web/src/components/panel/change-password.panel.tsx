@@ -2,6 +2,7 @@ import { Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Stack, Typography, TextField, Button, Divider, InputAdornment, IconButton, Alert, CircularProgress } from "@mui/material";
 import { useState } from "react";
 import { useUpdatePasswordMutation } from "../../app/features/account.api";
+import ConfirmChangePasswordDialog from "../dialogs/student/confirm-change-password.dialog";
 
 export default function ChangePasswordPanel() {
     const [form, setForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
@@ -75,8 +76,7 @@ export default function ChangePasswordPanel() {
                 ))}
 
                 {error && <Alert severity="error" sx={{ py: 0.5, fontSize: "0.8rem" }}>{error}</Alert>}
-                {success && <Alert severity="success" sx={{ py: 0.5, fontSize: "0.8rem" }}>Đổi mật khẩu thành công!</Alert>}
-
+                <ConfirmChangePasswordDialog open={success} />
                 <Button
                     variant="contained"
                     disableElevation

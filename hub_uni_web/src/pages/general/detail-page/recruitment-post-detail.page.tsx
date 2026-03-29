@@ -51,14 +51,14 @@ const RecruitmentPostDetailPage = () => {
             if (isSaved) {
                 await deleteFavourite(recruitmentPost?.SaveId || "").unwrap();
                 setIsSaved(false);
-                dispatch(showSnackbar({ message: "Đã hủy lưu tin tuyển sinh!", severity: "success" }));
+                dispatch(showSnackbar({ message: "Đã hủy lưu chương trình tuyển sinh!", severity: "success" }));
             } else {
                 await createFavourite({
                     CustomerId: userInfo?.Id || "",
                     RecruitPostId: recruitmentPost?.Id || "",
                 }).unwrap();
                 setIsSaved(true);
-                dispatch(showSnackbar({ message: "Đã lưu tin tuyển sinh thành công!", severity: "success" }));
+                dispatch(showSnackbar({ message: "Đã lưu chương trình tuyển sinh thành công!", severity: "success" }));
             }
         } catch (err) {
             dispatch(showSnackbar({ message: isSaved ? "Hủy lưu tin thất bại, vui lòng thử lại!" : "Lưu tin thất bại, vui lòng thử lại!", severity: "error" }));
@@ -96,7 +96,7 @@ const RecruitmentPostDetailPage = () => {
     if (error || !recruitmentPost) {
         return (
             <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-                <Typography variant="h5" color="error" gutterBottom>Không tìm thấy thông tin tin tuyển sinh</Typography>
+                <Typography variant="h5" color="error" gutterBottom>Không tìm thấy thông tin chương trình tuyển sinh</Typography>
                 <Button variant="contained" size="large" sx={{ mt: 3 }} onClick={() => navigate('/')}>Quay về trang chủ</Button>
             </Container>
         );
@@ -139,7 +139,7 @@ const RecruitmentPostDetailPage = () => {
                             {recruitmentPost.IsTop && (
                                 <Chip
                                     icon={<CheckCircle sx={{ fontSize: 16 }} />}
-                                    label="Tin tuyển sinh nổi bật"
+                                    label="Chương trình tuyển sinh nổi bật"
                                     sx={{
                                         bgcolor: 'rgba(255,255,255,0.25)',
                                         color: 'white',
@@ -561,7 +561,7 @@ const RecruitmentPostDetailPage = () => {
 
                 {relatedPosts && relatedPosts.Items && relatedPosts.Items.length > 0 && (
                     <Box sx={{ mt: 6 }}>
-                        <Typography fontSize={20} fontWeight={700} gutterBottom color="primary.main">Tin tuyển sinh khác</Typography>
+                        <Typography fontSize={20} fontWeight={700} gutterBottom color="primary.main">Chương trình tuyển sinh khác</Typography>
 
                         <Stack spacing={1}>
                             {relatedPosts.Items.filter(post => post.Id !== recruitmentPost.Id).slice(0, 6).map((post) => (

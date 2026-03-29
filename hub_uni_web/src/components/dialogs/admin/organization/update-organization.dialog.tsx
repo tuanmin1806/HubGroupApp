@@ -15,6 +15,9 @@ import { CommuneResponse } from "../../../../app/models/commune.model";
 import { OrgStatus } from "../../../../app/models/enums.model";
 import { ConvertService } from "../../../../app/services/convert.service";
 import { ProfessionResponse } from "../../../../app/models/profession.model";
+import { AppDispatch } from "../../../../app/store";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../../../../app/features/snackbar/snackbar.slice";
 
 interface Props {
     open: boolean;
@@ -55,6 +58,7 @@ const emptyProfession = (): Profession => ({ ProfessionId: "", ProfessionName: "
 
 export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     const userInfo = getUserInfo();
+    const dispatch = useDispatch<AppDispatch>();
     const organizationId = userInfo?.OrganizationId ?? "";
     const [loadingData, setLoadingData] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -224,11 +228,11 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                 Highlights: form.Highlights.filter((h: string) => h.trim()),
                 Professions: form.Professions.filter((p: Profession) => p.ProfessionId),
             }).unwrap();
-            console.log("Cập nhật thành công");
+            dispatch(showSnackbar({ message: "Cập nhật thông tin trường thành công!", severity: "success" }));
             newFeaturedFiles.forEach((f) => URL.revokeObjectURL(f.preview));
             onClose();
         } catch (err) {
-            console.log("Organization", err);
+            dispatch(showSnackbar({ message: "Có lỗi xảy ra khi cập nhật thông tin trường!", severity: "error" }));
         } finally {
             setIsSubmitting(false);
         }

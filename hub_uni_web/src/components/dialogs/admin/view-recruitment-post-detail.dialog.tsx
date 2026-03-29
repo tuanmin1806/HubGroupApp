@@ -98,7 +98,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth PaperProps={{ sx: { maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography fontWeight={600}>Chi tiết bài tuyển sinh</Typography>
+                <Typography fontWeight={600}>Chi tiết chương trình tuyển sinh</Typography>
                 <IconButton onClick={onClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />

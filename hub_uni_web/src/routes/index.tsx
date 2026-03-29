@@ -52,7 +52,10 @@ const router = createBrowserRouter(
         },
         {
             path: "/staff",
-            element: <StaffLayout />,
+            element:
+                <ProtectedRoute allowedAccountTypes={["Collaborator"]}>
+                    <StaffLayout />
+                </ProtectedRoute>,
             children: [
                 ...staffRoutes,
             ],

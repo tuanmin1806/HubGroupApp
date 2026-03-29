@@ -7,8 +7,8 @@
   }
 
   #hotline-call {
-    bottom: 40px;
-    right: 10px;
+    bottom: 70px !important;
+    right: 10px !important;
   }
 }
 

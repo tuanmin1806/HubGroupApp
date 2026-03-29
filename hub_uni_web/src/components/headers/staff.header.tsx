@@ -54,7 +54,7 @@ function StaffHeader() {
                                     lineHeight: 1.2,
                                 }}
                             >
-                                Quản lý bài tuyển sinh
+                                Quản lý chương trình tuyển sinh
                             </Typography>
 
                             <Typography
@@ -86,8 +86,11 @@ function StaffHeader() {
                                     "&:hover": { backgroundColor: "#1a9bf1" },
                                 }}
                             >
-                                <Avatar sx={{ width: { xs: 32, sm: 38 }, height: { xs: 32, sm: 38 } }}>
-                                    <Person3 />
+                                <Avatar
+                                    src={user?.AvatarFullUrl ?? undefined}
+                                    sx={{ width: { xs: 36, sm: 42 }, height: { xs: 36, sm: 42 }, fontSize: { xs: 16, sm: 18 } }}
+                                >
+                                    {user?.AvatarFullUrl ? null : (user?.FullName?.[0] ?? <Person3 />)}
                                 </Avatar>
 
                                 <Stack
@@ -95,7 +98,7 @@ function StaffHeader() {
                                     sx={{ display: { xs: "none", sm: "flex" } }}
                                 >
                                     <Typography variant="body1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                                        {user?.UserName}
+                                        {user?.FullName}
                                     </Typography>
                                     <Typography variant="caption">
                                         {ConvertService.convertAccountType(ConvertService.convertAccountTypeFromString(user?.AccountType))}
