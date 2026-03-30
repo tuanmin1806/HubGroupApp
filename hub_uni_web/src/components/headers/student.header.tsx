@@ -1,8 +1,17 @@
-import { Close, Person, Person3 } from "@mui/icons-material";
-import Person3Icon from "@mui/icons-material/Person3";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
+import Link from "@mui/material/Link";
+import {
+    createTheme, ThemeProvider, useMediaQuery, IconButton,
+    Drawer, List, ListItem, ListItemText, ListItemButton,
+    Menu, Button, MenuItem, Fade, Divider, Avatar, Tooltip,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { AppBar, Box, Container, createTheme, Drawer, IconButton, Link, List, ListItem, ListItemButton, ListItemText, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography, useMediaQuery, Menu, Button, Fade, Avatar } from "@mui/material";
-import React, { useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import { Person3, KeyboardArrowDown } from "@mui/icons-material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import hub_logo from "../../assets/hub_logo.png";
@@ -10,162 +19,103 @@ import { RootState } from "../../app/store";
 
 const theme = createTheme({
     palette: {
-        primary: {
-            main: "#f36730",
-        },
-        secondary: {
-            main: "#ffff",
-        },
+        primary: { main: "#f36730" },
+        secondary: { main: "#ffff" },
     },
 });
+
+const NAV_LINKS = [
+    { label: "Danh sách trường", action: "organization" },
+    { label: "Chương trình tuyển sinh", action: "recruitment" },
+    { label: "Bài viết", action: "article" },
+];
+
+const HUBGROUP_LINKS = [
+    { label: "Giới thiệu", url: "https://hubgroup.vn/ve-chung-toi" },
+    { label: "Liên hệ", url: "https://hubgroup.vn/lien-he" },
+    { label: "Thư viện ảnh", url: "https://hubgroup.vn/thu-vien-anh" },
+    { label: "Văn phòng HUBGROUP", url: "https://vanphong.hubgroup.vn/" },
+];
 
 function StudentHeader() {
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [drawerHubOpen, setDrawerHubOpen] = useState(false);
+    const menuOpen = Boolean(anchorEl);
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [anchorElUser, setAnchorElUser] = React.useState(null);
-    const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
-    const open = Boolean(anchorEl);
-
-    const handleSignOut = async () => {
-        navigate("/sign-out");
+    const handleNavigate = (action: string) => {
+        const routes: Record<string, () => void> = {
+            organization: () => navigate("/tim-kiem-truong"),
+            recruitment: () => navigate("/chuong-trinh-tuyen-sinh"),
+            article: () => navigate("/bai-viet"),
+        };
+        routes[action]?.();
+        setOpenDrawer(false);
     };
 
-    const handleOpenUserMenu = (event) => {
-        setAnchorElUser(event.currentTarget);
-    };
+    const DrawerContent = (
+        <Box sx={{ width: "80vw", maxWidth: 320 }} role="presentation">
+            {/* Header Drawer */}
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.5 }}>
+                <Box
+                    component="img"
+                    src={hub_logo}
+                    alt="logo"
+                    sx={{ height: "1.5rem", width: "auto", objectFit: "contain" }}
+                />
+                <IconButton onClick={() => setOpenDrawer(false)} size="small">
+                    <CloseIcon />
+                </IconButton>
+            </Box>
 
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
-    };
+            <Divider />
 
-    const handleMouseEnter = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+            <List disablePadding>
+                {NAV_LINKS.map(({ label, action }) => (
+                    <ListItem key={action} disablePadding>
+                        <ListItemButton onClick={() => handleNavigate(action)} sx={{ px: 2, py: 1.2 }}>
+                            <ListItemText
+                                primary={label}
+                                slotProps={{ primary: { fontWeight: 600, fontSize: "0.9rem" } }}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
 
-    const handleMouseLeave = () => {
-        setAnchorEl(null);
-    };
-    const handleNavigateArticle = () => {
-        navigate("/bai-viet");
-    }
-    const handleNavigateAboutUs = () => {
-        window.open("https://hubgroup.vn/ve-chung-toi", "_blank");
-    };
-
-    const handleNavigateContact = () => {
-        window.open("https://hubgroup.vn/lien-he", "_blank");
-    }
-
-    const handleNavigateImageLibrary = () => {
-        window.open("https://hubgroup.vn/thu-vien-anh", "_blank");
-    }
-
-    const handleNavigateImageOffice = () => {
-        window.open("https://vanphong.hubgroup.vn/", "_blank");
-    }
-
-    const handleNavigateOrganization = () => {
-        navigate("/tim-kiem-truong");
-    }
-
-    const handleNavigateRecruitmentPost = () => {
-        navigate("/chuong-trinh-tuyen-sinh");
-    }
-
-    const handleNavigateAccountInfo = () => {
-        navigate("/thong-tin-tai-khoan");
-    }
-
-    const toggleDrawer = (newOpen: boolean) => () => {
-        setOpenDrawer(newOpen);
-    };
-
-    const DrawerList = (
-        <Box
-            sx={{
-                width: { xs: '90vw', md: 400 },
-                p: { xs: 1, md: 2 },
-                position: 'relative',
-            }}
-            role="presentation"
-        >
-            {/* Close Icon for mobile */}
-            <IconButton
-                onClick={toggleDrawer(false)}
-                sx={{
-                    position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    visibility: { xs: 'visible', md: 'hidden' },
-                    zIndex: 1,
-                    bgcolor: 'white',
-                    boxShadow: 1,
-                    '&:hover': {
-                        bgcolor: 'grey.100',
-                    },
-                }}
-                aria-label="close drawer"
-            >
-                <Close />
-            </IconButton>
-
-            <Typography
-                variant="h6"
-                sx={{
-                    textAlign: 'center',
-                    mt: 2,
-                    fontSize: { xs: '1.25rem', md: '1.5rem' },
-                    fontFamily: 'monospace',
-                    fontWeight: 700,
-                    letterSpacing: { xs: '.1rem', md: '.3rem' },
-                }}
-            >
-                STUDENT
-            </Typography>
-
-            <List>
                 <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={() => {
-                            navigate("/");
-                            toggleDrawer(false)();
-                        }}
-                    >
+                    <ListItemButton onClick={() => setDrawerHubOpen(prev => !prev)} sx={{ px: 2, py: 1 }}>
                         <ListItemText
-                            primary="Trang Chủ"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
+                            primary="Về HUBGROUP"
+                            slotProps={{ primary: { fontWeight: 600, fontSize: "0.9rem" } }}
                         />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={handleNavigateOrganization}
-                    >
-                        <ListItemText
-                            primary="Danh sách trường"
-                            primaryTypographyProps={{
-                                fontSize: { xs: '0.875rem', md: '1rem' },
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase',
-                            }}
-                        />
+                        <KeyboardArrowDown sx={{ fontSize: 18, transition: "transform 0.2s", transform: drawerHubOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
                     </ListItemButton>
                 </ListItem>
 
+                {drawerHubOpen && HUBGROUP_LINKS.map(({ label, url }) => (
+                    <ListItem key={url} disablePadding>
+                        <ListItemButton onClick={() => { window.open(url, "_blank"); setOpenDrawer(false); }} sx={{ px: 4, py: 1 }}>
+                            <ListItemText
+                                primary={label}
+                                slotProps={{ primary: { fontSize: "0.85rem", color: "text.secondary" } }}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+
                 <ListItem disablePadding>
-                    <ListItemButton
-                        onClick={handleNavigateRecruitmentPost}
-                    >
+                    <ListItemButton onClick={() => { navigate("/thong-tin-tai-khoan"); setOpenDrawer(false); }} sx={{ px: 2, py: 1 }}>
+                        <Avatar
+                            src={user?.AvatarFullUrl ?? undefined}
+                            sx={{ width: 28, height: 28, fontSize: 13, mr: 1.5, border: "2px solid #f36730" }}
+                        >
+                            {user?.AvatarFullUrl ? null : (user?.FullName?.[0] ?? <Person3 sx={{ fontSize: 16 }} />)}
+                        </Avatar>
                         <ListItemText
-                            primary="Chương trình tuyển sinh"
+                            primary={user?.FullName ?? "Tài khoản"}
+                            slotProps={{ primary: { fontWeight: 600, fontSize: "0.9rem" } }}
                         />
                     </ListItemButton>
                 </ListItem>
@@ -175,21 +125,18 @@ function StudentHeader() {
 
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="fixed" sx={{
-                color: '#242424',
-                backgroundColor: '#fff'
-            }}>
+            <AppBar position="fixed" sx={{ color: "#242424", backgroundColor: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
                 <Container maxWidth="xl">
-                    <Toolbar disableGutters>
-                        {/* Hamburger Menu for xs */}
+                    <Toolbar disableGutters sx={{ minHeight: { xs: 56, md: 64 }, gap: 1 }}>
+
+                        {/* Hamburger — chỉ mobile */}
                         <IconButton
                             edge="start"
                             color="inherit"
-                            aria-label="menu"
-                            onClick={toggleDrawer(true)}
-                            sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
+                            onClick={() => setOpenDrawer(true)}
+                            sx={{ display: { xs: "flex", md: "none" } }}
                         >
-                            <MenuIcon fontSize={isMobile ? "medium" : "large"} />
+                            <MenuIcon />
                         </IconButton>
 
                         {/* Logo */}
@@ -200,154 +147,121 @@ function StudentHeader() {
                             onClick={() => navigate("/")}
                             sx={{
                                 cursor: "pointer",
-                                display: { xs: "flex", md: "flex" },
-                                mr: { xs: 1, md: 1 },
-                                height: { xs: "1.5rem", md: "2rem" },
+                                height: { xs: "1.4rem", md: "1.9rem" },
                                 width: "auto",
                                 objectFit: "contain",
+                                mr: { xs: 0, md: 2 },
                             }}
                         />
-                        {/* Navigation Links */}
-                        <Box
-                            sx={{
-                                flexGrow: 1,
-                                display: { xs: "none", md: "flex" },
-                                flexDirection: "row",
-                                justifyContent: "flex-start",
-                                alignItems: "center",
-                                gap: { xs: 1, md: 3 },
-                            }}
-                        >
-                            <Link
-                                sx={{
-                                    ml: { xs: 1, md: 3 },
-                                    textAlign: "center",
-                                    textTransform: "uppercase",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.75rem", md: "0.875rem" },
-                                }}
-                                component="button"
-                                color="inherit"
-                                variant="body2"
-                                underline="hover"
-                                onClick={handleNavigateOrganization}
-                            >
-                                Danh sách trường
-                            </Link>
-                            <Link
-                                sx={{
-                                    ml: { xs: 1, md: 3 },
-                                    textAlign: "center",
-                                    textTransform: "uppercase",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.75rem", md: "0.875rem" },
-                                }}
-                                component="button"
-                                color="inherit"
-                                variant="body2"
-                                underline="hover"
-                                onClick={handleNavigateRecruitmentPost}
-                            >
-                                Chương trình tuyển sinh
-                            </Link>
-                            <Link
-                                sx={{
-                                    ml: { xs: 1, md: 3 },
-                                    textAlign: "center",
-                                    textTransform: "uppercase",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.75rem", md: "0.875rem" },
-                                }}
-                                component="button"
-                                color="inherit"
-                                variant="body2"
-                                underline="hover"
-                                onClick={() => handleNavigateArticle()}
-                            >
-                                Bài viết
-                            </Link>
-                            <div onMouseLeave={handleMouseLeave}>
-                                <Button
-                                    id="fade-button"
-                                    aria-controls={open ? 'fade-menu' : undefined}
-                                    aria-haspopup="true"
-                                    aria-expanded={open ? 'true' : undefined}
-                                    onMouseEnter={handleMouseEnter}
+
+                        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, alignItems: "center", gap: 0.5, overflow: "hidden" }}>
+                            {NAV_LINKS.map(({ label, action }) => (
+                                <Link
+                                    key={action}
+                                    component="button"
+                                    color="inherit"
+                                    variant="body2"
+                                    underline="hover"
+                                    onClick={() => handleNavigate(action)}
                                     sx={{
-                                        ml: { xs: 1, md: 3 },
-                                        textAlign: "center",
+                                        px: { md: 1, lg: 1.5 },
                                         textTransform: "uppercase",
-                                        fontWeight: "bold",
-                                        fontSize: { xs: "0.75rem", md: "0.875rem" },
+                                        fontWeight: 700,
+                                        fontSize: { md: "0.75rem", lg: "0.875rem" },
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {label}
+                                </Link>
+                            ))}
+
+                            <div onMouseLeave={() => setAnchorEl(null)}>
+                                <Button
+                                    onMouseEnter={(e) => setAnchorEl(e.currentTarget)}
+                                    endIcon={<KeyboardArrowDown sx={{ fontSize: "1rem !important" }} />}
+                                    sx={{
+                                        px: { md: 1, lg: 1.5 },
+                                        textTransform: "uppercase",
+                                        fontWeight: 700,
+                                        fontSize: { md: "0.75rem", lg: "0.875rem" },
                                         color: "inherit",
-                                        background: "none",
+                                        whiteSpace: "nowrap",
                                     }}
                                 >
                                     Về HUBGROUP
                                 </Button>
                                 <Menu
-                                    id="fade-menu"
-                                    slotProps={{
-                                        list: {
-                                            'aria-labelledby': 'fade-button',
-                                            onMouseLeave: handleMouseLeave,
-                                        },
-                                    }}
-                                    slots={{ transition: Fade }}
                                     anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleMouseLeave}
+                                    open={menuOpen}
+                                    onClose={() => setAnchorEl(null)}
+                                    slots={{ transition: Fade }}
+                                    slotProps={{ list: { onMouseLeave: () => setAnchorEl(null) } }}
                                     disableRestoreFocus
-                                    sx={{ pointerEvents: 'none' }}
-                                    PaperProps={{ sx: { pointerEvents: 'auto' } }}
+                                    sx={{ pointerEvents: "none" }}
+                                    PaperProps={{ sx: { pointerEvents: "auto", mt: 0.5 } }}
                                 >
-                                    <MenuItem onClick={handleNavigateAboutUs}>Giới thiệu</MenuItem>
-                                    <MenuItem onClick={handleNavigateContact}>Liên hệ</MenuItem>
-                                    <MenuItem onClick={handleNavigateImageLibrary}>Thư viện ảnh</MenuItem>
-                                    <MenuItem onClick={handleNavigateImageOffice}>Văn phòng HUBGROUP</MenuItem>
+                                    {HUBGROUP_LINKS.map(({ label, url }) => (
+                                        <MenuItem key={url} onClick={() => { window.open(url, "_blank"); setAnchorEl(null); }} sx={{ fontSize: "0.875rem" }}>
+                                            {label}
+                                        </MenuItem>
+                                    ))}
                                 </Menu>
                             </div>
                         </Box>
-                        <Box sx={{ flexGrow: 0 }}>
-                            <Tooltip title="Thông tin tài khoản">
-                                <Box
-                                    sx={{ display: "flex", alignItems: "center" }}
-                                    style={{ cursor: "pointer" }}
-                                    onClick={handleNavigateAccountInfo}
+
+                        <Box sx={{ flexGrow: { xs: 1, md: 0 } }} />
+
+                        <Tooltip title="Thông tin tài khoản">
+                            <Box
+                                onClick={() => navigate("/thong-tin-tai-khoan")}
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    cursor: "pointer",
+                                    flexShrink: 0,
+                                    "&:hover": { opacity: 0.85 },
+                                }}
+                            >
+                                <Avatar
+                                    src={user?.AvatarFullUrl ?? undefined}
+                                    sx={{
+                                        width: { xs: 32, md: 36 },
+                                        height: { xs: 32, md: 36 },
+                                        fontSize: { xs: 14, md: 16 },
+                                        border: "2px solid #f36730",
+                                        boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                                    }}
                                 >
-                                    <Avatar
-                                        src={user?.AvatarFullUrl ?? undefined}
-                                        sx={{ width: { xs: 36, sm: 42 }, height: { xs: 36, sm: 42 }, fontSize: { xs: 16, sm: 18 }, border: "2px solid #fff", boxShadow: "0 2px 6px rgba(0.15,0.15,0.15,0.15)", objectFit: "contain"}}
-                                    >
-                                        {user?.AvatarFullUrl ? null : (user?.FullName?.[0] ?? <Person3 />)}
-                                    </Avatar>
-                                    <Link
-                                        sx={{
-                                            ml: 1,
-                                            textAlign: "center",
-                                            fontWeight: "bold",
-                                            fontSize: { xs: '0.875rem', md: '1rem' },
-                                        }}
-                                        component="button"
-                                        color="inherit"
-                                        variant="body1"
-                                        underline="none"
-                                    >
-                                        {user?.FullName}
-                                    </Link>
-                                </Box>
-                            </Tooltip>
-                        </Box>
+                                    {user?.AvatarFullUrl ? null : (user?.FullName?.[0] ?? <Person3 sx={{ fontSize: 18 }} />)}
+                                </Avatar>
+
+                                <Link
+                                    component="button"
+                                    color="inherit"
+                                    variant="body1"
+                                    underline="none"
+                                    sx={{
+                                        display: { xs: "none", md: "block" },
+                                        fontWeight: 700,
+                                        fontSize: "0.95rem",
+                                        whiteSpace: "nowrap",
+                                        maxWidth: 160,
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                    }}
+                                >
+                                    {user?.FullName}
+                                </Link>
+                            </Box>
+                        </Tooltip>
+
                     </Toolbar>
                 </Container>
             </AppBar>
-            {/* Drawer for xs */}
-            <Drawer
-                anchor="left"
-                open={openDrawer}
-                onClose={toggleDrawer(false)}
-            >
-                {DrawerList}
+
+            <Drawer anchor="left" open={openDrawer} onClose={() => setOpenDrawer(false)}>
+                {DrawerContent}
             </Drawer>
         </ThemeProvider>
     );

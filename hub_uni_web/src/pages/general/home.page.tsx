@@ -1,9 +1,8 @@
-import { Box, createTheme, ThemeProvider } from "@mui/material";
+import { Box, createTheme, ThemeProvider, Typography, Container } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../../components/searchs/search-bar.search";
 import SearchTabs from "../../components/searchs/search-tab.search";
-import { BACKGROUND_COLOR, TEXT_COLOR } from "../../constants/common.constant";
 import Grid from "@mui/material/Grid";
 import RecruitmentPostComponent from "../../components/general/homepage/recruitment-post.component";
 import OrganizationComponent from "../../components/general/homepage/organization.component";
@@ -11,139 +10,99 @@ import ArticleComponent from "../../components/general/homepage/article.componen
 
 const theme = createTheme({
     palette: {
-        primary: {
-            main: "#007FFF",
-            dark: "#0066CC",
-        },
+        primary: { main: "#007FFF", dark: "#0066CC" },
     },
     typography: {
-        fontFamily: [
-            "-apple-system",
-            "BlinkMacSystemFont",
-            '"Segoe UI"',
-            "Roboto",
-            '"Helvetica Neue"',
-            "Arial",
-            "sans-serif",
-            '"Apple Color Emoji"',
-            '"Segoe UI Emoji"',
-            '"Segoe UI Symbol"',
-        ].join(","),
+        fontFamily: ["-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto", '"Helvetica Neue"', "Arial", "sans-serif"].join(","),
     },
 });
+
+const STRIPES = [
+    { side: "left", right: undefined, left: "-25%", width: "55%", bg: "rgba(248,59,59,0.06)" },
+    { side: "left", right: undefined, left: "-10%", width: "30%", bg: "rgba(255,255,255,0.10)" },
+    { side: "left", right: undefined, left: "5%", width: "15%", bg: "rgba(255,255,255,0.13)" },
+    { side: "right", left: undefined, right: "-25%", width: "55%", bg: "rgba(243,69,69,0.06)" },
+    { side: "right", left: undefined, right: "-10%", width: "30%", bg: "rgba(255,255,255,0.10)" },
+    { side: "right", left: undefined, right: "5%", width: "15%", bg: "rgba(255,255,255,0.13)" },
+];
 
 const HomePage = () => {
     const navigate = useNavigate();
 
     const handleSearch = (query: string, provinceSeo: string) => {
         const params = new URLSearchParams();
-        if (query.trim()) params.append('search', query.trim());
-        if (provinceSeo) params.append('provinceSeo', provinceSeo);
+        if (query.trim()) params.append("search", query.trim());
+        if (provinceSeo) params.append("provinceSeo", provinceSeo);
         if (params.toString()) navigate(`/tim-kiem-truong?${params.toString()}`);
     };
 
     useEffect(() => {
         document.title = "Nền tảng tra cứu thông tin du học Hàn Quốc số 1 Việt Nam | duhochan.hubgroup.vn";
-    }, [navigate]);
+    }, []);
 
     return (
-        <>
-            <ThemeProvider theme={theme}>
-                <Grid
-                    container
-                    direction="column"
-                    alignItems="center"
-                    sx={{
-                        background: `linear-gradient(180deg, rgba(247, 148, 0, 0.95) 0%, rgba(252, 167, 40, 0.85) 40%, rgb(255, 183, 116) 100%)`,
-                        py: 3,
-                        position: "relative",
-                        overflow: "hidden",
-                    }}
-                >
-                    <Box sx={{
+        <ThemeProvider theme={theme}>
+            <Box
+                sx={{
+                    background: "linear-gradient(180deg, rgba(247,148,0,0.95) 0%, rgba(252,167,40,0.85) 40%, rgb(255,183,116) 100%)",
+                    py: { xs: 0.5, sm: 0.5, md: 0.5 },
+                    px: { xs: 0.5, sm: 0.5, md: 0.5 },
+                    position: "relative",
+                    overflow: "hidden",
+                }}
+            >
+                {STRIPES.map((s, i) => (
+                    <Box key={i} sx={{
                         position: "absolute",
-                        top: "-100%", left: "-25%",
-                        width: "55%", height: "350%",
-                        background: "rgba(248, 59, 59, 0.06)",
+                        top: "-100%",
+                        left: s.left,
+                        right: s.right,
+                        width: s.width,
+                        height: "350%",
+                        background: s.bg,
                         transform: "rotate(-45deg)",
                         pointerEvents: "none",
                     }} />
-                    <Box sx={{
-                        position: "absolute",
-                        top: "-100%", left: "-10%",
-                        width: "30%", height: "350%",
-                        background: "rgba(255,255,255,0.10)",
-                        transform: "rotate(-45deg)",
-                        pointerEvents: "none",
-                    }} />
-                    <Box sx={{
-                        position: "absolute",
-                        top: "-100%", left: "5%",
-                        width: "15%", height: "350%",
-                        background: "rgba(255,255,255,0.13)",
-                        transform: "rotate(-45deg)",
-                        pointerEvents: "none",
-                    }} />
-                   
-                    <Box sx={{
-                        position: "absolute",
-                        top: "-100%", right: "-25%",
-                        width: "55%", height: "350%",
-                        background: "rgba(243, 69, 69, 0.06)",
-                        transform: "rotate(-45deg)",
-                        pointerEvents: "none",
-                    }} />
-                    <Box sx={{
-                        position: "absolute",
-                        top: "-100%", right: "-10%",
-                        width: "30%", height: "350%",
-                        background: "rgba(255,255,255,0.10)",
-                        transform: "rotate(-45deg)",
-                        pointerEvents: "none",
-                    }} />
-                    <Box sx={{
-                        position: "absolute",
-                        top: "-100%", right: "5%",
-                        width: "15%", height: "350%",
-                        background: "rgba(255,255,255,0.13)",
-                        transform: "rotate(-45deg)",
-                        pointerEvents: "none",
-                    }} />
+                ))}
 
-                    {/* Nội dung */}
-                    <Box sx={{
-                        position: "relative", zIndex: 1,
-                        color: 'white', fontSize: 28, fontWeight: 'bold', mb: 2
-                    }}>
-                        Tra cứu thông chương trình tuyển sinh du học Hàn Quốc nhanh chóng và chính xác
+                <Container maxWidth="lg" disableGutters sx={{ position: "relative", zIndex: 1 }}>
+                    <Typography
+                        sx={{
+                            color: "white",
+                            fontWeight: 700,
+                            textAlign: "center",
+                            mb: { xs: 2, sm: 2.5, md: 3 },
+                            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem", lg: "1.75rem" },
+                            lineHeight: 1.4,
+                            px: { xs: 0, sm: 1, md: 2 },
+                            textShadow: "0 1px 4px rgba(0,0,0,0.15)",
+                        }}
+                    >
+                        Tra cứu thông tin chương trình tuyển sinh du học Hàn Quốc nhanh chóng và chính xác
+                    </Typography>
+
+                    <Box sx={{ width: "100%", mb: { xs: 1, sm: 1.5 } }}>
+                        <SearchBar onSearch={handleSearch} />
                     </Box>
 
-                    <Box sx={{
-                        position: "relative", zIndex: 1,
-                        width: "100%", maxWidth: 1200,
-                    }}>
-                        <Box>
-                            <SearchBar onSearch={handleSearch} />
-                        </Box>
-                        <Box sx={{ mt: 1.5 }}>
-                            <SearchTabs />
-                        </Box>
+                    <Box>
+                        <SearchTabs />
                     </Box>
-                </Grid>
+                </Container>
+            </Box>
 
-                <Grid container justifyContent="center" sx={{ py: 2 }}>
+            <Container maxWidth="xl" sx={{ py: { xs: 1, sm: 2 } }}>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <RecruitmentPostComponent />
-                </Grid>
-
-                <Grid container justifyContent="center" sx={{ py: 2 }}>
+                </Box>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <OrganizationComponent />
-                </Grid>
-
-                <Grid container justifyContent="center" sx={{ py: 2 }}>
+                </Box>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <ArticleComponent />
-                </Grid>
-            </ThemeProvider>
-        </>
+                </Box>
+            </Container>
+        </ThemeProvider>
     );
 };
 

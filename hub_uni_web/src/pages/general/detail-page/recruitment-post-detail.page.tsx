@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetRecruitmentPostBySeoQuery, useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
-import { LocationOn, BookmarkBorder, Share, AccessTime, Work, AttachMoney, School, Cake, Wc, Business, CheckCircle, PeopleAlt, Star, RunningWithErrors, Bookmark } from "@mui/icons-material";
+import { LocationOn, BookmarkBorder, Share, AccessTime, Work, AttachMoney, School, Cake, Wc, Business, CheckCircle, PeopleAlt, Star, RunningWithErrors, Bookmark, Flight } from "@mui/icons-material";
 import { Box, Typography, Button, Stack, Card, CardContent, Chip, Divider, Container, Avatar, Grid, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import ApplyConfirmDialog from "../../../components/dialogs/general/apply-confirm-dialog.dialog";
@@ -38,6 +38,7 @@ const RecruitmentPostDetailPage = () => {
     const [deleteApplication, { isLoading: isDeletingApply }] = useDeleteApplicationMutation();
     const [isSaved, setIsSaved] = useState(false);
     const userInfo = getUserInfo();
+    const isAdminOrStaff = hasAccountType(AccountType.Manager) || hasAccountType(AccountType.Collaborator);
 
     const { data: recruitmentPost, isLoading, error } = useGetRecruitmentPostBySeoQuery(seoUrl!, { skip: !seoUrl, });
     const { data: relatedPosts, isLoading: isLoadingRelated } = useGetRecruitmentPostsByPageQuery({ page: 1, size: 6, });
@@ -330,7 +331,7 @@ const RecruitmentPostDetailPage = () => {
                                         spacing={1.5}
                                         justifyContent="left"
                                     >
-                                        {hasAccountType(AccountType.Student) && (
+                                        {!isAdminOrStaff && (
                                             <Button
                                                 variant="contained"
                                                 size="small"
@@ -351,7 +352,7 @@ const RecruitmentPostDetailPage = () => {
                                                 {isDeletingApply ? 'Đang hủy...' : recruitmentPost.Applied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
                                             </Button>
                                         )}
-                                        {hasAccountType(AccountType.Student) && (
+                                        {!isAdminOrStaff && (
                                             <Button
                                                 variant={isSaved ? "contained" : "outlined"}
                                                 size="small"
@@ -414,10 +415,13 @@ const RecruitmentPostDetailPage = () => {
                                                 <RequirementRow
                                                     icon={<Cake sx={{ fontSize: 20, color: '#ff5722' }} />}
                                                     label="Độ tuổi"
-                                                    value={`${recruitmentPost.Requirement.FromAge} – ${recruitmentPost.Requirement.ToAge} tuổi`}
+                                                    value={
+                                                        recruitmentPost.Requirement.FromAge || recruitmentPost.Requirement.ToAge ? `${recruitmentPost.Requirement.FromAge ? `Từ ${recruitmentPost.Requirement.FromAge}` : ""}
+                                                        ${recruitmentPost.Requirement.FromAge && recruitmentPost.Requirement.ToAge ? " – " : ""}
+                                                        ${recruitmentPost.Requirement.ToAge ? `Đến ${recruitmentPost.Requirement.ToAge}` : ""} tuổi` : "Không yêu cầu"
+                                                    }
                                                     color="#fff3e0"
                                                 />
-
                                                 <RequirementRow
                                                     icon={<Wc sx={{ fontSize: 20, color: '#1976d2' }} />}
                                                     label="Giới tính"
@@ -463,6 +467,15 @@ const RecruitmentPostDetailPage = () => {
                                                         label="Số buổi nghỉ tối đa"
                                                         value={`${recruitmentPost.Requirement.MaxAbsence} buổi`}
                                                         color="#ffebee"
+                                                    />
+                                                )}
+
+                                                {recruitmentPost.Requirement.VisaType != null && (
+                                                    <RequirementRow
+                                                        icon={<Flight sx={{ fontSize: 20, color: '#b950ffff' }} />}
+                                                        label="Loại Visa"
+                                                        value={`${recruitmentPost.Requirement.VisaType}`}
+                                                        color="#fad3e2ff"
                                                     />
                                                 )}
                                             </Stack>

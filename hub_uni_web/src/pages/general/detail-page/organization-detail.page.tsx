@@ -102,7 +102,7 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                             src={images[0]}
                             alt="featured-0"
                             loading="lazy"
-                            sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease, filter 0.3s ease', display: 'block', }}
+                            sx={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.3s ease, filter 0.3s ease', display: 'block', }}
                         />
                     </Box>
 
@@ -122,7 +122,7 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                                             src={url}
                                             alt={`featured-${idx + 1}`}
                                             loading="lazy"
-                                            sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease, filter 0.3s ease', display: 'block', }}
+                                            sx={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.3s ease, filter 0.3s ease', display: 'block', }}
                                         />
                                         {showOverlay && (
                                             <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0,0,0,0.52)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 1.5, transition: 'bgcolor 0.2s', '&:hover': { bgcolor: 'rgba(0,0,0,0.65)' }, }}>
@@ -247,13 +247,21 @@ const OrganizationDetailPage = () => {
             )}
 
             <Box sx={{ p: { xs: 1, md: 1 }, maxWidth: 1200, mx: 'auto' }}>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 1, md: 2 } }}>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Stack spacing={1}>
 
                             <Card>
                                 <CardContent>
-                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: { xs: 'column', sm: 'row' },
+                                            alignItems: { xs: 'center', sm: 'flex-start' },
+                                            textAlign: { xs: 'center', sm: 'left' },
+                                            gap: 1.5
+                                        }}
+                                    >
                                         {organization.LogoFullUrl && (
                                             <Box
                                                 component="img"
@@ -296,7 +304,7 @@ const OrganizationDetailPage = () => {
 
                             <Card>
                                 <Box sx={{ px: 2, pt: 1, pb: 0, bgcolor: '#fff' }}>
-                                    <Stack direction="row">
+                                    <Stack direction="row" sx={{ overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
                                         {[
                                             { label: "Giới thiệu", icon: <Info sx={{ fontSize: 17 }} /> },
                                             { label: "Chương trình tuyển sinh", icon: <NotificationsActive sx={{ fontSize: 17 }} /> },
@@ -589,7 +597,7 @@ const OrganizationDetailPage = () => {
                         </Stack>
                     </Box>
 
-                    <Box sx={{ width: { xs: '100%', md: '340px' }, flexShrink: 0 }}>
+                    <Box sx={{ width: { xs: '100%', md: 340 }, flexShrink: 0, order: { xs: 2, md: 2 } }}>
                         <Stack spacing={1}>
 
                             <Card>

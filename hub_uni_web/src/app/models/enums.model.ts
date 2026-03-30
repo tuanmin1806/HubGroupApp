@@ -35,10 +35,10 @@ export enum Gender {
 
 export enum AccountType {
   Undefined = 0,
-  Staff = 1,
-  Manager = 4,
+  Collaborator = 3,
   Student = 7,
   Admin = 10,
+  Manager = 4,
   SuperAdmin = 100
 }
 

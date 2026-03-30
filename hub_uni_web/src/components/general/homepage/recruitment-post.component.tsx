@@ -17,7 +17,7 @@ const sectionWrapperSx = {
     borderRadius: 2,
     border: "1px solid #eee",
     boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-    p: { xs: 2, md: 2 },
+    p: { xs: 1.5, sm: 2, md: 2.5 },
 };
 
 const RecruitmentPostComponent = () => {
@@ -85,30 +85,20 @@ const RecruitmentPostComponent = () => {
     return (
         <Box sx={sectionWrapperSx}>
             {/* Header */}
-            <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    mb: 2,
-                }}
-            >
-                <Box sx={{ color: "#ff5722", fontSize: 18, fontWeight: 700, textTransform: "uppercase" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                <Box sx={{ color: "#ff5722", fontSize: { xs: 15, sm: 17, md: 18 }, fontWeight: 700, textTransform: "uppercase" }}>
                     Chương trình tuyển sinh
                 </Box>
-
                 <Button
                     variant="outlined"
                     endIcon={<ArrowForward />}
                     onClick={() => navigate("/chuong-trinh-tuyen-sinh")}
+                    size="small"
                     sx={{
                         borderColor: "#ff5722",
                         color: "#ff5722",
-                        fontSize: 12,
-                        "&:hover": {
-                            bgcolor: "#ff5722",
-                            color: "#fff",
-                        },
+                        fontSize: { xs: 9, sm: 11 },
+                        "&:hover": { bgcolor: "#ff5722", color: "#fff", borderColor: "#ff5722" },
                     }}
                 >
                     Xem tất cả
@@ -123,7 +113,7 @@ const RecruitmentPostComponent = () => {
                         spacing={2}
                         alignItems={{ xs: "stretch", md: "center" }}
                     >
-                        <FormControl sx={{ minWidth: 260 }}>
+                        <FormControl sx={{ minWidth: 260 }} size="small">
                             <InputLabel>
                                 <FilterAlt />
                                 Lọc

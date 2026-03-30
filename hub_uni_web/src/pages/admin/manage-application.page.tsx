@@ -178,7 +178,7 @@ export default function ManageApplicationPage() {
                     <Paper sx={{ display: "flex", alignItems: "center" }}>
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
-                            placeholder="Tìm kiếm nhân viên"
+                            placeholder="Tìm kiếm ứng viên"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}

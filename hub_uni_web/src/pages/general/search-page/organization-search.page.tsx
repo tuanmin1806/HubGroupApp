@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import { createTheme, Box, TextField, Button, Card, CardContent, Typography, FormControl, Chip, CircularProgress, FormLabel, RadioGroup, FormControlLabel, Radio, Divider, Stack, Paper } from "@mui/material";
+import { createTheme, Box, TextField, Button, Card, CardContent, Typography, FormControl, Chip, CircularProgress, FormLabel, RadioGroup, FormControlLabel, Radio, Divider, Stack, Paper, Tooltip, Drawer } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import OrganizationPagination from "../../../components/pagination/organization-pagination";
@@ -52,6 +52,7 @@ const OrganizationSearchPage = () => {
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
     const initialNameSearch = searchParams.get('search') || '';
+    const [openFilter, setOpenFilter] = useState(false);
 
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filters, setFilters] = useState<OrganizationFilterParams>({
@@ -191,10 +192,375 @@ const OrganizationSearchPage = () => {
         }
     };
 
+    const filterContent = (
+        <>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    position: { md: "sticky" },
+                    top: 24,
+                }}
+            >
+                {/* Header */}
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <FilterList sx={{ fontSize: 20 }} />
+                        <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
+                            Bộ lọc
+                        </Typography>
+                    </Stack>
+                    {hasActiveFilters && (
+                        <Button
+                            size="small"
+                            startIcon={<Clear sx={{ fontSize: 16 }} />}
+                            onClick={handleClearFilters}
+                            sx={{ fontSize: "0.75rem", minWidth: 0, px: 1 }}
+                        >
+                            Xóa
+                        </Button>
+                    )}
+                </Stack>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Loại hình*/}
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel
+                        sx={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "text.primary",
+                            mb: 1,
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Apartment sx={{ fontSize: 16, mr: 0.5 }} />
+                        Loại hình
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllOrgTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {isLoadingOrgTypes && allOrgTypes.length === 0 ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <RadioGroup
+                                value={filters.organizationTypeId}
+                                onChange={(e) => handleFilterChange("organizationTypeId", e.target.value)}
+                            >
+                                <FormControlLabel
+                                    sx={{ ml: 0 }}
+                                    value=""
+                                    control={<Radio size="small" />}
+                                    label={<Typography variant="body2">Tất cả</Typography>}
+                                />
+                                {(showAllOrgTypes ? allOrgTypes : allOrgTypes.slice(0, 5)).map((type) => (
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        key={type.Id}
+                                        value={type.Id}
+                                        control={<Radio size="small" />}
+                                        label={<Tooltip title={type.Name} arrow>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {type.Name}
+                                            </Typography>
+                                        </Tooltip>}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        {(hasMoreOrgTypes || allOrgTypes.length > 5) && (
+                            <Button
+                                size="small"
+                                onClick={handleToggleOrgTypes}
+                                disabled={isLoadingOrgTypes}
+                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                            >
+                                {isLoadingOrgTypes ? <CircularProgress size={16} /> : (showAllOrgTypes && !hasMoreOrgTypes) ? "Thu gọn" : "Xem thêm"}
+                            </Button>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Ngành nghề */}
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel
+                        sx={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "text.primary",
+                            mb: 1,
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Category sx={{ fontSize: 16, mr: 0.5 }} />
+                        Ngành nghề
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllProfessions ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {isLoadingProfessions && allProfessions.length === 0 ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <RadioGroup
+                                value={filters.professionId}
+                                onChange={(e) => handleFilterChange("professionId", e.target.value)}
+                            >
+                                <FormControlLabel
+                                    sx={{ ml: 0 }}
+                                    value=""
+                                    control={<Radio size="small" />}
+                                    label={<Typography variant="body2">Tất cả</Typography>}
+                                />
+                                {(showAllProfessions ? allProfessions : allProfessions.slice(0, 5)).map((profession) => (
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        key={profession.Id}
+                                        value={profession.Id}
+                                        control={<Radio size="small" />}
+                                        label={<Tooltip title={profession.Name} arrow>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {profession.Name}
+                                            </Typography>
+                                        </Tooltip>}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        {(hasMoreProfessions || allProfessions.length > 5) && (
+                            <Button
+                                size="small"
+                                onClick={handleToggleProfessions}
+                                disabled={isLoadingProfessions}
+                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                            >
+                                {isLoadingProfessions ? <CircularProgress size={16} /> : (showAllProfessions && !hasMoreProfessions) ? "Thu gọn" : "Xem thêm"}
+                            </Button>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Tỉnh / Thành phố */}
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel
+                        sx={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "text.primary",
+                            mb: 1,
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <LocationCity sx={{ fontSize: 16, mr: 0.5 }} />
+                        Tỉnh / Thành phố
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllProvinces ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {isLoadingProvinces ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <RadioGroup
+                                value={filters.provinceId}
+                                onChange={(e) => handleFilterChange("provinceId", e.target.value)}
+                            >
+                                <FormControlLabel
+                                    sx={{ ml: 0 }}
+                                    value=""
+                                    control={<Radio size="small" />}
+                                    label={<Typography variant="body2">Tất cả</Typography>}
+                                />
+                                {(showAllProvinces ? provinces : provinces?.slice(0, 5))?.map((province) => (
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        key={province.Id}
+                                        value={province.Id}
+                                        control={<Radio size="small" />}
+                                        label={<Tooltip title={province.Name} arrow>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {province.Name}
+                                            </Typography>
+                                        </Tooltip>}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        {provinces && provinces.length > 5 && (
+                            <Button
+                                size="small"
+                                onClick={() => setShowAllProvinces(!showAllProvinces)}
+                                sx={{
+                                    mt: 1,
+                                    fontSize: "0.75rem",
+                                    textTransform: "none",
+                                    color: "primary.main"
+                                }}
+                            >
+                                {showAllProvinces ? "Thu gọn" : "Xem thêm"}
+                            </Button>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Quận / Huyện */}
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel
+                        sx={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "text.primary",
+                            mb: 1,
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Place sx={{ fontSize: 16, mr: 0.5 }} />
+                        Quận / Huyện
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllCommunes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {!filters.provinceId ? (
+                            <Typography variant="body2" color="text.secondary" sx={{ py: 1, fontStyle: 'italic' }}>
+                                Vui lòng chọn Tỉnh/Thành phố trước
+                            </Typography>
+                        ) : isLoadingCommunes ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <>
+                                <RadioGroup
+                                    value={filters.communeId}
+                                    onChange={(e) => handleFilterChange("communeId", e.target.value)}
+                                >
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        value=""
+                                        control={<Radio size="small" />}
+                                        label={<Typography variant="body2">Tất cả</Typography>}
+                                    />
+                                    {(showAllCommunes ? communes : communes?.slice(0, 5))?.map((commune) => (
+                                        <FormControlLabel
+                                            sx={{ ml: 0 }}
+                                            key={commune.Id}
+                                            value={commune.Id}
+                                            control={<Radio size="small" />}
+                                            label={<Tooltip title={commune.Name} arrow>
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 1,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}
+                                                >
+                                                    {commune.Name}
+                                                </Typography>
+                                            </Tooltip>}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                                {communes && communes.length > 5 && (
+                                    <Button
+                                        size="small"
+                                        onClick={() => setShowAllCommunes(!showAllCommunes)}
+                                        sx={{
+                                            mt: 1,
+                                            fontSize: "0.75rem",
+                                            textTransform: "none",
+                                            color: "primary.main"
+                                        }}
+                                    >
+                                        {showAllCommunes ? "Thu gọn" : "Xem thêm"}
+                                    </Button>
+                                )}
+                            </>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Mã số thuế */}
+                <FormControl fullWidth>
+                    <FormLabel
+                        sx={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "text.primary",
+                            mb: 1,
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Numbers sx={{ fontSize: 16, mr: 0.5 }} />
+                        Mã số thuế
+                    </FormLabel>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        placeholder="Nhập mã số thuế"
+                        value={filters.taxSearch}
+                        onChange={(e) => handleFilterChange("taxSearch", e.target.value)}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                fontSize: '0.875rem'
+                            }
+                        }}
+                    />
+                </FormControl>
+            </Paper>
+        </>
+    );
+
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 2, display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ maxWidth: 1200, width: '100%', px: { xs: 2, md: 3 } }}>
+                <Box sx={{ maxWidth: 1200, width: '100%', px: { xs: 1, md: 3 } }}>
                     {/* Search Bar */}
                     <Box sx={{
                         width: "100%",
@@ -209,304 +575,45 @@ const OrganizationSearchPage = () => {
                         />
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            gap: 1,
+                            flexDirection: { xs: "column", md: "row" }
+                        }}
+                    >
                         {/* Left Sidebar - Filters */}
                         <Box
                             sx={{
-                                width: { xs: "100%", md: 300 },
+                                display: { xs: "none", md: "block" },
+                                width: 300,
                                 flexShrink: 0,
                             }}
                         >
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    p: 2.5,
-                                    borderRadius: 2,
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                    position: { md: "sticky" },
-                                    top: 24,
-                                }}
+                            {filterContent}
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: { xs: "flex", md: "none" },
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 1,
+                                px: 1
+                            }}
+                        >
+                            <Typography variant="body2">
+                                {organizationData?.Total || 0} kết quả
+                            </Typography>
+
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<FilterList />}
+                                onClick={() => setOpenFilter(true)}
                             >
-                                {/* Header */}
-                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <FilterList sx={{ fontSize: 20 }} />
-                                        <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
-                                            Bộ lọc
-                                        </Typography>
-                                    </Stack>
-                                    {hasActiveFilters && (
-                                        <Button
-                                            size="small"
-                                            startIcon={<Clear sx={{ fontSize: 16 }} />}
-                                            onClick={handleClearFilters}
-                                            sx={{ fontSize: "0.75rem", minWidth: 0, px: 1 }}
-                                        >
-                                            Xóa
-                                        </Button>
-                                    )}
-                                </Stack>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Loại hình*/}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel
-                                        sx={{
-                                            fontWeight: 600,
-                                            fontSize: "0.9rem",
-                                            color: "text.primary",
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <Apartment sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Loại hình
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllOrgTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingOrgTypes && allOrgTypes.length === 0 ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.organizationTypeId}
-                                                onChange={(e) => handleFilterChange("organizationTypeId", e.target.value)}
-                                            >
-                                                <FormControlLabel
-                                                    value=""
-                                                    control={<Radio size="small" />}
-                                                    label={<Typography variant="body2">Tất cả</Typography>}
-                                                />
-                                                {(showAllOrgTypes ? allOrgTypes : allOrgTypes.slice(0, 5)).map((type) => (
-                                                    <FormControlLabel
-                                                        key={type.Id}
-                                                        value={type.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{type.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {(hasMoreOrgTypes || allOrgTypes.length > 5) && (
-                                            <Button
-                                                size="small"
-                                                onClick={handleToggleOrgTypes}
-                                                disabled={isLoadingOrgTypes}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
-                                            >
-                                                {isLoadingOrgTypes ? <CircularProgress size={16} /> : (showAllOrgTypes && !hasMoreOrgTypes) ? "Thu gọn" : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Ngành nghề */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel
-                                        sx={{
-                                            fontWeight: 600,
-                                            fontSize: "0.9rem",
-                                            color: "text.primary",
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Ngành nghề
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllProfessions ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingProfessions && allProfessions.length === 0 ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.professionId}
-                                                onChange={(e) => handleFilterChange("professionId", e.target.value)}
-                                            >
-                                                <FormControlLabel
-                                                    value=""
-                                                    control={<Radio size="small" />}
-                                                    label={<Typography variant="body2">Tất cả</Typography>}
-                                                />
-                                                {(showAllProfessions ? allProfessions : allProfessions.slice(0, 5)).map((profession) => (
-                                                    <FormControlLabel
-                                                        key={profession.Id}
-                                                        value={profession.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{profession.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {(hasMoreProfessions || allProfessions.length > 5) && (
-                                            <Button
-                                                size="small"
-                                                onClick={handleToggleProfessions}
-                                                disabled={isLoadingProfessions}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
-                                            >
-                                                {isLoadingProfessions ? <CircularProgress size={16} /> : (showAllProfessions && !hasMoreProfessions) ? "Thu gọn" : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Tỉnh / Thành phố */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel
-                                        sx={{
-                                            fontWeight: 600,
-                                            fontSize: "0.9rem",
-                                            color: "text.primary",
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <LocationCity sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Tỉnh / Thành phố
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllProvinces ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingProvinces ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.provinceId}
-                                                onChange={(e) => handleFilterChange("provinceId", e.target.value)}
-                                            >
-                                                <FormControlLabel
-                                                    value=""
-                                                    control={<Radio size="small" />}
-                                                    label={<Typography variant="body2">Tất cả</Typography>}
-                                                />
-                                                {(showAllProvinces ? provinces : provinces?.slice(0, 5))?.map((province) => (
-                                                    <FormControlLabel
-                                                        key={province.Id}
-                                                        value={province.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{province.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {provinces && provinces.length > 5 && (
-                                            <Button
-                                                size="small"
-                                                onClick={() => setShowAllProvinces(!showAllProvinces)}
-                                                sx={{
-                                                    mt: 1,
-                                                    fontSize: "0.75rem",
-                                                    textTransform: "none",
-                                                    color: "primary.main"
-                                                }}
-                                            >
-                                                {showAllProvinces ? "Thu gọn" : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Quận / Huyện */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel
-                                        sx={{
-                                            fontWeight: 600,
-                                            fontSize: "0.9rem",
-                                            color: "text.primary",
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <Place sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Quận / Huyện
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllCommunes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {!filters.provinceId ? (
-                                            <Typography variant="body2" color="text.secondary" sx={{ py: 1, fontStyle: 'italic' }}>
-                                                Vui lòng chọn Tỉnh/Thành phố trước
-                                            </Typography>
-                                        ) : isLoadingCommunes ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <>
-                                                <RadioGroup
-                                                    value={filters.communeId}
-                                                    onChange={(e) => handleFilterChange("communeId", e.target.value)}
-                                                >
-                                                    <FormControlLabel
-                                                        value=""
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">Tất cả</Typography>}
-                                                    />
-                                                    {(showAllCommunes ? communes : communes?.slice(0, 5))?.map((commune) => (
-                                                        <FormControlLabel
-                                                            key={commune.Id}
-                                                            value={commune.Id}
-                                                            control={<Radio size="small" />}
-                                                            label={<Typography variant="body2">{commune.Name}</Typography>}
-                                                        />
-                                                    ))}
-                                                </RadioGroup>
-                                                {communes && communes.length > 5 && (
-                                                    <Button
-                                                        size="small"
-                                                        onClick={() => setShowAllCommunes(!showAllCommunes)}
-                                                        sx={{
-                                                            mt: 1,
-                                                            fontSize: "0.75rem",
-                                                            textTransform: "none",
-                                                            color: "primary.main"
-                                                        }}
-                                                    >
-                                                        {showAllCommunes ? "Thu gọn" : "Xem thêm"}
-                                                    </Button>
-                                                )}
-                                            </>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Mã số thuế */}
-                                <FormControl fullWidth>
-                                    <FormLabel
-                                        sx={{
-                                            fontWeight: 600,
-                                            fontSize: "0.9rem",
-                                            color: "text.primary",
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <Numbers sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Mã số thuế
-                                    </FormLabel>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        placeholder="Nhập mã số thuế"
-                                        value={filters.taxSearch}
-                                        onChange={(e) => handleFilterChange("taxSearch", e.target.value)}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                fontSize: '0.875rem'
-                                            }
-                                        }}
-                                    />
-                                </FormControl>
-                            </Paper>
+                                Bộ lọc
+                            </Button>
                         </Box>
 
                         {/* Right Side - Results */}
@@ -714,6 +821,20 @@ const OrganizationSearchPage = () => {
                     </Box>
                 </Box>
             </Box>
+            <Drawer
+                anchor="left"
+                open={openFilter}
+                onClose={() => setOpenFilter(false)}
+                PaperProps={{
+                    sx: {
+                        width: "80%",
+                        maxWidth: 320,
+                        p: 1
+                    }
+                }}
+            >
+                {filterContent}
+            </Drawer>
         </ThemeProvider>
     );
 };

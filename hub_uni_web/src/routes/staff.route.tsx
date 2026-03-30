@@ -8,7 +8,11 @@ import StaffDashboardPage from "../pages/staff/staff-dashboard.page"
 const staffRoutes = [
     {
         index: true,
-        element: <StaffDashboardPage />,
+        element: (
+            <ProtectedRoute allowedAccountTypes={["Collaborator"]}>
+                <StaffDashboardPage />
+            </ProtectedRoute>
+        ),
     },
     {
         path: "manage-recruitment-post",
@@ -28,7 +32,11 @@ const staffRoutes = [
     },
     {
         path: "create-recruitment-post",
-        element: <CreateRecruitmentPostPage />,
+        element: (
+            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Collaborator"]}>
+                <CreateRecruitmentPostPage />
+            </ProtectedRoute>
+        ),
     },
 ]
 

@@ -14,6 +14,7 @@ import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+import { useRoutePrefix } from "../../hooks/useRoutePrefix";
 
 const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
     Active: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },
@@ -38,6 +39,7 @@ export default function ManageRecruitmentPostPage() {
     const userInfo = getUserInfo();
     const dispatch = useDispatch<AppDispatch>();
     const organizationId = userInfo?.OrganizationId ?? "";
+    const prefix = useRoutePrefix();
 
     const queryParams: RecruitmentPostFilterParams = { page: page + 1, size: rowsPerPage, searchValue: searchValue || undefined, ...filterParams, organizationId: organizationId };
 
@@ -175,7 +177,7 @@ export default function ManageRecruitmentPostPage() {
                         variant="contained"
                         color="primary"
                         startIcon={<Add />}
-                        onClick={() => navigate("/admin/create-recruitment-post")}
+                        onClick={() => navigate(`${prefix}/create-recruitment-post`)}
                     >
                         Thêm
                     </Button>

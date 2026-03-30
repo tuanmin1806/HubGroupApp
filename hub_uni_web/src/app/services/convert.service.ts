@@ -86,9 +86,9 @@ export class ConvertService {
 
     private static ACCOUNT_TYPE_MAP: Record<AccountType, string> = {
         [AccountType.Undefined]: 'Không xác định',
-        [AccountType.Staff]: 'Nhân viên',
         [AccountType.Manager]: 'Quản lý',
         [AccountType.Admin]: 'Quản trị viên',
+        [AccountType.Collaborator]: 'Nhân viên',
         [AccountType.SuperAdmin]: 'SuperAdmin',
         [AccountType.Student]: 'Học sinh'
     };
@@ -122,10 +122,10 @@ export class ConvertService {
 
     private static REVERSE_ACCOUNT_TYPE_MAP: Record<string, AccountType> = {
         'Undefined': AccountType.Undefined,
-        'Staff': AccountType.Staff,
         'Manager': AccountType.Manager,
         'Admin': AccountType.Admin,
         'SuperAdmin': AccountType.SuperAdmin,
+        'Collaborator': AccountType.Collaborator,
         'Student': AccountType.Student
     };
 

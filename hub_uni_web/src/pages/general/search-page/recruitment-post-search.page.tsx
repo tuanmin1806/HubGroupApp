@@ -19,6 +19,8 @@ import {
     TextField,
     createTheme,
     ThemeProvider,
+    Tooltip,
+    Drawer,
 } from "@mui/material";
 import {
     WorkOutline,
@@ -84,6 +86,7 @@ const RecruitmentPostSearchPage = () => {
     const [showAllProvinces, setShowAllProvinces] = useState(false);
     const [showAllVisaTypes, setShowAllVisaTypes] = useState(false);
     const [showCostFilter] = useState(true);
+    const [openFilter, setOpenFilter] = useState(false);
 
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
@@ -176,6 +179,7 @@ const RecruitmentPostSearchPage = () => {
         setCostError("");
         setSelectedProvinceSeo('');
         setPage(DEFAULT_PAGE);
+        setOpenFilter(false);
     };
 
     const handleToggleProfessions = () => {
@@ -236,15 +240,312 @@ const RecruitmentPostSearchPage = () => {
 
     const hasMoreProfessions = professionsData && (allProfessions.length < professionsData.Total);
     const hasMoreVisaTypes = visaTypesData && (allVisaTypes.length < visaTypesData.Total);
-    const hasActiveFilters = filters.provinceId || filters.professionId || filters.searchValue || filters.fromCost || filters.toCost;
+    const hasActiveFilters = !!filters.provinceId || !!filters.professionId || !!filters.searchValue || !!filters.fromCost || !!filters.toCost || !!filters.visaTypeId;
 
     const costInputDirty = costInput.fromCost !== filters.fromCost || costInput.toCost !== filters.toCost;
     const currency = recruitmentPosts.find(p => p.Currency)?.Currency ?? "";
 
+    const filterContent = (
+        <>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    position: { md: "sticky" },
+                    top: 24,
+                }}
+            >
+                {/* Header */}
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <FilterList sx={{ fontSize: 20 }} />
+                        <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
+                            Bộ lọc
+                        </Typography>
+                    </Stack>
+                    {hasActiveFilters && (
+                        <Button
+                            size="small"
+                            startIcon={<Clear sx={{ fontSize: 16 }} />}
+                            onClick={handleClearFilters}
+                            sx={{ fontSize: "0.75rem", minWidth: 0, px: 1 }}
+                        >
+                            Xóa
+                        </Button>
+                    )}
+                </Stack>
+
+                <Divider sx={{ mb: 2 }} />
+
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1, display: "flex", alignItems: "center" }}>
+                        <Category sx={{ fontSize: 16, mr: 0.5 }} />
+                        Loại hình Visa
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllVisaTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {isLoadingVisaTypes && allVisaTypes.length === 0 ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <RadioGroup
+                                value={filters.visaTypeId}
+                                onChange={(e) => handleFilterChange("visaTypeId", e.target.value)}
+                            >
+                                <FormControlLabel sx={{ ml: 0 }} value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
+                                {(showAllVisaTypes ? allVisaTypes : allVisaTypes.slice(0, 5)).map((visaType) => (
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        key={visaType.Id}
+                                        value={visaType.Id}
+                                        control={<Radio size="small" />}
+                                        label={<Tooltip title={visaType.Name} arrow>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {visaType.Name}
+                                            </Typography>
+                                        </Tooltip>}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        {(hasMoreVisaTypes || allVisaTypes.length > 5) && (
+                            <Button
+                                size="small"
+                                onClick={handleToggleVisaTypes}
+                                disabled={isLoadingVisaTypes}
+                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                            >
+                                {isLoadingVisaTypes
+                                    ? <CircularProgress size={16} />
+                                    : (showAllVisaTypes && !hasMoreVisaTypes) ? "Thu gọn" : "Xem thêm"
+                                }
+                            </Button>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Ngành nghề */}
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1, display: "flex", alignItems: "center" }}>
+                        <Category sx={{ fontSize: 16, mr: 0.5 }} />
+                        Ngành nghề
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllProfessions ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {isLoadingProfessions && allProfessions.length === 0 ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <RadioGroup
+                                value={filters.professionId}
+                                onChange={(e) => handleFilterChange("professionId", e.target.value)}
+                            >
+                                <FormControlLabel sx={{ ml: 0 }} value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
+                                {(showAllProfessions ? allProfessions : allProfessions.slice(0, 5)).map((profession) => (
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        key={profession.Id}
+                                        value={profession.Id}
+                                        control={<Radio size="small" />}
+                                        label={<Tooltip title={profession.Name} arrow>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {profession.Name}
+                                            </Typography>
+                                        </Tooltip>}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        {(hasMoreProfessions || allProfessions.length > 5) && (
+                            <Button
+                                size="small"
+                                onClick={handleToggleProfessions}
+                                disabled={isLoadingProfessions}
+                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
+                            >
+                                {isLoadingProfessions ? <CircularProgress size={16} /> : (showAllProfessions && !hasMoreProfessions) ? "Thu gọn" : "Xem thêm"}
+                            </Button>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                {/* Tỉnh / Thành phố */}
+                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
+                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1, display: "flex", alignItems: "center" }}>
+                        <LocationCity sx={{ fontSize: 16, mr: 0.5 }} />
+                        Tỉnh / Thành phố
+                    </FormLabel>
+                    <Box sx={{ maxHeight: showAllProvinces ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
+                        {isLoadingProvinces ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
+                                <CircularProgress size={20} sx={{ mr: 1 }} />
+                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
+                            </Box>
+                        ) : (
+                            <RadioGroup
+                                value={filters.provinceId}
+                                onChange={(e) => handleFilterChange("provinceId", e.target.value)}
+                            >
+                                <FormControlLabel sx={{ ml: 0 }} value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
+                                {(showAllProvinces ? provinces : provinces?.slice(0, 5))?.map((province) => (
+                                    <FormControlLabel
+                                        sx={{ ml: 0 }}
+                                        key={province.Id}
+                                        value={province.Id}
+                                        control={<Radio size="small" />}
+                                        label={<Tooltip title={province.Name} arrow>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {province.Name}
+                                            </Typography>
+                                        </Tooltip>}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        {provinces && provinces.length > 5 && (
+                            <Button size="small" onClick={() => setShowAllProvinces(!showAllProvinces)}
+                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
+                                {showAllProvinces ? "Thu gọn" : "Xem thêm"}
+                            </Button>
+                        )}
+                    </Box>
+                </FormControl>
+
+                <Divider sx={{ mb: 2 }} />
+
+                <Box sx={{ mb: 1 }}>
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                    >
+                        <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1, display: "flex", alignItems: "center" }}>
+                            <AttachMoney sx={{ fontSize: 16, mr: 0.5 }} />
+                            Khoảng học phí ({currency})
+                        </FormLabel>
+                    </Stack>
+
+                    <Collapse in={showCostFilter}>
+                        <Stack spacing={1}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <TextField
+                                    size="small"
+                                    placeholder="Từ"
+                                    value={formatNumberDisplay(costInput.fromCost)}
+                                    onChange={(e) => handleCostInputChange("fromCost", e.target.value)}
+                                    sx={{
+                                        flex: 1,
+                                        "& .MuiInputBase-input": { fontSize: "0.8rem", py: "6px" },
+                                    }}
+                                />
+                                <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>—</Typography>
+                                <TextField
+                                    size="small"
+                                    placeholder="Đến"
+                                    value={formatNumberDisplay(costInput.toCost)}
+                                    onChange={(e) => handleCostInputChange("toCost", e.target.value)}
+                                    sx={{
+                                        flex: 1,
+                                        "& .MuiInputBase-input": { fontSize: "0.8rem", py: "6px" },
+                                    }}
+                                />
+                            </Stack>
+
+                            {costError && (
+                                <Typography variant="caption" color="error" sx={{ fontSize: "0.7rem" }}>
+                                    {costError}
+                                </Typography>
+                            )}
+
+                            {(filters.fromCost || filters.toCost) && !costInputDirty && (
+                                <Stack direction="row" alignItems="center" spacing={0.5}>
+                                    <Chip
+                                        label={`${filters.fromCost ? Number(filters.fromCost).toLocaleString("vi-VN") : "0"} — ${filters.toCost ? Number(filters.toCost).toLocaleString("vi-VN") : "∞"}`}
+                                        size="small"
+                                        onDelete={() => {
+                                            setCostInput({ fromCost: "", toCost: "" });
+                                            setFilters(prev => ({ ...prev, fromCost: "", toCost: "" }));
+                                            setCostError("");
+                                        }}
+                                        sx={{
+                                            fontSize: "0.68rem",
+                                            height: 22,
+                                            bgcolor: "rgba(243,103,48,0.1)",
+                                            color: "primary.main",
+                                            border: "1px solid",
+                                            borderColor: "primary.light",
+                                            "& .MuiChip-label": { px: 1 },
+                                            "& .MuiChip-deleteIcon": { fontSize: 14 },
+                                        }}
+                                    />
+                                </Stack>
+                            )}
+
+                            <Button
+                                size="small"
+                                variant="contained"
+                                onClick={handleApplyCost}
+                                disableElevation
+                                sx={{
+                                    fontSize: "0.75rem",
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    bgcolor: BACK_GROUND_BUTTON_COLOR,
+                                    "&:hover": { bgcolor: "#f59d19" },
+                                    borderRadius: 1,
+                                    py: 0.5,
+                                }}
+                            >
+                                Áp dụng
+                            </Button>
+
+                        </Stack>
+                    </Collapse>
+                </Box>
+            </Paper>
+        </>
+    );
+
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", py: 2 }}>
-                <Container maxWidth="lg">
+            <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 2, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ maxWidth: 1200, width: '100%', px: { xs: 1, md: 3 } }}>
                     {/* Search Bar */}
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
                         <SearchBar
@@ -254,259 +555,45 @@ const RecruitmentPostSearchPage = () => {
                         />
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            gap: 1,
+                            flexDirection: { xs: "column", md: "row" }
+                        }}
+                    >
                         {/* Sidebar Filter */}
-                        <Box sx={{ width: { xs: "100%", md: 300 }, flexShrink: 0 }}>
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    p: 2.5,
-                                    borderRadius: 2,
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                    position: { md: "sticky" },
-                                    top: 24,
-                                }}
+                        <Box
+                            sx={{
+                                display: { xs: "none", md: "block" },
+                                width: 300,
+                                flexShrink: 0,
+                            }}
+                        >
+                            {filterContent}
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: { xs: "flex", md: "none" },
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 1,
+                                px: 1
+                            }}
+                        >
+                            <Typography variant="body2">
+                                {recruitmentData?.Total || 0} kết quả
+                            </Typography>
+
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<FilterList />}
+                                onClick={() => setOpenFilter(true)}
                             >
-                                {/* Header */}
-                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <FilterList sx={{ fontSize: 20 }} />
-                                        <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.1rem" }}>
-                                            Bộ lọc
-                                        </Typography>
-                                    </Stack>
-                                    {hasActiveFilters && (
-                                        <Button
-                                            size="small"
-                                            startIcon={<Clear sx={{ fontSize: 16 }} />}
-                                            onClick={handleClearFilters}
-                                            sx={{ fontSize: "0.75rem", minWidth: 0, px: 1 }}
-                                        >
-                                            Xóa
-                                        </Button>
-                                    )}
-                                </Stack>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
-                                        <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Loại hình Visa
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllVisaTypes ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingVisaTypes && allVisaTypes.length === 0 ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.visaTypeId}
-                                                onChange={(e) => handleFilterChange("visaTypeId", e.target.value)}
-                                            >
-                                                <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
-                                                {(showAllVisaTypes ? allVisaTypes : allVisaTypes.slice(0, 5)).map((visaType) => (
-                                                    <FormControlLabel
-                                                        key={visaType.Id}
-                                                        value={visaType.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{visaType.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {(hasMoreVisaTypes || allVisaTypes.length > 5) && (
-                                            <Button
-                                                size="small"
-                                                onClick={handleToggleVisaTypes}
-                                                disabled={isLoadingVisaTypes}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
-                                            >
-                                                {isLoadingVisaTypes
-                                                    ? <CircularProgress size={16} />
-                                                    : (showAllVisaTypes && !hasMoreVisaTypes) ? "Thu gọn" : "Xem thêm"
-                                                }
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Ngành nghề */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
-                                        <Category sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Ngành nghề
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllProfessions ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingProfessions && allProfessions.length === 0 ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.professionId}
-                                                onChange={(e) => handleFilterChange("professionId", e.target.value)}
-                                            >
-                                                <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
-                                                {(showAllProfessions ? allProfessions : allProfessions.slice(0, 5)).map((profession) => (
-                                                    <FormControlLabel
-                                                        key={profession.Id}
-                                                        value={profession.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{profession.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {(hasMoreProfessions || allProfessions.length > 5) && (
-                                            <Button
-                                                size="small"
-                                                onClick={handleToggleProfessions}
-                                                disabled={isLoadingProfessions}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}
-                                            >
-                                                {isLoadingProfessions ? <CircularProgress size={16} /> : (showAllProfessions && !hasMoreProfessions) ? "Thu gọn" : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                {/* Tỉnh / Thành phố */}
-                                <FormControl component="fieldset" fullWidth sx={{ mb: 1 }}>
-                                    <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", mb: 1 }}>
-                                        <LocationCity sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                        Tỉnh / Thành phố
-                                    </FormLabel>
-                                    <Box sx={{ maxHeight: showAllProvinces ? 400 : 'auto', overflowY: "auto", pr: 1 }}>
-                                        {isLoadingProvinces ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', py: 2 }}>
-                                                <CircularProgress size={20} sx={{ mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">Đang tải...</Typography>
-                                            </Box>
-                                        ) : (
-                                            <RadioGroup
-                                                value={filters.provinceId}
-                                                onChange={(e) => handleFilterChange("provinceId", e.target.value)}
-                                            >
-                                                <FormControlLabel value="" control={<Radio size="small" />} label={<Typography variant="body2">Tất cả</Typography>} />
-                                                {(showAllProvinces ? provinces : provinces?.slice(0, 5))?.map((province) => (
-                                                    <FormControlLabel
-                                                        key={province.Id}
-                                                        value={province.Id}
-                                                        control={<Radio size="small" />}
-                                                        label={<Typography variant="body2">{province.Name}</Typography>}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        )}
-                                        {provinces && provinces.length > 5 && (
-                                            <Button size="small" onClick={() => setShowAllProvinces(!showAllProvinces)}
-                                                sx={{ mt: 1, fontSize: "0.75rem", textTransform: "none", color: "primary.main" }}>
-                                                {showAllProvinces ? "Thu gọn" : "Xem thêm"}
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </FormControl>
-
-                                <Divider sx={{ mb: 2 }} />
-
-                                <Box sx={{ mb: 1 }}>
-                                    <Stack
-                                        direction="row"
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                    >
-                                        <FormLabel sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", cursor: "pointer", mb: 1.5 }}>
-                                            <AttachMoney sx={{ fontSize: 16, mr: 0.5, verticalAlign: "middle" }} />
-                                            Khoảng học phí ({currency})
-                                        </FormLabel>
-                                    </Stack>
-
-                                    <Collapse in={showCostFilter}>
-                                        <Stack spacing={1}>
-                                            <Stack direction="row" spacing={1} alignItems="center">
-                                                <TextField
-                                                    size="small"
-                                                    placeholder="Từ"
-                                                    value={formatNumberDisplay(costInput.fromCost)}
-                                                    onChange={(e) => handleCostInputChange("fromCost", e.target.value)}
-                                                    sx={{
-                                                        flex: 1,
-                                                        "& .MuiInputBase-input": { fontSize: "0.8rem", py: "6px" },
-                                                    }}
-                                                />
-                                                <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>—</Typography>
-                                                <TextField
-                                                    size="small"
-                                                    placeholder="Đến"
-                                                    value={formatNumberDisplay(costInput.toCost)}
-                                                    onChange={(e) => handleCostInputChange("toCost", e.target.value)}
-                                                    sx={{
-                                                        flex: 1,
-                                                        "& .MuiInputBase-input": { fontSize: "0.8rem", py: "6px" },
-                                                    }}
-                                                />
-                                            </Stack>
-
-                                            {costError && (
-                                                <Typography variant="caption" color="error" sx={{ fontSize: "0.7rem" }}>
-                                                    {costError}
-                                                </Typography>
-                                            )}
-
-                                            {(filters.fromCost || filters.toCost) && !costInputDirty && (
-                                                <Stack direction="row" alignItems="center" spacing={0.5}>
-                                                    <Chip
-                                                        label={`${filters.fromCost ? Number(filters.fromCost).toLocaleString("vi-VN") : "0"} — ${filters.toCost ? Number(filters.toCost).toLocaleString("vi-VN") : "∞"}`}
-                                                        size="small"
-                                                        onDelete={() => {
-                                                            setCostInput({ fromCost: "", toCost: "" });
-                                                            setFilters(prev => ({ ...prev, fromCost: "", toCost: "" }));
-                                                            setCostError("");
-                                                        }}
-                                                        sx={{
-                                                            fontSize: "0.68rem",
-                                                            height: 22,
-                                                            bgcolor: "rgba(243,103,48,0.1)",
-                                                            color: "primary.main",
-                                                            border: "1px solid",
-                                                            borderColor: "primary.light",
-                                                            "& .MuiChip-label": { px: 1 },
-                                                            "& .MuiChip-deleteIcon": { fontSize: 14 },
-                                                        }}
-                                                    />
-                                                </Stack>
-                                            )}
-
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                onClick={handleApplyCost}
-                                                disableElevation
-                                                sx={{
-                                                    fontSize: "0.75rem",
-                                                    textTransform: "none",
-                                                    fontWeight: 600,
-                                                    bgcolor: BACK_GROUND_BUTTON_COLOR,
-                                                    "&:hover": { bgcolor: "#f59d19" },
-                                                    borderRadius: 1,
-                                                    py: 0.5,
-                                                }}
-                                            >
-                                                Áp dụng
-                                            </Button>
-
-                                        </Stack>
-                                    </Collapse>
-                                </Box>
-                            </Paper>
+                                Bộ lọc
+                            </Button>
                         </Box>
 
                         {/* Job Listings */}
@@ -528,11 +615,6 @@ const RecruitmentPostSearchPage = () => {
                                     <Typography variant="body2" color="text.secondary" mb={2}>
                                         Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm
                                     </Typography>
-                                    {hasActiveFilters && (
-                                        <Button variant="outlined" startIcon={<Clear />} onClick={handleClearFilters} sx={{ mt: 1 }}>
-                                            Xóa bộ lọc
-                                        </Button>
-                                    )}
                                 </Paper>
                             ) : (
                                 <>
@@ -716,8 +798,22 @@ const RecruitmentPostSearchPage = () => {
                             )}
                         </Box>
                     </Box>
-                </Container>
+                </Box>
             </Box>
+            <Drawer
+                anchor="left"
+                open={openFilter}
+                onClose={() => setOpenFilter(false)}
+                PaperProps={{
+                    sx: {
+                        width: "80%",
+                        maxWidth: 320,
+                        p: 1
+                    }
+                }}
+            >
+                {filterContent}
+            </Drawer>
         </ThemeProvider>
     );
 };

@@ -11,6 +11,7 @@ import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "../../
 import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetProfessionsByOrganizationQuery } from "../../app/features/organization.api";
+import { useRoutePrefix } from "../../hooks/useRoutePrefix";
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 
@@ -40,6 +41,7 @@ export default function CreateRecruitmentPostPage() {
     const { data: provinces, isLoading: provincesLoading } = useGetAllProvinceNoAuthenQuery();
     const { data: visaTypesData } = useGetAllVisaTypesQuery();
     const organizationId = userInfo?.OrganizationId ?? "";
+    const prefix = useRoutePrefix();
 
     const visaTypeOptions = useMemo(
         () => visaTypesData?.map((v: { Id: string; Name: string }) => ({ value: v.Id, label: v.Name })) ?? [],
@@ -129,7 +131,7 @@ export default function CreateRecruitmentPostPage() {
                     OtherReqs: requirement.OtherReqs.filter(r => r.trim()),
                 },
             }).unwrap();
-            navigate("/admin/manage-recruitment-post");
+            navigate(`${prefix}/manage-recruitment-post`);
         } catch (error) {
             console.error("Failed to create recruitment post:", error);
         }
