@@ -1,14 +1,28 @@
-import { CalendarToday, FilterList, LocationOn, School, WorkOutline } from "@mui/icons-material";
-import { Box, Paper, Chip, CircularProgress, Stack, Typography, Button, SelectChangeEvent, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { lazy } from "react";
+import CalendarToday from "@mui/icons-material/CalendarToday";
+import LocationOn from "@mui/icons-material/LocationOn";
+import School from "@mui/icons-material/School";
+import WorkOutline from "@mui/icons-material/WorkOutline";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetByCustomerQuery } from "../../app/features/application.api";
 import { ApplicationResponse } from "../../app/models/application.model";
 import { getUserInfo } from "../../app/services/auth.service";
 import { formatDate } from "../../utils/date.utils";
-import ApplicationDetailDialog from "../dialogs/student/application-detail.dialog";
 import { ApplicationStatus } from "../../app/models/enums.model";
 import { ConvertService } from "../../app/services/convert.service";
+const ApplicationDetailDialog = lazy(() => import("../dialogs/student/application-detail.dialog"));
 
 const STATUS_OPTIONS = [
     { value: "", label: "Tất cả" },

@@ -1,25 +1,21 @@
-import {
-  Email,
-  LocationOn,
-  Phone,
-  Work,
-  Business,
-  MenuBook,
-  Info,
-  Gavel,
-  Security,
-  ContactMail,
-} from "@mui/icons-material";
-import {
-  Box,
-  Grid,
-  Link,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Typography
-} from "@mui/material";
+import Email from "@mui/icons-material/Email";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Phone from "@mui/icons-material/Phone";
+import Work from "@mui/icons-material/Work";
+import Business from "@mui/icons-material/Business";
+import MenuBook from "@mui/icons-material/MenuBook";
+import Info from "@mui/icons-material/Info";
+import Gavel from "@mui/icons-material/Gavel";
+import Security from "@mui/icons-material/Security";
+import ContactMail from "@mui/icons-material/ContactMail";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { BACKGROUND_COLOR, TEXT_COLOR } from "../../constants/common.constant";
 

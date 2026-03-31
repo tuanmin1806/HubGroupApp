@@ -1,8 +1,20 @@
-import { Lock, Visibility, VisibilityOff } from "@mui/icons-material";
-import { Box, Stack, Typography, TextField, Button, Divider, InputAdornment, IconButton, Alert, CircularProgress } from "@mui/material";
+import { lazy } from "react";
+import Lock from "@mui/icons-material/Lock";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useState } from "react";
 import { useUpdatePasswordMutation } from "../../app/features/account.api";
-import ConfirmChangePasswordDialog from "../dialogs/student/confirm-change-password.dialog";
+const ConfirmChangePasswordDialog = lazy(() => import("../dialogs/student/confirm-change-password.dialog"));
 
 export default function ChangePasswordPanel() {
     const [form, setForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });

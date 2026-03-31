@@ -1,7 +1,9 @@
-import { Box, Toolbar } from "@mui/material";
+import { lazy } from "react";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
 import { Outlet } from "react-router-dom";
-import Footer from "../components/footer/footer";
-import StudentHeader from "../components/headers/student.header";
+const Footer = lazy(() => import("../components/footer/footer"));
+const StudentHeader = lazy(() => import("../components/headers/student.header"));
 
 const StudentLayout = () => {
     return (

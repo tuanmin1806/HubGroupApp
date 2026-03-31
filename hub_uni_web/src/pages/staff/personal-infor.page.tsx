@@ -1,21 +1,52 @@
-import { Person, Phone, Email, Cake, Wc, LocationOn, Badge, Edit, Save, Cancel, Public, Business, Lock, CameraAlt } from "@mui/icons-material";
-import { Avatar, Box, Chip, CircularProgress, Divider, Grid, Stack, Typography, TextField, MenuItem, Button, Autocomplete, InputAdornment, Paper, Tooltip } from "@mui/material";
+import { lazy } from "react";
+import Person from "@mui/icons-material/Person";
+import Phone from "@mui/icons-material/Phone";
+import Email from "@mui/icons-material/Email";
+import Cake from "@mui/icons-material/Cake";
+import Wc from "@mui/icons-material/Wc";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Badge from "@mui/icons-material/Badge";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
+import Cancel from "@mui/icons-material/Cancel";
+import Public from "@mui/icons-material/Public";
+import Business from "@mui/icons-material/Business";
+import Lock from "@mui/icons-material/Lock";
+import CameraAlt from "@mui/icons-material/CameraAlt";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Autocomplete from "@mui/material/Autocomplete";
+import InputAdornment from "@mui/material/InputAdornment";
+import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
 import { useState, useEffect } from "react";
 import { useGetCustomerInforQuery, useUpdateCustomerMutation } from "../../app/features/customer.api";
 import { useGetAllCountryNoAuthenQuery } from "../../app/features/country.api";
 import { useGetProvinceByCountryQuery } from "../../app/features/province.api";
 import { useGetCommunesByProvinceQuery } from "../../app/features/commune.api";
 import { ConvertService } from "../../app/services/convert.service";
-import { getUserInfo } from "../../app/services/auth.service";
+import { getUserInfo, saveUserInfo } from "../../app/services/auth.service";
 import { AccountStatus, EducationLevel, Gender, JobExperience } from "../../app/models/enums.model";
 import { CustomerResponse, UpdateCustomerRequest } from "../../app/models/customer.model";
 import { Country } from "../../app/models/country.model";
 import { Province } from "../../app/models/province.model";
 import { CommuneResponse } from "../../app/models/commune.model";
-import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
-import ChangePasswordDialog from "../../components/dialogs/admin/change-password.dialog";
 import { useNavigate } from "react-router-dom";
-import AdminLogoUploadDialog from "../../components/dialogs/admin/admin-logo-upload.dialog";
+import { useDispatch } from "react-redux";
+import { AuthInfo } from "../../app/models/auth.model";
+import { restoreCredentials } from "../../app/features/auth/auth.slice";
+const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+const ChangePasswordDialog = lazy(() => import("../../components/dialogs/admin/change-password.dialog"));
+const AdminLogoUploadDialog = lazy(() => import("../../components/dialogs/admin/admin-logo-upload.dialog"));
 
 const GENDER_OPTIONS = [
     { value: Gender.Male, label: "Nam" },
@@ -51,7 +82,7 @@ function buildForm(data: CustomerResponse): EditableForm {
         PhoneNumber: data.PhoneNumber ?? "",
         Gender: ConvertService.convertGenderFromString(p?.Gender ?? data.Gender),
         DateOfBirth: p?.DateOfBirth?.substring(0, 10) ?? null,
-        AvatarUrl: data.AvatarFullUrl ?? "",
+        AvatarUrl: data.AvatarUrl ?? "",
         Experience: ConvertService.convertJobExperienceFromString(p?.Experience),
         EducationLevel: ConvertService.convertEducationLevelFromString(p?.EducationLevel),
         GraduationYear: p?.GraduationYear || "",
@@ -76,9 +107,9 @@ function buildPayload(data: CustomerResponse, form: EditableForm): UpdateCustome
         AccountStatus: ConvertService.convertAccountStatusFromString(data.AccountStatus),
         RoleIds: data.Roles?.map(r => r.Id) ?? [],
         OrganizationId: form.OrganizationId,
+        Gender: form.Gender,
         ProfileInfo: {
             DateOfBirth: form.DateOfBirth || null,
-            Gender: form.Gender,
             Experience: form.Experience,
             EducationLevel: form.EducationLevel,
             GraduationYear: Number(form.GraduationYear) || 0,
@@ -107,8 +138,29 @@ const SectionLabel = ({ children }: { children: React.ReactNode }) => (
 
 export default function PersonalInforPage() {
     const userInfo = getUserInfo();
+    const dispatch = useDispatch();
     const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
     const { data, isLoading, isError } = useGetCustomerInforQuery(userInfo?.Id ?? "");
+
+    useEffect(() => {
+        if (!data) return;
+        const current = getUserInfo();
+        if (!current) return;
+
+        const updated: AuthInfo = {
+            ...current,
+            FullName: data.FullName ?? current.FullName,
+            AvatarFullUrl: data.AvatarFullUrl ?? current.AvatarFullUrl,
+        };
+
+        if (
+            current.FullName === updated.FullName &&
+            current.AvatarFullUrl === updated.AvatarFullUrl
+        ) return;
+
+        saveUserInfo(updated);
+        dispatch(restoreCredentials(updated));
+    }, [data, dispatch]);
 
     if (isLoading) return (<Box display="flex" justifyContent="center" py={8}><CircularProgress sx={{ color: BLUE }} /></Box>);
     if (isError || !data) return (<Box textAlign="center" py={8}><Typography color="error">Không thể tải thông tin người dùng.</Typography></Box>);
@@ -119,7 +171,7 @@ export default function PersonalInforPage() {
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 3 }}>
                     <Paper elevation={1} sx={{ p: 3, textAlign: "center", position: { md: "sticky" }, top: { md: 80 } }}>
-                           <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+                        <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
                             <Avatar
                                 src={data.AvatarFullUrl ?? undefined}
                                 sx={{ width: 100, height: 100, fontSize: 36, bgcolor: BLUE }}
@@ -330,7 +382,7 @@ function EditForm({ data }: { data: CustomerResponse }) {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Autocomplete
-                        options={provinces} disabled={!editing}
+                        options={provinces} disabled={!editing} loading={provLoading}
                         getOptionLabel={(o: Province) => o.Name ?? ""}
                         value={selectedProvince}
                         onChange={(_, val: Province | null) => setForm(p => ({ ...p, ProvinceId: val?.Id ?? "", CommuneId: "" }))}

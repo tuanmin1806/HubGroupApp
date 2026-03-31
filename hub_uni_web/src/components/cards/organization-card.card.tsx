@@ -51,6 +51,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               component="img"
               src={org.LogoFullUrl || defaultImage}
               alt={org.Name}
+              loading="lazy"
               sx={{
                 width: "100%",
                 height: "100%",

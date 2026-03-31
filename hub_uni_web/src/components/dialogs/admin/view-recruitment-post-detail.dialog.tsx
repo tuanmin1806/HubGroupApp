@@ -1,5 +1,24 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Grid, IconButton, CircularProgress, Typography, Divider, Box, Chip, Autocomplete, Paper, Accordion, AccordionSummary, AccordionDetails, } from "@mui/material";
-import { Close, ExpandMore } from "@mui/icons-material";
+import { lazy } from "react";
+import Close from "@mui/icons-material/Close";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Autocomplete from "@mui/material/Autocomplete";
+import Paper from "@mui/material/Paper";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
 import { useMemo } from "react";
 import { useGetRecruitmentPostByIdQuery } from "../../../app/features/recruitment-post.api";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
@@ -10,7 +29,7 @@ import { RecruitPostStatus, Gender, JobExperience, EducationLevel } from "../../
 import { Province } from "../../../app/models/province.model";
 import { Profession } from "../../../app/models/recruitment-post.model";
 import { formatDate } from "../../../utils/date.utils";
-import RichTextEditorComponent from "../../editor";
+const RichTextEditorComponent = lazy(() => import("../../editor"));
 
 interface ViewRecruitmentPostDialogProps {
     open: boolean;

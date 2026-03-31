@@ -1,11 +1,12 @@
-import { ArrowForward } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
-import ArticleCard from "../../cards/article-card.card";
+import { lazy } from "react";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+const ArticleCard = lazy(() => import("../../cards/article-card.card"));
 import { useGetArticlesByPageNoAuthenQuery } from "../../../app/features/article.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-
 
 const sectionWrapperSx = {
     width: "100%",

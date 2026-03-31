@@ -1,41 +1,57 @@
-import ProtectedRoute from "../components/protected-route"
-import CreateRecruitmentPostPage from "../pages/admin/create-recruitment-post.page"
-import ManageRecruitmentPostPage from "../pages/admin/manage-recruitment-post.page"
-import OrganizationInforPage from "../pages/admin/organization-infor.page"
-import PersonalInforPage from "../pages/staff/personal-infor.page"
-import StaffDashboardPage from "../pages/staff/staff-dashboard.page"
+import { lazy, Suspense } from "react";
+import Loader from "../components/general/loader";
+const ProtectedRoute = lazy(() => import("../components/protected-route"))
+const CreateRecruitmentPostPage = lazy(() => import("../pages/admin/create-recruitment-post.page"))
+const ManageRecruitmentPostPage = lazy(() => import("../pages/admin/manage-recruitment-post.page"))
+const OrganizationInforPage = lazy(() => import("../pages/admin/organization-infor.page"))
+const PersonalInforPage = lazy(() => import("../pages/staff/personal-infor.page"))
+const StaffDashboardPage = lazy(() => import("../pages/staff/staff-dashboard.page"))
 
 const staffRoutes = [
     {
         index: true,
         element: (
-            <ProtectedRoute allowedAccountTypes={["Collaborator"]}>
-                <StaffDashboardPage />
-            </ProtectedRoute>
+            <Suspense fallback={Loader}>
+                <ProtectedRoute allowedAccountTypes={["Collaborator"]}>
+                    <StaffDashboardPage />
+                </ProtectedRoute>
+            </Suspense>
         ),
     },
     {
         path: "manage-recruitment-post",
         element: (
-            <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
-                <ManageRecruitmentPostPage />
-            </ProtectedRoute>
+            <Suspense fallback={Loader}>
+                <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
+                    <ManageRecruitmentPostPage />
+                </ProtectedRoute>
+            </Suspense>
         ),
     },
     {
         path: "organization-info",
-        element: <OrganizationInforPage />,
+        element: (
+            <Suspense fallback={Loader}>
+                <OrganizationInforPage />
+            </Suspense>
+        ),
     },
     {
         path: "personal-information",
-        element: <PersonalInforPage />,
+        element: (
+            <Suspense fallback={Loader}>
+                <PersonalInforPage />
+            </Suspense>
+        ),
     },
     {
         path: "create-recruitment-post",
         element: (
-            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Collaborator"]}>
-                <CreateRecruitmentPostPage />
-            </ProtectedRoute>
+            <Suspense fallback={Loader}>
+                <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Collaborator"]}>
+                    <CreateRecruitmentPostPage />
+                </ProtectedRoute>
+            </Suspense>
         ),
     },
 ]

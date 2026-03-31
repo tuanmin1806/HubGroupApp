@@ -105,7 +105,7 @@ export interface AuthInfo {
     PhoneNumber: string,
     Gender: string,
     AccountType: string,
-    Address: boolean,
+    Address: string,
     Roles: Role[],
     Departments: Department[],
     PermissionKeys: string[],

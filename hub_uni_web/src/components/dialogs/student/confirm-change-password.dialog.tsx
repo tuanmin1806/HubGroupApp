@@ -1,5 +1,9 @@
-import { CheckCircle } from "@mui/icons-material";
-import { Dialog, DialogContent, Stack, Typography, Button } from "@mui/material";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 
 interface ConfirmChangePasswordDialogProps {

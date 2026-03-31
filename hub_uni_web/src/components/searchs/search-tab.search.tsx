@@ -1,8 +1,16 @@
 import * as React from "react";
-import { Box, Typography, CircularProgress, Stack, Avatar, Button } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import LocationOn from "@mui/icons-material/LocationOn";
+import AccessTime from "@mui/icons-material/AccessTime";
+import PeopleAlt from "@mui/icons-material/PeopleAlt";
+import NavigateNext from "@mui/icons-material/NavigateNext";
 import { useGetAllProfessionNoAuthenQuery } from "../../app/features/profession.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../app/features/recruitment-post.api";
-import { LocationOn, AccessTime, PeopleAlt, NavigateNext } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/date.utils";
 import { getRecruitmentStatus } from "../../utils/recruitment-post.utils";
@@ -154,6 +162,12 @@ export default function ProfessionRecruitmentTabs() {
                             >
                                 <Avatar
                                     src={post.Organization?.LogoFullUrl || undefined}
+                                    slotProps={{
+                                        img: {
+                                            loading: "lazy",
+                                            decoding: "async",
+                                        }
+                                    }}
                                     sx={{
                                         display: { xs: "none", sm: "flex" },
                                         width: { sm: 32, md: 36 },

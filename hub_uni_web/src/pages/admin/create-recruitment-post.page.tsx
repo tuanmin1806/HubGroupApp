@@ -1,8 +1,25 @@
-import { Box, Button, Chip, CircularProgress, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, Autocomplete, SelectChangeEvent, IconButton } from "@mui/material";
-import { Save, Add, Remove } from "@mui/icons-material";
+import { lazy } from "react";
+import { SelectChangeEvent } from "@mui/material";
 import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import RichTextEditorComponent from "../../components/editor";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Autocomplete from "@mui/material/Autocomplete";
+import IconButton from "@mui/material/IconButton";
+import Save from "@mui/icons-material/Save";
+import Add from "@mui/icons-material/Add";
+import Remove from "@mui/icons-material/Remove";
 import { useCreateRecruitmentPostMutation } from "../../app/features/recruitment-post.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
 import { useGetAllVisaTypesQuery } from "../../app/features/visa-type.api";
@@ -12,6 +29,7 @@ import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetProfessionsByOrganizationQuery } from "../../app/features/organization.api";
 import { useRoutePrefix } from "../../hooks/useRoutePrefix";
+const RichTextEditorComponent = lazy(() => import("../../components/editor"));
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 

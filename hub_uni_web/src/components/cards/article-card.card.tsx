@@ -67,6 +67,7 @@ export default function ArticleCard({ article }: Props) {
           image={article.AvatarFullUrl || "/placeholder-image.jpg"}
           alt={article.Title}
           className="card-image"
+          loading="lazy"
           sx={{
             width: "100%",
             height: "100%",

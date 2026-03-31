@@ -1,7 +1,8 @@
+import { lazy } from "react";
 import { useSelector } from "react-redux";
-import GuestLayout from "./guest.layout";
 import { RootState } from "../app/store";
-import StudentLayout from "./student.layout";
+const GuestLayout = lazy(() => import("./guest.layout"));
+const StudentLayout = lazy(() => import("./student.layout"));
 const RoleBasedLayout = () => {
     const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 

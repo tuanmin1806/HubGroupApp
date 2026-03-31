@@ -59,6 +59,7 @@ export interface UpdateCustomerRequest {
     FullName: string;
     Email: string;
     PhoneNumber: string | null;
+    Gender: Gender;
     UserName?: string;
     AccountType?: AccountType;
     AccountStatus?: AccountStatus;

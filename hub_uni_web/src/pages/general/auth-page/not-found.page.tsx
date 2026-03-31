@@ -1,5 +1,9 @@
-import { Box, Button, Container, Typography } from "@mui/material";
-import { HomeOutlined, SearchOff } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import HomeOutlined from "@mui/icons-material/HomeOutlined";
+import SearchOff from "@mui/icons-material/SearchOff";
 import { useNavigate } from "react-router-dom";
 
 const NotFoundPage = () => {
@@ -41,7 +45,7 @@ const NotFoundPage = () => {
                     size="large"
                     startIcon={<HomeOutlined />}
                     onClick={() => navigate('/')}
-                    sx={{ mt: 1, textTransform: 'none', borderRadius: 1, px: 2, backgroundColor: '#faa11b', fontWeight: 'bold'}}
+                    sx={{ mt: 1, textTransform: 'none', borderRadius: 1, px: 2, backgroundColor: '#faa11b', fontWeight: 'bold' }}
                 >
                     Về trang chủ
                 </Button>

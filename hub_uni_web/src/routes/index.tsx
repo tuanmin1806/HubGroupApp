@@ -1,42 +1,64 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import generalRoutes from "./general.route";
-import AuthLayout from "../layouts/auth.layout";
 import adminRoutes from "./admin.route";
 import staffRoutes from "./staff.route";
-import AdminLayout from "../layouts/admin.layout";
-import StaffLayout from "../layouts/staff.layout";
-import RoleBasedLayout from "../layouts/role-based.layout";
-import UnauthorizedPage from "../pages/general/auth-page/unauthorized.page";
-import NotFoundPage from "../pages/general/auth-page/not-found.page";
-import CustomerLogin from "../pages/general/auth-page/customer-login.page";
-import StudentRegister from "../pages/general/auth-page/student-register.page";
-import AdminRegister from "../pages/general/auth-page/admin-register.page";
-import ProtectedRoute from "../components/protected-route";
+import Loader from "../components/general/loader";
+const AuthLayout = lazy(() => import("../layouts/auth.layout"));
+const AdminLayout = lazy(() => import("../layouts/admin.layout"));
+const StaffLayout = lazy(() => import("../layouts/staff.layout"));
+const RoleBasedLayout = lazy(() => import("../layouts/role-based.layout"));
+const UnauthorizedPage = lazy(() => import("../pages/general/auth-page/unauthorized.page"));
+const NotFoundPage = lazy(() => import("../pages/general/auth-page/not-found.page"));
+const CustomerLogin = lazy(() => import("../pages/general/auth-page/customer-login.page"));
+const StudentRegister = lazy(() => import("../pages/general/auth-page/student-register.page"));
+const AdminRegister = lazy(() => import("../pages/general/auth-page/admin-register.page"));
+const ProtectedRoute = lazy(() => import("../components/protected-route"));
 
 const router = createBrowserRouter(
     [
         {
             path: "/unauthorized",
-            element: <UnauthorizedPage />,
+            element: (
+                <Suspense fallback={Loader}>
+                    <UnauthorizedPage />
+                </Suspense>
+            ),
         },
         {
             path: "*",
-            element: <NotFoundPage />,
+            element: (
+                <Suspense fallback={Loader}>
+                    <NotFoundPage />
+                </Suspense>
+            ),
         },
         {
             element: <AuthLayout />,
             children: [
                 {
                     path: "dang-nhap",
-                    element: <CustomerLogin />,
+                    element: (
+                        <Suspense fallback={Loader}>
+                            <CustomerLogin />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: "dang-ky/customer",
-                    element: <StudentRegister />,
+                    element: (
+                        <Suspense fallback={Loader}>
+                            <StudentRegister />
+                        </Suspense>
+                    ),
                 },
                 {
                     path: "dang-ky/admin",
-                    element: <AdminRegister />,
+                    element: (
+                        <Suspense fallback={Loader}>
+                            <AdminRegister />
+                        </Suspense>
+                    ),
                 },
             ],
         },

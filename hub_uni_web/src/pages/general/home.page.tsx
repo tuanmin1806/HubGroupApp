@@ -1,12 +1,15 @@
-import { Box, createTheme, ThemeProvider, Typography, Container } from "@mui/material";
+import { lazy } from "react";
+import { createTheme, ThemeProvider } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+const RecruitmentPostComponent = lazy(() => import("../../components/general/homepage/recruitment-post.component"));
+const OrganizationComponent = lazy(() => import("../../components/general/homepage/organization.component"));
+const ArticleComponent = lazy(() => import("../../components/general/homepage/article.component"));
+const SearchBar = lazy(() => import("../../components/searchs/search-bar.search"));
+const SearchTabs = lazy(() => import("../../components/searchs/search-tab.search"));
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SearchBar from "../../components/searchs/search-bar.search";
-import SearchTabs from "../../components/searchs/search-tab.search";
-import Grid from "@mui/material/Grid";
-import RecruitmentPostComponent from "../../components/general/homepage/recruitment-post.component";
-import OrganizationComponent from "../../components/general/homepage/organization.component";
-import ArticleComponent from "../../components/general/homepage/article.component";
 
 const theme = createTheme({
     palette: {

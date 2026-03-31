@@ -82,6 +82,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
               component="img"
               src={rcp.Organization.LogoFullUrl}
               alt={rcp.Name}
+              loading="lazy"
               sx={{
                 width: 120,
                 height: 120,

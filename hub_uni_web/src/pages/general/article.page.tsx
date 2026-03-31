@@ -1,12 +1,20 @@
-import { Search, ChevronLeft, ChevronRight, Category } from "@mui/icons-material";
-import ArticleCard from "../../components/cards/article-card.card";
+import { lazy } from "react";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
 import { useEffect, useRef, useState } from "react";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
 import { useGetAllCategoryQuery } from "../../app/features/category.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../constants/common.constant";
-import OrganizationPagination from "../../components/pagination/organization-pagination";
-import { Box, IconButton, InputAdornment, Stack, TextField, Typography, Container, Grid } from "@mui/material";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import { useNavigate } from "react-router-dom";
+const ArticleCard = lazy(() => import("../../components/cards/article-card.card"));
+const OrganizationPagination = lazy(() => import("../../components/pagination/organization-pagination"));
 
 const ArticlePage = () => {
     const navigate = useNavigate();
@@ -18,7 +26,7 @@ const ArticlePage = () => {
     const categoryListRef = useRef<HTMLDivElement>(null);
 
     const { data: categories = [] } = useGetAllCategoryQuery();
-    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page,  size: PAGE_SIZE, searchValue,});
+    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, searchValue, });
 
     const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
     const articles = articleData?.Items || [];

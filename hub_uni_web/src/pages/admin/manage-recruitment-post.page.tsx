@@ -1,20 +1,42 @@
-import { Add, Clear, Delete, Edit, Search, Visibility } from "@mui/icons-material";
-import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Chip } from "@mui/material";
+import { lazy } from "react";
+import Add from "@mui/icons-material/Add";
+import Clear from "@mui/icons-material/Clear";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Search from "@mui/icons-material/Search";
+import Visibility from "@mui/icons-material/Visibility";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import InputBase from "@mui/material/InputBase";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import Tooltip from "@mui/material/Tooltip";
+import TablePagination from "@mui/material/TablePagination";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 import { useState, useCallback } from "react";
 import { RecruitmentPostFilterParams, RecruitmentPostResponse } from "../../app/models/recruitment-post.model";
 import { PAGE_SIZE } from "../../constants/common.constant";
 import { useDeleteRecruitmentPostMutation, useGetRecruitmentPostsByOrganizationQuery } from "../../app/features/recruitment-post.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { useNavigate } from "react-router-dom";
-import UpdateRecruitmentPostDialog from "../../components/dialogs/staff/update-recruitment-post.dialog";
 import { formatDate } from "../../utils/date.utils";
 import { getUserInfo } from "../../app/services/auth.service";
-import ViewRecruitmentPostDialog from "../../components/dialogs/admin/view-recruitment-post-detail.dialog";
-import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { useRoutePrefix } from "../../hooks/useRoutePrefix";
+const UpdateRecruitmentPostDialog = lazy(() => import("../../components/dialogs/staff/update-recruitment-post.dialog"));
+const ViewRecruitmentPostDialog = lazy(() => import("../../components/dialogs/admin/view-recruitment-post-detail.dialog"));
+const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
 
 const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
     Active: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },

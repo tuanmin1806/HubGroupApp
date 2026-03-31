@@ -1,25 +1,21 @@
 import { useParams, useNavigate } from "react-router-dom";
-import {
-    Box,
-    Container,
-    Typography,
-    Chip,
-    Stack,
-    Avatar,
-    Divider,
-    Paper,
-    Breadcrumbs,
-    Link,
-    Skeleton,
-    Grid,
-} from "@mui/material";
-import {
-    CalendarToday,
-    ArrowBack,
-    Share,
-    Bookmark,
-    NavigateNext,
-} from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import Skeleton from "@mui/material/Skeleton";
+import Grid from "@mui/material/Grid";
+import CalendarToday from "@mui/icons-material/CalendarToday";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import Share from "@mui/icons-material/Share";
+import Bookmark from "@mui/icons-material/Bookmark";
+import NavigateNext from "@mui/icons-material/NavigateNext";
 import { useGetArticleBySeoQuery } from "../../../app/features/article.api";
 import { useEffect } from "react";
 

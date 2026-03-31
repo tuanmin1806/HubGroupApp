@@ -1,14 +1,42 @@
-import { Box, Container, Typography, Stack, Grid, Chip, CircularProgress, Divider, Button, IconButton, Tooltip } from "@mui/material";
+import { lazy } from "react";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Edit from "@mui/icons-material/Edit";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Email from "@mui/icons-material/Email";
+import Language from "@mui/icons-material/Language";
+import Business from "@mui/icons-material/Business";
+import School from "@mui/icons-material/School";
+import Phone from "@mui/icons-material/Phone";
+import AccountBalance from "@mui/icons-material/AccountBalance";
+import Star from "@mui/icons-material/Star";
+import Facebook from "@mui/icons-material/Facebook";
+import LinkedIn from "@mui/icons-material/LinkedIn";
+import YouTube from "@mui/icons-material/YouTube";
+import Twitter from "@mui/icons-material/Twitter";
+import Instagram from "@mui/icons-material/Instagram";
+import Map from "@mui/icons-material/Map";
+import Bed from "@mui/icons-material/Bed";
+import CameraAlt from "@mui/icons-material/CameraAlt";
+import Info from "@mui/icons-material/Info";
+import { useState } from "react";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetOrganizationByIdQuery } from "../../app/features/organization.api";
-import { Edit, LocationOn, Email, Language, Business, School, Phone, AccountBalance, Star, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, Bed, CameraAlt, Info } from "@mui/icons-material";
-import { useState } from "react";
-import UpdateOrganizationDialog from "../../components/dialogs/admin/organization/update-organization.dialog";
 import { ConvertService } from "../../app/services/convert.service";
-import { Profession } from "../../app/models/organization.model";
-import LogoUploadDialog from "../../components/dialogs/admin/logo-upload.dialog";
 import { hasAccountType } from "../../utils/auth.utils";
 import { AccountType } from "../../app/models/enums.model";
+import { Profession } from "../../app/models/organization.model";
+const UpdateOrganizationDialog = lazy(() => import("../../components/dialogs/admin/organization/update-organization.dialog"));
+const LogoUploadDialog = lazy(() => import("../../components/dialogs/admin/logo-upload.dialog"));
 
 export default function OrganizationInforPage() {
     const userInfo = getUserInfo();
@@ -58,7 +86,7 @@ export default function OrganizationInforPage() {
                 />
 
                 <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 3 }}>
-                    {hasAccountType(AccountType.Admin) && (
+                    {hasAccountType(AccountType.Manager) && (
                         <Button
                             variant="contained"
                             startIcon={<Edit />}

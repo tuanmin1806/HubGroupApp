@@ -1,5 +1,11 @@
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
-import { Dashboard, PendingActions, CheckCircle, Person, People } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Dashboard from "@mui/icons-material/Dashboard";
+import PendingActions from "@mui/icons-material/PendingActions";
+import People from "@mui/icons-material/People";
 
 export default function AdminDashboardPage() {
     return (

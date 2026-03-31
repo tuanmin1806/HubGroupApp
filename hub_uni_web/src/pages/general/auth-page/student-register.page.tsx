@@ -1,5 +1,7 @@
-import { Box, Card } from "@mui/material";
-import StudentSignupForm from "../../../components/auth/student-signup-form";
+import { lazy } from "react";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+const StudentSignupForm = lazy(() => import("../../../components/auth/student-signup-form"));
 
 const StudentRegister = () => {
     return (

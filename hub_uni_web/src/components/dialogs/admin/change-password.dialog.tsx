@@ -1,9 +1,21 @@
-import { Close, Lock, Visibility, VisibilityOff, CheckCircle, Logout } from "@mui/icons-material";
-import {
-    Box, Button, CircularProgress, Dialog, DialogContent,
-    IconButton, InputAdornment, Stack, TextField, Typography,
-    useMediaQuery, useTheme, Alert,
-} from "@mui/material";
+import Close from "@mui/icons-material/Close";
+import Lock from "@mui/icons-material/Lock";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import Logout from "@mui/icons-material/Logout";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../app/store";
@@ -106,7 +118,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
     return (
         <Dialog
             open={open}
-            onClose={() => {}}
+            onClose={() => { }}
             disableEscapeKeyDown
             fullScreen={fullScreen}
             maxWidth="xs"

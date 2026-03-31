@@ -1,4 +1,5 @@
-import { Box, Toolbar } from "@mui/material";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
 import { Outlet } from "react-router-dom";
 import GuestHeader from "../components/headers/guest.header";
 import Footer from "../components/footer/footer";
@@ -15,7 +16,7 @@ const AuthLayout = () => {
             <GuestHeader />
             <Toolbar />
 
-            <Box sx={{ flexGrow: 1 , backgroundColor: "#fffbf2" }}>
+            <Box sx={{ flexGrow: 1, backgroundColor: "#fffbf2" }}>
                 <Outlet />
             </Box>
 

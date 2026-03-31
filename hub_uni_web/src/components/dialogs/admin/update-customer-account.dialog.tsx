@@ -1,5 +1,20 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Grid, IconButton, CircularProgress, Typography, Divider, Box, Paper, InputAdornment } from "@mui/material";
-import { Close, LocationOn, LockOutlined, PersonOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
+import Close from "@mui/icons-material/Close";
+import LockOutlined from "@mui/icons-material/LockOutlined";
+import PersonOutlined from "@mui/icons-material/PersonOutlined";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
@@ -84,13 +99,13 @@ const defaultForm: UpdateCustomerRequest = {
     PhoneNumber: "",
     AccountStatus: AccountStatus.Undefined,
     RoleIds: [],
+    Gender: Gender.Other,
     ProfileInfo: {
         DateOfBirth: "",
         CountryId: "",
         ProvinceId: "",
         CommuneId: "",
         Address: "",
-        Gender: Gender.Other,
     },
 };
 
@@ -181,13 +196,13 @@ export default function UpdateCustomerAccountDialog({
                     RoleIds: (data.Roles ?? []).map(r => r.Id),
                     UserName: data.UserName ?? "",
                     OrganizationId: data.OrganizationId ?? "",
+                    Gender: ConvertService.convertGenderFromString(data.Gender),
                     ProfileInfo: {
                         DateOfBirth: data.ProfileInfo?.DateOfBirth ?? "",
                         CountryId: data.ProfileInfo?.CountryId ?? "",
                         ProvinceId: data.ProfileInfo?.ProvinceId ?? "",
                         CommuneId: data.ProfileInfo?.CommuneId ?? "",
                         Address: data.ProfileInfo?.Address ?? "",
-                        Gender: ConvertService.convertGenderFromString(data.Gender),
                     }
                 });
             });
@@ -262,7 +277,7 @@ export default function UpdateCustomerAccountDialog({
     const isLoading = isFetching || isUpdating;
 
     const isSaveDisabled = (): boolean => {
-        const requiredFieldsInvalid: boolean = !form.FullName.trim() || !form.ProfileInfo.DateOfBirth || !form.ProfileInfo.Gender || !form.ProfileInfo.CountryId || !form.ProfileInfo.ProvinceId || !form.ProfileInfo.CommuneId || !form.AccountStatus;
+        const requiredFieldsInvalid: boolean = !form.FullName.trim() || !form.ProfileInfo.DateOfBirth || !form.Gender || !form.ProfileInfo.CountryId || !form.ProfileInfo.ProvinceId || !form.ProfileInfo.CommuneId || !form.AccountStatus;
         return requiredFieldsInvalid;
     };
 
@@ -352,8 +367,8 @@ export default function UpdateCustomerAccountDialog({
                                         label={<> Giới tính <RequiredStar /></>}
                                         fullWidth
                                         size="small"
-                                        value={form.ProfileInfo.Gender}
-                                        onChange={(e) => handleProfileChange("Gender", Number(e.target.value))}
+                                        value={form.Gender}
+                                        onChange={(e) => handleChange("Gender", Number(e.target.value))}
                                     >
                                         {GENDER_OPTIONS.map(opt => (
                                             <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>

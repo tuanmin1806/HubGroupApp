@@ -1,18 +1,51 @@
-import { Add, Clear, Delete, Edit, Search } from "@mui/icons-material";
-import { Grid, IconButton, InputBase, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip, Tooltip, TablePagination, Button, CircularProgress, Box, Typography, Avatar } from "@mui/material";
+import { lazy } from "react";
+import Add from "@mui/icons-material/Add";
+import Clear from "@mui/icons-material/Clear";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Search from "@mui/icons-material/Search";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import InputBase from "@mui/material/InputBase";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import Chip from "@mui/material/Chip";
+import Tooltip from "@mui/material/Tooltip";
+import TablePagination from "@mui/material/TablePagination";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 import { useState, useCallback } from "react";
 import { CustomerResponse, CustomerFilterParams } from "../../app/models/customer.model";
 import { useDeleteCustomerMutation, useGetCustomerByOrganizationWithPageQuery } from "../../app/features/customer.api";
 import { ConvertService } from "../../app/services/convert.service";
 import { getUserInfo } from "../../app/services/auth.service";
-import { AccountStatus } from "../../app/models/enums.model";
-import CreateCustomerAccountDialog from "../../components/dialogs/admin/create-customer-account.dialog";
-import UpdateCustomerAccountDialog from "../../components/dialogs/admin/update-customer-account.dialog";
-import ConfirmDialog from "../../components/dialogs/general/confirm.dialog";
+import { AccountStatus, AccountType } from "../../app/models/enums.model";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { isSelf } from "../../utils/auth.utils";
+const CreateCustomerAccountDialog = lazy(() => import("../../components/dialogs/admin/create-customer-account.dialog"));
+const UpdateCustomerAccountDialog = lazy(() => import("../../components/dialogs/admin/update-customer-account.dialog"));
+const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+
+const getAccountTypeColor = (accountType: AccountType): "default" | "primary" | "secondary" | "success" | "warning" | "error" | "info" => {
+    switch (accountType) {
+        case AccountType.Manager: return "primary";
+        case AccountType.Collaborator: return "success";
+        case AccountType.Admin: return "error";
+        case AccountType.SuperAdmin: return "error";
+        case AccountType.Student: return "info";
+        default: return "default";
+    }
+};
 
 export default function ManageStaffAccountPage() {
     const [inputValue, setInputValue] = useState("");
@@ -106,7 +139,21 @@ export default function ManageStaffAccountPage() {
                 <TableCell>{staff.Email ?? "—"}</TableCell>
                 <TableCell>{staff.PhoneNumber ?? "—"}</TableCell>
                 <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(staff.Gender))}</TableCell>
-                <TableCell><Chip label={ConvertService.convertAccountStatus(ConvertService.convertAccountStatusFromString(staff.AccountStatus))} size="small" color={ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Activated ? "success" : staff.AccountStatus === AccountStatus.Locked ? "error" : "default"} variant="outlined" /></TableCell>
+                <TableCell>
+                    <Chip
+                        label={ConvertService.convertAccountType(ConvertService.convertAccountTypeFromString(staff.AccountType))}
+                        size="small"
+                        color={getAccountTypeColor(ConvertService.convertAccountTypeFromString(staff.AccountType))}
+                        variant="outlined"
+                    />
+                </TableCell>
+                <TableCell>
+                    <Chip label={ConvertService.convertAccountStatus(ConvertService.convertAccountStatusFromString(staff.AccountStatus))} size="small" color={ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Activated ? "success"
+                        : ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.NotActivated ? "warning"
+                            : ConvertService.convertAccountStatusFromString(staff.AccountStatus) === AccountStatus.Locked ? "error" : "default"}
+                        variant="filled"
+                    />
+                </TableCell>
                 <TableCell align="center">
                     {isSelf(staff.Id) ? (
                         <Tooltip title="Không thể tự chỉnh sửa hoặc xóa tài khoản của chính mình">
@@ -171,6 +218,7 @@ export default function ManageStaffAccountPage() {
                                     <TableCell>Email</TableCell>
                                     <TableCell>Số điện thoại</TableCell>
                                     <TableCell>Giới tính</TableCell>
+                                    <TableCell>Loại tài khoản</TableCell>
                                     <TableCell>Trạng thái</TableCell>
                                     <TableCell align="center">Tiện ích</TableCell>
                                 </TableRow>

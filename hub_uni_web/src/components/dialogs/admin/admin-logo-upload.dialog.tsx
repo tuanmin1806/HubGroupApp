@@ -1,5 +1,15 @@
-import { Business, Delete, CloudUpload } from "@mui/icons-material";
-import { Dialog, DialogTitle, DialogContent, Box, Tooltip, IconButton, Button, DialogActions, CircularProgress, Avatar } from "@mui/material";
+import Delete from "@mui/icons-material/Delete";
+import CloudUpload from "@mui/icons-material/CloudUpload";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
 import { useState, useRef } from "react";
 import { useUpdateCustomerAvatarMutation } from "../../../app/features/customer.api";
 

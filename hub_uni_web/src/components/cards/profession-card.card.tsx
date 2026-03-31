@@ -44,6 +44,7 @@ export default function ProfesstionSelectActionCard({ professions }: Props) {
               component="img"
               src={"/default_organization_card.jpg"}
               alt={org.Name}
+              loading="lazy"
               sx={{
                 width: "100%",
                 height: 140,

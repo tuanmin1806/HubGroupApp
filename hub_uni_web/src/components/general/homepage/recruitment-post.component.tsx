@@ -1,13 +1,26 @@
-import { ArrowForward, ChevronLeft, ChevronRight, FilterAlt, LocationOn, School } from "@mui/icons-material";
-import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack } from "@mui/material";
-import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import RecruitmentPostSelectActionCard from "../../cards/recruitment-post.card";
-import OrganizationPagination from "../../pagination/organization-pagination";
+import { lazy } from "react";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import FilterAlt from "@mui/icons-material/FilterAlt";
+import LocationOn from "@mui/icons-material/LocationOn";
+import School from "@mui/icons-material/School";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
 import { useRef, useState } from "react";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
 import { useGetAllProfessionNoAuthenQuery } from "../../../app/features/profession.api";
 import { useNavigate } from "react-router-dom";
 import { useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
+import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
+const RecruitmentPostSelectActionCard = lazy(() => import("../../cards/recruitment-post.card"));
+const OrganizationPagination = lazy(() => import("../../pagination/organization-pagination"));
 
 const sectionWrapperSx = {
     width: "100%",

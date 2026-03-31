@@ -1,11 +1,16 @@
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
-import { Dashboard, PendingActions, CheckCircle } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Dashboard from "@mui/icons-material/Dashboard";
+import PendingActions from "@mui/icons-material/PendingActions";
 
 export default function StaffDashboardPage() {
     return (
         <Box>
             <Typography variant="h5" fontWeight={600} gutterBottom>
-               Tổng quan
+                Tổng quan
             </Typography>
 
             <Typography variant="body2" color="text.secondary" mb={3}>

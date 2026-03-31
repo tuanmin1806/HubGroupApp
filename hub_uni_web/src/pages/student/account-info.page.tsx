@@ -1,16 +1,33 @@
-import { Person, Lock, WorkOutline, CameraAlt, Logout, Save, TurnedInNot, School } from "@mui/icons-material";
-import { Avatar, Box, CircularProgress, Container, Paper, Stack, Typography, Divider } from "@mui/material";
-import { useState } from "react";
-import { getUserInfo } from "../../app/services/auth.service";
-import AccountInfoPanel from "../../components/panel/account-info.panel";
-import ApplicationListPanel from "../../components/panel/application-list.panel";
-import ChangePasswordPanel from "../../components/panel/change-password.panel";
-import { useGetCustomerByIdQuery } from "../../app/features/customer.api";
-import StudentLogoUploadDialog from "../../components/dialogs/student/student-logo-upload.dialog";
-import { useNavigate } from "react-router-dom";
-import FavouriteRecruitPostListPanel from "../../components/panel/favourite-recruitposts.panel";
+import { lazy, useEffect } from "react";
+import Person from "@mui/icons-material/Person";
+import Lock from "@mui/icons-material/Lock";
+import WorkOutline from "@mui/icons-material/WorkOutline";
+import CameraAlt from "@mui/icons-material/CameraAlt";
+import Logout from "@mui/icons-material/Logout";
+import TurnedInNot from "@mui/icons-material/TurnedInNot";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+const AccountInfoPanel = lazy(() => import("../../components/panel/account-info.panel"));
+const ApplicationListPanel = lazy(() => import("../../components/panel/application-list.panel"));
+const ChangePasswordPanel = lazy(() => import("../../components/panel/change-password.panel"));
+const StudentLogoUploadDialog = lazy(() => import("../../components/dialogs/student/student-logo-upload.dialog"));
+const FavouriteRecruitPostListPanel = lazy(() => import("../../components/panel/favourite-recruitposts.panel"));
 import { hasAccountType } from "../../utils/auth.utils";
 import { AccountType } from "../../app/models/enums.model";
+import { useNavigate } from "react-router-dom";
+import { useGetCustomerByIdQuery } from "../../app/features/customer.api";
+import { useState } from "react";
+import { getUserInfo, saveUserInfo } from "../../app/services/auth.service";
+import { AuthInfo } from "../../app/models/auth.model";
+import { restoreCredentials } from "../../app/features/auth/auth.slice";
+import { useDispatch } from "react-redux";
+
 
 type TabKey = "info" | "password" | "applications" | "logout" | "favourite-recruitposts" | "saved-organizations";
 
@@ -23,12 +40,33 @@ const MENU_ITEMS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 
 export default function AccountInfoPage() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [logoDialogOpen, setLogoDialogOpen] = useState(false);
     const userInfo = getUserInfo();
     const [activeTab, setActiveTab] = useState<TabKey>("info");
 
     const handleSignOut = async () => { navigate("/sign-out"); };
     const { data: account, isLoading } = useGetCustomerByIdQuery(userInfo?.Id ?? "", { skip: !userInfo?.Id });
+
+    useEffect(() => {
+        if (!account) return;
+        const current = getUserInfo();
+        if (!current) return;
+
+        const updated: AuthInfo = {
+            ...current,
+            FullName: account.FullName ?? current.FullName,
+            AvatarFullUrl: account.AvatarFullUrl ?? current.AvatarFullUrl,
+        };
+
+        if (
+            current.FullName === updated.FullName &&
+            current.AvatarFullUrl === updated.AvatarFullUrl
+        ) return;
+
+        saveUserInfo(updated);
+        dispatch(restoreCredentials(updated));
+    }, [account, dispatch]);
 
     return (
         <Box sx={{ bgcolor: "#f9fafb", minHeight: "100vh", pt: { xs: 2, md: 4 }, pb: { xs: 2, md: 3 } }}>

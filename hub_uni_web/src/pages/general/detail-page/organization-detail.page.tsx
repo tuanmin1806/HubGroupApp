@@ -1,14 +1,46 @@
-import { LocationOn, Language, Share, Info, Phone, Business, School, Email, WorkOutline, PeopleAlt, CalendarToday, Star, PhotoLibrary, ChevronRight, ChevronLeft, NotificationsActive, Facebook, LinkedIn, YouTube, Twitter, Instagram, Map, AccessTime } from "@mui/icons-material";
-import { Box, Typography, Stack, Card, CardContent, Chip, Divider, Button, CircularProgress, Tooltip, IconButton } from "@mui/material";
+import { lazy } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Language from "@mui/icons-material/Language";
+import Share from "@mui/icons-material/Share";
+import Info from "@mui/icons-material/Info";
+import Phone from "@mui/icons-material/Phone";
+import Business from "@mui/icons-material/Business";
+import School from "@mui/icons-material/School";
+import Email from "@mui/icons-material/Email";
+import WorkOutline from "@mui/icons-material/WorkOutline";
+import PeopleAlt from "@mui/icons-material/PeopleAlt";
+import Star from "@mui/icons-material/Star";
+import PhotoLibrary from "@mui/icons-material/PhotoLibrary";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import NotificationsActive from "@mui/icons-material/NotificationsActive";
+import Facebook from "@mui/icons-material/Facebook";
+import LinkedIn from "@mui/icons-material/LinkedIn";
+import YouTube from "@mui/icons-material/YouTube";
+import Twitter from "@mui/icons-material/Twitter";
+import Instagram from "@mui/icons-material/Instagram";
+import Map from "@mui/icons-material/Map";
+import AccessTime from "@mui/icons-material/AccessTime";
+import MuiLink from "@mui/material/Link";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetOrganizationBySeoQuery } from "../../../app/features/organization.api";
 import { useGetRecruitmentPostsByOrganizationWithPageQuery } from "../../../app/features/recruitment-post.api";
-import OrganizationSelectActionCard from "../../../components/cards/organization-card.card";
-import MuiLink from "@mui/material/Link";
 import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/date.utils";
 import { normalizeUrl } from "../../../utils/recruitment-post.utils";
 import { ConvertService } from "../../../app/services/convert.service";
+const OrganizationSelectActionCard = lazy(() => import("../../../components/cards/organization-card.card"));
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -167,6 +199,7 @@ function FeaturedGallerySidebar({ images }: { images: string[] }) {
                             <Box
                                 component="img"
                                 src={selected}
+                                loading="lazy"
                                 alt="preview"
                                 sx={{ maxWidth: '80vw', maxHeight: '82vh', borderRadius: 2, boxShadow: '0 24px 80px rgba(0,0,0,0.6)', objectFit: 'contain', display: 'block', }}
                             />
@@ -266,6 +299,7 @@ const OrganizationDetailPage = () => {
                                             <Box
                                                 component="img"
                                                 src={organization.LogoFullUrl}
+                                                loading="lazy"
                                                 alt={organization.Name}
                                                 sx={{ width: 80, height: 80, borderRadius: 2, objectFit: 'cover', border: '1px solid #e0e0e0', flexShrink: 0, }}
                                             />

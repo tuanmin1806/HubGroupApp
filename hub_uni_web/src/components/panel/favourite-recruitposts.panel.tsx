@@ -1,14 +1,31 @@
-import { AccessTime, AttachMoney, Business, Cake, Female, LocationOn, Male, PeopleAlt, School, Transgender, Work } from "@mui/icons-material";
-import { Box, Paper, Chip, CircularProgress, Stack, Typography, Button } from "@mui/material";
-import { href, useNavigate } from "react-router-dom";
-import { getUserInfo } from "../../app/services/auth.service";
-import { formatDate } from "../../utils/date.utils";
+import AccessTime from "@mui/icons-material/AccessTime";
+import AttachMoney from "@mui/icons-material/AttachMoney";
+import Business from "@mui/icons-material/Business";
+import Cake from "@mui/icons-material/Cake";
+import Female from "@mui/icons-material/Female";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Male from "@mui/icons-material/Male";
+import PeopleAlt from "@mui/icons-material/PeopleAlt";
+import School from "@mui/icons-material/School";
+import Transgender from "@mui/icons-material/Transgender";
+import Work from "@mui/icons-material/Work";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 import { useGetFavouriteRecruitPostByCustomerQuery } from "../../app/features/favourite.api";
 import { FavouriteResponse } from "../../app/models/favourite.model";
 import { Gender } from "../../app/models/enums.model";
 import { ConvertService } from "../../app/services/convert.service";
 import { BACK_GROUND_BUTTON_COLOR } from "../../constants/common.constant";
+
 import { formatCurrency, getRecruitmentStatus } from "../../utils/recruitment-post.utils";
+import { formatDate } from "../../utils/date.utils";
+import { getUserInfo } from "../../app/services/auth.service";
 
 function FavouriteRecruitPostCard({ app }: { app: FavouriteResponse }) {
     const navigate = useNavigate();

@@ -1,50 +1,41 @@
 import { useEffect, useState } from "react";
-import {
-    Box,
-    Container,
-    Typography,
-    Paper,
-    Stack,
-    Chip,
-    FormControl,
-    FormLabel,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
-    Divider,
-    Button,
-    IconButton,
-    CircularProgress,
-    Collapse,
-    TextField,
-    createTheme,
-    ThemeProvider,
-    Tooltip,
-    Drawer,
-} from "@mui/material";
-import {
-    WorkOutline,
-    LocationOn,
-    Business,
-    FilterList,
-    Clear,
-    FavoriteBorder,
-    PeopleAlt,
-    Male,
-    Transgender,
-    Cake,
-    Work,
-    Female,
-    Category,
-    LocationCity,
-    AccessTime,
-    AttachMoney,
-} from "@mui/icons-material";
+import { createTheme, ThemeProvider, Tooltip, Drawer } from "@mui/material";
+import { lazy } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Collapse from "@mui/material/Collapse";
+import TextField from "@mui/material/TextField";
+import WorkOutline from "@mui/icons-material/WorkOutline";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Business from "@mui/icons-material/Business";
+import FilterList from "@mui/icons-material/FilterList";
+import Clear from "@mui/icons-material/Clear";
+import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
+import PeopleAlt from "@mui/icons-material/PeopleAlt";
+import Male from "@mui/icons-material/Male";
+import Transgender from "@mui/icons-material/Transgender";
+import Cake from "@mui/icons-material/Cake";
+import Work from "@mui/icons-material/Work";
+import Female from "@mui/icons-material/Female";
+import Category from "@mui/icons-material/Category";
+import LocationCity from "@mui/icons-material/LocationCity";
+import AccessTime from "@mui/icons-material/AccessTime";
+import AttachMoney from "@mui/icons-material/AttachMoney";
 import { useNavigate } from "react-router-dom";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
-import OrganizationPagination from "../../../components/pagination/organization-pagination";
-import SearchBar from "../../../components/searchs/search-bar.search";
 import { BACK_GROUND_BUTTON_COLOR, DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { formatCurrency, formatNumberDisplay, getRecruitmentStatus, parseNumberInput } from "../../../utils/recruitment-post.utils";
@@ -54,6 +45,8 @@ import { useGetVisaTypesByPageQuery } from "../../../app/features/visa-type.api"
 import { ProfessionResponse } from "../../../app/models/profession.model";
 import { VisaTypeResponse } from "../../../app/models/visa-type.model";
 import { Gender } from "../../../app/models/enums.model";
+const OrganizationPagination = lazy(() => import("../../../components/pagination/organization-pagination"));
+const SearchBar = lazy(() => import("../../../components/searchs/search-bar.search"));
 
 const theme = createTheme({
     palette: {
@@ -130,7 +123,7 @@ const RecruitmentPostSearchPage = () => {
     const handleFilterChange = (field: keyof RecruitmentPostFilterParams, value: string) => {
         if (field === 'provinceId' && value !== filters.provinceId) {
             const province = provinces?.find(p => p.Id === value);
-            setSelectedProvinceSeo(province?.Seo || '');
+            setSelectedProvinceSeo(province?.SeoUrl || '');
             setFilters(prev => ({ ...prev, provinceId: value }));
         } else {
             setFilters(prev => ({ ...prev, [field]: value }));
@@ -229,7 +222,7 @@ const RecruitmentPostSearchPage = () => {
 
     useEffect(() => {
         if (initialProvinceSeo && provinces && provinces.length > 0 && !filters.provinceId) {
-            const province = provinces.find(p => p.Seo === initialProvinceSeo);
+            const province = provinces.find(p => p.SeoUrl === initialProvinceSeo);
             if (province) setFilters(prev => ({ ...prev, provinceId: province.Id }));
         }
     }, [provinces]);
@@ -546,9 +539,9 @@ const RecruitmentPostSearchPage = () => {
         <ThemeProvider theme={theme}>
             <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 2, display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ maxWidth: 1200, width: '100%', px: { xs: 1, md: 3 } }}>
-                    {/* Search Bar */}
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
                         <SearchBar
+                            key={selectedProvinceSeo}
                             onSearch={handleSearch}
                             initialQuery={filters.searchValue}
                             initialProvinceSeo={selectedProvinceSeo}
@@ -562,7 +555,6 @@ const RecruitmentPostSearchPage = () => {
                             flexDirection: { xs: "column", md: "row" }
                         }}
                     >
-                        {/* Sidebar Filter */}
                         <Box
                             sx={{
                                 display: { xs: "none", md: "block" },

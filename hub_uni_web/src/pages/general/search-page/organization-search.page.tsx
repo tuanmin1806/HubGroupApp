@@ -1,17 +1,44 @@
 import { ThemeProvider } from "@emotion/react";
-import { createTheme, Box, TextField, Button, Card, CardContent, Typography, FormControl, Chip, CircularProgress, FormLabel, RadioGroup, FormControlLabel, Radio, Divider, Stack, Paper, Tooltip, Drawer } from "@mui/material";
+import { lazy } from "react";
+import { createTheme } from "@mui/material";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormLabel from "@mui/material/FormLabel";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
+import Drawer from "@mui/material/Drawer";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import OrganizationPagination from "../../../components/pagination/organization-pagination";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import { Apartment, Category, Code, LocationCity, LocationOn, Numbers, Place, School, Clear, FilterList } from "@mui/icons-material";
-import SearchBar from "../../../components/searchs/search-bar.search";
+import Apartment from "@mui/icons-material/Apartment";
+import Category from "@mui/icons-material/Category";
+import LocationCity from "@mui/icons-material/LocationCity";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Numbers from "@mui/icons-material/Numbers";
+import Place from "@mui/icons-material/Place";
+import School from "@mui/icons-material/School";
+import Clear from "@mui/icons-material/Clear";
+import FilterList from "@mui/icons-material/FilterList";
 import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
 import { useGetOrganizationTypesByPageQuery } from "../../../app/features/organization-type.api";
 import { useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
 import { useGetProfessionsByPageQuery } from "../../../app/features/professtion.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
 import { OrganizationResponse } from "../../../app/models/organization.model";
+const SearchBar = lazy(() => import("../../../components/searchs/search-bar.search"));
+const OrganizationPagination = lazy(() => import("../../../components/pagination/organization-pagination"));
 
 const theme = createTheme({
     palette: {
@@ -561,7 +588,6 @@ const OrganizationSearchPage = () => {
         <ThemeProvider theme={theme}>
             <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', py: 2, display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ maxWidth: 1200, width: '100%', px: { xs: 1, md: 3 } }}>
-                    {/* Search Bar */}
                     <Box sx={{
                         width: "100%",
                         maxWidth: 1200,
@@ -569,6 +595,7 @@ const OrganizationSearchPage = () => {
                         mx: 'auto'
                     }}>
                         <SearchBar
+                            key={selectedProvinceSeo}
                             onSearch={handleSearch}
                             initialQuery={filters.nameSearch}
                             initialProvinceSeo={selectedProvinceSeo}
@@ -686,6 +713,7 @@ const OrganizationSearchPage = () => {
                                                         {org.LogoFullUrl ? (
                                                             <img
                                                                 src={org.LogoFullUrl}
+                                                                loading="lazy"
                                                                 alt={org.Name}
                                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                             />

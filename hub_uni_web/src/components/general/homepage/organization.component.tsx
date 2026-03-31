@@ -1,13 +1,28 @@
-import { ArrowForward, School, ChevronLeft, ChevronRight, FilterAlt, Work, PeopleAlt, House } from "@mui/icons-material";
-import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack } from "@mui/material";
-import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
-import OrganizationSelectActionCard from "../../cards/organization-card.card";
-import OrganizationPagination from "../../pagination/organization-pagination";
+import { lazy } from "react";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import School from "@mui/icons-material/School";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import FilterAlt from "@mui/icons-material/FilterAlt";
+import Work from "@mui/icons-material/Work";
+import PeopleAlt from "@mui/icons-material/PeopleAlt";
+import House from "@mui/icons-material/House";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
+const OrganizationSelectActionCard = lazy(() => import("../../cards/organization-card.card"));
+const OrganizationPagination = lazy(() => import("../../pagination/organization-pagination"));
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { useGetAllProfessionNoAuthenQuery } from "../../../app/features/profession.api";
-import { useOrganizationsFullTextSearchQuery, useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
+import { useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
 import { useGetAllOrganizationTypesNoAuthenQuery } from "../../../app/features/organization-type.api";
+import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 
 const sectionWrapperSx = {
     width: "100%",

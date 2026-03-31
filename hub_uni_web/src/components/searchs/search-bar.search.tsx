@@ -1,16 +1,15 @@
-import { SearchOutlined, LocationOn } from "@mui/icons-material";
-import {
-    Button,
-    FormControl,
-    InputBase,
-    MenuItem,
-    Paper,
-    Select,
-    CircularProgress,
-    Divider,
-    IconButton,
-    Box,
-} from "@mui/material";
+import LocationOn from "@mui/icons-material/LocationOn";
+import SearchOutlined from "@mui/icons-material/SearchOutlined";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import InputBase from "@mui/material/InputBase";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+
 import React from "react";
 import { useGetAllProvinceNoAuthenQuery } from "../../app/features/province.api";
 import { TEXT_COLOR } from "../../constants/common.constant";
@@ -82,7 +81,7 @@ export default function SearchBar({ onSearch, initialQuery = "", initialProvince
                         </MenuItem>
                     ) : (
                         provinces.map((p) => (
-                            <MenuItem key={p.Id} value={p.Seo} sx={{ fontSize: "0.875rem" }}>
+                            <MenuItem key={p.Id} value={p.SeoUrl} sx={{ fontSize: "0.875rem" }}>
                                 {p.Name}
                             </MenuItem>
                         ))
