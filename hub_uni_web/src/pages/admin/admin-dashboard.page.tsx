@@ -1,68 +1,314 @@
-import Box from "@mui/material/Box";
+import TrendingUp from "@mui/icons-material/TrendingUp";
+import Article from "@mui/icons-material/Article";
+import People from "@mui/icons-material/People";
+import HowToReg from "@mui/icons-material/HowToReg";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import Cancel from "@mui/icons-material/Cancel";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Dashboard from "@mui/icons-material/Dashboard";
-import PendingActions from "@mui/icons-material/PendingActions";
-import People from "@mui/icons-material/People";
+import Skeleton from "@mui/material/Skeleton";
+import Chip from "@mui/material/Chip";
+import Grid from "@mui/material/Grid";
+import { useSelector } from "react-redux";
+import { useGetDashboardQuery } from "../../app/features/dashboard.api";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { getUserInfo } from "../../app/services/auth.service";
+
+interface StatCardProps {
+    icon: React.ReactNode;
+    label: string;
+    value: number | undefined;
+    color: string;
+    bg: string;
+    loading: boolean;
+}
+
+function StatCard({ icon, label, value, color, bg, loading }: StatCardProps) {
+    return (
+        <Card
+            elevation={0}
+            sx={{
+                borderRadius: 4,
+                border: "1px solid",
+                borderColor: "divider",
+                height: "100%",
+                transition: "box-shadow 0.2s, transform 0.2s",
+                "&:hover": {
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.10)",
+                    transform: "translateY(-2px)",
+                },
+            }}
+        >
+            <CardContent sx={{ p: 3 }}>
+                <Box display="flex" alignItems="flex-start" gap={2}>
+                    <Box
+                        sx={{
+                            width: 52,
+                            height: 52,
+                            borderRadius: 3,
+                            background: bg,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            color,
+                        }}
+                    >
+                        {icon}
+                    </Box>
+                    <Box flex={1} minWidth={0}>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            fontWeight={500}
+                            noWrap
+                            mb={0.5}
+                        >
+                            {label}
+                        </Typography>
+                        {loading ? (
+                            <Skeleton variant="text" width={60} height={40} />
+                        ) : (
+                            <Typography variant="h4" fontWeight={700} lineHeight={1.2}>
+                                {value ?? 0}
+                            </Typography>
+                        )}
+                    </Box>
+                </Box>
+            </CardContent>
+        </Card>
+    );
+}
+
+function EmptyChart() {
+    return (
+        <Box display="flex" alignItems="center" justifyContent="center" height={240}>
+            <Typography color="text.secondary" variant="body2">
+                Chưa có dữ liệu
+            </Typography>
+        </Box>
+    );
+}
 
 export default function AdminDashboardPage() {
+    const userInfo = getUserInfo();
+    const orgId = userInfo?.OrganizationId ?? "";
+
+    const { data, isLoading } = useGetDashboardQuery(orgId, { skip: !orgId });
+
+    const pending = (data?.StudentApplyCount ?? 0) - (data?.StudentPassCount ?? 0) - (data?.StudentFailCount ?? 0);
+
+    const pieData = [
+        { id: 0, value: data?.StudentPassCount ?? 0, label: "Đậu", color: "#22c55e" },
+        { id: 1, value: data?.StudentFailCount ?? 0, label: "Rớt", color: "#ef4444" },
+        { id: 2, value: pending > 0 ? pending : 0, label: "Chưa xét", color: "#f59e0b" },
+    ].filter((d) => d.value > 0);
+
+    const hasPieData = pieData.length > 0;
+
+    const barLabels = data?.StudentByRecruitPost?.map((item) => item.RecruitPost) ?? [];
+    const barValues = data?.StudentByRecruitPost?.map((item) => item.StudentCount) ?? [];
+    const hasBarData = barLabels.length > 0;
+
+    const passRate = data && data.StudentApplyCount > 0 ? Math.round((data.StudentPassCount / data.StudentApplyCount) * 100) : 0;
+
     return (
-        <Box>
-            <Typography variant="h5" fontWeight={600} gutterBottom>
-                Tổng quan
-            </Typography>
+        <Box sx={{ pb: 4 }}>
+            <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                mb={1}
+                flexWrap="wrap"
+                gap={1}
+            >
+                <Box>
+                    <Typography variant="h5" fontWeight={700} mb={0.5}>
+                        Tổng quan
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Tổng quan hoạt động tuyển sinh của trường
+                    </Typography>
+                </Box>
+                <Chip
+                    icon={<TrendingUp fontSize="small" />}
+                    label={`Tỷ lệ đậu: ${passRate}%`}
+                    color="success"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, fontSize: 13 }}
+                />
+            </Box>
 
-            <Typography variant="body2" color="text.secondary" mb={3}>
-                Tổng quan hoạt động trường
-            </Typography>
+            <Grid container spacing={2} mt={1}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <StatCard
+                        icon={<Article />}
+                        label="Chương trình tuyển sinh"
+                        value={data?.RecruitPostCount}
+                        color="#3b82f6"
+                        bg="#eff6ff"
+                        loading={isLoading}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <StatCard
+                        icon={<People />}
+                        label="Số lượng nhân viên"
+                        value={data?.StaffCount}
+                        color="#f59e0b"
+                        bg="#fffbeb"
+                        loading={isLoading}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <StatCard
+                        icon={<HowToReg />}
+                        label="Tổng số ứng viên ứng tuyển"
+                        value={data?.StudentApplyCount}
+                        color="#8b5cf6"
+                        bg="#f5f3ff"
+                        loading={isLoading}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                    <StatCard
+                        icon={<CheckCircle />}
+                        label="Số ứng viên đỗ"
+                        value={data?.StudentPassCount}
+                        color="#22c55e"
+                        bg="#f0fdf4"
+                        loading={isLoading}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                    <StatCard
+                        icon={<Cancel />}
+                        label="Số ứng viên trượt"
+                        value={data?.StudentFailCount}
+                        color="#ef4444"
+                        bg="#fef2f2"
+                        loading={isLoading}
+                    />
+                </Grid>
+            </Grid>
 
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Card sx={{ borderRadius: 3 }}>
-                        <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <Dashboard color="primary" fontSize="large" />
-                            <Box>
-                                <Typography variant="body2" color="text.secondary">
-                                    Số lượng chương trình tuyển sinh
-                                </Typography>
-                                <Typography variant="h6" fontWeight={600}>
-                                    0
-                                </Typography>
-                            </Box>
+            <Grid container spacing={2} mt={1}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 4,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            height: "100%",
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Typography variant="subtitle1" fontWeight={700} mb={0.5}>
+                                Tỷ lệ kết quả xét tuyển
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" mb={1}>
+                                Phân bổ ứng viên đỗ / trượt / đang xét
+                            </Typography>
+
+                            {isLoading ? (
+                                <Skeleton
+                                    variant="circular"
+                                    width={180}
+                                    height={180}
+                                    sx={{ mx: "auto", mt: 2 }}
+                                />
+                            ) : !hasPieData ? (<EmptyChart />
+                            ) : (
+                                <PieChart
+                                    series={[
+                                        {
+                                            data: pieData,
+                                            innerRadius: 55,
+                                            outerRadius: 95,
+                                            paddingAngle: 3,
+                                            cornerRadius: 4,
+                                            highlightScope: { fade: "global", highlight: "item" },
+                                            faded: {
+                                                innerRadius: 55,
+                                                additionalRadius: -4,
+                                                color: "gray",
+                                            },
+                                        },
+                                    ]}
+                                    height={270}
+                                    slotProps={{
+                                        legend: {
+                                            direction: "vertical",
+                                            position: { vertical: "bottom", horizontal: "center" },
+                                        },
+                                    }}
+                                />
+                            )}
                         </CardContent>
                     </Card>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Card sx={{ borderRadius: 3 }}>
-                        <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <People color="warning" fontSize="large" />
-                            <Box>
-                                <Typography variant="body2" color="text.secondary">
-                                    Số lượng nhân viên
-                                </Typography>
-                                <Typography variant="h6" fontWeight={600}>
-                                    0
-                                </Typography>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            borderRadius: 4,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            height: "100%",
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Typography variant="subtitle1" fontWeight={700} mb={0.5}>
+                                Thống kê ứng viên theo chương trình tuyển sinh
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" mb={1}>
+                                Số lượng ứng viên theo từng chương trình
+                            </Typography>
 
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Card sx={{ borderRadius: 3 }}>
-                        <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <PendingActions color="info" fontSize="large" />
-                            <Box>
-                                <Typography variant="body2" color="text.secondary">
-                                    Số lượng bài tuyển sinh
-                                </Typography>
-                                <Typography variant="h6" fontWeight={600}>
-                                    0
-                                </Typography>
-                            </Box>
+                            {isLoading ? (
+                                <Skeleton
+                                    variant="rectangular"
+                                    width="100%"
+                                    height={230}
+                                    sx={{ borderRadius: 2 }}
+                                />
+                            ) : !hasBarData ? (
+                                <EmptyChart />
+                            ) : (
+                                <BarChart
+                                    xAxis={[
+                                        {
+                                            scaleType: "band",
+                                            data: barLabels,
+                                            tickLabelStyle: { fontSize: 12, fontWeight: 500 },
+                                        },
+                                    ]}
+                                    yAxis={[
+                                        {
+                                            tickMinStep: 1,
+                                            tickLabelStyle: { fontSize: 12 },
+                                        },
+                                    ]}
+                                    series={[
+                                        {
+                                            data: barValues,
+                                            label: "Số hồ sơ",
+                                            color: "#3b82f6",
+                                            highlightScope: { fade: "global", highlight: "item" },
+                                        },
+                                    ]}
+                                    height={270}
+                                    borderRadius={6}
+                                    margin={{ top: 16, right: 16, left: 32, bottom: 32 }}
+
+                                    hideLegend
+                                />
+                            )}
                         </CardContent>
                     </Card>
                 </Grid>

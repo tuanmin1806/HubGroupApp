@@ -27,9 +27,22 @@ import { ConvertService } from "../../app/services/convert.service";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { Collapse, Divider } from "@mui/material";
 const UpdateApplicationDialog = lazy(() => import("../../components/dialogs/admin/application/update-application.dialog"));
 const ViewApplicationDialog = lazy(() => import("../../components/dialogs/admin/view-application-detail.dialog"));
 const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+
+function DetailField({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Typography variant="caption" color="text.secondary" display="block" mb={0.3}>
+                {label}
+            </Typography>
+            {children}
+        </Grid>
+    );
+}
 
 const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
     Accepted: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },
@@ -37,6 +50,128 @@ const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: str
     Pending: { bgcolor: "#fcf0cfff", color: "#c69f28", border: "#f0e427ff" },
     Undefined: { bgcolor: "#f5f5f5", color: "#757575", border: "#e0e0e0" },
 };
+
+function ApplicationRow({
+    application,
+    isDeleting,
+    deleteApplicationId,
+    onView,
+    onUpdate,
+    onDelete,
+}: any) {
+    const [open, setOpen] = useState(false);
+
+    const customer = application.Customer;
+    const profile = customer?.ProfileInfo;
+
+    const style = STATUS_STYLE[application.ApplicationStatus] ?? STATUS_STYLE.Undefined;
+
+    return (
+        <>
+            {/* ROW CHÍNH */}
+            <TableRow hover>
+                <TableCell sx={{ width: 40, pl: 1 }}>
+                    <IconButton size="small" onClick={() => setOpen(!open)}>
+                        {open ? <KeyboardArrowUp fontSize="small" /> : <KeyboardArrowDown fontSize="small" />}
+                    </IconButton>
+                </TableCell>
+
+                <TableCell>{customer?.FullName ?? "—"}</TableCell>
+                <TableCell>
+                    {ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender)) ?? "—"}
+                </TableCell>
+                <TableCell>
+                    {ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth) ?? "—"}
+                </TableCell>
+                <TableCell>{application.RecruitmentPost?.Name ?? "—"}</TableCell>
+
+                <TableCell>
+                    <Chip
+                        label={ConvertService.convertApplicationStatus(ConvertService.convertApplicationStatusFromString(application.ApplicationStatus))}
+                        size="small"
+                        sx={{
+                            bgcolor: style.bgcolor,
+                            color: style.color,
+                            fontWeight: 600,
+                            fontSize: 12,
+                            border: `1px solid ${style.border}`,
+                        }}
+                    />
+                </TableCell>
+
+                <TableCell align="center">
+                    <Tooltip title="Xem chi tiết">
+                        <IconButton size="small" color="info" onClick={() => onView(application.Id)}>
+                            <Visibility fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Cập nhật">
+                        <IconButton size="small" color="warning" onClick={() => onUpdate(application.Id)}>
+                            <ChangeCircle fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Xóa">
+                        <IconButton
+                            size="small"
+                            color="error"
+                            disabled={isDeleting && deleteApplicationId === application.Id}
+                            onClick={() => onDelete(application.Id)}
+                        >
+                            {isDeleting && deleteApplicationId === application.Id ? <CircularProgress size={16} color="error" /> : <Delete fontSize="small" />}
+                        </IconButton>
+                    </Tooltip>
+                </TableCell>
+            </TableRow>
+
+            <TableRow>
+                <TableCell colSpan={7} sx={{ py: 0 }}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
+                            <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+                                Thông tin ứng viên
+                            </Typography>
+                            <Divider sx={{ mb: 2 }} />
+
+                            <Grid container spacing={2} mb={2}>
+                                <DetailField label="Họ tên">
+                                    <Typography fontWeight={500} fontSize={14}>{customer?.FullName}</Typography>
+                                </DetailField>
+
+                                <DetailField label="Giới tính">
+                                    <Typography fontWeight={500} fontSize={14}>
+                                        {ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender))}
+                                    </Typography>
+                                </DetailField>
+
+                                <DetailField label="Ngày sinh">
+                                    <Typography fontWeight={500} fontSize={14}>
+                                        {ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth)}
+                                    </Typography>
+                                </DetailField>
+
+                                <DetailField label="Email">
+                                    <Typography fontWeight={500} fontSize={14}>{customer?.Email ?? "—"}</Typography>
+                                </DetailField>
+
+                                <DetailField label="Số điện thoại">
+                                    <Typography fontWeight={500} fontSize={14}>{customer?.PhoneNumber ?? "—"}</Typography>
+                                </DetailField>
+
+                                <DetailField label="Chương trình">
+                                    <Typography fontWeight={500} fontSize={14}>
+                                        {application.RecruitmentPost?.Name}
+                                    </Typography>
+                                </DetailField>
+                            </Grid>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </>
+    );
+}
 
 export default function ManageApplicationPage() {
     const [inputValue, setInputValue] = useState("");
@@ -139,55 +274,15 @@ export default function ManageApplicationPage() {
         }
 
         return data.Items.map((application: ApplicationResponse) => (
-            <TableRow key={application.Id} hover>
-                <TableCell>{application.Customer?.FullName ?? "—"}</TableCell>
-                <TableCell>{ConvertService.convertGender(ConvertService.convertGenderFromString(application.Customer?.ProfileInfo?.Gender)) ?? "—"}</TableCell>
-                <TableCell>{ConvertService.formatDateToddMMyyyy(application.Customer?.ProfileInfo?.DateOfBirth) ?? "—"}</TableCell>
-                <TableCell>{application.RecruitmentPost.Name ?? "—"}</TableCell>
-                <TableCell>
-                    {(() => {
-                        const style = STATUS_STYLE[application.ApplicationStatus] ?? STATUS_STYLE.Undefined;
-                        return (
-                            <Chip
-                                label={ConvertService.convertApplicationStatus(ConvertService.convertApplicationStatusFromString(application.ApplicationStatus))}
-                                size="small"
-                                sx={{
-                                    bgcolor: style.bgcolor,
-                                    color: style.color,
-                                    fontWeight: 600,
-                                    fontSize: 12,
-                                    border: `1px solid ${style.border}`,
-                                }}
-                            />
-                        );
-                    })()}
-                </TableCell>
-                <TableCell align="center">
-                    <Tooltip title="Xem chi tiết">
-                        <IconButton size="small" color="primary" onClick={() => handleOpenView(application.Id)}>
-                            <Visibility fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Thay đổi trạng thái">
-                        <IconButton size="small" color="warning" onClick={() => handleOpenUpdate(application.Id)}>
-                            <ChangeCircle fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Xóa">
-                        <IconButton
-                            size="small"
-                            color="error"
-                            disabled={isDeleting && deleteApplicationId === application.Id}
-                            onClick={() => handleOpenDelete(application.Id)}
-                        >
-                            {isDeleting && deleteApplicationId === application.Id
-                                ? <CircularProgress size={16} color="error" />
-                                : <Delete fontSize="small" />
-                            }
-                        </IconButton>
-                    </Tooltip>
-                </TableCell>
-            </TableRow>
+            <ApplicationRow
+                key={application.Id}
+                application={application}
+                isDeleting={isDeleting}
+                deleteApplicationId={deleteApplicationId}
+                onView={handleOpenView}
+                onUpdate={handleOpenUpdate}
+                onDelete={handleOpenDelete}
+            />
         ));
     };
 
@@ -212,10 +307,11 @@ export default function ManageApplicationPage() {
                         <Table sx={{ minWidth: 650 }} size="small" aria-label="staff account table">
                             <TableHead>
                                 <TableRow>
+                                    <TableCell />
                                     <TableCell>Họ tên</TableCell>
                                     <TableCell>Giới tính</TableCell>
                                     <TableCell>Ngày sinh</TableCell>
-                                    <TableCell>Chương trình tuyển sinh</TableCell>
+                                    <TableCell>Chương trình</TableCell>
                                     <TableCell>Trạng thái</TableCell>
                                     <TableCell align="center">Tiện ích</TableCell>
                                 </TableRow>
@@ -226,11 +322,11 @@ export default function ManageApplicationPage() {
                             component="div"
                             count={data?.Total ?? 0}
                             page={page}
-                            onPageChange={handlePageChange}
                             rowsPerPage={rowsPerPage}
+                            onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             rowsPerPageOptions={[5, 10, 25, 50]}
-                            labelRowsPerPage="Số hàng:"
+                            sx={{ "& .MuiTablePagination-actions button": { color: "inherit" }, "& .MuiSvgIcon-root": { fontSize: 20 } }}
                         />
                     </TableContainer>
                 </Grid>

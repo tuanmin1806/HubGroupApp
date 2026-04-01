@@ -8,4 +8,5 @@ export const TAG_TYPES = {
     FAVOURITE: 'Favourite',
     RECRUITMENT_POST: 'RecruitmentPost',
     APPLICATION: 'Application',
+    DASHBOARD: 'Dashboard',
 } as const;

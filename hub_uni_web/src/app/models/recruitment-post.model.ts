@@ -1,5 +1,6 @@
 import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "./enums.model";
 import { OrganizationResponse } from "./organization.model";
+import { ProfessionResponse } from "./profession.model";
 
 export interface Requirement {
     FromAge: number | undefined;
@@ -85,7 +86,7 @@ export interface RecruitmentPostResponse {
     Highlights: string[];
     Applied: boolean;
     Organization: OrganizationResponse;
-    Professions: Profession[];
+    Professions: ProfessionResponse[];
     CreatedBy: string;
     CreatedAt: string;
     UpdatedAt: string;
