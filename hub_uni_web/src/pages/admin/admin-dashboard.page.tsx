@@ -11,7 +11,6 @@ import Typography from "@mui/material/Typography";
 import Skeleton from "@mui/material/Skeleton";
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
-import { useSelector } from "react-redux";
 import { useGetDashboardQuery } from "../../app/features/dashboard.api";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
@@ -93,25 +92,33 @@ function EmptyChart() {
     );
 }
 
+const MAX_TICK = 14;
+
+function truncate(str: string, max = MAX_TICK) { return str.length > max ? str.slice(0, max) + "…" : str; }
+
 export default function AdminDashboardPage() {
     const userInfo = getUserInfo();
     const orgId = userInfo?.OrganizationId ?? "";
 
     const { data, isLoading } = useGetDashboardQuery(orgId, { skip: !orgId });
 
-    const pending = (data?.StudentApplyCount ?? 0) - (data?.StudentPassCount ?? 0) - (data?.StudentFailCount ?? 0);
+    const pending =
+        (data?.StudentApplyCount ?? 0) -
+        (data?.StudentPassCount ?? 0) -
+        (data?.StudentFailCount ?? 0);
 
     const pieData = [
-        { id: 0, value: data?.StudentPassCount ?? 0, label: "Đậu", color: "#22c55e" },
-        { id: 1, value: data?.StudentFailCount ?? 0, label: "Rớt", color: "#ef4444" },
-        { id: 2, value: pending > 0 ? pending : 0, label: "Chưa xét", color: "#f59e0b" },
+        { id: 0, value: data?.StudentPassCount ?? 0, label: "Đỗ", color: "#22c55e" },
+        { id: 1, value: data?.StudentFailCount ?? 0, label: "Trượt", color: "#ef4444" },
+        { id: 2, value: pending > 0 ? pending : 0, label: "Đang xét", color: "#f59e0b" },
     ].filter((d) => d.value > 0);
 
     const hasPieData = pieData.length > 0;
 
-    const barLabels = data?.StudentByRecruitPost?.map((item) => item.RecruitPost) ?? [];
-    const barValues = data?.StudentByRecruitPost?.map((item) => item.StudentCount) ?? [];
-    const hasBarData = barLabels.length > 0;
+    const recruitData = (data?.StudentByRecruitPost ?? []).slice(0, 12);
+    const fullLabels = recruitData.map((item) => item.RecruitPost);
+    const barValues = recruitData.map((item) => item.StudentCount);
+    const hasBarData = recruitData.length > 0;
 
     const passRate = data && data.StudentApplyCount > 0 ? Math.round((data.StudentPassCount / data.StudentApplyCount) * 100) : 0;
 
@@ -135,7 +142,7 @@ export default function AdminDashboardPage() {
                 </Box>
                 <Chip
                     icon={<TrendingUp fontSize="small" />}
-                    label={`Tỷ lệ đậu: ${passRate}%`}
+                    label={`Tỷ lệ đỗ: ${passRate}%`}
                     color="success"
                     variant="outlined"
                     sx={{ fontWeight: 600, fontSize: 13 }}
@@ -221,7 +228,8 @@ export default function AdminDashboardPage() {
                                     height={180}
                                     sx={{ mx: "auto", mt: 2 }}
                                 />
-                            ) : !hasPieData ? (<EmptyChart />
+                            ) : !hasPieData ? (
+                                <EmptyChart />
                             ) : (
                                 <PieChart
                                     series={[
@@ -280,34 +288,59 @@ export default function AdminDashboardPage() {
                             ) : !hasBarData ? (
                                 <EmptyChart />
                             ) : (
-                                <BarChart
-                                    xAxis={[
-                                        {
-                                            scaleType: "band",
-                                            data: barLabels,
-                                            tickLabelStyle: { fontSize: 12, fontWeight: 500 },
+                                <Box
+                                    sx={{
+                                        overflowX: "auto",
+                                        "&::-webkit-scrollbar": { height: 6 },
+                                        "&::-webkit-scrollbar-track": {
+                                            borderRadius: 3,
+                                            bgcolor: "grey.100",
                                         },
-                                    ]}
-                                    yAxis={[
-                                        {
-                                            tickMinStep: 1,
-                                            tickLabelStyle: { fontSize: 12 },
+                                        "&::-webkit-scrollbar-thumb": {
+                                            borderRadius: 3,
+                                            bgcolor: "grey.400",
                                         },
-                                    ]}
-                                    series={[
-                                        {
-                                            data: barValues,
-                                            label: "Số hồ sơ",
-                                            color: "#3b82f6",
-                                            highlightScope: { fade: "global", highlight: "item" },
-                                        },
-                                    ]}
-                                    height={270}
-                                    borderRadius={6}
-                                    margin={{ top: 16, right: 16, left: 32, bottom: 32 }}
-
-                                    hideLegend
-                                />
+                                    }}
+                                >
+                                    <Box
+                                        sx={{ minWidth: Math.max(recruitData.length * 72, 300) }}
+                                    >
+                                        <BarChart
+                                            xAxis={[
+                                                {
+                                                    scaleType: "band",
+                                                    data: fullLabels,
+                                                    valueFormatter: (value, context) => context.location === "tick" ? truncate(value) : value,
+                                                    tickLabelStyle: {
+                                                        fontSize: 11,
+                                                        fontWeight: 500,
+                                                    },
+                                                },
+                                            ]}
+                                            yAxis={[
+                                                {
+                                                    tickMinStep: 1,
+                                                    tickLabelStyle: { fontSize: 12 },
+                                                },
+                                            ]}
+                                            series={[
+                                                {
+                                                    data: barValues,
+                                                    label: "Số hồ sơ",
+                                                    color: "#3b82f6",
+                                                    highlightScope: {
+                                                        fade: "global",
+                                                        highlight: "item",
+                                                    },
+                                                },
+                                            ]}
+                                            height={270}
+                                            borderRadius={6}
+                                            margin={{ top: 16, right: 16, left: 36, bottom: 56 }}
+                                            hideLegend
+                                        />
+                                    </Box>
+                                </Box>
                             )}
                         </CardContent>
                     </Card>

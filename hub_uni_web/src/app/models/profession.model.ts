@@ -4,6 +4,10 @@ export interface ProfessionResponse {
     EnglishName: string;
     Seo: string;
     SigCode: string;
+    ProfessionId: string;
+    ProfessionName: string;
+    ProfessionSeoUrl: string;
+    Cost: number;
 }
 
 export interface ProfessionFilterParams {
