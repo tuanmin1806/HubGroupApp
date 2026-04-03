@@ -12,12 +12,19 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import { useState, useRef } from "react";
 import { useUpdateCustomerAvatarMutation } from "../../../app/features/customer.api";
+import labelsVi from "../../../i18n/labels.vi";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../app/store";
+import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
+
+const labels = labelsVi.adminLogoUpload;
 
 export default function AdminLogoUploadDialog({ open, onClose, currentLogoUrl }: {
     open: boolean;
     onClose: () => void;
     currentLogoUrl: string;
 }) {
+    const dispatch = useDispatch<AppDispatch>();
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,10 +51,11 @@ export default function AdminLogoUploadDialog({ open, onClose, currentLogoUrl }:
             const formData = new FormData();
             formData.append("LogoUrl", selectedFile);
             await updateLogo(formData).unwrap();
+            dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             onClose();
             handleRemove();
         } catch (err) {
-            console.error("Failed to update logo:", err);
+            dispatch(showSnackbar({ message: labels.updateFailed, severity: "error" }));
         }
     };
 
@@ -60,7 +68,7 @@ export default function AdminLogoUploadDialog({ open, onClose, currentLogoUrl }:
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 2, overflow: "hidden" } }}>
-            <DialogTitle sx={{ fontWeight: 700, fontSize: 16 }}>Cập nhật ảnh đại diện</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 700, fontSize: 16 }}>{labels.title}</DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
                 <Box sx={{ position: "relative", display: "inline-block" }}>
                     <Box
@@ -88,7 +96,7 @@ export default function AdminLogoUploadDialog({ open, onClose, currentLogoUrl }:
                     </Box>
 
                     {previewUrl && (
-                        <Tooltip title="Xóa ảnh đã chọn">
+                        <Tooltip title={labels.removeImage}>
                             <IconButton
                                 onClick={handleRemove}
                                 size="small"
@@ -131,14 +139,14 @@ export default function AdminLogoUploadDialog({ open, onClose, currentLogoUrl }:
                         "&:hover": { bgcolor: "#cce2f8" },
                     }}
                 >
-                    {previewUrl ? "Chọn ảnh khác" : "Chọn ảnh"}
+                    {previewUrl ? labels.selectAnotherImage : labels.selectImage}
                 </Button>
             </DialogContent>
 
             <DialogActions sx={{ pb: 1 }}>
-                <Button onClick={handleClose} sx={{ textTransform: "none", color: "text.secondary" }}>Hủy</Button>
+                <Button onClick={handleClose} sx={{ textTransform: "none", color: "text.secondary" }}>{labels.cancel}</Button>
                 <Button variant="contained" onClick={handleSave} disabled={!selectedFile || isLoading} sx={{ textTransform: "none", bgcolor: "rgb(65, 134, 202)", fontWeight: 600, borderRadius: 2, "&:hover": { bgcolor: "#1975d1" } }}>
-                    {isLoading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : "Lưu"}
+                    {isLoading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

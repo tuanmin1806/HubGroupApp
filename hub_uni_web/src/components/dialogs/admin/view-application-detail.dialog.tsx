@@ -15,6 +15,7 @@ import Stack from "@mui/material/Stack";
 import { useGetApplicationByIdQuery } from "../../../app/features/application.api";
 import { ConvertService } from "../../../app/services/convert.service";
 import { ApplicationStatus } from "../../../app/models/enums.model";
+import labelsVi from "../../../i18n/labels.vi";
 
 interface ViewApplicationDialogProps {
     open: boolean;
@@ -52,6 +53,8 @@ const InfoRow = ({ label, value }: { label: string; value?: string | number | nu
     </Box>
 );
 
+const labels = labelsVi.application;
+
 export default function ViewApplicationDialog({ open, applicationId, onClose }: ViewApplicationDialogProps) {
     const { data, isFetching, isError } = useGetApplicationByIdQuery(applicationId!, { skip: !open || !applicationId, refetchOnMountOrArgChange: true });
 
@@ -66,7 +69,7 @@ export default function ViewApplicationDialog({ open, applicationId, onClose }: 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth PaperProps={{ sx: { maxHeight: "92vh", borderRadius: 2 } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 1.5, bgcolor: "grey.50", borderBottom: "1px solid", borderColor: "divider" }}>
-                <Typography variant="subtitle1" fontWeight={700}>Chi tiết ứng viên</Typography>
+                <Typography variant="subtitle1" fontWeight={700}>{labels.applicationDetail}</Typography>
                 <Stack direction="row" alignItems="center" gap={1.5}>
                     {statusStyle && statusEnum !== null && (
                         <Chip
@@ -81,12 +84,12 @@ export default function ViewApplicationDialog({ open, applicationId, onClose }: 
 
             <DialogContent sx={{ p: 0, overflow: "auto" }}>
                 {isFetching && (<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 10 }}><CircularProgress size={36} /></Box>)}
-                {isError && !isFetching && (<Box sx={{ display: "flex", justifyContent: "center", py: 10 }}><Typography color="error">Đã xảy ra lỗi khi tải dữ liệu.</Typography></Box>)}
+                {isError && !isFetching && (<Box sx={{ display: "flex", justifyContent: "center", py: 10 }}><Typography color="error">{labels.loadDataFailed}</Typography></Box>)}
 
                 {!isFetching && !isError && data && (
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
                         <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}>
-                            <SectionTitle title="Thông tin ứng viên" />
+                            <SectionTitle title={labels.applicationInfo} />
 
                             <Stack direction="row" alignItems="center" gap={2} sx={{ mb: 3 }}>
                                 <Avatar
@@ -105,55 +108,55 @@ export default function ViewApplicationDialog({ open, applicationId, onClose }: 
 
                             <Grid container spacing={2.5}>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Ngày sinh" value={ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth)} />
+                                    <InfoRow label={labels.dateOfBirth} value={ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth)} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Giới tính" value={ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender))} />
+                                    <InfoRow label={labels.gender} value={ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender))} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Trình độ học vấn" value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(profile?.EducationLevel))} />
+                                    <InfoRow label={labels.educationLevel} value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(profile?.EducationLevel))} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Kinh nghiệm" value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(profile?.Experience))} />
+                                    <InfoRow label={labels.experience} value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(profile?.Experience))} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="GPA" value={profile?.Gpa} />
+                                    <InfoRow label={labels.gpa} value={profile?.Gpa} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Năm tốt nghiệp" value={profile?.GraduationYear} />
+                                    <InfoRow label={labels.graduationYear} value={profile?.GraduationYear} />
                                 </Grid>
                                 <Grid size={{ xs: 12 }}>
-                                    <InfoRow label="Địa chỉ" value={profile?.Address} />
+                                    <InfoRow label={labels.address} value={profile?.Address} />
                                 </Grid>
                             </Grid>
                         </Box>
 
                         <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}>
-                            <SectionTitle title="Chương trình tuyển sinh" />
+                            <SectionTitle title={labels.recruitmentProgram} />
                             <Grid container spacing={2.5}>
                                 <Grid size={{ xs: 12 }}>
-                                    <InfoRow label="Tên chương trình tuyển sinh" value={post?.Name} />
+                                    <InfoRow label={labels.recruitmentProgramName} value={post?.Name} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Tỉnh / Thành phố" value={post?.Province} />
+                                    <InfoRow label={labels.province} value={post?.Province} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Số lượng tuyển" value={post?.Quantity} />
+                                    <InfoRow label={labels.quantity} value={post?.Quantity} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Đơn vị tiền tệ" value={post?.Currency} />
+                                    <InfoRow label={labels.currency} value={post?.Currency} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Tuyển từ ngày" value={post?.RecruitmentFromDate ? ConvertService.formatDateToddMMyyyy(post.RecruitmentFromDate) : null} />
+                                    <InfoRow label={labels.recruitmentFromDate} value={post?.RecruitmentFromDate ? ConvertService.formatDateToddMMyyyy(post.RecruitmentFromDate) : null} />
                                 </Grid>
                                 <Grid size={{ xs: 6, sm: 4 }}>
-                                    <InfoRow label="Tuyển đến ngày" value={post?.RecruitmentToDate ? ConvertService.formatDateToddMMyyyy(post.RecruitmentToDate) : null} />
+                                    <InfoRow label={labels.recruitmentToDate} value={post?.RecruitmentToDate ? ConvertService.formatDateToddMMyyyy(post.RecruitmentToDate) : null} />
                                 </Grid>
 
                                 {post?.Professions && post.Professions.length > 0 && (
                                     <Grid size={{ xs: 12 }}>
                                         <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.4 }}>
-                                            Ngành nghề tuyển dụng
+                                            {labels.profession}
                                         </Typography>
                                         <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 0.75 }}>
                                             {post.Professions.map((p: { Id: string; Name: string }) => (
@@ -172,37 +175,37 @@ export default function ViewApplicationDialog({ open, applicationId, onClose }: 
 
                         {req && (
                             <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}>
-                                <SectionTitle title="Yêu cầu" />
+                                <SectionTitle title={labels.requirements} />
                                 <Grid container spacing={2.5}>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Độ tuổi" value={req.FromAge && req.ToAge ? `${req.FromAge} – ${req.ToAge} tuổi` : null} />
+                                        <InfoRow label={labels.ageRange} value={req.FromAge && req.ToAge ? `${req.FromAge} – ${req.ToAge} tuổi` : null} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Giới tính" value={ConvertService.convertGender(ConvertService.convertGenderFromString(req.Gender))} />
+                                        <InfoRow label={labels.gender} value={ConvertService.convertGender(ConvertService.convertGenderFromString(req.Gender))} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Trình độ học vấn" value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(req.EducationLevel))} />
+                                        <InfoRow label={labels.educationLevel} value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(req.EducationLevel))} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Kinh nghiệm" value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(req.Experience))} />
+                                        <InfoRow label={labels.experience} value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(req.Experience))} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="GPA tối thiểu" value={req.MinimumGpa} />
+                                        <InfoRow label={labels.minimumGpa} value={req.MinimumGpa} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Số năm tốt nghiệp tối đa" value={req.MaxYearsSinceGrad} />
+                                        <InfoRow label={labels.maxYearsSinceGrad} value={req.MaxYearsSinceGrad} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Số ngày vắng mặt tối đa" value={req.MaxAbsence} />
+                                        <InfoRow label={labels.maxAbsence} value={req.MaxAbsence} />
                                     </Grid>
                                     <Grid size={{ xs: 6, sm: 4 }}>
-                                        <InfoRow label="Loại visa" value={req.VisaType} />
+                                        <InfoRow label={labels.visaType} value={req.VisaType} />
                                     </Grid>
 
                                     {req.OtherReqs?.length > 0 && (
                                         <Grid size={{ xs: 12 }}>
                                             <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.4 }}>
-                                                Yêu cầu khác
+                                                {labels.otherReqs}
                                             </Typography>
                                             <Box component="ul" sx={{ mt: 0.75, pl: 2.5, mb: 0 }}>
                                                 {req.OtherReqs.map((r: string, i: number) => (
@@ -221,7 +224,7 @@ export default function ViewApplicationDialog({ open, applicationId, onClose }: 
             </DialogContent>
 
             <DialogActions sx={{ px: 2, py: 1.5, bgcolor: "grey.50" }}>
-                <Button onClick={onClose} variant="outlined" color="inherit" size="small">Đóng</Button>
+                <Button onClick={onClose} variant="outlined" color="inherit" size="small">{labels.close}</Button>
             </DialogActions>
         </Dialog>
     );

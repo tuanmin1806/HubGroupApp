@@ -22,8 +22,10 @@ import { AppDispatch } from "../../../app/store";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { UpdatePasswordRequest } from "../../../app/models/customer.model";
 import { useUpdatePasswordMutation } from "../../../app/features/customer.api";
+import labelsVi from "../../../i18n/labels.vi";
 
 const BLUE = "#1975d1";
+const labels = labelsVi.changePassword;
 
 interface Props {
     open: boolean;
@@ -63,12 +65,12 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
 
     const validate = (): boolean => {
         const errs: FormErrors = {};
-        if (!form.OldPassword) errs.OldPassword = "Vui lòng nhập mật khẩu hiện tại";
-        if (!form.NewPassword) errs.NewPassword = "Vui lòng nhập mật khẩu mới";
-        else if (form.NewPassword.length < 3) errs.NewPassword = "Mật khẩu mới phải có ít nhất 3 ký tự";
-        else if (form.NewPassword === form.OldPassword) errs.NewPassword = "Mật khẩu mới không được trùng mật khẩu hiện tại";
-        if (!form.ConfirmPassword) errs.ConfirmPassword = "Vui lòng xác nhận mật khẩu mới";
-        else if (form.ConfirmPassword !== form.NewPassword) errs.ConfirmPassword = "Xác nhận mật khẩu không khớp";
+        if (!form.OldPassword) errs.OldPassword = labels.currentPasswordRequired;
+        if (!form.NewPassword) errs.NewPassword = labels.newPasswordRequired;
+        else if (form.NewPassword.length < 3) errs.NewPassword = labels.newPasswordLengthRequired;
+        else if (form.NewPassword === form.OldPassword) errs.NewPassword = labels.newPasswordMismatch;
+        if (!form.ConfirmPassword) errs.ConfirmPassword = labels.confirmPasswordRequired;
+        else if (form.ConfirmPassword !== form.NewPassword) errs.ConfirmPassword = labels.confirmPasswordMismatch;
         setErrors(errs);
         return Object.keys(errs).length === 0;
     };
@@ -89,7 +91,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
             await updatePassword(payload).unwrap();
             setSuccess(true);
         } catch (err: any) {
-            const msg = err?.data?.Message || "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.";
+            const msg = err?.data?.Message || labels.changePasswordFailed;
             dispatch(showSnackbar({ message: msg, severity: "error" }));
         }
     };
@@ -108,9 +110,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
     const passAdorn = (field: keyof typeof showPass) => (
         <InputAdornment position="end">
             <IconButton size="small" onClick={() => toggleShow(field)} edge="end">
-                {showPass[field]
-                    ? <VisibilityOff sx={{ fontSize: 18 }} />
-                    : <Visibility sx={{ fontSize: 18 }} />}
+                {showPass[field] ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
             </IconButton>
         </InputAdornment>
     );
@@ -134,7 +134,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                 <Stack direction="row" spacing={1.5} alignItems="center">
                     <Box sx={{ width: 4, height: 20, borderRadius: 1, bgcolor: BLUE }} />
                     <Typography fontWeight={700} fontSize={16} color="#1e293b">
-                        Đổi mật khẩu
+                        {labels.title}
                     </Typography>
                 </Stack>
                 {!isLoading && !success && (
@@ -159,10 +159,10 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                         </Box>
                         <Box textAlign="center">
                             <Typography fontWeight={700} fontSize={15} color="#1e293b" mb={0.75}>
-                                Thay đổi mật khẩu thành công!
+                                {labels.changePasswordSuccess}
                             </Typography>
                             <Typography fontSize={13} color="#64748b" lineHeight={1.6}>
-                                Vì lý do bảo mật, bạn cần đăng xuất và đăng nhập lại bằng mật khẩu mới.
+                                {labels.changePasswordSuccessDescription}
                             </Typography>
                         </Box>
                         <Button
@@ -179,7 +179,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                                 "&:hover": { bgcolor: "#1565c0" },
                             }}
                         >
-                            Đăng xuất ngay
+                            {labels.logout}
                         </Button>
                     </Stack>
                 ) : (
@@ -190,7 +190,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                         <TextField
                             size="small"
                             fullWidth
-                            label="Mật khẩu hiện tại"
+                            label={labels.currentPassword}
                             type={showPass.current ? "text" : "password"}
                             value={form.OldPassword}
                             onChange={handleChange("OldPassword")}
@@ -210,7 +210,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                         <TextField
                             size="small"
                             fullWidth
-                            label="Mật khẩu mới"
+                            label={labels.newPassword}
                             type={showPass.newPass ? "text" : "password"}
                             value={form.NewPassword}
                             onChange={handleChange("NewPassword")}
@@ -230,7 +230,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                         <TextField
                             size="small"
                             fullWidth
-                            label="Xác nhận mật khẩu mới"
+                            label={labels.confirmNewPassword}
                             type={showPass.confirm ? "text" : "password"}
                             value={form.ConfirmPassword}
                             onChange={handleChange("ConfirmPassword")}
@@ -263,7 +263,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                                     "&:hover": { borderColor: "#cbd5e1", bgcolor: "#f8fafc" },
                                 }}
                             >
-                                Hủy
+                                {labels.cancel}
                             </Button>
                             <Button
                                 fullWidth
@@ -279,9 +279,7 @@ export default function ChangePasswordDialog({ open, onClose, onLogout }: Props)
                                     "&:hover": { bgcolor: "#1565c0" },
                                 }}
                             >
-                                {isLoading
-                                    ? <CircularProgress size={18} sx={{ color: "white" }} />
-                                    : "Lưu mật khẩu"}
+                                {isLoading ? <CircularProgress size={18} sx={{ color: "white" }} /> : labels.savePassword}
                             </Button>
                         </Stack>
                     </Stack>

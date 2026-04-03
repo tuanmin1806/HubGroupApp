@@ -37,6 +37,9 @@ import { ProfessionResponse } from "../../../../app/models/profession.model";
 import { AppDispatch } from "../../../../app/store";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../../../app/features/snackbar/snackbar.slice";
+import labelsVi from "../../../../i18n/labels.vi";
+
+const labels = labelsVi.organization;
 
 interface Props {
     open: boolean;
@@ -67,7 +70,7 @@ function ImageUploadBox({ label, previewUrl, onFileChange, onRemove, required }:
                     <IconButton size="small" onClick={onRemove} sx={{ position: "absolute", top: -8, right: -8, bgcolor: "error.main", color: "#fff", width: 20, height: 20, "&:hover": { bgcolor: "error.dark" } }}> <Close sx={{ fontSize: 12 }} /></IconButton>
                 </Box>
             ) : (
-                <Button component="label" variant="outlined" size="small" startIcon={<CloudUpload />} sx={{ borderStyle: "dashed", borderColor: "#ccc", color: "text.secondary", textTransform: "none", fontSize: 12, py: 1, "&:hover": { borderColor: "#1975d1", color: "#1975d1" } }}> Chọn ảnh <input type="file" accept="image/*" hidden onChange={onFileChange} /></Button>
+                <Button component="label" variant="outlined" size="small" startIcon={<CloudUpload />} sx={{ borderStyle: "dashed", borderColor: "#ccc", color: "text.secondary", textTransform: "none", fontSize: 12, py: 1, "&:hover": { borderColor: "#1975d1", color: "#1975d1" } }}> {labels.selectFile} <input type="file" accept="image/*" hidden onChange={onFileChange} /></Button>
             )}
         </Box>
     );
@@ -148,7 +151,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
             setExistingFeaturedRelUrls(data.FeaturedImageUrls ?? []);
             setNewFeaturedFiles([]);
         }).catch(() => {
-            console.log("Không thể tải thông tin tổ chức");
+            dispatch(showSnackbar({ message: labels.cannotLoadOrganizationInfo, severity: "error" }));
         }).finally(() => setLoadingData(false));
     }, [open]);
 
@@ -170,8 +173,8 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     };
 
     const validateImage = (file: File) => {
-        if (file.size > 5 * 1024 * 1024) { console.log("Kích thước ảnh không được vượt quá 5MB"); return false; }
-        if (!file.type.startsWith("image/")) { console.log("Vui lòng chọn file ảnh hợp lệ"); return false; }
+        if (file.size > 5 * 1024 * 1024) { dispatch(showSnackbar({ message: labels.imageSizeExceeded, severity: "error" })); return false; }
+        if (!file.type.startsWith("image/")) { dispatch(showSnackbar({ message: labels.invalidImageFile, severity: "error" })); return false; }
         return true;
     };
 
@@ -183,7 +186,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
             const res = await uploadOneFile(file).unwrap();
             set("LogoUrl", res.RelativeUrl);
             setLogoPreview(res.FullUrl);
-        } catch { console.log("Tải ảnh thất bại"); }
+        } catch { dispatch(showSnackbar({ message: labels.uploadFailed, severity: "error" })); }
         finally { setIsSubmitting(false); }
     };
 
@@ -195,7 +198,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
             const res = await uploadOneFile(file).unwrap();
             set("WallpaperUrl", res.RelativeUrl);
             setWallpaperPreview(res.FullUrl);
-        } catch { console.log("Tải ảnh thất bại"); }
+        } catch { dispatch(showSnackbar({ message: labels.uploadFailed, severity: "error" })); }
         finally { setIsSubmitting(false); }
     };
 
@@ -247,11 +250,11 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                 Highlights: form.Highlights.filter((h: string) => h.trim()),
                 Professions: form.Professions.filter((p: Profession) => p.ProfessionId),
             }).unwrap();
-            dispatch(showSnackbar({ message: "Cập nhật thông tin trường thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             newFeaturedFiles.forEach((f) => URL.revokeObjectURL(f.preview));
             onClose();
         } catch (err) {
-            dispatch(showSnackbar({ message: "Có lỗi xảy ra khi cập nhật thông tin trường!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.updateFailed, severity: "error" }));
         } finally {
             setIsSubmitting(false);
         }
@@ -265,7 +268,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth PaperProps={{ sx: { borderRadius: 3, maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1, pt: 2, px: 2 }}>
-                <Typography fontWeight={700} fontSize={17}>Chỉnh sửa thông tin trường</Typography>
+                <Typography fontWeight={700} fontSize={17}>{labels.editOrganization}</Typography>
                 <IconButton size="small" onClick={onClose}><Close fontSize="small" /></IconButton>
             </DialogTitle>
 
@@ -273,38 +276,38 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                 {loadingData ? (
                     <Stack alignItems="center" justifyContent="center" sx={{ height: 280 }} spacing={1.5}>
                         <CircularProgress sx={{ color: "#1975d1" }} />
-                        <Typography variant="body2" color="text.secondary">Đang tải thông tin...</Typography>
+                        <Typography variant="body2" color="text.secondary">{labels.loadingData}</Typography>
                     </Stack>
                 ) : (
                     <Grid container spacing={2}>
 
-                        <SectionHeader title="Thông tin cơ bản" />
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> Tên trường <RequiredStar /> </>} value={form.Name} onChange={(e) => set("Name", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Tên quốc tế" value={form.InternationalName} onChange={(e) => set("InternationalName", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Mã số thuế" value={form.TaxCode} onChange={(e) => set("TaxCode", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Quản lý bởi" value={form.ManagedBy} onChange={(e) => set("ManagedBy", e.target.value)} /> </Grid>
+                        <SectionHeader title={labels.basicInfo} />
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> {labels.name} <RequiredStar /> </>} value={form.Name} onChange={(e) => set("Name", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.internationalName} value={form.InternationalName} onChange={(e) => set("InternationalName", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.taxCode} value={form.TaxCode} onChange={(e) => set("TaxCode", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.managedBy} value={form.ManagedBy} onChange={(e) => set("ManagedBy", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField {...tf} label={<> Trạng thái <RequiredStar /> </>} select value={form.OrgStatus} onChange={(e) => set("OrgStatus", e.target.value)}>
-                                <MenuItem value={OrgStatus.Undefined}>Không xác định</MenuItem>
-                                <MenuItem value={OrgStatus.Active}>Hoạt động</MenuItem>
-                                <MenuItem value={OrgStatus.Inactive}>Dừng hoạt động</MenuItem>
-                                <MenuItem value={OrgStatus.Locked}>Bị khóa</MenuItem>
+                            <TextField {...tf} label={<> {labels.status} <RequiredStar /> </>} select value={form.OrgStatus} onChange={(e) => set("OrgStatus", e.target.value)}>
+                                <MenuItem value={OrgStatus.Undefined}>{labels.undefined}</MenuItem>
+                                <MenuItem value={OrgStatus.Active}>{labels.active}</MenuItem>
+                                <MenuItem value={OrgStatus.Inactive}>{labels.inactive}</MenuItem>
+                                <MenuItem value={OrgStatus.Locked}>{labels.locked}</MenuItem>
                             </TextField>
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 {...tf}
-                                label="Chi phí KTX"
+                                label={labels.dormCost}
                                 type="number"
                                 value={form.DormCost}
                                 onChange={(e) => set("DormCost", Number(e.target.value))}
                                 slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }}
                             />
                         </Grid>
-                        <SectionHeader title="Ngành đào tạo" />
+                        <SectionHeader title={labels.profession} />
 
                         <Grid size={{ xs: 12 }}>
-                            <Typography variant="body2" fontWeight={600} mb={1.5}> Ngành chính </Typography>
+                            <Typography variant="body2" fontWeight={600} mb={1.5}> {labels.mainProfession} </Typography>
                             <Grid container spacing={1.5}>
                                 <Grid size={{ xs: 12, sm: 8 }}>
                                     <Autocomplete
@@ -318,11 +321,11 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                             ProfessionId: opt?.Id ?? "",
                                             ProfessionName: opt?.Name ?? "",
                                         })}
-                                        renderInput={(params) => <TextField {...params} label="Chọn ngành chính" />}
+                                        renderInput={(params) => <TextField {...params} label={labels.selectMainProfession} />}
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 4 }}>
-                                    <TextField {...tf} label="Học phí" type="number"
+                                    <TextField {...tf} label={labels.tuitionFee} type="number"
                                         slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }}
                                         value={form.MainProfession?.Cost ?? 0}
                                         onChange={(e) => set("MainProfession", { ...form.MainProfession, Cost: Number(e.target.value) })} />
@@ -332,14 +335,14 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
 
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                <Typography variant="body2" fontWeight={600}> Các ngành đào tạo ({form.Professions.length}) </Typography>
-                                <Button size="small" startIcon={<Add />} onClick={addProfession} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}> Thêm ngành </Button>
+                                <Typography variant="body2" fontWeight={600}> {labels.professions} ({form.Professions.length}) </Typography>
+                                <Button size="small" startIcon={<Add />} onClick={addProfession} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}> {labels.add} </Button>
                             </Stack>
                             <Stack spacing={1}>
                                 {form.Professions.map((p: Profession, i: number) => (
                                     <Box key={i} sx={{ p: 1, borderRadius: 2, border: "0.5px solid #e8e8e8", bgcolor: "#fafafa" }}>
                                         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                            <Typography variant="caption" color="text.secondary" fontWeight={600}>Ngành {i + 1}</Typography>
+                                            <Typography variant="caption" color="text.secondary" fontWeight={600}> {labels.major} {i + 1}</Typography>
                                             <IconButton size="small" onClick={() => removeProfession(i)} sx={{ color: "error.main" }}>
                                                 <Delete sx={{ fontSize: 16 }} />
                                             </IconButton>
@@ -358,51 +361,51 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                                             ProfessionName: opt?.Name ?? "",
                                                         });
                                                     }}
-                                                    renderInput={(params) => <TextField {...params} label="Chọn ngành" />}
+                                                    renderInput={(params) => <TextField {...params} label={labels.selectProfession} />}
                                                 />
                                             </Grid>
-                                            <Grid size={{ xs: 12, sm: 4 }}> <TextField {...tf} label="Học phí" type="number" value={p.Cost} onChange={(e) => updateProfessionField(i, "Cost", Number(e.target.value))} slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }} /></Grid>
+                                            <Grid size={{ xs: 12, sm: 4 }}> <TextField {...tf} label={labels.tuitionFee} type="number" value={p.Cost} onChange={(e) => updateProfessionField(i, "Cost", Number(e.target.value))} slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }} /></Grid>
                                         </Grid>
                                     </Box>
                                 ))}
                             </Stack>
                         </Grid>
 
-                        <SectionHeader title="Liên hệ & địa chỉ" />
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Email" type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Số điện thoại" value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label="Website" value={form.WebsiteUrl} onChange={(e) => set("WebsiteUrl", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={provinces} getOptionLabel={(opt: Province) => opt.Name ?? ""} isOptionEqualToValue={(opt: Province, val: Province) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label={<> Tỉnh / Thành phố <RequiredStar /> </>} />} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={communes} getOptionLabel={(opt: CommuneResponse) => opt.Name ?? ""} isOptionEqualToValue={(opt: CommuneResponse, val: CommuneResponse) => opt.Id === val?.Id} value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedProvinceSeo} noOptionsText={selectedProvinceSeo ? "Không có dữ liệu" : "Vui lòng chọn tỉnh trước"} renderInput={(params) => <TextField {...params} label={<> Xã/Phường <RequiredStar /> </>} placeholder={!selectedProvinceSeo ? "Chọn tỉnh trước" : ""} />} /> </Grid>
+                        <SectionHeader title={labels.contactAndAddress} />
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.email} type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.phoneNumber} value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.website} value={form.WebsiteUrl} onChange={(e) => set("WebsiteUrl", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={provinces} getOptionLabel={(opt: Province) => opt.Name ?? ""} isOptionEqualToValue={(opt: Province, val: Province) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label={<>{labels.province} <RequiredStar /> </>} />} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={communes} getOptionLabel={(opt: CommuneResponse) => opt.Name ?? ""} isOptionEqualToValue={(opt: CommuneResponse, val: CommuneResponse) => opt.Id === val?.Id} value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedProvinceSeo} noOptionsText={selectedProvinceSeo ? labels.noData : labels.selectProvinceFirst} renderInput={(params) => <TextField {...params} label={<> {labels.commune} <RequiredStar /> </>} placeholder={!selectedProvinceSeo ? labels.selectProvinceFirst : ""} />} /> </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> Địa chỉ <RequiredStar /> </>} value={form.Address} onChange={(e) => set("Address", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> {labels.address} <RequiredStar /> </>} value={form.Address} onChange={(e) => set("Address", e.target.value)} /> </Grid>
 
-                        <SectionHeader title="Mạng xã hội" />
+                        <SectionHeader title={labels.socialNetworks} />
                         {[
-                            { field: "FacebookUrl", label: "Facebook" },
-                            { field: "LinkedinUrl", label: "LinkedIn" },
-                            { field: "YoutubeUrl", label: "YouTube" },
-                            { field: "TwitterUrl", label: "Twitter" },
-                            { field: "InstagramUrl", label: "Instagram" },
-                            { field: "GoogleMapUrl", label: "Google Maps" },
+                            { field: "FacebookUrl", label: labels.facebook },
+                            { field: "LinkedinUrl", label: labels.linkedin },
+                            { field: "YoutubeUrl", label: labels.youtube },
+                            { field: "TwitterUrl", label: labels.twitter },
+                            { field: "InstagramUrl", label: labels.instagram },
+                            { field: "GoogleMapUrl", label: labels.googleMap },
                         ].map(({ field, label }) => (<Grid key={field} size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={label} value={form[field] ?? ""} onChange={(e) => set(field, e.target.value)} /> </Grid>))}
 
-                        <SectionHeader title="Hình ảnh" />
+                        <SectionHeader title={labels.images} />
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <ImageUploadBox label="Logo" required previewUrl={logoPreview}
+                            <ImageUploadBox label={labels.logo} required previewUrl={logoPreview}
                                 onFileChange={handleLogoChange}
                                 onRemove={() => { set("LogoUrl", ""); setLogoPreview(null); }} />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <ImageUploadBox label="Ảnh bìa" required previewUrl={wallpaperPreview}
+                            <ImageUploadBox label={labels.wallpaper} required previewUrl={wallpaperPreview}
                                 onFileChange={handleWallpaperChange}
                                 onRemove={() => { set("WallpaperUrl", ""); setWallpaperPreview(null); }} />
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                <Typography variant="body2" fontWeight={600}>Ảnh nổi bật</Typography>
-                                <Button component="label" size="small" startIcon={<Add />} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}> Thêm ảnh <input type="file" accept="image/*" multiple hidden onChange={handleFeaturedImagesChange} /> </Button>
+                                <Typography variant="body2" fontWeight={600}>{labels.featuredImages}</Typography>
+                                <Button component="label" size="small" startIcon={<Add />} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}> {labels.add} <input type="file" accept="image/*" multiple hidden onChange={handleFeaturedImagesChange} /> </Button>
                             </Stack>
                             {(existingFeaturedFullUrls.length > 0 || newFeaturedFiles.length > 0) && (
                                 <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 1 }}>
@@ -417,7 +420,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                     {newFeaturedFiles.map((f, i) => (
                                         <Box key={`new-${i}`} sx={{ position: "relative" }}>
                                             <Box component="img" src={f.preview} sx={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 1.5, display: "block", border: "2px solid #1975d1" }} />
-                                            <Chip label="Mới" size="small" sx={{ position: "absolute", bottom: 2, left: 2, height: 16, fontSize: 9, bgcolor: "#1975d1", color: "#fff" }} />
+                                            <Chip label={labels.new} size="small" sx={{ position: "absolute", bottom: 2, left: 2, height: 16, fontSize: 9, bgcolor: "#1975d1", color: "#fff" }} />
                                             <IconButton size="small" onClick={() => removeNewFeatured(i)} sx={{ position: "absolute", top: -6, right: -6, bgcolor: "error.main", color: "#fff", width: 18, height: 18, "&:hover": { bgcolor: "error.dark" } }}>
                                                 <Close sx={{ fontSize: 11 }} />
                                             </IconButton>
@@ -427,17 +430,17 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                             )}
                         </Grid>
 
-                        <SectionHeader title="Nội dung" />
-                        <Grid size={{ xs: 12 }}> <TextField {...tfMultiline} label="Tóm tắt" multiline rows={2} value={form.Summary} onChange={(e) => set("Summary", e.target.value)} /> </Grid>
+                        <SectionHeader title={labels.content} />
+                        <Grid size={{ xs: 12 }}> <TextField {...tfMultiline} label={labels.summary} multiline rows={2} value={form.Summary} onChange={(e) => set("Summary", e.target.value)} /> </Grid>
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                <Typography variant="body2" fontWeight={600}>Điểm nổi bật</Typography>
-                                <Button size="small" startIcon={<Add />} onClick={addHighlight} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}>Thêm</Button>
+                                <Typography variant="body2" fontWeight={600}>{labels.highlights}</Typography>
+                                <Button size="small" startIcon={<Add />} onClick={addHighlight} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}>{labels.add}</Button>
                             </Stack>
                             <Stack spacing={1}>
                                 {form.Highlights.map((h: string, i: number) => (
                                     <Stack key={i} direction="row" spacing={1} alignItems="center">
-                                        <TextField {...tf} placeholder={`Điểm nổi bật ${i + 1}`} value={h} onChange={(e) => updateHighlight(i, e.target.value)} />
+                                        <TextField {...tf} placeholder={`${labels.highlights} ${i + 1}`} value={h} onChange={(e) => updateHighlight(i, e.target.value)} />
                                         <IconButton size="small" onClick={() => removeHighlight(i)} sx={{ color: "error.main", flexShrink: 0 }}>
                                             <Delete fontSize="small" />
                                         </IconButton>
@@ -447,7 +450,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                         </Grid>
                         <Grid size={{ xs: 12 }}>
                             <Paper sx={{ p: 1, borderRadius: 2 }}>
-                                <Typography variant="body2" fontWeight={600} mb={1}>{<> Mô tả chi tiết <RequiredStar /> </>}</Typography>
+                                <Typography variant="body2" fontWeight={600} mb={1}>{<> {labels.description} <RequiredStar /> </>}</Typography>
                                 <RichTextEditorComponent value={form.Description} onChange={(val: string) => set("Description", val)} />
                             </Paper>
                         </Grid>
@@ -456,10 +459,10 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
             </DialogContent>
 
             <DialogActions sx={{ px: 1, py: 1 }}>
-                <Button onClick={onClose} size="small" sx={{ textTransform: "none", color: "text.secondary" }}>Hủy</Button>
+                <Button onClick={onClose} size="small" sx={{ textTransform: "none", color: "text.secondary" }}>{labels.cancel}</Button>
                 <Button variant="contained" onClick={handleSubmit} disabled={isSubmitting} size="small"
                     sx={{ textTransform: "none", bgcolor: "#1975d1", "&:hover": { bgcolor: "#1975d1" }, minWidth: 50 }}
-                    startIcon={isSubmitting ? <CircularProgress size={14} color="inherit" /> : undefined}> {isSubmitting ? "Đang lưu..." : "Lưu"}
+                    startIcon={isSubmitting ? <CircularProgress size={14} color="inherit" /> : undefined}> {isSubmitting ? labels.saving : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

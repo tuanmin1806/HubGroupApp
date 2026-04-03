@@ -36,6 +36,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { isSelf } from "../../utils/auth.utils";
+import labelsVi from "../../i18n/labels.vi";
 
 const CreateCustomerAccountDialog = lazy(() => import("../../components/dialogs/admin/create-customer-account.dialog"));
 const UpdateCustomerAccountDialog = lazy(() => import("../../components/dialogs/admin/update-customer-account.dialog"));
@@ -126,17 +127,17 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
 
                 <TableCell align="center">
                     {isSelf(staff.Id) ? (
-                        <Tooltip title="Không thể tự chỉnh sửa hoặc xóa tài khoản của chính mình">
+                        <Tooltip title={labels.cannotEditOrDeleteYourself}>
                             <Typography variant="caption" color="text.disabled">—</Typography>
                         </Tooltip>
                     ) : (
                         <>
-                            <Tooltip title="Chỉnh sửa">
+                            <Tooltip title={labels.editCustomer}>
                                 <IconButton size="small" color="primary" onClick={() => onEdit(staff.Id)}>
                                     <Edit fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Xóa">
+                            <Tooltip title={labels.deleteCustomer}>
                                 <IconButton
                                     size="small"
                                     color="error"
@@ -158,31 +159,31 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                                Thông tin chi tiết
+                                {labels.customerDetail}
                             </Typography>
                             <Divider sx={{ mb: 2 }} />
                             <Grid container spacing={2}>
-                                <DetailField label="Họ và tên">
+                                <DetailField label={labels.fullName}>
                                     <Typography variant="body2" fontWeight={500}>{staff.FullName ?? "—"}</Typography>
                                 </DetailField>
-                                <DetailField label="Tên đăng nhập">
+                                <DetailField label={labels.userName}>
                                     <Typography variant="body2" fontWeight={500}>{staff.UserName ?? "—"}</Typography>
                                 </DetailField>
-                                <DetailField label="Email">
+                                <DetailField label={labels.email}>
                                     <Typography variant="body2" fontWeight={500}>{staff.Email ?? "—"}</Typography>
                                 </DetailField>
-                                <DetailField label="Số điện thoại">
+                                <DetailField label={labels.phoneNumber}>
                                     <Typography variant="body2" fontWeight={500}>{staff.PhoneNumber ?? "—"}</Typography>
                                 </DetailField>
-                                <DetailField label="Giới tính">
+                                <DetailField label={labels.gender}>
                                     <Typography variant="body2" fontWeight={500}>
                                         {ConvertService.convertGender(ConvertService.convertGenderFromString(staff.Gender))}
                                     </Typography>
                                 </DetailField>
-                                <DetailField label="Ngày sinh">
+                                <DetailField label={labels.dateOfBirth}>
                                     <Typography variant="body2" fontWeight={500}>{staff.DateOfBirth ?? "—"}</Typography>
                                 </DetailField>
-                                <DetailField label="Loại tài khoản">
+                                <DetailField label={labels.accountType}>
                                     <Chip
                                         label={ConvertService.convertAccountType(accountType)}
                                         size="small"
@@ -190,7 +191,7 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
                                         variant="outlined"
                                     />
                                 </DetailField>
-                                <DetailField label="Trạng thái">
+                                <DetailField label={labels.accountStatus}>
                                     <Chip
                                         label={ConvertService.convertAccountStatus(accountStatus)}
                                         size="small"
@@ -206,6 +207,8 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
         </React.Fragment>
     );
 }
+
+const labels = labelsVi.customer;
 
 export default function ManageStaffAccountPage() {
     const [inputValue, setInputValue] = useState("");
@@ -247,11 +250,11 @@ export default function ManageStaffAccountPage() {
         if (!deleteCustomerId) return;
         try {
             await deleteCustomer(deleteCustomerId).unwrap();
-            dispatch(showSnackbar({ message: "Xóa tài khoản thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.deleteSuccess, severity: "success" }));
             handleCloseDelete();
             if ((data?.Items?.length ?? 0) === 1 && page > 0) setPage((p) => p - 1);
         } catch {
-            dispatch(showSnackbar({ message: "Xóa tài khoản thất bại. Vui lòng thử lại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.deleteFailed, severity: "error" }));
         }
     }, [deleteCustomerId, deleteCustomer, dispatch, handleCloseDelete, data?.Items?.length, page]);
 
@@ -269,7 +272,7 @@ export default function ManageStaffAccountPage() {
             return (
                 <TableRow>
                     <TableCell colSpan={7} align="center">
-                        <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography>
+                        <Typography color="error" sx={{ py: 4 }}>{labels.loadDataFailed}</Typography>
                     </TableCell>
                 </TableRow>
             );
@@ -278,7 +281,7 @@ export default function ManageStaffAccountPage() {
             return (
                 <TableRow>
                     <TableCell colSpan={7} align="center">
-                        <Typography sx={{ py: 4 }} color="text.secondary">Không có dữ liệu.</Typography>
+                        <Typography sx={{ py: 4 }} color="text.secondary">{labels.noData}</Typography>
                     </TableCell>
                 </TableRow>
             );
@@ -303,7 +306,7 @@ export default function ManageStaffAccountPage() {
                     <Paper sx={{ display: "flex", alignItems: "center" }}>
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
-                            placeholder="Tìm kiếm nhân viên"
+                            placeholder={labels.searchCustomer}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -321,7 +324,7 @@ export default function ManageStaffAccountPage() {
 
                 <Grid size="auto">
                     <Button variant="contained" color="primary" startIcon={<Add />} onClick={() => setOpenDialog(true)}>
-                        Thêm
+                        {labels.addCustomer}
                     </Button>
                 </Grid>
 
@@ -331,12 +334,12 @@ export default function ManageStaffAccountPage() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell />
-                                    <TableCell>Nhân viên</TableCell>
-                                    <TableCell>Email</TableCell>
-                                    <TableCell>Số điện thoại</TableCell>
-                                    <TableCell>Loại tài khoản</TableCell>
-                                    <TableCell>Trạng thái</TableCell>
-                                    <TableCell align="center">Tiện ích</TableCell>
+                                    <TableCell>{labels.fullName}</TableCell>
+                                    <TableCell>{labels.email}</TableCell>
+                                    <TableCell>{labels.phoneNumber}</TableCell>
+                                    <TableCell>{labels.accountType}</TableCell>
+                                    <TableCell>{labels.status}</TableCell>
+                                    <TableCell align="center">{labels.utility}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -369,8 +372,8 @@ export default function ManageStaffAccountPage() {
                 open={openDeleteDialog}
                 onClose={handleCloseDelete}
                 onConfirm={handleConfirmDelete}
-                title="Xác nhận xóa"
-                message="Bạn có chắc chắn muốn xóa tài khoản nhân viên này không? Hành động này không thể hoàn tác."
+                title={labels.confirmDelete}
+                message={labels.confirmDeleteMessage}
             />
         </>
     );

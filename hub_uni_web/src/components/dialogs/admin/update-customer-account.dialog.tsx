@@ -28,8 +28,11 @@ import { useGetProvinceByCountryQuery } from "../../../app/features/province.api
 import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
 import { Province } from "../../../app/models/province.model";
 import { Country } from "../../../app/models/country.model";
+import labelsVi from "../../../i18n/labels.vi";
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
+
+const labels = labelsVi.customer;
 
 const ACCOUNT_STATUS_OPTIONS = [
     { value: AccountStatus.Activated, label: "Đã kích hoạt" },
@@ -235,9 +238,9 @@ export default function UpdateCustomerAccountDialog({
 
     const validate = (): boolean => {
         const newErrors: FormErrors = {};
-        if (!form.FullName.trim()) newErrors.FullName = "Họ và tên không được để trống";
-        if (!form.Email.trim()) newErrors.Email = "Email không được để trống";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email)) newErrors.Email = "Email không hợp lệ";
+        if (!form.FullName.trim()) newErrors.FullName = labels.fullNameRequired;
+        if (!form.Email.trim()) newErrors.Email = labels.emailRequired;
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email)) newErrors.Email = labels.emailInvalid;
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -267,10 +270,10 @@ export default function UpdateCustomerAccountDialog({
                     ...form.ProfileInfo
                 }
             }).unwrap();
-            dispatch(showSnackbar({ message: "Cập nhật tài khoản thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             handleClose();
         } catch (err) {
-            dispatch(showSnackbar({ message: "Cập nhật tài khoản thất bại. Vui lòng thử lại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.updateError, severity: "error" }));
         }
     };
 
@@ -284,7 +287,7 @@ export default function UpdateCustomerAccountDialog({
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography variant="h6" fontWeight={600}>Chỉnh sửa nhân viên</Typography>
+                <Typography variant="h6" fontWeight={600}>{labels.updateCustomer}</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />
@@ -301,12 +304,12 @@ export default function UpdateCustomerAccountDialog({
                         >
                             <SectionHeader
                                 icon={<LockOutlined sx={{ fontSize: 16 }} />}
-                                title="Thông tin đăng nhập"
+                                title={labels.loginInfo}
                             />
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
-                                        label={<> Tên đăng nhập <RequiredStar /> </>}
+                                        label={<> {labels.userName} <RequiredStar /> </>}
                                         fullWidth
                                         disabled
                                         size="small"
@@ -316,12 +319,12 @@ export default function UpdateCustomerAccountDialog({
                             </Grid>
                         </Paper>
                         <Paper sx={{ p: 2, mb: 2 }}>
-                            <SectionHeader icon={<PersonOutlined />} title="Thông tin tài khoản" />
+                            <SectionHeader icon={<PersonOutlined />} title={labels.accountInfo} />
 
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12 }}>
                                     <TextField
-                                        label={<> Họ và tên <RequiredStar /></>}
+                                        label={<> {labels.fullName} <RequiredStar /></>}
                                         fullWidth
                                         size="small"
                                         value={form.FullName}
@@ -331,7 +334,7 @@ export default function UpdateCustomerAccountDialog({
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
-                                        label="Email"
+                                        label={<> {labels.email}</>}
                                         fullWidth
                                         size="small"
                                         value={form.Email}
@@ -341,7 +344,7 @@ export default function UpdateCustomerAccountDialog({
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
-                                        label="Số điện thoại"
+                                        label={<> {labels.phoneNumber}</>}
                                         fullWidth
                                         size="small"
                                         value={form.PhoneNumber ?? ""}
@@ -352,7 +355,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         type="date"
-                                        label={<> Ngày sinh <RequiredStar /></>}
+                                        label={<> {labels.dateOfBirth} <RequiredStar /></>}
                                         fullWidth
                                         size="small"
                                         InputLabelProps={{ shrink: true }}
@@ -364,7 +367,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label={<> Giới tính <RequiredStar /></>}
+                                        label={<> {labels.gender} <RequiredStar /></>}
                                         fullWidth
                                         size="small"
                                         value={form.Gender}
@@ -378,7 +381,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label={<> Quốc gia <RequiredStar /></>}
+                                        label={<> {labels.country} <RequiredStar /></>}
                                         value={form.ProfileInfo.CountryId}
                                         onChange={(e) => handleCountryChange(e.target.value)}
                                         fullWidth
@@ -393,7 +396,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label={<> Tỉnh / Thành phố <RequiredStar /></>}
+                                        label={<> {labels.province} <RequiredStar /></>}
                                         value={form.ProfileInfo.ProvinceId}
                                         onChange={(e) => handleProvinceChange(e.target.value)}
                                         fullWidth
@@ -409,7 +412,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label={<> Xã / Phường <RequiredStar /></>}
+                                        label={<> {labels.commune} <RequiredStar /></>}
                                         value={form.ProfileInfo.CommuneId}
                                         onChange={(e) => handleCommuneChange(e.target.value)}
                                         fullWidth
@@ -424,7 +427,7 @@ export default function UpdateCustomerAccountDialog({
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
-                                        label="Địa chỉ cụ thể"
+                                        label={<> {labels.address} <RequiredStar /></>}
                                         fullWidth
                                         size="small"
                                         value={form.ProfileInfo.Address ?? ""}
@@ -435,7 +438,7 @@ export default function UpdateCustomerAccountDialog({
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
                                         select
-                                        label={<> Trạng thái <RequiredStar /> </>}
+                                        label={<> {labels.accountStatus} <RequiredStar /> </>}
                                         fullWidth
                                         size="small"
                                         value={form.AccountStatus}
@@ -453,7 +456,7 @@ export default function UpdateCustomerAccountDialog({
             </DialogContent>
             <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
                 <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}>
-                    Hủy
+                    {labels.cancel}
                 </Button>
                 <Button
                     onClick={handleSubmit}
@@ -462,7 +465,7 @@ export default function UpdateCustomerAccountDialog({
                     disabled={isLoading || isSaveDisabled()}
                     startIcon={isUpdating ? <CircularProgress size={16} color="inherit" /> : null}
                 >
-                    {isUpdating ? "Đang lưu..." : "Lưu"}
+                    {isUpdating ? labels.saving : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

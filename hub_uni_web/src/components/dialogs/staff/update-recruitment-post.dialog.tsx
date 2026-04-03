@@ -35,9 +35,12 @@ import { Profession, Requirement, UpdateRecruitmentPostRequest } from "../../../
 import { ConvertService } from "../../../app/services/convert.service";
 import { AppDispatch } from "../../../app/store";
 import { useGetAllVisaTypesQuery } from "../../../app/features/visa-type.api";
+import labelsVi from "../../../i18n/labels.vi";
 const RichTextEditorComponent = lazy(() => import("../../editor"));
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
+
+const labels = labelsVi.recruitmentPost;
 
 interface UpdateRecruitmentPostDialogProps {
     open: boolean;
@@ -146,13 +149,7 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
             Cost: 0,
         }));
 
-        const merged = [
-            ...mapped,
-            ...selectedProfessions.filter(
-                (sp) => !mapped.some((m) => m.ProfessionId === sp.ProfessionId)
-            ),
-        ];
-
+        const merged = [...mapped, ...selectedProfessions.filter((sp) => !mapped.some((m) => m.ProfessionId === sp.ProfessionId))];
         setProfessionList(merged);
 
     }, [professionData, selectedProfessions]);
@@ -164,39 +161,35 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
         setForm(defaultForm);
         setErrors({});
 
-        fetchRecruitmentPost(postId, false)
-            .unwrap()
-            .then((data) => {
-                if (!data) return;
-                setForm({
-                    Id: data.Id,
-                    RecruitPostStatus: ConvertService.convertPostStatusFromString(data.RecruitPostStatus),
-                    Name: data.Name ?? "",
-                    OrganizationId: data.OrganizationId ?? "",
-                    ProfessionIds: data.ProfessionIds ?? [],
-                    Quantity: data.Quantity ?? 1,
-                    Description: data.Description ?? "",
-                    ProvinceId: data.ProvinceId ?? "",
-                    Requirement: {
-                        FromAge: data.Requirement?.FromAge ?? undefined,
-                        ToAge: data.Requirement?.ToAge ?? undefined,
-                        Gender: ConvertService.convertGenderFromString(data.Requirement?.Gender),
-                        Experience: ConvertService.convertJobExperienceFromString(data.Requirement?.Experience),
-                        EducationLevel: ConvertService.convertEducationLevelFromString(data.Requirement?.EducationLevel),
-                        MinimumGpa: data.Requirement?.MinimumGpa ?? 0,
-                        MaxYearsSinceGrad: data.Requirement?.MaxYearsSinceGrad ?? 0,
-                        MaxAbsence: data.Requirement?.MaxAbsence ?? 0,
-                        VisaTypeId: data.Requirement?.VisaTypeId ?? "",
-                        OtherReqs: data.Requirement?.OtherReqs?.length > 0
-                            ? data.Requirement.OtherReqs
-                            : [""],
-                    },
-                    RecruitmentFromDate: data.RecruitmentFromDate ?? null,
-                    RecruitmentToDate: data.RecruitmentToDate ?? null,
-                    IsTop: data.IsTop ?? false,
-                    Highlights: data.Highlights?.length > 0 ? data.Highlights : [],
-                });
+        fetchRecruitmentPost(postId, false).unwrap().then((data) => {
+            if (!data) return;
+            setForm({
+                Id: data.Id,
+                RecruitPostStatus: ConvertService.convertPostStatusFromString(data.RecruitPostStatus),
+                Name: data.Name ?? "",
+                OrganizationId: data.OrganizationId ?? "",
+                ProfessionIds: data.ProfessionIds ?? [],
+                Quantity: data.Quantity ?? 1,
+                Description: data.Description ?? "",
+                ProvinceId: data.ProvinceId ?? "",
+                Requirement: {
+                    FromAge: data.Requirement?.FromAge ?? undefined,
+                    ToAge: data.Requirement?.ToAge ?? undefined,
+                    Gender: ConvertService.convertGenderFromString(data.Requirement?.Gender),
+                    Experience: ConvertService.convertJobExperienceFromString(data.Requirement?.Experience),
+                    EducationLevel: ConvertService.convertEducationLevelFromString(data.Requirement?.EducationLevel),
+                    MinimumGpa: data.Requirement?.MinimumGpa ?? 0,
+                    MaxYearsSinceGrad: data.Requirement?.MaxYearsSinceGrad ?? 0,
+                    MaxAbsence: data.Requirement?.MaxAbsence ?? 0,
+                    VisaTypeId: data.Requirement?.VisaTypeId ?? "",
+                    OtherReqs: data.Requirement?.OtherReqs?.length > 0 ? data.Requirement.OtherReqs : [""],
+                },
+                RecruitmentFromDate: data.RecruitmentFromDate ?? null,
+                RecruitmentToDate: data.RecruitmentToDate ?? null,
+                IsTop: data.IsTop ?? false,
+                Highlights: data.Highlights?.length > 0 ? data.Highlights : [],
             });
+        });
     }, [open, postId]);
 
 
@@ -221,23 +214,16 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
 
     useEffect(() => {
         if (!organizationDetail || !orgChangedManually) return;
-
-        if (organizationDetail.ProvinceId) {
-            setForm((prev) => ({ ...prev, ProvinceId: organizationDetail.ProvinceId }));
-        }
+        if (organizationDetail.ProvinceId) setForm((prev) => ({ ...prev, ProvinceId: organizationDetail.ProvinceId }));
 
         const allIds: string[] = [];
-        if (organizationDetail.MainProfession?.ProfessionId) {
-            allIds.push(organizationDetail.MainProfession.ProfessionId);
-        }
+        if (organizationDetail.MainProfession?.ProfessionId) allIds.push(organizationDetail.MainProfession.ProfessionId);
         organizationDetail.Professions?.forEach((p: { ProfessionId: string }) => {
             if (p.ProfessionId && !allIds.includes(p.ProfessionId)) allIds.push(p.ProfessionId);
         });
 
         if (allIds.length > 0) {
-            const matched = allIds
-                .map((id) => professionList.find((p) => p.ProfessionId === id))
-                .filter((p): p is Profession => p !== undefined);
+            const matched = allIds.map((id) => professionList.find((p) => p.ProfessionId === id)).filter((p): p is Profession => p !== undefined);
             setSelectedProfessions(matched);
             setForm((prev) => ({ ...prev, ProfessionIds: allIds }));
         }
@@ -272,11 +258,11 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
 
     const validate = (): boolean => {
         const e: FormErrors = {};
-        if (!form.Name.trim()) e.Name = "Tên bài đăng không được để trống";
-        if (!form.ProvinceId) e.ProvinceId = "Vui lòng chọn tỉnh thành";
-        if (!form.ProfessionIds.length) e.ProfessionIds = "Vui lòng chọn ít nhất một ngành nghề";
-        if (!form.Quantity || form.Quantity < 1) e.Quantity = "Số lượng phải lớn hơn 0";
-        if (!form.Description.trim()) e.Description = "Mô tả không được để trống";
+        if (!form.Name.trim()) e.Name = labelsVi.recruitmentPost.postNameRequired;
+        if (!form.ProvinceId) e.ProvinceId = labelsVi.recruitmentPost.provinceRequired;
+        if (!form.ProfessionIds.length) e.ProfessionIds = labelsVi.recruitmentPost.professionRequired;
+        if (!form.Quantity || form.Quantity < 1) e.Quantity = labelsVi.recruitmentPost.quantityRequired;
+        if (!form.Description.trim()) e.Description = labelsVi.recruitmentPost.descriptionRequired;
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -296,11 +282,11 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
                 Highlights: form.Highlights.filter((h) => h.trim()),
                 Requirement: { ...form.Requirement, OtherReqs: form.Requirement.OtherReqs.filter((r) => r.trim()) },
             }).unwrap();
-            dispatch(showSnackbar({ message: "Cập nhật chương trình tuyển sinh thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labelsVi.recruitmentPost.updateSuccess, severity: "success" }));
             onSuccess?.();
             handleClose();
         } catch {
-            dispatch(showSnackbar({ message: "Cập nhật chương trình tuyển sinh thất bại. Vui lòng thử lại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labelsVi.recruitmentPost.updateFailed, severity: "error" }));
         }
     };
 
@@ -317,7 +303,7 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth PaperProps={{ sx: { maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography fontWeight={600}>Chỉnh sửa chương trình tuyển sinh</Typography>
+                <Typography fontWeight={600}>{labelsVi.recruitmentPost.editRecruitmentPost}</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />
@@ -325,32 +311,32 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
             <DialogContent sx={{ pt: 2 }}>
                 {isFetchingPost ? <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}><CircularProgress size={36} /></Box> : (
                     <Grid container spacing={2}>
-                        <Grid size={{ xs: 12 }}><Typography variant="subtitle2" fontWeight={600} color="text.secondary">THÔNG TIN CƠ BẢN</Typography></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>Tên bài đăng <RequiredStar /></>} value={form.Name} onChange={(e) => handleChange("Name", e.target.value)} error={!!errors.Name} helperText={errors.Name} /></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label={<>Trạng thái <RequiredStar /></>} value={form.RecruitPostStatus} onChange={(e) => handleChange("RecruitPostStatus", Number(e.target.value) as RecruitPostStatus)}>{POST_STATUS_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Province> {...tf} options={provinces} getOptionLabel={(opt) => opt.Name ?? ""} isOptionEqualToValue={(opt, val) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label={<>Tỉnh / Thành phố <RequiredStar /></>} error={!!errors.ProvinceId} helperText={errors.ProvinceId} />} /></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Profession, true> multiple {...tf} options={professionList} getOptionLabel={(opt) => opt.ProfessionName ?? opt.ProfessionId} value={selectedProfessions} onChange={handleProfessionChange} isOptionEqualToValue={(opt, val) => opt.ProfessionId === val.ProfessionId} loading={isFetchingProfessions || isOrgDetailFetching} renderTags={(value, getTagProps) => value.map((opt, index) => { const { key, ...tagProps } = getTagProps({ index }); return <Chip key={opt.ProfessionId} label={opt.ProfessionName ?? opt.ProfessionId} size="small" {...tagProps} />; })} renderInput={(params) => (<TextField {...params} label={<>Ngành nghề <RequiredStar /></>} placeholder={selectedProfessions.length === 0 ? "Chọn ngành nghề..." : ""} error={!!errors.ProfessionIds} helperText={errors.ProfessionIds} InputProps={{ ...params.InputProps, endAdornment: (<> {(isFetchingProfessions || isOrgDetailFetching) && <CircularProgress size={16} />} {params.InputProps.endAdornment}</>) }} />)} /></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>Số lượng tuyển <RequiredStar /></>} type="number" value={form.Quantity} onChange={(e) => handleChange("Quantity", Number(e.target.value))} error={!!errors.Quantity} helperText={errors.Quantity} inputProps={{ min: 1 }} /></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tuyển từ ngày" type="date" value={form.RecruitmentFromDate ?? ""} onChange={(e) => handleChange("RecruitmentFromDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Tuyển đến ngày" type="date" value={form.RecruitmentToDate ?? ""} onChange={(e) => handleChange("RecruitmentToDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
-                        <Grid size={{ xs: 12 }}><Accordion variant="outlined" disableGutters sx={{ borderRadius: 1 }}><AccordionSummary expandIcon={<ExpandMore />}><Typography variant="subtitle2" fontWeight={600} color="text.secondary"> Yêu cầu ứng viên </Typography></AccordionSummary><AccordionDetails><Grid container spacing={2}>
-                            <Grid size={{ xs: 6 }}><TextField {...tf} label="Tuổi từ" type="number" value={form.Requirement.FromAge ?? ""} onChange={(e) => handleRequirementChange("FromAge", e.target.value ? Number(e.target.value) : undefined)} inputProps={{ min: 0 }} /></Grid>
-                            <Grid size={{ xs: 6 }}><TextField {...tf} label="Tuổi đến" type="number" value={form.Requirement.ToAge ?? ""} onChange={(e) => handleRequirementChange("ToAge", e.target.value ? Number(e.target.value) : undefined)} inputProps={{ min: 0 }} /></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Giới tính" value={form.Requirement.Gender} onChange={(e) => handleRequirementChange("Gender", Number(e.target.value) as Gender)}>{GENDER_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Kinh nghiệm" value={form.Requirement.Experience} onChange={(e) => handleRequirementChange("Experience", Number(e.target.value) as JobExperience)}>{EXPERIENCE_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label="Trình độ học vấn" value={form.Requirement.EducationLevel} onChange={(e) => handleRequirementChange("EducationLevel", Number(e.target.value) as EducationLevel)}>{EDUCATION_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="GPA tối thiểu" type="number" value={form.Requirement.MinimumGpa ?? 0} onChange={(e) => handleRequirementChange("MinimumGpa", Number(e.target.value))} inputProps={{ min: 0, step: 0.1 }} /></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Thời hạn tốt nghiệp tối đa (năm)" type="number" value={form.Requirement.MaxYearsSinceGrad ?? 0} onChange={(e) => handleRequirementChange("MaxYearsSinceGrad", Number(e.target.value))} inputProps={{ min: 0 }} /></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label="Số buổi nghỉ tối đa" type="number" value={form.Requirement.MaxAbsence ?? 0} onChange={(e) => handleRequirementChange("MaxAbsence", Number(e.target.value))} inputProps={{ min: 0 }} /></Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}><Autocomplete {...tf} options={visaTypeOptions} getOptionLabel={(opt) => opt.label} isOptionEqualToValue={(opt, val) => opt.value === val?.value} value={selectedVisaType} onChange={(_, opt) => handleRequirementChange("VisaTypeId", opt?.value ?? "")} renderInput={(params) => <TextField {...params} label="Loại visa" />} /></Grid>
+                        <Grid size={{ xs: 12 }}><Typography variant="subtitle2" fontWeight={600} color="text.secondary">{labelsVi.recruitmentPost.basicInfo}</Typography></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.recruitmentProgramName} <RequiredStar /></>} value={form.Name} onChange={(e) => handleChange("Name", e.target.value)} error={!!errors.Name} helperText={errors.Name} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label={<>{labelsVi.recruitmentPost.status} <RequiredStar /></>} value={form.RecruitPostStatus} onChange={(e) => handleChange("RecruitPostStatus", Number(e.target.value) as RecruitPostStatus)}>{POST_STATUS_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Province> {...tf} options={provinces} getOptionLabel={(opt) => opt.Name ?? ""} isOptionEqualToValue={(opt, val) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label={<>{labelsVi.recruitmentPost.province} <RequiredStar /></>} error={!!errors.ProvinceId} helperText={errors.ProvinceId} />} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><Autocomplete<Profession, true> multiple {...tf} options={professionList} getOptionLabel={(opt) => opt.ProfessionName ?? opt.ProfessionId} value={selectedProfessions} onChange={handleProfessionChange} isOptionEqualToValue={(opt, val) => opt.ProfessionId === val.ProfessionId} loading={isFetchingProfessions || isOrgDetailFetching} renderTags={(value, getTagProps) => value.map((opt, index) => { const { key, ...tagProps } = getTagProps({ index }); return <Chip key={opt.ProfessionId} label={opt.ProfessionName ?? opt.ProfessionId} size="small" {...tagProps} />; })} renderInput={(params) => (<TextField {...params} label={<>{labelsVi.recruitmentPost.profession} <RequiredStar /></>} placeholder={selectedProfessions.length === 0 ? labelsVi.recruitmentPost.selectProfessionPlaceholder : ""} error={!!errors.ProfessionIds} helperText={errors.ProfessionIds} InputProps={{ ...params.InputProps, endAdornment: (<> {(isFetchingProfessions || isOrgDetailFetching) && <CircularProgress size={16} />} {params.InputProps.endAdornment}</>) }} />)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.quantity} <RequiredStar /></>} type="number" value={form.Quantity} onChange={(e) => handleChange("Quantity", Number(e.target.value))} error={!!errors.Quantity} helperText={errors.Quantity} inputProps={{ min: 1 }} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.recruitmentFromDate} <RequiredStar /></>} type="date" value={form.RecruitmentFromDate ?? ""} onChange={(e) => handleChange("RecruitmentFromDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.recruitmentToDate} <RequiredStar /></>} type="date" value={form.RecruitmentToDate ?? ""} onChange={(e) => handleChange("RecruitmentToDate", e.target.value || null)} InputLabelProps={{ shrink: true }} /></Grid>
+                        <Grid size={{ xs: 12 }}><Accordion variant="outlined" disableGutters sx={{ borderRadius: 1 }}><AccordionSummary expandIcon={<ExpandMore />}><Typography variant="subtitle2" fontWeight={600} color="text.secondary"> {labelsVi.recruitmentPost.recruitmentApplication} </Typography></AccordionSummary><AccordionDetails><Grid container spacing={2}>
+                            <Grid size={{ xs: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.fromAge} <RequiredStar /></>} type="number" value={form.Requirement.FromAge ?? ""} onChange={(e) => handleRequirementChange("FromAge", e.target.value ? Number(e.target.value) : undefined)} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.toAge} <RequiredStar /></>} type="number" value={form.Requirement.ToAge ?? ""} onChange={(e) => handleRequirementChange("ToAge", e.target.value ? Number(e.target.value) : undefined)} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label={<>{labelsVi.recruitmentPost.gender} <RequiredStar /></>} value={form.Requirement.Gender} onChange={(e) => handleRequirementChange("Gender", Number(e.target.value) as Gender)}>{GENDER_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label={<>{labelsVi.recruitmentPost.experience} <RequiredStar /></>} value={form.Requirement.Experience} onChange={(e) => handleRequirementChange("Experience", Number(e.target.value) as JobExperience)}>{EXPERIENCE_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} select label={<>{labelsVi.recruitmentPost.educationLevel} <RequiredStar /></>} value={form.Requirement.EducationLevel} onChange={(e) => handleRequirementChange("EducationLevel", Number(e.target.value) as EducationLevel)}>{EDUCATION_OPTIONS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)} </TextField></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.minimumGpa} <RequiredStar /></>} type="number" value={form.Requirement.MinimumGpa ?? 0} onChange={(e) => handleRequirementChange("MinimumGpa", Number(e.target.value))} inputProps={{ min: 0, step: 0.1 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.maxYearsSinceGrad} <RequiredStar /></>} type="number" value={form.Requirement.MaxYearsSinceGrad ?? 0} onChange={(e) => handleRequirementChange("MaxYearsSinceGrad", Number(e.target.value))} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labelsVi.recruitmentPost.maxAbsence} <RequiredStar /></>} type="number" value={form.Requirement.MaxAbsence ?? 0} onChange={(e) => handleRequirementChange("MaxAbsence", Number(e.target.value))} inputProps={{ min: 0 }} /></Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}><Autocomplete {...tf} options={visaTypeOptions} getOptionLabel={(opt) => opt.label} isOptionEqualToValue={(opt, val) => opt.value === val?.value} value={selectedVisaType} onChange={(_, opt) => handleRequirementChange("VisaTypeId", opt?.value ?? "")} renderInput={(params) => <TextField {...params} label={<>{labelsVi.recruitmentPost.visaType} <RequiredStar /></>} />} /></Grid>
                             <Grid size={{ xs: 12 }}>
                                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-                                    <Typography variant="body2" fontWeight={600} color="text.secondary"> Yêu cầu khác </Typography>
-                                    <Button size="small" startIcon={<Add />} onClick={handleAddOtherReq} sx={{ textTransform: "none", fontSize: 12 }}> Thêm </Button>
+                                    <Typography variant="body2" fontWeight={600} color="text.secondary"> {labelsVi.recruitmentPost.otherReqs} </Typography>
+                                    <Button size="small" startIcon={<Add />} onClick={handleAddOtherReq} sx={{ textTransform: "none", fontSize: 12 }}> {labelsVi.recruitmentPost.add} </Button>
                                 </Box>
                                 {form.Requirement.OtherReqs.map((req, i) => (
                                     <Box key={i} sx={{ display: "flex", gap: 1, mb: 1 }}>
-                                        <TextField {...tf} size="small" placeholder={`Yêu cầu ${i + 1}`} value={req} onChange={(e) => handleOtherReqChange(i, e.target.value)} />
+                                        <TextField {...tf} size="small" placeholder={`${labelsVi.recruitmentPost.requirement} ${i + 1}`} value={req} onChange={(e) => handleOtherReqChange(i, e.target.value)} />
                                         <IconButton size="small" color="error" onClick={() => handleRemoveOtherReq(i)} disabled={form.Requirement.OtherReqs.length === 1 && !req.trim()}><Remove fontSize="small" /></IconButton>
                                     </Box>
                                 ))}
@@ -362,15 +348,15 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
                         <Grid size={{ xs: 12 }}>
                             <Divider sx={{ my: 1 }} />
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary"> THÔNG TIN NỔI BẬT </Typography>
-                                <Button size="small" variant="outlined" startIcon={<Add />} onClick={handleAddHighlight}> Thêm </Button>
+                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary"> {labelsVi.recruitmentPost.highlights} </Typography>
+                                <Button size="small" variant="outlined" startIcon={<Add />} onClick={handleAddHighlight}> {labelsVi.recruitmentPost.add} </Button>
                             </Box>
 
-                            {form.Highlights.length === 0 && <Typography variant="body2" color="text.disabled" sx={{ fontStyle: "italic" }}> Chưa có điểm nổi bật nào. Nhấn "Thêm" để bổ sung. </Typography>}
+                            {form.Highlights.length === 0 && <Typography variant="body2" color="text.disabled" sx={{ fontStyle: "italic" }}> {labelsVi.recruitmentPost.noHighlights} </Typography>}
 
                             {form.Highlights.map((h, i) => (
                                 <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                                    <TextField fullWidth size="small" placeholder={`Điểm nổi bật ${i + 1}`} value={h} onChange={(e) => handleHighlightChange(i, e.target.value)} />
+                                    <TextField fullWidth size="small" placeholder={`${labelsVi.recruitmentPost.highlight} ${i + 1}`} value={h} onChange={(e) => handleHighlightChange(i, e.target.value)} />
                                     <IconButton size="small" color="error" onClick={() => handleRemoveHighlight(i)}><Remove fontSize="small" /></IconButton>
                                 </Box>
                             ))}
@@ -378,7 +364,7 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
 
                         <Grid size={{ xs: 12 }}>
                             <Paper elevation={1} sx={{ p: 2 }}>
-                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}> Mô tả <RequiredStar /></Typography>
+                                <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}> {labelsVi.recruitmentPost.description} <RequiredStar /></Typography>
                                 <RichTextEditorComponent
                                     key={form.Description}
                                     value={form.Description}
@@ -392,9 +378,9 @@ export default function UpdateRecruitmentPostDialog({ open, postId, onClose, onS
             </DialogContent>
             <Divider />
             <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
-                <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}> Hủy </Button>
+                <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}> {labelsVi.recruitmentPost.cancel} </Button>
                 <Button onClick={handleSubmit} variant="contained" color="primary" disabled={isLoading || isSaveDisabled()} startIcon={isUpdating ? <CircularProgress size={16} color="inherit" /> : null}>
-                    {isUpdating ? "Đang lưu..." : "Lưu"}
+                    {isUpdating ? labelsVi.recruitmentPost.saving : labelsVi.recruitmentPost.save}
                 </Button>
             </DialogActions>
         </Dialog>

@@ -1,4 +1,18 @@
-import { Box, Stack, Typography, TextField, Button, MenuItem, Stepper, Step, StepLabel, CircularProgress, Grid, Alert, Autocomplete, Divider, Chip } from "@mui/material";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import Alert from "@mui/material/Alert";
+import Autocomplete from "@mui/material/Autocomplete";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
 import { useState, useCallback, useRef } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -17,9 +31,12 @@ import { RecruiterRegisterRequestBody } from "../../app/models/auth.model";
 import { DEFAULT_PAGE } from "../../constants/common.constant";
 import LogoImage from "../../assets/hub_logo.png";
 import { useNavigate } from "react-router-dom";
+import labelsVi from "../../i18n/labels.vi";
+
+const labels = labelsVi.adminRegister;
 
 const PAGE_SIZE = 100;
-const STEPS = ["Thông tin tài khoản", "Thông tin trường"];
+const STEPS = [labels.accountInfo, labels.organizationInfo];
 const DEBOUNCE_DELAY = 2000;
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
@@ -112,7 +129,7 @@ const RecruiterSignupForm = () => {
                 OrgEmail: detail.Email ?? "",
             }));
         } catch {
-            setError("Không thể tải thông tin trường. Vui lòng thử lại.");
+            setError(labels.cannotLoadOrganizationInfo);
         } finally { setOrgDetailLoading(false); }
     }, [getOrgBySeo, provinces]);
 
@@ -135,17 +152,17 @@ const RecruiterSignupForm = () => {
 
     const validateStep = (step: number): string => {
         if (step === 0) {
-            if (!form.UserName.trim()) return "Vui lòng nhập tên đăng nhập";
-            if (form.UserName.trim().length < 3) return "Tên đăng nhập phải có ít nhất 3 ký tự";
-            if (!form.Password) return "Vui lòng nhập mật khẩu";
-            if (form.Password !== form.ConfirmPassword) return "Mật khẩu xác nhận không khớp";
-            if (!form.FullName.trim()) return "Vui lòng nhập họ và tên";
-            if (!form.PhoneNumber.trim()) return "Vui lòng nhập số điện thoại liên hệ";
-            if (!form.Email.trim()) return "Vui lòng nhập email";
+            if (!form.UserName.trim()) return labels.userNameRequired;
+            if (form.UserName.trim().length < 3) return labels.userNameLengthRequired;
+            if (!form.Password) return labels.passwordRequired;
+            if (form.Password !== form.ConfirmPassword) return labels.confirmPasswordNotMatch;
+            if (!form.FullName.trim()) return labels.fullNameRequired;
+            if (!form.PhoneNumber.trim()) return labels.phoneNumberRequired;
+            if (!form.Email.trim()) return labels.emailRequired;
         }
         if (step === 1) {
-            if (!selectedOrg && !isNewOrg) return "Vui lòng chọn hoặc tạo mới trường";
-            if (isNewOrg && !form.OrgName.trim()) return "Vui lòng nhập tên trường";
+            if (!selectedOrg && !isNewOrg) return labels.selectOrCreateNewOrganization;
+            if (isNewOrg && !form.OrgName.trim()) return labels.organizationNameRequired;
         }
         return "";
     };
@@ -199,7 +216,7 @@ const RecruiterSignupForm = () => {
             await registerRecruiter(payload).unwrap();
             setSubmitSuccess(true);
         } catch {
-            setError("Đăng ký thất bại. Vui lòng thử lại.");
+            setError(labels.registerFailed);
         } finally {
             setSubmitting(false);
         }
@@ -209,9 +226,9 @@ const RecruiterSignupForm = () => {
         return (
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: 2 }}>
                 <CheckCircleIcon sx={{ fontSize: 72, color: "#008631" }} />
-                <Typography variant="h5" fontWeight={700} color="#008631">Đăng ký thành công!</Typography>
-                <Typography color="#008631">Tài khoản của bạn đang chờ phê duyệt.</Typography>
-                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#faa11b", px: 3, fontWeight: 600, "&:hover": { backgroundColor: "#fcb448ff" } }}> Đăng nhập </Button>
+                <Typography variant="h5" fontWeight={700} color="#008631">{labels.registerSuccess}</Typography>
+                <Typography color="#008631">{labels.accountWaitingForApproval}</Typography>
+                <Button variant="contained" onClick={() => navigate("/dang-nhap")} sx={{ mt: 1, backgroundColor: "#faa11b", px: 3, fontWeight: 600, "&:hover": { backgroundColor: "#fcb448ff" } }}> {labels.login} </Button>
             </Box>
         );
     }
@@ -223,8 +240,8 @@ const RecruiterSignupForm = () => {
 
             <Stack alignItems="center" spacing={1} mb={2}>
                 <Box component="img" src={LogoImage} sx={{ height: { xs: 32, sm: 48 }, objectFit: "contain" }} />
-                <Typography variant="h5" fontWeight={700} sx={{ color: "#faa11b", textAlign: "center" }}>Đăng ký thông tin</Typography>
-                <Typography variant="body2" sx={{ color: "text.secondary", textAlign: "center", maxWidth: 420 }}>  Vui lòng điền đầy đủ thông tin để tạo tài khoản </Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: "#faa11b", textAlign: "center" }}>{labels.registerOrganizationInfo}</Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary", textAlign: "center", maxWidth: 420 }}>  {labels.pleaseFillInAllInformationToCreateAnAccount} </Typography>
             </Stack>
 
             <Stepper
@@ -240,26 +257,26 @@ const RecruiterSignupForm = () => {
                 {activeStep === 0 && (
                     <Stack spacing={2}>
                         <Box>
-                            <Typography fontWeight={600} color="#faa11b" mb={2}>Thông tin đăng nhập</Typography>
+                            <Typography fontWeight={600} color="#faa11b" mb={2}>{labels.loginInformation}</Typography>
                             <Grid container spacing={2}>
-                                <Grid size={{ xs: 12 }}> <TextField label={<>Tên đăng nhập <RequiredStar /></>} value={form.UserName} onChange={(e) => set("UserName", e.target.value)} fullWidth size="small" /> </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label={<>Mật khẩu <RequiredStar /></>} type="password" value={form.Password} onChange={(e) => set("Password", e.target.value)} fullWidth size="small" /> </Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<> {labels.userName} <RequiredStar /></>} value={form.UserName} onChange={(e) => set("UserName", e.target.value)} fullWidth size="small" /> </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label={<> {labels.password} <RequiredStar /></>} type="password" value={form.Password} onChange={(e) => set("Password", e.target.value)} fullWidth size="small" /> </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField
-                                        label={<>Xác nhận mật khẩu <RequiredStar /></>} type="password"
+                                        label={<> {labels.confirmPassword} <RequiredStar /></>} type="password"
                                         value={form.ConfirmPassword} onChange={(e) => set("ConfirmPassword", e.target.value)}
                                         fullWidth size="small"
                                         error={!!form.ConfirmPassword && form.Password !== form.ConfirmPassword}
-                                        helperText={form.ConfirmPassword && form.Password !== form.ConfirmPassword ? "Không khớp" : ""}
+                                        helperText={form.ConfirmPassword && form.Password !== form.ConfirmPassword ? labels.passwordNotMatch : ""}
                                     />
                                 </Grid>
                             </Grid>
                         </Box>
 
                         <Box>
-                            <Typography fontWeight={600} color="#faa11b" mb={2}>Thông tin cá nhân</Typography>
+                            <Typography fontWeight={600} color="#faa11b" mb={2}>{labels.personalInformation}</Typography>
                             <Grid container spacing={2}>
-                                <Grid size={{ xs: 12 }}> <TextField label={<>Họ và tên <RequiredStar /></>} value={form.FullName} onChange={(e) => set("FullName", e.target.value)} fullWidth size="small" /></Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<> {labels.fullName} <RequiredStar /></>} value={form.FullName} onChange={(e) => set("FullName", e.target.value)} fullWidth size="small" /></Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <TextField select label="Giới tính" value={form.Gender} onChange={(e) => set("Gender", e.target.value)} fullWidth size="small">
                                         <MenuItem value={Gender.Male}>Nam</MenuItem>
@@ -267,8 +284,8 @@ const RecruiterSignupForm = () => {
                                         <MenuItem value={Gender.Other}>Khác</MenuItem>
                                     </TextField>
                                 </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label={<>Số điện thoại liên hệ <RequiredStar /></>} value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} fullWidth size="small" /> </Grid>
-                                <Grid size={{ xs: 12 }}> <TextField label={<>Email liên hệ <RequiredStar /></>} type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} fullWidth size="small" /></Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}> <TextField label={<> {labels.phoneNumber} <RequiredStar /></>} value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} fullWidth size="small" /> </Grid>
+                                <Grid size={{ xs: 12 }}> <TextField label={<> {labels.email} <RequiredStar /></>} type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} fullWidth size="small" /></Grid>
                             </Grid>
                         </Box>
                     </Stack>
@@ -276,7 +293,7 @@ const RecruiterSignupForm = () => {
 
                 {activeStep === 1 && (
                     <Stack spacing={2}>
-                        <Typography fontWeight={600} color="#faa11b">Thông tin trường</Typography>
+                        <Typography fontWeight={600} color="#faa11b">{labels.organizationInformation}</Typography>
 
                         <Box>
                             <Autocomplete<OrganizationResponse, false, false, true>
@@ -288,7 +305,7 @@ const RecruiterSignupForm = () => {
                                 onChange={handleOrgSelect}
                                 loading={orgSearchLoading}
                                 filterOptions={(x) => x}
-                                noOptionsText="Không tìm thấy trường phù hợp"
+                                noOptionsText={labels.noOptionsText}
                                 renderOption={(props, option) => (
                                     <Box component="li" {...props} key={option.Id}>
                                         <Stack>
@@ -301,7 +318,7 @@ const RecruiterSignupForm = () => {
                                     <TextField
                                         {...params}
                                         size="small"
-                                        placeholder="Nhập tên trường để tìm kiếm..."
+                                        placeholder={labels.searchOrganization}
                                         InputProps={{
                                             ...params.InputProps,
                                             startAdornment: <SearchIcon sx={{ color: "text.disabled", mr: 0.5, fontSize: 18 }} />,
@@ -319,34 +336,34 @@ const RecruiterSignupForm = () => {
                             {orgSearchLoading && (
                                 <Box mt={1} display="flex" alignItems="center" gap={1}>
                                     <CircularProgress size={14} sx={{ color: "#faa11b" }} />
-                                    <Typography variant="caption" color="text.secondary">Đang tìm kiếm...</Typography>
+                                    <Typography variant="caption" color="text.secondary">{labels.searching}</Typography>
                                 </Box>
                             )}
 
                             {showCreateNewButton && (
                                 <Box mt={1.5} display="flex" alignItems="center" gap={1}>
-                                    <Typography variant="body2" color="text.secondary">Không tìm thấy trường phù hợp.</Typography>
+                                    <Typography variant="body2" color="text.secondary">{labels.noOptionsText}</Typography>
                                     <Button
                                         size="small"
                                         startIcon={<AddCircleOutlineIcon />}
                                         onClick={handleCreateNewOrg}
                                         sx={{ color: "#faa11b", fontWeight: 600, p: 0, minWidth: "auto", textTransform: "none" }}
                                     >
-                                        Tạo mới "{orgSearchInput}"
+                                        {labels.createNew} "{orgSearchInput}"
                                     </Button>
                                 </Box>
                             )}
 
                             {selectedOrg && (
                                 <Box mt={1} display="flex" alignItems="center" gap={1} flexWrap="wrap">
-                                    <Chip size="small" label={`Đã chọn: ${selectedOrg.Name}`} color="success" variant="outlined" onDelete={handleClearOrg} />
-                                    <Typography variant="caption" color="text.secondary">Thông tin trường đã được điền tự động</Typography>
+                                    <Chip size="small" label={`${labels.selected}: ${selectedOrg.Name}`} color="success" variant="outlined" onDelete={handleClearOrg} />
+                                    <Typography variant="caption" color="text.secondary">{labels.organizationInfoFilledAutomatically}</Typography>
                                 </Box>
                             )}
                             {isNewOrg && (
                                 <Box mt={1} display="flex" alignItems="center" gap={1} flexWrap="wrap">
-                                    <Chip size="small" label="Tạo trường mới" color="warning" variant="outlined" onDelete={handleClearOrg} />
-                                    <Typography variant="caption" color="text.secondary">Vui lòng điền đầy đủ thông tin bên dưới</Typography>
+                                    <Chip size="small" label={labels.createNewOrganization} color="warning" variant="outlined" onDelete={handleClearOrg} />
+                                    <Typography variant="caption" color="text.secondary">{labels.pleaseFillInAllInformationBelow}</Typography>
                                 </Box>
                             )}
                         </Box>
@@ -360,35 +377,35 @@ const RecruiterSignupForm = () => {
                                 ) : (
                                     <>
                                         <Divider sx={{ mb: 2 }}>
-                                            <Typography variant="caption" color="text.secondary"> {selectedOrg ? "Thông tin trường (xem trước)" : "Thông tin trường mới"} </Typography>
+                                            <Typography variant="caption" color="text.secondary"> {selectedOrg ? labels.organizationInfoPreview : labels.organizationInfoNew} </Typography>
                                         </Divider>
                                         <Grid container spacing={2}>
                                             <Grid size={{ xs: 12 }}>
-                                                <TextField label={<>Tên trường <RequiredStar /></>} value={form.OrgName} onChange={(e) => set("OrgName", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
+                                                <TextField label={<> {labels.organizationName} <RequiredStar /></>} value={form.OrgName} onChange={(e) => set("OrgName", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
                                             </Grid>
                                             <Grid size={{ xs: 12, sm: 6 }}>
-                                                <TextField select label="Loại trường" value={form.OrganizationTypeId} onChange={(e) => set("OrganizationTypeId", e.target.value)} fullWidth size="small" disabled={!!selectedOrg}>
+                                                <TextField select label={<> {labels.organizationType} <RequiredStar /></>} value={form.OrganizationTypeId} onChange={(e) => set("OrganizationTypeId", e.target.value)} fullWidth size="small" disabled={!!selectedOrg}>
                                                     {orgTypes.map((ot) => <MenuItem key={ot.Id} value={ot.Id}>{ot.Name}</MenuItem>)}
                                                 </TextField>
                                             </Grid>
                                             <Grid size={{ xs: 12, sm: 6 }}>
-                                                <TextField select label="Tỉnh / Thành phố" value={form.ProvinceId} onChange={(e) => handleProvinceChange(e.target.value)} fullWidth size="small" disabled={!!selectedOrg}>
+                                                <TextField select label={<> {labels.province} <RequiredStar /></>} value={form.ProvinceId} onChange={(e) => handleProvinceChange(e.target.value)} fullWidth size="small" disabled={!!selectedOrg}>
                                                     {provinces.map((p: Province) => <MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>)}
                                                 </TextField>
                                             </Grid>
                                             <Grid size={{ xs: 12, sm: 6 }}>
-                                                <TextField select label="Quận / Xã" value={form.CommuneId} onChange={(e) => set("CommuneId", e.target.value)} fullWidth size="small" disabled={!!selectedOrg || !selectedProvinceSeo}>
+                                                <TextField select label={<> {labels.commune} <RequiredStar /></>} value={form.CommuneId} onChange={(e) => set("CommuneId", e.target.value)} fullWidth size="small" disabled={!!selectedOrg || !selectedProvinceSeo}>
                                                     {communes.map((c) => <MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>)}
                                                 </TextField>
                                             </Grid>
                                             <Grid size={{ xs: 12 }}>
-                                                <TextField label="Địa chỉ" value={form.Address} onChange={(e) => set("Address", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
+                                                <TextField label={<> {labels.address} <RequiredStar /></>} value={form.Address} onChange={(e) => set("Address", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
                                             </Grid>
                                             <Grid size={{ xs: 12, sm: 6 }}>
-                                                <TextField label="SĐT trường" value={form.OrgPhoneNumber} onChange={(e) => set("OrgPhoneNumber", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
+                                                <TextField label={<> {labels.phoneNumber} <RequiredStar /></>} value={form.OrgPhoneNumber} onChange={(e) => set("OrgPhoneNumber", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
                                             </Grid>
                                             <Grid size={{ xs: 12, sm: 6 }}>
-                                                <TextField label="Email trường" type="email" value={form.OrgEmail} onChange={(e) => set("OrgEmail", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
+                                                <TextField label={<> {labels.email} <RequiredStar /></>} type="email" value={form.OrgEmail} onChange={(e) => set("OrgEmail", e.target.value)} fullWidth size="small" disabled={!!selectedOrg} />
                                             </Grid>
                                         </Grid>
                                     </>
@@ -401,19 +418,19 @@ const RecruiterSignupForm = () => {
                 <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4, gap: 1 }}>
                     <Button type="button" variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack} disabled={activeStep === 0}
                         sx={{ minWidth: 110, borderColor: "#faa11b", color: "#faa11b" }}>
-                        Quay lại
+                        {labels.back}
                     </Button>
 
                     {activeStep < STEPS.length - 1 ? (
                         <Button type="button" variant="contained" endIcon={<ArrowForwardIcon />} onClick={handleNext}
                             sx={{ minWidth: 110, backgroundColor: "#faa11b", "&:hover": { backgroundColor: "#e28e13" } }}>
-                            Tiếp theo
+                            {labels.next}
                         </Button>
                     ) : (
                         <Button type="button" onClick={handleSubmit} variant="contained" disabled={submitting}
                             sx={{ minWidth: 150, backgroundColor: "#faa11b", "&:hover": { backgroundColor: "#e28e13" } }}
                             startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : <CheckCircleIcon />}>
-                            {submitting ? "Đang xử lý..." : "Hoàn tất đăng ký"}
+                            {submitting ? labels.submitting : labels.completeRegistration}
                         </Button>
                     )}
                 </Box>

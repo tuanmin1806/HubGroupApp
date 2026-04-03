@@ -29,9 +29,12 @@ import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { Collapse, Divider } from "@mui/material";
+import labelsVi from "../../i18n/labels.vi";
 const UpdateApplicationDialog = lazy(() => import("../../components/dialogs/admin/application/update-application.dialog"));
 const ViewApplicationDialog = lazy(() => import("../../components/dialogs/admin/view-application-detail.dialog"));
 const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+
+const labels = labelsVi.application;
 
 function DetailField({ label, children }: { label: string; children: React.ReactNode }) {
     return (
@@ -68,7 +71,6 @@ function ApplicationRow({
 
     return (
         <>
-            {/* ROW CHÍNH */}
             <TableRow hover>
                 <TableCell sx={{ width: 40, pl: 1 }}>
                     <IconButton size="small" onClick={() => setOpen(!open)}>
@@ -100,19 +102,19 @@ function ApplicationRow({
                 </TableCell>
 
                 <TableCell align="center">
-                    <Tooltip title="Xem chi tiết">
+                    <Tooltip title={labels.viewApplicationDetail}>
                         <IconButton size="small" color="info" onClick={() => onView(application.Id)}>
                             <Visibility fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Cập nhật">
+                    <Tooltip title={labels.updateApplication}>
                         <IconButton size="small" color="warning" onClick={() => onUpdate(application.Id)}>
                             <ChangeCircle fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Xóa">
+                    <Tooltip title={labels.deleteApplication}>
                         <IconButton
                             size="small"
                             color="error"
@@ -130,36 +132,36 @@ function ApplicationRow({
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                                Thông tin ứng viên
+                                {labels.applicationInfo}
                             </Typography>
                             <Divider sx={{ mb: 2 }} />
 
                             <Grid container spacing={2} mb={2}>
-                                <DetailField label="Họ tên">
+                                <DetailField label={labels.fullName}>
                                     <Typography fontWeight={500} fontSize={14}>{customer?.FullName}</Typography>
                                 </DetailField>
 
-                                <DetailField label="Giới tính">
+                                <DetailField label={labels.gender}>
                                     <Typography fontWeight={500} fontSize={14}>
                                         {ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender))}
                                     </Typography>
                                 </DetailField>
 
-                                <DetailField label="Ngày sinh">
+                                <DetailField label={labels.dateOfBirth}>
                                     <Typography fontWeight={500} fontSize={14}>
                                         {ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth)}
                                     </Typography>
                                 </DetailField>
 
-                                <DetailField label="Email">
+                                <DetailField label={labels.email}>
                                     <Typography fontWeight={500} fontSize={14}>{customer?.Email ?? "—"}</Typography>
                                 </DetailField>
 
-                                <DetailField label="Số điện thoại">
+                                <DetailField label={labels.phoneNumber}>
                                     <Typography fontWeight={500} fontSize={14}>{customer?.PhoneNumber ?? "—"}</Typography>
                                 </DetailField>
 
-                                <DetailField label="Chương trình">
+                                <DetailField label={labels.recruitmentPost}>
                                     <Typography fontWeight={500} fontSize={14}>
                                         {application.RecruitmentPost?.Name}
                                     </Typography>
@@ -224,10 +226,10 @@ export default function ManageApplicationPage() {
         if (!deleteApplicationId) return;
         try {
             await deleteApplication(deleteApplicationId).unwrap();
-            dispatch(showSnackbar({ message: "Xóa đơn ứng tuyển thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.deleteSuccess, severity: "success" }));
             handleCloseDelete();
         } catch {
-            dispatch(showSnackbar({ message: "Xóa đơn ứng tuyển thất bại. Vui lòng thử lại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.deleteFailed, severity: "error" }));
         }
     }, [deleteApplicationId, deleteApplication, dispatch, handleCloseDelete]);
 
@@ -254,7 +256,7 @@ export default function ManageApplicationPage() {
                 <TableRow>
                     <TableCell colSpan={8} align="center">
                         <Typography color="error" sx={{ py: 4 }}>
-                            Đã xảy ra lỗi khi tải dữ liệu.
+                            {labels.loadDataFailed}
                         </Typography>
                     </TableCell>
                 </TableRow>
@@ -266,7 +268,7 @@ export default function ManageApplicationPage() {
                 <TableRow>
                     <TableCell colSpan={8} align="center">
                         <Typography sx={{ py: 4 }}>
-                            Không có dữ liệu.
+                            {labels.noData}
                         </Typography>
                     </TableCell>
                 </TableRow>
@@ -293,7 +295,7 @@ export default function ManageApplicationPage() {
                     <Paper sx={{ display: "flex", alignItems: "center" }}>
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
-                            placeholder="Tìm kiếm ứng viên"
+                            placeholder={labels.searchApplication}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -308,12 +310,12 @@ export default function ManageApplicationPage() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell />
-                                    <TableCell>Họ tên</TableCell>
-                                    <TableCell>Giới tính</TableCell>
-                                    <TableCell>Ngày sinh</TableCell>
-                                    <TableCell>Chương trình</TableCell>
-                                    <TableCell>Trạng thái</TableCell>
-                                    <TableCell align="center">Tiện ích</TableCell>
+                                    <TableCell>{labels.fullName}</TableCell>
+                                    <TableCell>{labels.gender}</TableCell>
+                                    <TableCell>{labels.dateOfBirth}</TableCell>
+                                    <TableCell>{labels.recruitmentPost}</TableCell>
+                                    <TableCell>{labels.applicationStatus}</TableCell>
+                                    <TableCell align="center">{labels.utility}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>{renderTableContent()}</TableBody>
@@ -346,8 +348,8 @@ export default function ManageApplicationPage() {
                 open={openDeleteDialog}
                 onClose={handleCloseDelete}
                 onConfirm={handleConfirmDelete}
-                title="Xác nhận xóa"
-                message="Bạn có chắc chắn muốn xóa ứng viên này không? Hành động này không thể hoàn tác."
+                title={labels.confirmDelete}
+                message={labels.confirmDeleteMessage}
             />
         </>
     );

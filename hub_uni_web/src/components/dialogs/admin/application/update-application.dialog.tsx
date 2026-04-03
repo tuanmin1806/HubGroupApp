@@ -21,6 +21,7 @@ import { AppDispatch } from "../../../../app/store";
 import { UpdateApplicationRequest } from "../../../../app/models/application.model";
 import { useLazyGetApplicationByIdQuery, useUpdateApplicationMutation } from "../../../../app/features/application.api";
 import { ConvertService } from "../../../../app/services/convert.service";
+import labelsVi from "../../../../i18n/labels.vi";
 
 const APPLICATION_STATUS_OPTIONS = [
     { value: ApplicationStatus.Pending, label: "Chờ xử lý" },
@@ -32,6 +33,8 @@ const defaultForm: UpdateApplicationRequest = {
     ApplicationId: "",
     ApplicationStatus: ApplicationStatus.Undefined,
 };
+
+const labels = labelsVi.application;
 
 export default function UpdateApplicationDialog({ open, applicationId, onClose }: any) {
     const dispatch = useDispatch<AppDispatch>();
@@ -45,21 +48,17 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
 
         setForm(defaultForm);
 
-        fetchApplication(applicationId, false)
-            .unwrap()
-            .then((data) => {
-                if (!data) return;
+        fetchApplication(applicationId, false).unwrap().then((data) => {
+            if (!data) return;
 
-                setForm({
-                    ApplicationId: data.Id,
-                    ApplicationStatus: ConvertService.convertApplicationStatusFromString(data.ApplicationStatus),
-                });
+            setForm({
+                ApplicationId: data.Id,
+                ApplicationStatus: ConvertService.convertApplicationStatusFromString(data.ApplicationStatus),
             });
+        });
     }, [open, applicationId]);
 
-    const handleChange = (value: number) => {
-        setForm((prev) => ({ ...prev, ApplicationStatus: value }));
-    };
+    const handleChange = (value: number) => setForm((prev) => ({ ...prev, ApplicationStatus: value }));
 
     const handleClose = () => {
         setForm(defaultForm);
@@ -69,10 +68,10 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
     const handleSubmit = async () => {
         try {
             await updateApplication(form).unwrap();
-            dispatch(showSnackbar({ message: "Cập nhật thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             handleClose();
         } catch {
-            dispatch(showSnackbar({ message: "Cập nhật thất bại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.updateFailed, severity: "error" }));
         }
     };
 
@@ -86,7 +85,6 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
             fullWidth
             PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
         >
-            {/* HEADER */}
             <DialogTitle sx={{ px: 2, py: 1 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -104,7 +102,7 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
                             <Autorenew sx={{ color: "#1975d1" }} />
                         </Box>
                         <Typography fontWeight={700}>
-                            Cập nhật trạng thái
+                            {labels.updateApplicationStatus}
                         </Typography>
                     </Stack>
 
@@ -116,18 +114,17 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
 
             <Divider />
 
-            {/* CONTENT */}
             <DialogContent sx={{ px: 2, py: 2 }}>
                 {isFetching ? (
                     <Box sx={{ textAlign: "center", py: 4 }}>
                         <CircularProgress size={28} />
-                        <Typography variant="body2" sx={{ mt: 1 }}> Đang tải dữ liệu... </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}> {labels.loading} </Typography>
                     </Box>
                 ) : (
                     <Stack spacing={2}>
                         <TextField
                             select
-                            label="Trạng thái ứng viên"
+                            label={labels.applicationStatus}
                             fullWidth
                             size="small"
                             disabled={isFetching}
@@ -150,7 +147,7 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
                     disabled={isLoading}
                     sx={{ borderRadius: 2, textTransform: "none" }}
                 >
-                    Hủy
+                    {labels.cancel}
                 </Button>
 
                 <Button
@@ -160,7 +157,7 @@ export default function UpdateApplicationDialog({ open, applicationId, onClose }
                     sx={{ borderRadius: 2, textTransform: "none", bgcolor: "#1975d1", "&:hover": { bgcolor: "#1565c0" } }}
                     startIcon={isUpdating ? <CircularProgress size={16} color="inherit" /> : null}
                 >
-                    {isUpdating ? "Đang lưu..." : "Lưu"}
+                    {isUpdating ? labels.saving : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

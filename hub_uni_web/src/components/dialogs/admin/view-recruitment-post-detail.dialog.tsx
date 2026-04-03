@@ -29,6 +29,7 @@ import { RecruitPostStatus, Gender, JobExperience, EducationLevel } from "../../
 import { Province } from "../../../app/models/province.model";
 import { Profession } from "../../../app/models/recruitment-post.model";
 import { formatDate } from "../../../utils/date.utils";
+import labelsVi from "../../../i18n/labels.vi";
 const RichTextEditorComponent = lazy(() => import("../../editor"));
 
 interface ViewRecruitmentPostDialogProps {
@@ -70,6 +71,8 @@ const EDUCATION_LABELS: Record<number, string> = {
     [EducationLevel.University]: "Đại học",
     [EducationLevel.Postgraduate]: "Sau đại học",
 };
+
+const labels = labelsVi.recruitmentPost;
 
 export default function ViewRecruitmentPostDialog({ open, postId, onClose }: ViewRecruitmentPostDialogProps) {
     const { data: postData, isFetching: isFetchingPost } = useGetRecruitmentPostByIdQuery(postId!, { skip: !open || !postId, });
@@ -117,7 +120,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth PaperProps={{ sx: { maxHeight: "95vh" } }}>
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography fontWeight={600}>Chi tiết chương trình tuyển sinh</Typography>
+                <Typography fontWeight={600}>{labels.viewRecruitmentPostDetail}</Typography>
                 <IconButton onClick={onClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />
@@ -126,21 +129,21 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                 {isFetchingPost ? (
                     <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}> <CircularProgress size={36} /> </Box>
                 ) : !postData ? (
-                    <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}> <Typography color="text.secondary">Không tìm thấy dữ liệu.</Typography> </Box>
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}> <Typography color="text.secondary">{labels.noData}</Typography> </Box>
                 ) : (
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            <Typography variant="subtitle2" fontWeight={600} color="text.secondary">THÔNG TIN CƠ BẢN</Typography>
+                            <Typography variant="subtitle2" fontWeight={600} color="text.secondary">{labels.basicInfo}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField {...tf} {...roProps} label="Tên bài đăng" value={postData.Name ?? ""} />
+                            <TextField {...tf} {...roProps} label={labels.recruitmentProgramName} value={postData.Name ?? ""} />
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 {...tf} {...roProps}
-                                label="Trạng thái"
+                                label={labels.status}
                                 value={POST_STATUS_LABELS[status] ?? "—"}
                             />
                         </Grid>
@@ -153,7 +156,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                                 value={selectedProvince}
                                 readOnly
                                 renderInput={(params) => (
-                                    <TextField {...params} label="Tỉnh / Thành phố" sx={roProps.sx} />
+                                    <TextField {...params} label={labels.province} sx={roProps.sx} />
                                 )}
                             />
                         </Grid>
@@ -181,19 +184,19 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                                     })
                                 }
                                 renderInput={(params) => (
-                                    <TextField {...params} label="Ngành nghề" sx={roProps.sx} />
+                                    <TextField {...params} label={labels.profession} sx={roProps.sx} />
                                 )}
                             />
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField {...tf} {...roProps} label="Số lượng tuyển" value={postData.Quantity ?? ""} />
+                            <TextField {...tf} {...roProps} label={labels.quantity} value={postData.Quantity ?? ""} />
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 {...tf} {...roProps}
-                                label="Tuyển từ ngày"
+                                label={labels.recruitmentFromDate}
                                 value={formatDate(postData.RecruitmentFromDate) ?? "—"}
                             />
                         </Grid>
@@ -201,7 +204,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 {...tf} {...roProps}
-                                label="Tuyển đến ngày"
+                                label={labels.recruitmentToDate}
                                 value={formatDate(postData.RecruitmentToDate) ?? "—"}
                             />
                         </Grid>
@@ -210,34 +213,34 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                             <Accordion variant="outlined" disableGutters sx={{ borderRadius: 1 }}>
                                 <AccordionSummary expandIcon={<ExpandMore />}>
                                     <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-                                        Yêu cầu ứng viên
+                                        {labels.requirements}
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Grid container spacing={2}>
                                         <Grid size={{ xs: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Tuổi từ" value={req?.FromAge ?? "—"} />
+                                            <TextField {...tf} {...roProps} label={labels.fromAge} value={req?.FromAge ?? "—"} />
                                         </Grid>
                                         <Grid size={{ xs: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Tuổi đến" value={req?.ToAge ?? "—"} />
+                                            <TextField {...tf} {...roProps} label={labels.toAge} value={req?.ToAge ?? "—"} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Giới tính" value={GENDER_LABELS[gender] ?? "—"} />
+                                            <TextField {...tf} {...roProps} label={labels.gender} value={GENDER_LABELS[gender] ?? "—"} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Kinh nghiệm" value={EXPERIENCE_LABELS[experience] ?? "—"} />
+                                            <TextField {...tf} {...roProps} label={labels.experience} value={EXPERIENCE_LABELS[experience] ?? "—"} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Trình độ học vấn" value={EDUCATION_LABELS[educationLevel] ?? "—"} />
+                                            <TextField {...tf} {...roProps} label={labels.educationLevel} value={EDUCATION_LABELS[educationLevel] ?? "—"} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField {...tf} {...roProps} label="GPA tối thiểu" value={req?.MinimumGpa ?? 0} />
+                                            <TextField {...tf} {...roProps} label={labels.minimumGpa} value={req?.MinimumGpa ?? 0} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Thời hạn tốt nghiệp tối đa (năm)" value={req?.MaxYearsSinceGrad ?? 0} />
+                                            <TextField {...tf} {...roProps} label={labels.maxYearsSinceGrad} value={req?.MaxYearsSinceGrad ?? 0} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField {...tf} {...roProps} label="Số buổi nghỉ tối đa" value={req?.MaxAbsence ?? 0} />
+                                            <TextField {...tf} {...roProps} label={labels.maxAbsence} value={req?.MaxAbsence ?? 0} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 6 }}>
                                             <Autocomplete
@@ -247,7 +250,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                                                 value={selectedVisaType}
                                                 readOnly
                                                 renderInput={(params) => (
-                                                    <TextField {...params} label="Loại visa" sx={roProps.sx} />
+                                                    <TextField {...params} label={labels.visaType} sx={roProps.sx} />
                                                 )}
                                             />
                                         </Grid>
@@ -255,7 +258,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                                         {otherReqs.length > 0 && (
                                             <Grid size={{ xs: 12 }}>
                                                 <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                                                    Yêu cầu khác
+                                                    {labels.otherReqs}
                                                 </Typography>
                                                 {otherReqs.map((req, i) => (
                                                     <Box key={i} sx={{ mb: 1 }}>
@@ -263,7 +266,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                                                             {...tf} {...roProps}
                                                             size="small"
                                                             value={req}
-                                                            placeholder={`Yêu cầu ${i + 1}`}
+                                                            placeholder={`${labels.requirement} ${i + 1}`}
                                                         />
                                                     </Box>
                                                 ))}
@@ -278,7 +281,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                             <Grid size={{ xs: 12 }}>
                                 <Divider sx={{ my: 1 }} />
                                 <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                                    THÔNG TIN NỔI BẬT
+                                    {labels.highlights}
                                 </Typography>
                                 {highlights.map((h, i) => (
                                     <Box key={i} sx={{ mb: 1 }}>
@@ -291,7 +294,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
                         <Grid size={{ xs: 12 }}>
                             <Paper elevation={1} sx={{ p: 2 }}>
                                 <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                                    Mô tả
+                                    {labels.description}
                                 </Typography>
                                 <RichTextEditorComponent
                                     key={postData.Description}
@@ -305,7 +308,7 @@ export default function ViewRecruitmentPostDialog({ open, postId, onClose }: Vie
 
             <Divider />
             <DialogActions sx={{ px: 3, py: 2 }}>
-                <Button onClick={onClose} variant="outlined" color="inherit">Đóng</Button>
+                <Button onClick={onClose} variant="outlined" color="inherit">{labels.close}</Button>
             </DialogActions>
         </Dialog>
     );

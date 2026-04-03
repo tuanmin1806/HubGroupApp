@@ -25,8 +25,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import LogoImage from "../assets/hub_logo.png";
 import { ConvertService } from "../app/services/convert.service";
+import labelsVi from "../i18n/labels.vi";
 
 const theme = createTheme({ palette: { mode: "light" } });
+const labels = labelsVi;
 
 const GLOBAL_STYLES = {
     ".MuiAppBar-root": {
@@ -52,31 +54,31 @@ const GLOBAL_STYLES = {
 } as const;
 
 const NAVIGATION: NavigationItem[] = [
-    { kind: "header", title: "Danh mục" },
-    { segment: "staff", title: "Trang chủ", icon: <Dashboard /> },
+    { kind: "header", title: labels.sidebar.category },
+    { segment: "staff", title: labels.sidebar.home, icon: <Dashboard /> },
     {
-        title: "Quản lý tuyển sinh",
+        title: labels.sidebar.manageRecruitment,
         icon: <School />,
         children: [
             {
                 segment: "staff/manage-recruitment-post",
-                title: "Quản lý chương trình tuyển sinh",
+                title: labels.sidebar.manageRecruitmentPost,
                 icon: <MenuBook />,
             },
         ],
     },
     {
-        title: "Thông tin chung",
+        title: labels.sidebar.generalInfo,
         icon: <Info />,
         children: [
             {
                 segment: "staff/organization-info",
-                title: "Thông tin trường",
+                title: labels.sidebar.organizationInfo,
                 icon: <CorporateFare />,
             },
             {
                 segment: "staff/personal-information",
-                title: "Thông tin tài khoản",
+                title: labels.sidebar.personalInformation,
                 icon: <Person />,
             },
         ],
@@ -101,7 +103,7 @@ function CustomToolbarAccount() {
 
     return (
         <Box sx={{ flexShrink: 0 }}>
-            <Tooltip title="Cài đặt tài khoản">
+            <Tooltip title={labels.sidebar.accountSetting}>
                 <Box
                     onClick={handleOpen}
                     sx={{
@@ -148,11 +150,11 @@ function CustomToolbarAccount() {
             >
                 <MenuItem onClick={handleClose}>
                     <AccountCircle sx={{ mr: 1 }} />
-                    <Typography>Thông tin tài khoản</Typography>
+                    <Typography>{labels.sidebar.personalInformation}</Typography>
                 </MenuItem>
                 <MenuItem onClick={handleSignOut}>
                     <Logout sx={{ mr: 1, color: "error.main" }} />
-                    <Typography color="error.main">Đăng xuất</Typography>
+                    <Typography color="error.main">{labels.sidebar.logout}</Typography>
                 </MenuItem>
             </Menu>
         </Box>
@@ -194,7 +196,7 @@ function CustomAppTitle() {
                         color: "white",
                     }}
                 >
-                    Quản lý thông tin trường
+                    {labels.sidebar.manageOrganizationInfo}
                 </Typography>
 
                 {organizationName && (

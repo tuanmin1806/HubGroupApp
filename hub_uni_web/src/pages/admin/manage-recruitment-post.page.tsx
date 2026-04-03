@@ -40,6 +40,7 @@ import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { useRoutePrefix } from "../../hooks/useRoutePrefix";
 import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "../../app/models/enums.model";
 import { formatCurrency } from "../../utils/recruitment-post.utils";
+import labelsVi from "../../i18n/labels.vi";
 
 const UpdateRecruitmentPostDialog = lazy(() => import("../../components/dialogs/staff/update-recruitment-post.dialog"));
 const ViewRecruitmentPostDialog = lazy(() => import("../../components/dialogs/admin/view-recruitment-post-detail.dialog"));
@@ -89,6 +90,8 @@ interface PostRowProps {
     onDelete: (id: string) => void;
 }
 
+const labels = labelsVi.recruitmentPost;
+
 function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: PostRowProps) {
     const [open, setOpen] = useState(false);
     const req = post.Requirement;
@@ -119,17 +122,17 @@ function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: P
                 </TableCell>
 
                 <TableCell align="center">
-                    <Tooltip title="Xem chi tiết">
+                    <Tooltip title={labels.view}>
                         <IconButton size="small" color="info" onClick={() => onView(post.Id)}>
                             <Visibility fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Cập nhật">
+                    <Tooltip title={labels.update}>
                         <IconButton size="small" color="primary" onClick={() => onEdit(post.Id)}>
                             <Edit fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa">
+                    <Tooltip title={labels.delete}>
                         <IconButton
                             size="small"
                             color="error"
@@ -147,35 +150,35 @@ function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: P
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                                Thông tin chung
+                                {labels.recruitmentBasicInfo}
                             </Typography>
                             <Divider sx={{ mb: 2 }} />
                             <Grid container spacing={2} mb={2}>
-                                <DetailField label="Thời gian tuyển sinh">
+                                <DetailField label={labels.recruitmentPeriod}>
                                     <Typography variant="body2" fontWeight={500}>
                                         {formatDate(post.RecruitmentFromDate)} — {formatDate(post.RecruitmentToDate)}
                                     </Typography>
                                 </DetailField>
-                                <DetailField label="Tỉnh/Thành phố">
+                                <DetailField label={labels.province}>
                                     <Typography variant="body2" fontWeight={500}>{post.Province ?? "—"}</Typography>
                                 </DetailField>
-                                <DetailField label="Số lượng">
+                                <DetailField label={labels.quantity}>
                                     <Typography variant="body2" fontWeight={500}>{post.Quantity}</Typography>
                                 </DetailField>
-                                <DetailField label="Chi phí">
+                                <DetailField label={labels.cost}>
                                     <Typography variant="body2" fontWeight={500}>{post.MinCost === post.MaxCost ? formatCurrency(post.MinCost) : `${formatCurrency(post.MinCost)} – ${formatCurrency(post.MaxCost)} ${post.Currency}`}</Typography>
                                 </DetailField>
-                                <DetailField label="Trạng thái">
+                                <DetailField label={labels.status}>
                                     <StatusChip status={post.RecruitPostStatus} />
                                 </DetailField>
-                                <DetailField label="Cập nhật lần cuối">
+                                <DetailField label={labels.updatedAt}>
                                     <Typography variant="body2" fontWeight={500}>{formatDate(post.UpdatedAt) ?? "—"}</Typography>
                                 </DetailField>
                             </Grid>
                             {post.Professions?.length > 0 && (
                                 <>
                                     <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                                        Ngành nghề
+                                        {labels.profession}
                                     </Typography>
                                     <Divider sx={{ mb: 1.5 }} />
                                     <Stack direction="row" flexWrap="wrap" gap={1} mb={2}>
@@ -195,58 +198,58 @@ function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: P
                             {req && (
                                 <>
                                     <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                                        Yêu cầu tuyển sinh
+                                        {labels.recruitmentRequirements}
                                     </Typography>
                                     <Divider sx={{ mb: 2 }} />
                                     <Grid container spacing={2} mb={2}>
                                         {(req.FromAge || req.ToAge) && (
-                                            <DetailField label="Độ tuổi">
+                                            <DetailField label={labels.ageRange}>
                                                 <Typography variant="body2" fontWeight={500}>
-                                                    {req.FromAge} – {req.ToAge} tuổi
+                                                    {req.FromAge} – {req.ToAge} {labels.age}
                                                 </Typography>
                                             </DetailField>
                                         )}
                                         {req.Gender && ConvertService.convertGenderFromString(req.Gender) !== Gender.Undefined && (
-                                            <DetailField label="Giới tính">
+                                            <DetailField label={labels.gender}>
                                                 <Typography variant="body2" fontWeight={500}>
                                                     {ConvertService.convertGender(ConvertService.convertGenderFromString(req.Gender))}
                                                 </Typography>
                                             </DetailField>
                                         )}
                                         {req.EducationLevel && ConvertService.convertEducationLevelFromString(req.EducationLevel) !== EducationLevel.Undefined && (
-                                            <DetailField label="Trình độ học vấn">
+                                            <DetailField label={labels.educationLevel}>
                                                 <Typography variant="body2" fontWeight={500}>
                                                     {ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(req.EducationLevel)) ?? req.EducationLevel}
                                                 </Typography>
                                             </DetailField>
                                         )}
                                         {req.Experience && ConvertService.convertJobExperienceFromString(req.Experience) !== JobExperience.Undefined && (
-                                            <DetailField label="Kinh nghiệm">
+                                            <DetailField label={labels.experience}>
                                                 <Typography variant="body2" fontWeight={500}>
                                                     {ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(req.Experience)) ?? req.Experience}
                                                 </Typography>
                                             </DetailField>
                                         )}
                                         {req.MinimumGpa != null && req.MinimumGpa > 0 && (
-                                            <DetailField label="GPA tối thiểu">
+                                            <DetailField label={labels.minimumGpa}>
                                                 <Typography variant="body2" fontWeight={500}>{req.MinimumGpa}</Typography>
                                             </DetailField>
                                         )}
                                         {req.MaxYearsSinceGrad != null && req.MaxYearsSinceGrad > 0 && (
-                                            <DetailField label="Số năm ra trường tối đa">
-                                                <Typography variant="body2" fontWeight={500}>{req.MaxYearsSinceGrad} năm</Typography>
+                                            <DetailField label={labels.maxYearsSinceGrad}>
+                                                <Typography variant="body2" fontWeight={500}>{req.MaxYearsSinceGrad} {labels.year}</Typography>
                                             </DetailField>
                                         )}
                                         {req.MaxAbsence != null && req.MaxAbsence > 0 && (
-                                            <DetailField label="Số buổi nghỉ tối đa">
-                                                <Typography variant="body2" fontWeight={500}>{req.MaxAbsence} buổi</Typography>
+                                            <DetailField label={labels.maxAbsence}>
+                                                <Typography variant="body2" fontWeight={500}>{req.MaxAbsence} {labels.absence}</Typography>
                                             </DetailField>
                                         )}
                                     </Grid>
                                     {req.OtherReqs?.length > 0 && (
                                         <Box mb={2}>
                                             <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
-                                                Yêu cầu khác
+                                                {labels.otherReqs}
                                             </Typography>
                                             <Stack spacing={0.5}>
                                                 {req.OtherReqs.map((r, i) => (
@@ -263,7 +266,7 @@ function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: P
                             {post.Highlights?.length > 0 && (
                                 <>
                                     <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                                        Điểm nổi bật
+                                        {labels.highlights}
                                     </Typography>
                                     <Divider sx={{ mb: 1.5 }} />
                                     <Stack spacing={0.5}>
@@ -332,11 +335,11 @@ export default function ManageRecruitmentPostPage() {
         if (!deletePostId) return;
         try {
             await deleteRecruitmentPost(deletePostId).unwrap();
-            dispatch(showSnackbar({ message: "Xóa bài tuyển sinh thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.deleteSuccess, severity: "success" }));
             handleCloseDelete();
             if ((data?.Items?.length ?? 0) === 1 && page > 0) setPage((p) => p - 1);
         } catch {
-            dispatch(showSnackbar({ message: "Xóa bài tuyển sinh thất bại. Vui lòng thử lại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.deleteFailed, severity: "error" }));
         }
     }, [deletePostId, deleteRecruitmentPost, dispatch, handleCloseDelete, data?.Items?.length, page]);
 
@@ -354,7 +357,7 @@ export default function ManageRecruitmentPostPage() {
             return (
                 <TableRow>
                     <TableCell colSpan={7} align="center">
-                        <Typography color="error" sx={{ py: 4 }}>Đã xảy ra lỗi khi tải dữ liệu.</Typography>
+                        <Typography color="error" sx={{ py: 4 }}>{labels.loadDataFailed}</Typography>
                     </TableCell>
                 </TableRow>
             );
@@ -363,7 +366,7 @@ export default function ManageRecruitmentPostPage() {
             return (
                 <TableRow>
                     <TableCell colSpan={7} align="center">
-                        <Typography sx={{ py: 4 }} color="text.secondary">Không có dữ liệu.</Typography>
+                        <Typography sx={{ py: 4 }} color="text.secondary">{labels.noData}</Typography>
                     </TableCell>
                 </TableRow>
             );
@@ -389,7 +392,7 @@ export default function ManageRecruitmentPostPage() {
                     <Paper sx={{ display: "flex", alignItems: "center" }}>
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
-                            placeholder="Tìm kiếm chương trình tuyển sinh"
+                            placeholder={labels.searchRecruitmentPost}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -412,7 +415,7 @@ export default function ManageRecruitmentPostPage() {
                         startIcon={<Add />}
                         onClick={() => navigate(`${prefix}/create-recruitment-post`)}
                     >
-                        Thêm
+                        {labels.add}
                     </Button>
                 </Grid>
 
@@ -422,12 +425,12 @@ export default function ManageRecruitmentPostPage() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell />
-                                    <TableCell>Tên chương trình tuyển sinh</TableCell>
-                                    <TableCell>Tỉnh/Thành phố</TableCell>
-                                    <TableCell>Số lượng</TableCell>
-                                    <TableCell>Hạn tuyển</TableCell>
-                                    <TableCell>Trạng thái</TableCell>
-                                    <TableCell align="center">Tiện ích</TableCell>
+                                    <TableCell>{labels.recruitmentProgramName}</TableCell>
+                                    <TableCell>{labels.province}</TableCell>
+                                    <TableCell>{labels.quantity}</TableCell>
+                                    <TableCell>{labels.recruitmentToDate}</TableCell>
+                                    <TableCell>{labels.status}</TableCell>
+                                    <TableCell align="center">{labels.utility}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -455,8 +458,8 @@ export default function ManageRecruitmentPostPage() {
                 open={openDeleteDialog}
                 onClose={handleCloseDelete}
                 onConfirm={handleConfirmDelete}
-                title="Xác nhận xóa"
-                message="Bạn có chắc chắn muốn xóa chương trình tuyển sinh này không? Hành động này không thể hoàn tác."
+                title={labels.confirmDelete}
+                message={labels.confirmDeleteMessage}
             />
         </>
     );

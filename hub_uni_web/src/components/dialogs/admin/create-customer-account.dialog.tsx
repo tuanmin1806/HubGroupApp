@@ -30,6 +30,7 @@ import { useGetProvinceByCountryQuery } from "../../../app/features/province.api
 import { useGetCommunesByProvinceQuery } from "../../../app/features/commune.api";
 import { Province } from "../../../app/models/province.model";
 import { Country } from "../../../app/models/country.model";
+import labelsVi from "../../../i18n/labels.vi";
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 
@@ -72,6 +73,10 @@ interface FormErrors {
     UserName?: string;
     Password?: string;
     Email?: string;
+    CountryId?: string;
+    ProvinceId?: string;
+    CommuneId?: string;
+    Address?: string;
 }
 
 interface SectionHeaderProps {
@@ -116,6 +121,8 @@ function SectionHeader({ icon, title }: SectionHeaderProps) {
     );
 }
 
+const labels = labelsVi.customer;
+
 export default function CreateCustomerAccountDialog({
     open,
     onClose
@@ -156,11 +163,15 @@ export default function CreateCustomerAccountDialog({
 
     const validate = (): boolean => {
         const newErrors: FormErrors = {};
-        if (!form.FullName.trim()) newErrors.FullName = "Họ và tên không được để trống";
-        if (!form.UserName.trim()) newErrors.UserName = "Tên đăng nhập không được để trống";
-        if (!form.Password.trim()) newErrors.Password = "Mật khẩu không được để trống";
-        else if (form.Password.length < 3) newErrors.Password = "Mật khẩu phải có ít nhất 3 ký tự";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email)) newErrors.Email = "Email không hợp lệ";
+        if (!form.FullName.trim()) newErrors.FullName = labels.fullNameRequired;
+        if (!form.UserName.trim()) newErrors.UserName = labels.userNameRequired;
+        if (!form.Password.trim()) newErrors.Password = labels.passwordRequired;
+        if (!form.CountryId) newErrors.CountryId = labels.countryRequired;
+        if (!form.ProvinceId) newErrors.ProvinceId = labels.provinceRequired;
+        if (!form.CommuneId) newErrors.CommuneId = labels.communeRequired;
+        if (!form.Address.trim()) newErrors.Address = labels.addressRequired;
+        else if (form.Password.length < 3) newErrors.Password = labels.passwordLengthRequired;
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email)) newErrors.Email = labels.emailInvalid;
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -193,10 +204,10 @@ export default function CreateCustomerAccountDialog({
                     Address: form.Address
                 },
             }).unwrap();
-            dispatch(showSnackbar({ message: "Thêm nhân viên thành công!", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.createSuccess, severity: "success" }));
             handleClose();
         } catch {
-            dispatch(showSnackbar({ message: "Thêm nhân viên thất bại!", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.createFailed, severity: "error" }));
         }
     };
 
@@ -214,7 +225,7 @@ export default function CreateCustomerAccountDialog({
             PaperProps={{ sx: { borderRadius: 2 } }}
         >
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-                <Typography fontWeight={600}>Thêm nhân viên mới</Typography>
+                <Typography fontWeight={600}>{labels.addNewCustomer}</Typography>
                 <IconButton onClick={handleClose} size="small"><Close /></IconButton>
             </DialogTitle>
             <Divider />
@@ -226,12 +237,12 @@ export default function CreateCustomerAccountDialog({
                 >
                     <SectionHeader
                         icon={<LockOutlined sx={{ fontSize: 16 }} />}
-                        title="Thông tin đăng nhập"
+                        title={labels.loginInfo}
                     />
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label={<> Tên đăng nhập <RequiredStar /> </>}
+                                label={<> {labels.userName} <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
                                 value={form.UserName}
@@ -243,7 +254,7 @@ export default function CreateCustomerAccountDialog({
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label={<> Mật khẩu <RequiredStar /> </>}
+                                label={<> {labels.password} <RequiredStar /> </>}
                                 type={showPassword ? "text" : "password"}
                                 fullWidth
                                 size="small"
@@ -271,12 +282,12 @@ export default function CreateCustomerAccountDialog({
                 >
                     <SectionHeader
                         icon={<PersonOutlined sx={{ fontSize: 16 }} />}
-                        title="Thông tin tài khoản"
+                        title={labels.accountInfo}
                     />
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
                             <TextField
-                                label={<> Họ và tên <RequiredStar /> </>}
+                                label={<> {labels.fullName} <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
                                 value={form.FullName}
@@ -288,7 +299,7 @@ export default function CreateCustomerAccountDialog({
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label="Email"
+                                label={<> {labels.email}</>}
                                 fullWidth
                                 size="small"
                                 value={form.Email}
@@ -300,7 +311,7 @@ export default function CreateCustomerAccountDialog({
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label="Số điện thoại"
+                                label={<> {labels.phoneNumber}</>}
                                 fullWidth
                                 size="small"
                                 value={form.PhoneNumber ?? ""}
@@ -310,7 +321,7 @@ export default function CreateCustomerAccountDialog({
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
-                                label={<> Ngày sinh <RequiredStar /> </>}
+                                label={<> {labels.dateOfBirth} <RequiredStar /> </>}
                                 type="date"
                                 value={form.DateOfBirth}
                                 onChange={(e) => set("DateOfBirth", e.target.value)}
@@ -322,7 +333,7 @@ export default function CreateCustomerAccountDialog({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 select
-                                label={<> Giới tính <RequiredStar /> </>}
+                                label={<> {labels.gender} <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
                                 value={form.Gender}
@@ -334,17 +345,17 @@ export default function CreateCustomerAccountDialog({
                             </TextField>
                         </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> Quốc gia <RequiredStar /> </>} value={form.CountryId}
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> {labels.country} <RequiredStar /> </>} value={form.CountryId}
                             onChange={(e) => handleCountryChange(e.target.value)}
                             fullWidth size="small">
                             {countries.map((c: Country) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}
                         </TextField></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> Tỉnh / Thành phố <RequiredStar /> </>} value={form.ProvinceId}
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> {labels.province} <RequiredStar /> </>} value={form.ProvinceId}
                             onChange={(e) => handleProvinceChange(e.target.value)}
                             fullWidth size="small" disabled={!selectedCountrySeo}>
                             {provinces.map((p: Province) => (<MenuItem key={p.Id} value={p.Id}>{p.Name}</MenuItem>))}
                         </TextField></Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> Xã / Phường <RequiredStar /> </>} value={form.CommuneId}
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField select label={<> {labels.commune} <RequiredStar /> </>} value={form.CommuneId}
                             onChange={(e) => set("CommuneId", e.target.value)}
                             fullWidth size="small" disabled={!selectedProvinceSeo}>
                             {communes.map((c) => (<MenuItem key={c.Id} value={c.Id}>{c.Name}</MenuItem>))}
@@ -354,7 +365,7 @@ export default function CreateCustomerAccountDialog({
                             <TextField
                                 size="small"
                                 fullWidth
-                                label="Địa chỉ cụ thể"
+                                label={<> {labels.address} <RequiredStar /> </>}
                                 onChange={(e) =>
                                     setForm(prev => ({
                                         ...prev,
@@ -366,7 +377,7 @@ export default function CreateCustomerAccountDialog({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <TextField
                                 select
-                                label={<> Trạng thái <RequiredStar /> </>}
+                                label={<> {labels.status} <RequiredStar /> </>}
                                 fullWidth
                                 size="small"
                                 value={form.AccountStatus}
@@ -384,7 +395,7 @@ export default function CreateCustomerAccountDialog({
             <Divider />
             <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
                 <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isLoading}>
-                    Hủy
+                    {labels.cancel}
                 </Button>
                 <Button
                     onClick={handleSubmit}
@@ -393,7 +404,7 @@ export default function CreateCustomerAccountDialog({
                     disabled={isLoading || isSaveDisabled()}
                     startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}
                 >
-                    {isLoading ? "Đang tạo..." : "Lưu"}
+                    {isLoading ? labels.loading : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

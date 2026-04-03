@@ -35,8 +35,11 @@ import { ConvertService } from "../../app/services/convert.service";
 import { hasAccountType } from "../../utils/auth.utils";
 import { AccountType } from "../../app/models/enums.model";
 import { Profession } from "../../app/models/organization.model";
+import labelsVi from "../../i18n/labels.vi";
 const UpdateOrganizationDialog = lazy(() => import("../../components/dialogs/admin/organization/update-organization.dialog"));
 const LogoUploadDialog = lazy(() => import("../../components/dialogs/admin/logo-upload.dialog"));
+
+const labels = labelsVi.organization;
 
 export default function OrganizationInforPage() {
     const userInfo = getUserInfo();
@@ -51,12 +54,12 @@ export default function OrganizationInforPage() {
     if (!data) return null;
 
     const socialLinks = [
-        { icon: <Facebook />, url: data.FacebookUrl, label: "Facebook" },
-        { icon: <LinkedIn />, url: data.LinkedinUrl, label: "LinkedIn" },
-        { icon: <YouTube />, url: data.YoutubeUrl, label: "YouTube" },
-        { icon: <Twitter />, url: data.TwitterUrl, label: "Twitter" },
-        { icon: <Instagram />, url: data.InstagramUrl, label: "Instagram" },
-        { icon: <Map />, url: data.GoogleMapUrl, label: "Google Maps" },
+        { icon: <Facebook />, url: data.FacebookUrl, label: labels.facebook },
+        { icon: <LinkedIn />, url: data.LinkedinUrl, label: labels.linkedIn },
+        { icon: <YouTube />, url: data.YoutubeUrl, label: labels.youTube },
+        { icon: <Twitter />, url: data.TwitterUrl, label: labels.twitter },
+        { icon: <Instagram />, url: data.InstagramUrl, label: labels.instagram },
+        { icon: <Map />, url: data.GoogleMapUrl, label: labels.googleMaps },
     ].filter((s) => s.url);
 
     return (
@@ -103,7 +106,7 @@ export default function OrganizationInforPage() {
                                 "&:hover": { bgcolor: "rgba(255,255,255,0.25)" },
                             }}
                         >
-                            Cập nhật thông tin
+                            {labels.updateOrganization}
                         </Button>
                     )}
                 </Box>
@@ -181,7 +184,7 @@ export default function OrganizationInforPage() {
                                 {data.IsTop && (
                                     <Chip
                                         icon={<Star sx={{ fontSize: 14, color: "#ffffff !important" }} />}
-                                        label="TOP"
+                                        label={labels.top}
                                         size="small"
                                         sx={{
                                             bgcolor: "#1975d1",
@@ -242,7 +245,7 @@ export default function OrganizationInforPage() {
                         <Stack spacing={0.5}>
 
                             {data.Summary && (
-                                <SectionCard title="Giới thiệu" icon={<Info sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={labels.introduction} icon={<Info sx={{ color: "#1975d1" }} />}>
                                     <Typography
                                         color="text.secondary"
                                         sx={{ lineHeight: 1.8, fontSize: 15 }}
@@ -253,7 +256,7 @@ export default function OrganizationInforPage() {
                             )}
 
                             {data.Highlights?.length > 0 && (
-                                <SectionCard title="Điểm nổi bật" icon={<Star sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={labels.highlights} icon={<Star sx={{ color: "#1975d1" }} />}>
                                     <Stack spacing={1}>
                                         {data.Highlights.map((h: string, i: number) => (
                                             <Stack key={i} direction="row" spacing={1} alignItems="center">
@@ -273,7 +276,7 @@ export default function OrganizationInforPage() {
                             )}
 
                             {data.Description && (
-                                <SectionCard title="Thông tin chi tiết" icon={<Business sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={labels.detail} icon={<Business sx={{ color: "#1975d1" }} />}>
                                     <Box
                                         sx={{
                                             "& img": { maxWidth: "100%", borderRadius: 2 },
@@ -297,7 +300,7 @@ export default function OrganizationInforPage() {
                             )}
 
                             {data.FeaturedImageFullUrls?.length > 0 && (
-                                <SectionCard title="Hình ảnh" icon={<Star sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={labels.image} icon={<Star sx={{ color: "#1975d1" }} />}>
                                     <Grid container spacing={1.5}>
                                         {data.FeaturedImageFullUrls.map((img: string, index: number) => (
                                             <Grid key={index} size={{ xs: 6, sm: 4 }}>
@@ -326,7 +329,7 @@ export default function OrganizationInforPage() {
                         <Stack spacing={0.5}>
 
                             {/* Contact info */}
-                            <SectionCard title="Thông tin liên hệ" icon={<Phone sx={{ color: "#1975d1" }} />}>
+                            <SectionCard title={labels.contactInfo} icon={<Phone sx={{ color: "#1975d1" }} />}>
                                 <Stack spacing={2}>
                                     {[
                                         { icon: <LocationOn sx={{ fontSize: 16, color: "#1975d1" }} />, label: data.Province },
@@ -386,9 +389,9 @@ export default function OrganizationInforPage() {
 
                             {/* Dorm cost */}
                             {data.DormCost && (
-                                <SectionCard title="Ký túc xá" icon={<Bed sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={labels.dormitory} icon={<Bed sx={{ color: "#1975d1" }} />}>
                                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                        <Typography sx={{ fontSize: 13, color: "text.secondary" }}>Chi phí</Typography>
+                                        <Typography sx={{ fontSize: 13, color: "text.secondary" }}>{labels.cost}</Typography>
                                         <Typography sx={{ fontWeight: 700, color: "#1975d1", fontSize: 15 }}>
                                             {ConvertService.formatCurrencyVND(data.DormCost)}{data.Currency}
                                         </Typography>
@@ -398,7 +401,7 @@ export default function OrganizationInforPage() {
 
                             {/* Main Profession */}
                             {data.MainProfession && (
-                                <SectionCard title="Ngành chính" icon={<Star sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={labels.mainProfession} icon={<Star sx={{ color: "#1975d1" }} />}>
                                     <Box
                                         sx={{
                                             p: 1,
@@ -418,7 +421,7 @@ export default function OrganizationInforPage() {
 
                             {/* Professions */}
                             {data.Professions?.length > 0 && (
-                                <SectionCard title={`Ngành đào tạo (${data.Professions.length})`} icon={<School sx={{ color: "#1975d1" }} />}>
+                                <SectionCard title={`${labels.professions} (${data.Professions.length})`} icon={<School sx={{ color: "#1975d1" }} />}>
                                     <Stack spacing={0} divider={<Divider />}>
                                         {data.Professions.map((p: Profession, i: number) => (
                                             <Stack

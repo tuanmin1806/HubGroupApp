@@ -30,10 +30,13 @@ import { useTheme } from "@mui/material/styles";
 import { useGetApplicationByIdQuery } from "../../../app/features/application.api";
 import { ConvertService } from "../../../app/services/convert.service";
 import { ApplicationStatus } from "../../../app/models/enums.model";
+import labelsVi from "../../../i18n/labels.vi";
 
 const brand = "#f36730";
 const brandLight = "#fff4ef";
 const brandDark = "#c94e1a";
+
+const labels = labelsVi.applicationDetail;
 
 function StatusChip({ status }: { status?: ApplicationStatus }) {
     switch (status) {
@@ -139,7 +142,7 @@ export default function ApplicationDetailDialog({ applicationId, open, onClose }
                 <Stack direction="row" spacing={1.5} alignItems="center">
                     <Box sx={{ width: 4, height: 20, borderRadius: 1, bgcolor: brand }} />
                     <Typography fontWeight={700} fontSize={17} color="#1e293b">
-                        Chi tiết chương trình ứng tuyển
+                        {labels.title}
                     </Typography>
                 </Stack>
                 <Box display="flex" alignItems="center" gap={1.5}>
@@ -155,7 +158,7 @@ export default function ApplicationDetailDialog({ applicationId, open, onClose }
 
                 {isError && (
                     <Box p={5} textAlign="center">
-                        <Typography color="error" fontWeight={500}>Không thể tải dữ liệu</Typography>
+                        <Typography color="error" fontWeight={500}>{labels.loadDataFailed}</Typography>
                     </Box>
                 )}
 
@@ -201,7 +204,7 @@ export default function ApplicationDetailDialog({ applicationId, open, onClose }
                                             borderRadius: 1.5, fontSize: 11, flexShrink: 0, "&:hover": { borderColor: brandDark, color: brandDark, bgcolor: brandLight },
                                         }}
                                     >
-                                        Xem chi tiết
+                                        {labels.viewDetail}
                                     </Button>
                                 )}
                             </Stack>
@@ -210,32 +213,32 @@ export default function ApplicationDetailDialog({ applicationId, open, onClose }
                         <Grid container spacing={1}>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <SectionCard title="Yêu cầu" icon={<Visibility sx={{ fontSize: 15 }} />}>
+                                <SectionCard title={labels.requirements} icon={<Visibility sx={{ fontSize: 15 }} />}>
                                     <Stack spacing={1.75}>
                                         <InfoRow
                                             icon={<Cake sx={{ fontSize: 14 }} />}
-                                            label="Độ tuổi"
+                                            label={labels.ageRange}
                                             value={req?.FromAge || req?.ToAge ? [req.FromAge ? `Từ ${req.FromAge}` : null, req.ToAge ? `đến ${req.ToAge}` : null].filter(Boolean).join(" ") + " tuổi" : "Không yêu cầu"}
                                         />
-                                        <InfoRow icon={<Person sx={{ fontSize: 14 }} />} label="Giới tính" value={ConvertService.convertGender(ConvertService.convertGenderFromString(req?.Gender))} />
-                                        <InfoRow icon={<Work sx={{ fontSize: 14 }} />} label="Kinh nghiệm" value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(req?.Experience))} />
-                                        <InfoRow icon={<School sx={{ fontSize: 14 }} />} label="Trình độ học vấn" value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(req?.EducationLevel))} />
-                                        <InfoRow icon={<StarRate sx={{ fontSize: 14 }} />} label="GPA tối thiểu" value={req?.MinimumGpa != null ? `≥ ${req.MinimumGpa}` : null} />
-                                        <InfoRow icon={<EventAvailable sx={{ fontSize: 14 }} />} label="Thời gian tốt nghiệp tối đa" value={req?.MaxYearsSinceGrad ? `${req.MaxYearsSinceGrad} năm` : null} />
-                                        <InfoRow icon={<WatchLater sx={{ fontSize: 14 }} />} label="Số buổi nghỉ tối đa" value={req?.MaxAbsence != null ? `≤ ${req.MaxAbsence} buổi` : null} />
+                                        <InfoRow icon={<Person sx={{ fontSize: 14 }} />} label={labels.gender} value={ConvertService.convertGender(ConvertService.convertGenderFromString(req?.Gender))} />
+                                        <InfoRow icon={<Work sx={{ fontSize: 14 }} />} label={labels.experience} value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(req?.Experience))} />
+                                        <InfoRow icon={<School sx={{ fontSize: 14 }} />} label={labels.educationLevel} value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(req?.EducationLevel))} />
+                                        <InfoRow icon={<StarRate sx={{ fontSize: 14 }} />} label={labels.minimumGpa} value={req?.MinimumGpa != null ? `≥ ${req.MinimumGpa}` : null} />
+                                        <InfoRow icon={<EventAvailable sx={{ fontSize: 14 }} />} label={labels.maxYearsSinceGrad} value={req?.MaxYearsSinceGrad ? `${req.MaxYearsSinceGrad} năm` : null} />
+                                        <InfoRow icon={<WatchLater sx={{ fontSize: 14 }} />} label={labels.maxAbsence} value={req?.MaxAbsence != null ? `≤ ${req.MaxAbsence} buổi` : null} />
                                     </Stack>
                                 </SectionCard>
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <SectionCard title="Hồ sơ ứng viên" icon={<Person sx={{ fontSize: 15 }} />}>
+                                <SectionCard title={labels.applicationInfo} icon={<Person sx={{ fontSize: 15 }} />}>
                                     <Stack spacing={1.75}>
-                                        <InfoRow icon={<Cake sx={{ fontSize: 14 }} />} label="Ngày sinh" value={ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth)} />
-                                        <InfoRow icon={<Person sx={{ fontSize: 14 }} />} label="Giới tính" value={ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender))} />
-                                        <InfoRow icon={<Work sx={{ fontSize: 14 }} />} label="Kinh nghiệm" value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(profile?.Experience))} />
-                                        <InfoRow icon={<School sx={{ fontSize: 14 }} />} label="Trình độ học vấn" value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(profile?.EducationLevel))} />
-                                        <InfoRow icon={<StarRate sx={{ fontSize: 14 }} />} label="GPA" value={profile?.Gpa != null ? `${Number(profile.Gpa).toFixed(1)}` : null} />
-                                        <InfoRow icon={<EventAvailable sx={{ fontSize: 14 }} />} label="Năm tốt nghiệp" value={profile?.GraduationYear ? `Năm ${profile.GraduationYear}` : null} />
+                                        <InfoRow icon={<Cake sx={{ fontSize: 14 }} />} label={labels.dateOfBirth} value={ConvertService.formatDateToddMMyyyy(profile?.DateOfBirth)} />
+                                        <InfoRow icon={<Person sx={{ fontSize: 14 }} />} label={labels.gender} value={ConvertService.convertGender(ConvertService.convertGenderFromString(profile?.Gender))} />
+                                        <InfoRow icon={<Work sx={{ fontSize: 14 }} />} label={labels.experience} value={ConvertService.convertJobExperience(ConvertService.convertJobExperienceFromString(profile?.Experience))} />
+                                        <InfoRow icon={<School sx={{ fontSize: 14 }} />} label={labels.educationLevel} value={ConvertService.convertEducationLevel(ConvertService.convertEducationLevelFromString(profile?.EducationLevel))} />
+                                        <InfoRow icon={<StarRate sx={{ fontSize: 14 }} />} label={labels.gpa} value={profile?.Gpa != null ? `${Number(profile.Gpa).toFixed(1)}` : null} />
+                                        <InfoRow icon={<EventAvailable sx={{ fontSize: 14 }} />} label={labels.graduationYear} value={profile?.GraduationYear ? `Năm ${profile.GraduationYear}` : null} />
                                     </Stack>
                                 </SectionCard>
                             </Grid>

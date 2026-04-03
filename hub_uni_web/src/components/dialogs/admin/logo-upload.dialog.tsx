@@ -10,6 +10,12 @@ import DialogActions from "@mui/material/DialogActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useState, useRef } from "react";
 import { useUpdateOrganizationLogoMutation } from "../../../app/features/organization.api";
+import labelsVi from "../../../i18n/labels.vi";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../app/store";
+import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
+
+const labels = labelsVi.logoUpload;
 
 export default function LogoUploadDialog({ open, onClose, currentLogoUrl, organizationId }: {
     open: boolean;
@@ -20,6 +26,7 @@ export default function LogoUploadDialog({ open, onClose, currentLogoUrl, organi
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const dispatch = useDispatch<AppDispatch>();
     const [updateLogo, { isLoading }] = useUpdateOrganizationLogoMutation();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,10 +50,11 @@ export default function LogoUploadDialog({ open, onClose, currentLogoUrl, organi
             const formData = new FormData();
             formData.append("LogoUrl", selectedFile);
             await updateLogo({ Id: organizationId, formData }).unwrap();
+            dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             onClose();
             handleRemove();
         } catch (err) {
-            console.error("Failed to update logo:", err);
+            dispatch(showSnackbar({ message: labels.updateFailed, severity: "error" }));
         }
     };
 
@@ -59,7 +67,7 @@ export default function LogoUploadDialog({ open, onClose, currentLogoUrl, organi
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}>
-            <DialogTitle sx={{ fontWeight: 700, fontSize: 16 }}>Cập nhật logo tổ chức</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 700, fontSize: 16 }}>{labels.title}</DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
                 <Box sx={{ position: "relative", display: "inline-block" }}>
                     <Box
@@ -87,7 +95,7 @@ export default function LogoUploadDialog({ open, onClose, currentLogoUrl, organi
                     </Box>
 
                     {previewUrl && (
-                        <Tooltip title="Xóa ảnh đã chọn">
+                        <Tooltip title={labels.removeImage}>
                             <IconButton
                                 onClick={handleRemove}
                                 size="small"
@@ -130,14 +138,14 @@ export default function LogoUploadDialog({ open, onClose, currentLogoUrl, organi
                         "&:hover": { bgcolor: "#e8f0fd" },
                     }}
                 >
-                    {previewUrl ? "Chọn ảnh khác" : "Chọn ảnh"}
+                    {previewUrl ? labels.selectAnotherImage : labels.selectImage}
                 </Button>
             </DialogContent>
 
             <DialogActions sx={{ pb: 1, gap: 0.5 }}>
-                <Button onClick={handleClose} sx={{ textTransform: "none", color: "text.secondary" }}>Hủy</Button>
+                <Button onClick={handleClose} sx={{ textTransform: "none", color: "text.secondary" }}>{labels.cancel}</Button>
                 <Button variant="contained" onClick={handleSave} disabled={!selectedFile || isLoading} sx={{ textTransform: "none", bgcolor: "#1975d1", fontWeight: 600, borderRadius: 2, "&:hover": { bgcolor: "#1565b8" } }}>
-                    {isLoading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : "Lưu"}
+                    {isLoading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

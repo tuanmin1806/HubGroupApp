@@ -138,7 +138,7 @@ const OrganizationSearchPage = () => {
 
     useEffect(() => {
         if (initialProvinceSeo && provinces && provinces.length > 0 && !filters.provinceId) {
-            const province = provinces.find(p => p.Seo === initialProvinceSeo);
+            const province = provinces.find(p => p.SeoUrl === initialProvinceSeo);
             if (province) {
                 setFilters(prev => ({ ...prev, provinceId: province.Id }));
             }
@@ -166,7 +166,7 @@ const OrganizationSearchPage = () => {
         }
         if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
             setSelectedProvinceSeo(provinceSeo);
-            const province = provinces?.find(p => p.Seo === provinceSeo);
+            const province = provinces?.find(p => p.SeoUrl === provinceSeo);
             setFilters(prev => ({
                 ...prev,
                 provinceId: province?.Id || '',

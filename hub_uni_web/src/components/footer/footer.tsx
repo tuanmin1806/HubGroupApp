@@ -18,6 +18,9 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { BACKGROUND_COLOR, TEXT_COLOR } from "../../constants/common.constant";
+import labelsVi from "../../i18n/labels.vi";
+
+const labels = labelsVi.footer;
 
 const linkStyle = {
   cursor: "pointer",
@@ -40,7 +43,7 @@ export default function Footer() {
 
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Kết nối với chúng tôi
+              {labels.connectWithUs}
             </Typography>
 
             <List dense>
@@ -72,58 +75,58 @@ export default function Footer() {
                 <ListItemIcon sx={{ color: "#ff5722" }}>
                   <LocationOn />
                 </ListItemIcon>
-                <ListItemText primary="Tầng 1, Tòa nhà Pan Horizon, 117 Xuân Thủy, Phường Cầu Giấy, TP. Hà Nội." />
+                <ListItemText primary={labels.contactAddress} />
               </ListItem>
             </List>
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Về Hubgroup.vn
+              {labels.aboutHubgroup}
             </Typography>
 
             <List dense>
               <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/ve-chung-toi")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><Info /></ListItemIcon>
-                <ListItemText primary="Về chúng tôi" />
+                <ListItemText primary={labels.aboutUs} />
               </ListItem>
 
               <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/dieu-khoan-su-dung")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><Gavel /></ListItemIcon>
-                <ListItemText primary="Quy chế hoạt động" />
+                <ListItemText primary={labels.termsOfUse} />
               </ListItem>
 
               <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/dieu-khoan-su-dung#bao-mat")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><Security /></ListItemIcon>
-                <ListItemText primary="Quy định bảo mật" />
+                <ListItemText primary={labels.privacyPolicy} />
               </ListItem>
 
               <ListItem disableGutters sx={linkStyle} onClick={() => handleExternal("https://hubgroup.vn/lien-he")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><ContactMail /></ListItemIcon>
-                <ListItemText primary="Liên hệ" />
+                <ListItemText primary={labels.contact} />
               </ListItem>
             </List>
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Danh mục
+              {labels.categories}
             </Typography>
 
             <List dense>
               <ListItem disableGutters sx={linkStyle} onClick={() => handleInternal("/tim-kiem-truong")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><Business /></ListItemIcon>
-                <ListItemText primary="Danh sách trường" />
+                <ListItemText primary={labels.schoolList} />
               </ListItem>
 
               <ListItem disableGutters sx={linkStyle} onClick={() => handleInternal("/chuong-trinh-tuyen-sinh")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><Work /></ListItemIcon>
-                <ListItemText primary="Chương trình tuyển sinh" />
+                <ListItemText primary={labels.programs} />
               </ListItem>
 
               <ListItem disableGutters sx={linkStyle} onClick={() => handleInternal("/bai-viet")}>
                 <ListItemIcon sx={{ color: "#ff5722" }}><MenuBook /></ListItemIcon>
-                <ListItemText primary="Bài viết" />
+                <ListItemText primary={labels.articles} />
               </ListItem>
             </List>
           </Grid>
@@ -139,11 +142,11 @@ export default function Footer() {
           fontSize: 14,
         }}
       >
-        © Copyright 2021 by{" "}
+        {labels.copyright2021By}{" "}
         <Link href="https://hubgroup.vn" target="_blank" rel="noopener noreferrer" underline="hover" color="inherit" sx={{ fontWeight: "bold", "&:hover": { textDecoration: "underline" } }}>
-          Hubgroup.vn
+          {labels.hubgroup}
         </Link>
-        . All rights reserved.
+        . {labels.allRightsReserved}
       </Box>
     </Box>
   );

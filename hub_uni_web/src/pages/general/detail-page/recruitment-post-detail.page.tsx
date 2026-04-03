@@ -1,8 +1,9 @@
 import { lazy } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Favorite from "@mui/icons-material/Favorite"
+import FavoriteBorder from "@mui/icons-material/FavoriteBorder"
 import LocationOn from "@mui/icons-material/LocationOn";
-import BookmarkBorder from "@mui/icons-material/BookmarkBorder";
 import Share from "@mui/icons-material/Share";
 import AccessTime from "@mui/icons-material/AccessTime";
 import Work from "@mui/icons-material/Work";
@@ -15,7 +16,6 @@ import CheckCircle from "@mui/icons-material/CheckCircle";
 import PeopleAlt from "@mui/icons-material/PeopleAlt";
 import Star from "@mui/icons-material/Star";
 import RunningWithErrors from "@mui/icons-material/RunningWithErrors";
-import Bookmark from "@mui/icons-material/Bookmark";
 import Flight from "@mui/icons-material/Flight";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -383,7 +383,7 @@ const RecruitmentPostDetailPage = () => {
                                             <Button
                                                 variant={isSaved ? "contained" : "outlined"}
                                                 size="small"
-                                                startIcon={isSaving || isDeleting ? <CircularProgress size={18} color="inherit" /> : isSaved ? <Bookmark /> : <BookmarkBorder />}
+                                                startIcon={isSaving || isDeleting ? <CircularProgress size={18} color="inherit" /> : isSaved ? <Favorite /> : <FavoriteBorder />}
                                                 onClick={handleSaveToggle}
                                                 disabled={isSaving || isDeleting}
                                                 sx={{
@@ -392,7 +392,7 @@ const RecruitmentPostDetailPage = () => {
                                                     py: 0.5,
                                                     fontSize: 12,
                                                     transition: 'all 0.25s ease',
-                                                    ...(isSaved ? { bgcolor: '#ff5722', borderColor: '#ff5722', color: 'white', '&:hover': { bgcolor: '#c62828', borderColor: '#c62828', color: 'white', }, } : { borderColor: '#ff5722', color: '#ff5722', '&:hover': { bgcolor: '#ff5722', color: 'white', }, }),
+                                                    ...(isSaved ? { bgcolor: '#ff5722', borderColor: '#ff5722', color: 'white', '&:hover': { bgcolor: '#ff3c00ff', borderColor: '#ff3c00ff', color: 'white', }, } : { borderColor: '#ff5722', color: '#ff5722', '&:hover': { bgcolor: '#ff5722', color: 'white', }, }),
                                                 }}
                                             >
                                                 {isSaving ? 'Đang lưu...' : isDeleting ? 'Đang hủy...' : isSaved ? 'Đã lưu' : 'Lưu tin'}

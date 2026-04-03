@@ -15,6 +15,7 @@ import { useGetDashboardQuery } from "../../app/features/dashboard.api";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { getUserInfo } from "../../app/services/auth.service";
+import labelsVi from "../../i18n/labels.vi";
 
 interface StatCardProps {
     icon: React.ReactNode;
@@ -86,7 +87,7 @@ function EmptyChart() {
     return (
         <Box display="flex" alignItems="center" justifyContent="center" height={240}>
             <Typography color="text.secondary" variant="body2">
-                Chưa có dữ liệu
+                {labels.dashboard.noData}
             </Typography>
         </Box>
     );
@@ -95,6 +96,8 @@ function EmptyChart() {
 const MAX_TICK = 14;
 
 function truncate(str: string, max = MAX_TICK) { return str.length > max ? str.slice(0, max) + "…" : str; }
+
+const labels = labelsVi;
 
 export default function AdminDashboardPage() {
     const userInfo = getUserInfo();
@@ -108,9 +111,9 @@ export default function AdminDashboardPage() {
         (data?.StudentFailCount ?? 0);
 
     const pieData = [
-        { id: 0, value: data?.StudentPassCount ?? 0, label: "Đỗ", color: "#22c55e" },
-        { id: 1, value: data?.StudentFailCount ?? 0, label: "Trượt", color: "#ef4444" },
-        { id: 2, value: pending > 0 ? pending : 0, label: "Đang xét", color: "#f59e0b" },
+        { id: 0, value: data?.StudentPassCount ?? 0, label: labels.dashboard.pass, color: "#22c55e" },
+        { id: 1, value: data?.StudentFailCount ?? 0, label: labels.dashboard.fail, color: "#ef4444" },
+        { id: 2, value: pending > 0 ? pending : 0, label: labels.dashboard.pending, color: "#f59e0b" },
     ].filter((d) => d.value > 0);
 
     const hasPieData = pieData.length > 0;
@@ -134,15 +137,15 @@ export default function AdminDashboardPage() {
             >
                 <Box>
                     <Typography variant="h5" fontWeight={700} mb={0.5}>
-                        Tổng quan
+                        {labels.dashboard.overview}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Tổng quan hoạt động tuyển sinh của trường
+                        {labels.dashboard.overviewDescription}
                     </Typography>
                 </Box>
                 <Chip
                     icon={<TrendingUp fontSize="small" />}
-                    label={`Tỷ lệ đỗ: ${passRate}%`}
+                    label={`${labels.dashboard.passRate}: ${passRate}%`}
                     color="success"
                     variant="outlined"
                     sx={{ fontWeight: 600, fontSize: 13 }}
@@ -153,7 +156,7 @@ export default function AdminDashboardPage() {
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <StatCard
                         icon={<Article />}
-                        label="Chương trình tuyển sinh"
+                        label={labels.dashboard.recruitmentProgram}
                         value={data?.RecruitPostCount}
                         color="#3b82f6"
                         bg="#eff6ff"
@@ -163,7 +166,7 @@ export default function AdminDashboardPage() {
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <StatCard
                         icon={<People />}
-                        label="Số lượng nhân viên"
+                        label={labels.dashboard.staffAccountManagement}
                         value={data?.StaffCount}
                         color="#f59e0b"
                         bg="#fffbeb"
@@ -173,7 +176,7 @@ export default function AdminDashboardPage() {
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <StatCard
                         icon={<HowToReg />}
-                        label="Tổng số ứng viên ứng tuyển"
+                        label={labels.dashboard.totalApplications}
                         value={data?.StudentApplyCount}
                         color="#8b5cf6"
                         bg="#f5f3ff"
@@ -183,7 +186,7 @@ export default function AdminDashboardPage() {
                 <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                     <StatCard
                         icon={<CheckCircle />}
-                        label="Số ứng viên đỗ"
+                        label={labels.dashboard.totalPass}
                         value={data?.StudentPassCount}
                         color="#22c55e"
                         bg="#f0fdf4"
@@ -193,7 +196,7 @@ export default function AdminDashboardPage() {
                 <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                     <StatCard
                         icon={<Cancel />}
-                        label="Số ứng viên trượt"
+                        label={labels.dashboard.totalFail}
                         value={data?.StudentFailCount}
                         color="#ef4444"
                         bg="#fef2f2"
@@ -215,10 +218,10 @@ export default function AdminDashboardPage() {
                     >
                         <CardContent sx={{ p: 3 }}>
                             <Typography variant="subtitle1" fontWeight={700} mb={0.5}>
-                                Tỷ lệ kết quả xét tuyển
+                                {labels.dashboard.passRate}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" mb={1}>
-                                Phân bổ ứng viên đỗ / trượt / đang xét
+                                {labels.dashboard.passRateDescription}
                             </Typography>
 
                             {isLoading ? (
@@ -272,10 +275,10 @@ export default function AdminDashboardPage() {
                     >
                         <CardContent sx={{ p: 3 }}>
                             <Typography variant="subtitle1" fontWeight={700} mb={0.5}>
-                                Thống kê ứng viên theo chương trình tuyển sinh
+                                {labels.dashboard.totalApplicationsByRecruitmentProgram}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" mb={1}>
-                                Số lượng ứng viên theo từng chương trình
+                                {labels.dashboard.totalApplicationsByRecruitmentProgramDescription}
                             </Typography>
 
                             {isLoading ? (
@@ -326,7 +329,7 @@ export default function AdminDashboardPage() {
                                             series={[
                                                 {
                                                     data: barValues,
-                                                    label: "Số hồ sơ",
+                                                    label: labels.dashboard.totalApplications,
                                                     color: "#3b82f6",
                                                     highlightScope: {
                                                         fade: "global",

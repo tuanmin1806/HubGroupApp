@@ -8,6 +8,9 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
+import labelsVi from "../../../i18n/labels.vi";
+
+const labels = labelsVi.confirmDialog;
 
 ConfirmDialog.propTypes = {
     open: PropTypes.bool.isRequired,
@@ -40,11 +43,11 @@ export default function ConfirmDialog({ open, onClose, onConfirm, title, message
 
             <DialogActions sx={{ px: 1, pb: 2, pt: 1, display: "flex", }}>
                 <Button onClick={onClose} fullWidth variant="outlined" sx={{ borderRadius: 2, textTransform: "none", borderColor: "#faa11b", color: "#faa11b", "&:hover": { borderColor: "#d97706", bgcolor: "#fff7ed", } }}>
-                    Hủy bỏ
+                    {labels.cancel}
                 </Button>
 
                 <Button onClick={onConfirm} fullWidth variant="contained" autoFocus sx={{ borderRadius: 2, textTransform: "none", bgcolor: "#faa11b", fontWeight: 500, boxShadow: "none", "&:hover": { bgcolor: "#d97706", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" } }}>
-                    Chấp nhận
+                    {labels.confirm}
                 </Button>
             </DialogActions>
         </Dialog>

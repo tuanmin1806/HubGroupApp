@@ -44,7 +44,8 @@ import { RecruitmentPostFilterParams } from "../../../app/models/recruitment-pos
 import { useGetVisaTypesByPageQuery } from "../../../app/features/visa-type.api";
 import { ProfessionResponse } from "../../../app/models/profession.model";
 import { VisaTypeResponse } from "../../../app/models/visa-type.model";
-import { Gender } from "../../../app/models/enums.model";
+import { AccountType, Gender } from "../../../app/models/enums.model";
+import { hasAccountType } from "../../../utils/auth.utils";
 const OrganizationPagination = lazy(() => import("../../../components/pagination/organization-pagination"));
 const SearchBar = lazy(() => import("../../../components/searchs/search-bar.search"));
 
@@ -86,6 +87,8 @@ const RecruitmentPostSearchPage = () => {
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState(initialProvinceSeo);
     const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); setShowAllProfessions(true); };
     const handleLoadMoreVisaTypes = () => { setVisaTypePage(prev => prev + 1); setShowAllVisaTypes(true); };
+    const isAdminOrStaff = hasAccountType(AccountType.Manager) || hasAccountType(AccountType.Collaborator);
+
 
     const [filters, setFilters] = useState({
         searchValue: "",
@@ -160,7 +163,7 @@ const RecruitmentPostSearchPage = () => {
         }
         if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
             setSelectedProvinceSeo(provinceSeo);
-            const province = provinces?.find(p => p.Seo === provinceSeo);
+            const province = provinces?.find(p => p.SeoUrl === provinceSeo);
             setFilters(prev => ({ ...prev, provinceId: province?.Id || '' }));
         }
         setPage(DEFAULT_PAGE);
@@ -758,19 +761,23 @@ const RecruitmentPostSearchPage = () => {
                                                             </Stack>
                                                         )}
                                                         <Stack direction="row" spacing={0.75} flexShrink={0} sx={{ ml: "auto" }}>
-                                                            <Button variant="contained" size="small"
-                                                                onClick={(e) => { e.stopPropagation(); navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`); }}
-                                                                sx={{
-                                                                    backgroundColor: BACK_GROUND_BUTTON_COLOR, borderRadius: 1.5, fontSize: "0.72rem",
-                                                                    px: 1.5, height: 30, textTransform: "none", fontWeight: 600
-                                                                }}>
-                                                                Ứng tuyển
-                                                            </Button>
-                                                            <IconButton size="small" color="primary"
-                                                                onClick={(e) => { e.stopPropagation(); }}
-                                                                sx={{ border: "1px solid", borderColor: "primary.light", borderRadius: 1.5, width: 30, height: 30 }}>
-                                                                <FavoriteBorder sx={{ fontSize: 16 }} />
-                                                            </IconButton>
+                                                            {!isAdminOrStaff && (
+                                                                <Button variant="contained" size="small"
+                                                                    onClick={(e) => { e.stopPropagation(); navigate(`/chuong-trinh-tuyen-sinh/${post.SeoUrl}`); }}
+                                                                    sx={{
+                                                                        backgroundColor: BACK_GROUND_BUTTON_COLOR, borderRadius: 1.5, fontSize: "0.72rem",
+                                                                        px: 1.5, height: 30, textTransform: "none", fontWeight: 600
+                                                                    }}>
+                                                                    Ứng tuyển
+                                                                </Button>
+                                                            )}
+                                                            {!isAdminOrStaff && (
+                                                                <IconButton size="small" color="primary"
+                                                                    onClick={(e) => { e.stopPropagation(); }}
+                                                                    sx={{ border: "1px solid", borderColor: "primary.light", borderRadius: 1.5, width: 30, height: 30 }}>
+                                                                    <FavoriteBorder sx={{ fontSize: 16 }} />
+                                                                </IconButton>
+                                                            )}
                                                         </Stack>
                                                     </Stack>
                                                 </Stack>

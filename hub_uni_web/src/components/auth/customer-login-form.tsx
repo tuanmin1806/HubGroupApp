@@ -1,14 +1,27 @@
-import { Box, Button, IconButton, InputAdornment, Link, Stack, TextField, Typography, Paper } from "@mui/material";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 import { useLocation, useNavigate } from "react-router-dom";
 import { requiredValidator, validate } from "../../app/services/validation.service";
 import { useCustomerLoginMutation } from "../../app/features/auth/auth.api";
 import { useState } from "react";
-import { Visibility, VisibilityOff, Login } from "@mui/icons-material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Login from "@mui/icons-material/Login";
 import LogoImage from "../../assets/hub_logo.png";
 import SelectRegisterType from "./select-register.page";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+import labelsVi from "../../i18n/labels.vi";
+
+const labels = labelsVi.customerLogin;
 
 const initialState = {
   UserName: "",
@@ -53,7 +66,7 @@ const CustomerLoginForm = () => {
 
     try {
       const data = await customerLogin(form).unwrap();
-      dispatch(showSnackbar({ message: "Đăng nhập thành công", severity: "success" }));
+      dispatch(showSnackbar({ message: labels.loginSuccess, severity: "success" }));
       const defaultPage = data?.Roles?.[0]?.DefaultPage;
 
       if (from) {
@@ -64,7 +77,7 @@ const CustomerLoginForm = () => {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      dispatch(showSnackbar({ message: "Không thể đăng nhập, vui lòng kiểm tra lại thông tin hoặc liên hệ với hỗ trợ kỹ thuật!", severity: "error" }));
+      dispatch(showSnackbar({ message: labels.loginFailed, severity: "error" }));
     }
   };
 
@@ -83,7 +96,7 @@ const CustomerLoginForm = () => {
         />
 
         {/* TITLE */}
-        <Typography variant="h5" fontWeight={700}> Đăng nhập </Typography>
+        <Typography variant="h5" fontWeight={700}> {labels.login} </Typography>
 
         {/* FORM */}
         <Box component="form" width="100%" onSubmit={handleSubmit}>
@@ -91,7 +104,7 @@ const CustomerLoginForm = () => {
             <TextField
               size="small"
               fullWidth
-              label="Tên đăng nhập"
+              label={labels.userName}
               value={form.UserName}
               onChange={handleChange("UserName")}
               error={!!errors.UserName}
@@ -101,7 +114,7 @@ const CustomerLoginForm = () => {
             <TextField
               fullWidth
               size="small"
-              label="Mật khẩu"
+              label={labels.password}
               value={form.Password}
               onChange={handleChange("Password")}
               error={!!errors.Password}
@@ -139,10 +152,10 @@ const CustomerLoginForm = () => {
                 backgroundColor: "#faa11b"
               }}
             >
-              Đăng nhập
+              {labels.login}
             </Button>
 
-            <Stack alignItems="center"><Link href="#!" underline="hover" variant="body2"> Quên mật khẩu? </Link></Stack>
+            <Stack alignItems="center"><Link href="#!" underline="hover" variant="body2"> {labels.forgotPassword} </Link></Stack>
 
             {/* REGISTER */}
             <Typography
@@ -150,12 +163,12 @@ const CustomerLoginForm = () => {
               textAlign="center"
               sx={{ color: "text.secondary", p: 1, cursor: "pointer" }}
             >
-              Chưa có tài khoản?
+              {labels.noAccount}
               <Link
                 sx={{ ml: 0.5, textDecoration: "none" }}
                 onClick={() => setLoginDialogOpen(true)}
               >
-                Đăng ký ngay
+                {labels.registerNow}
               </Link>
             </Typography>
           </Stack>

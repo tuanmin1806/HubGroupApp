@@ -25,6 +25,9 @@ import { getUserInfo } from "../../../app/services/auth.service";
 import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { AppDispatch } from "../../../app/store";
 import { useDispatch } from "react-redux";
+import labelsVi from "../../../i18n/labels.vi";
+
+const labels = labelsVi.applyConfirm;
 
 interface ApplyConfirmDialogProps {
     open: boolean;
@@ -63,7 +66,7 @@ const ApplyConfirmDialog = ({
 
         const userInfo = getUserInfo();
         if (!userInfo?.Id) {
-            setErrorMsg("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
+            setErrorMsg(labels.errorMsg);
             return;
         }
 
@@ -73,11 +76,11 @@ const ApplyConfirmDialog = ({
                 CustomerId: userInfo.Id,
                 RecruitmentPostId: recruitmentPostId,
             }).unwrap();
-            dispatch(showSnackbar({ message: "Ứng tuyển thành công", severity: "success" }));
+            dispatch(showSnackbar({ message: labels.applySuccess, severity: "success" }));
             handleClose();
             onSuccess?.();
         } catch (err: any) {
-            dispatch(showSnackbar({ message: "Ứng tuyển thất bại. Vui lòng thử lại sau.", severity: "error" }));
+            dispatch(showSnackbar({ message: labels.applyFailed, severity: "error" }));
         }
     };
 
@@ -123,7 +126,7 @@ const ApplyConfirmDialog = ({
                                 fontSize: "0.7rem",
                             }}
                         >
-                            Xác nhận ứng tuyển
+                            {labels.title}
                         </Typography>
                         <Typography
                             variant="h6"
@@ -194,17 +197,14 @@ const ApplyConfirmDialog = ({
                                     gutterBottom
                                     sx={{ fontSize: "0.85rem" }}
                                 >
-                                    Lưu ý quan trọng từ HubGroup
+                                    {labels.importantNote}
                                 </Typography>
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
                                     sx={{ lineHeight: 1.7, fontSize: "0.82rem" }}
                                 >
-                                    HubGroup khuyến cáo tất cả các bạn hãy luôn cẩn trọng trong quá
-                                    trình tìm chương trình tuyển sinh phù hợp và chủ động nghiên cứu về thông tin trường trước khi ứng tuyển, ứng viên cần có trách
-                                    nhiệm với hành vi ứng tuyển của mình. Nếu bạn gặp phải chương trình tuyển sinh hoặc nhận được liên lạc đáng ngờ của nhà trường hãy báo cáo ngay
-                                    HubGroup qua email {" "}
+                                    {labels.importantNoteContent}
                                     <Link
                                         href="mailto:contact@hubgroup.vn"
                                         sx={{
@@ -213,9 +213,9 @@ const ApplyConfirmDialog = ({
                                             textDecorationColor: "#ff5722",
                                         }}
                                     >
-                                        contact@hubgroup.vn
+                                        {labels.contactEmail}
                                     </Link>{" "}
-                                    để được hỗ trợ kịp thời.
+                                    {labels.importantNoteContent2}
                                 </Typography>
                             </Box>
                         </Stack>
@@ -240,7 +240,7 @@ const ApplyConfirmDialog = ({
                                     color="text.secondary"
                                     sx={{ fontSize: "0.85rem" }}
                                 >
-                                    Tôi đã đọc và đồng ý với{" "}
+                                    {labels.agreement}{" "}
                                     <Link
                                         href="https://hubgroup.vn/dieu-khoan-su-dung"
                                         target="_blank"
@@ -251,9 +251,9 @@ const ApplyConfirmDialog = ({
                                             textDecorationColor: "#ff5722",
                                         }}
                                     >
-                                        Thoả thuận sử dụng dữ liệu cá nhân
+                                        {labels.termsOfUse}
                                     </Link>{" "}
-                                    của HubGroup
+                                    {labels.ofHubGroup}
                                 </Typography>
                             }
                             sx={{ alignItems: "center" }}
@@ -286,7 +286,7 @@ const ApplyConfirmDialog = ({
                         },
                     }}
                 >
-                    Hủy bỏ
+                    {labels.cancel}
                 </Button>
                 <Button
                     variant="contained"
@@ -312,7 +312,7 @@ const ApplyConfirmDialog = ({
                         },
                     }}
                 >
-                    {isLoading ? "Đang xử lý..." : "Xác nhận ứng tuyển"}
+                    {isLoading ? labels.applying : labels.confirmApply}
                 </Button>
             </DialogActions>
         </Dialog>
