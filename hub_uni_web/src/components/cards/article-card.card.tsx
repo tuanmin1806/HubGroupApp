@@ -1,13 +1,11 @@
-import {
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Chip,
-  Stack,
-  Box,
-} from "@mui/material";
-import { CalendarToday } from "@mui/icons-material";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import CalendarToday from "@mui/icons-material/CalendarToday";
 import { ArticleResponse } from "../../app/models/article.model";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/date.utils";

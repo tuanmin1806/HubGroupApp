@@ -1,7 +1,14 @@
-import { Box, Card, Typography, Tooltip, Button, Chip } from "@mui/material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import { useNavigate } from "react-router-dom";
 import { OrganizationResponse } from "../../app/models/organization.model";
-import { Language, LocationOn, Visibility } from "@mui/icons-material";
+import Language from "@mui/icons-material/Language";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Visibility from "@mui/icons-material/Visibility";
 import defaultImage from "../../assets/default_organization_card.jpg"
 
 interface Props { organizations: OrganizationResponse[]; }

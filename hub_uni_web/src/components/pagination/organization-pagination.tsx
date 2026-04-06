@@ -1,5 +1,6 @@
-import { ArrowBackIosNew, ArrowForwardIos } from "@mui/icons-material";
 import { Box, IconButton, Typography } from "@mui/material";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIos from "@mui/icons-material/ArrowForwardIos";
 
 interface OrganizationPaginationProps {
     page: number;

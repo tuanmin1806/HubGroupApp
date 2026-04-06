@@ -668,7 +668,7 @@ const RecruitmentPostSearchPage = () => {
                                                                     {post.Name}
                                                                 </Typography>
                                                                 {post.IsTop && (
-                                                                    <Chip label="Nổi bật" size="small"
+                                                                    <Chip label="HOT" size="small"
                                                                         sx={{
                                                                             height: 20, fontSize: "0.62rem", fontWeight: 700, flexShrink: 0,
                                                                             alignSelf: "flex-start", bgcolor: "#f3522a", color: "#ffffff", border: "none"

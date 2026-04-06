@@ -26,6 +26,9 @@ import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
 import { AppDispatch } from "../../../app/store";
 import { useDispatch } from "react-redux";
 import labelsVi from "../../../i18n/labels.vi";
+import { Requirement } from "../../../app/models/recruitment-post.model";
+import { ConvertService } from "../../../app/services/convert.service";
+import { Cake, Wc, Work, School, AccessTime, RunningWithErrors, Flight } from "@mui/icons-material";
 
 const labels = labelsVi.applyConfirm;
 
@@ -37,6 +40,7 @@ interface ApplyConfirmDialogProps {
     organizationLogo?: string;
     jobTitle: string;
     recruitmentPostId: string;
+    requirement?: Requirement
 }
 
 const ApplyConfirmDialog = ({
@@ -47,6 +51,7 @@ const ApplyConfirmDialog = ({
     organizationLogo,
     jobTitle,
     recruitmentPostId,
+    requirement
 }: ApplyConfirmDialogProps) => {
     const [agreed, setAgreed] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
@@ -204,7 +209,7 @@ const ApplyConfirmDialog = ({
                                     color="text.secondary"
                                     sx={{ lineHeight: 1.7, fontSize: "0.82rem" }}
                                 >
-                                    {labels.importantNoteContent}
+                                    {labels.importantNoteContent}{" "}
                                     <Link
                                         href="mailto:contact@hubgroup.vn"
                                         sx={{
@@ -221,9 +226,182 @@ const ApplyConfirmDialog = ({
                         </Stack>
                     </Paper>
 
+                    {requirement && (
+                        <Box
+                            sx={{
+                                borderRadius: 2,
+                                border: "1px solid #e3f2fd",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    px: 2,
+                                    py: 1,
+                                    background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 60%, #42a5f5 100%)',
+                                }}
+                            >
+                                <Typography
+                                    variant="subtitle2"
+                                    fontWeight={700}
+                                    color="white"
+                                    sx={{ fontSize: "0.85rem" }}
+                                >
+                                    {labels.requirement}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ p: 1.5 }}>
+                                <Stack spacing={1}>
+                                    {(requirement.FromAge != null || requirement.ToAge != null) && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#fff3e0", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <Cake sx={{ fontSize: 16, color: "#ff5722" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.age}:{" "}
+                                                <b>
+                                                    {requirement.FromAge != null ? `Từ ${requirement.FromAge}` : ""}
+                                                    {requirement.FromAge != null && requirement.ToAge != null ? " " : ""}
+                                                    {requirement.ToAge != null ? `đến ${requirement.ToAge}` : ""}
+                                                    {(requirement.FromAge != null || requirement.ToAge != null) && " tuổi"}
+                                                </b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.Gender && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#e3f2fd", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <Wc sx={{ fontSize: 16, color: "#1976d2" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.gender}:{" "}
+                                                <b>
+                                                    {ConvertService.convertGender(
+                                                        ConvertService.convertGenderFromString(requirement.Gender)
+                                                    )}
+                                                </b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.Experience && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#e8f5e9", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <Work sx={{ fontSize: 16, color: "#388e3c" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.experience}:{" "}
+                                                <b>
+                                                    {ConvertService.convertJobExperience(
+                                                        ConvertService.convertJobExperienceFromString(requirement.Experience)
+                                                    )}
+                                                </b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.EducationLevel && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#f3e5f5", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <School sx={{ fontSize: 16, color: "#7b1fa2" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.educationLevel}:{" "}
+                                                <b>
+                                                    {ConvertService.convertEducationLevel(
+                                                        ConvertService.convertEducationLevelFromString(requirement.EducationLevel)
+                                                    )}
+                                                </b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.MinimumGpa != null && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#fff8e1", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <Typography sx={{ fontSize: 12, fontWeight: 800, color: "#f57c00" }}>
+                                                    {labels.gpa}
+                                                </Typography>
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.minimumGpa}: <b>{requirement.MinimumGpa}</b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.MaxYearsSinceGrad != null && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#e1f5fe", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <AccessTime sx={{ fontSize: 16, color: "#0288d1" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.maxYearsSinceGrad}: <b>{requirement.MaxYearsSinceGrad} năm</b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.MaxAbsence != null && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#ffebee", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <RunningWithErrors sx={{ fontSize: 16, color: "#c62828" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.maxAbsence}: <b>{requirement.MaxAbsence} buổi</b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+
+                                    {requirement.VisaType && (
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Box sx={{
+                                                width: 28, height: 28, borderRadius: 1,
+                                                bgcolor: "#fce4ec", display: "flex",
+                                                alignItems: "center", justifyContent: "center"
+                                            }}>
+                                                <Flight sx={{ fontSize: 16, color: "#d81b60" }} />
+                                            </Box>
+                                            <Typography variant="body2">
+                                                {labels.visaType}: <b>{requirement.VisaType}</b>
+                                            </Typography>
+                                        </Stack>
+                                    )}
+                                </Stack>
+                            </Box>
+                        </Box>
+                    )}
+
                     <Divider />
 
-                    {/* Agreement Checkbox */}
                     <Box>
                         <FormControlLabel
                             control={

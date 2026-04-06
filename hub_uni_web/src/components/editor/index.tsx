@@ -1,5 +1,7 @@
-import { Box } from "@mui/material";
-import Editor from "./editor";
+import { lazy } from "react";
+import Box from "@mui/material/Box";
+const Editor = lazy(() => import("./editor"));
+
 
 interface RichTextEditorProps {
   value?: string;
@@ -8,7 +10,7 @@ interface RichTextEditorProps {
 
 export default function RichTextEditorComponent({ value, onChange }: RichTextEditorProps) {
   return (
-    <Box sx={{maxWidth: '100%', margin: "0 auto" }}>
+    <Box sx={{ maxWidth: '100%', margin: "0 auto" }}>
       <Editor value={value} onChange={onChange} />
     </Box>
   );

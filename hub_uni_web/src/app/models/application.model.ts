@@ -30,6 +30,8 @@ export interface ApplicationResponse {
     ApplicationStatus: ApplicationStatus;
     CreatedAt: string;
     UpdatedAt: string;
+    CreatedBy: string;
+    UpdatedBy: string;
 }
 
 export interface UpdateApplicationRequest {

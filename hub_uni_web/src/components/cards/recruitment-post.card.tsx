@@ -1,7 +1,17 @@
-import { Box, Card, Typography, Button, Tooltip, Stack, Chip } from "@mui/material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
 import { useNavigate } from "react-router-dom";
 import { RecruitmentPostDetailResponse } from "../../app/models/recruitment-post.model";
-import { Send, Visibility, PeopleAlt, CalendarToday, LocationOn, AccessTime } from "@mui/icons-material";
+import Send from "@mui/icons-material/Send";
+import Visibility from "@mui/icons-material/Visibility";
+import PeopleAlt from "@mui/icons-material/PeopleAlt";
+import LocationOn from "@mui/icons-material/LocationOn";
+import AccessTime from "@mui/icons-material/AccessTime";
 import { formatDate } from "../../utils/date.utils";
 import { getRecruitmentStatus } from "../../utils/recruitment-post.utils";
 
@@ -44,7 +54,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                   right: 8,
                   bgcolor: "#f3522a",
                   color: "#fafafa",
-                  fontSize: "0.7rem",
+                  fontSize: "0.6rem",
                   fontWeight: 600,
                   px: 0.5,
                   py: 0.15,

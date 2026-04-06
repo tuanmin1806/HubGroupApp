@@ -1,5 +1,4 @@
-import { lazy, Suspense } from "react";
-import Loader from "../components/general/loader";
+import { lazy } from "react";
 const AdminDashboardPage = lazy(() => import("../pages/admin/admin-dashboard.page"))
 const ManageStaffAccountPage = lazy(() => import("../pages/admin/manage-customer.page"))
 const OrganizationInforPage = lazy(() => import("../pages/admin/organization-infor.page"))
@@ -13,11 +12,9 @@ const adminRoutes = [
     {
         index: true,
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute allowedAccountTypes={["Manager"]}>
-                    <AdminDashboardPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <AdminDashboardPage />
+            </ProtectedRoute>
         ),
     },
     {
@@ -25,11 +22,9 @@ const adminRoutes = [
             {
                 path: "manage-recruitment-post",
                 element: (
-                    <Suspense fallback={Loader}>
-                        <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
-                            <ManageRecruitmentPostPage />
-                        </ProtectedRoute>
-                    </Suspense>
+                    <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
+                        <ManageRecruitmentPostPage />
+                    </ProtectedRoute>
                 ),
             },
         ],
@@ -37,51 +32,41 @@ const adminRoutes = [
     {
         path: "organization-info",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute allowedAccountTypes={["Manager"]}>
-                    <OrganizationInforPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <OrganizationInforPage />
+            </ProtectedRoute>
         ),
     },
     {
         path: "personal-information",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute allowedAccountTypes={["Manager"]}>
-                    <PersonalInforPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <PersonalInforPage />
+            </ProtectedRoute>
         ),
     },
     {
         path: "manage-staff-account",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute permissionGroup="MANAGE_STAFF_ACCOUNT" allowedAccountTypes={["Manager"]}>
-                    <ManageStaffAccountPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute permissionGroup="MANAGE_STAFF_ACCOUNT" allowedAccountTypes={["Manager"]}>
+                <ManageStaffAccountPage />
+            </ProtectedRoute>
         ),
     },
     {
         path: "manage-application",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute allowedAccountTypes={["Manager"]}>
-                    <ManageApplicationPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute allowedAccountTypes={["Manager"]}>
+                <ManageApplicationPage />
+            </ProtectedRoute>
         ),
     },
     {
         path: "create-recruitment-post",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Manager"]}>
-                    <CreateRecruitmentPostPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Manager"]}>
+                <CreateRecruitmentPostPage />
+            </ProtectedRoute>
         ),
     },
 ]

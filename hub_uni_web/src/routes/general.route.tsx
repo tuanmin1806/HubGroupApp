@@ -10,49 +10,47 @@ const HomePage = lazy(() => import("../pages/general/home.page"));
 const AccountInfoPage = lazy(() => import("../pages/student/account-info.page"));
 
 import ProtectedRoute from "../components/protected-route";
-import { Suspense } from "react";
-import Loader from "../components/general/loader";
 
 const generalRoutes = [
     {
         path: '/',
-        element: (<Suspense fallback={Loader}><HomePage /></Suspense>),
+        element: (<HomePage />),
     },
     {
         path: 'sign-out',
-        element: (<Suspense fallback={Loader}><SignOutPage /></Suspense>),
+        element: (<SignOutPage />),
     },
     {
         path: '/chi-tiet-bai-viet',
-        element: (<Suspense fallback={Loader}><ArticleDetailPage /></Suspense>),
+        element: (<ArticleDetailPage />),
     },
     {
         path: '/bai-viet',
-        element: (<Suspense fallback={Loader}><ArticlePage /></Suspense>),
+        element: (<ArticlePage />),
     },
     {
         path: '/tim-kiem-truong',
-        element: (<Suspense fallback={Loader}><OrganizationSearchPage /></Suspense>),
+        element: (<OrganizationSearchPage />),
     },
     {
         path: '/thong-tin-truong/:seoUrl',
-        element: (<Suspense fallback={Loader}><OrganizationDetailPage /></Suspense>),
+        element: (<OrganizationDetailPage />),
     },
     {
         path: '/chuong-trinh-tuyen-sinh/:seoUrl',
-        element: (<Suspense fallback={Loader}><RecruitmentPostDetailPage /></Suspense>),
+        element: (<RecruitmentPostDetailPage />),
     },
     {
         path: "/bai-viet/:seo",
-        element: (<Suspense fallback={Loader}><ArticleDetailPage /></Suspense>),
+        element: (<ArticleDetailPage />),
     },
     {
         path: "/chuong-trinh-tuyen-sinh",
-        element: (<Suspense fallback={Loader}><RecruitmentPostSearchPage /></Suspense>),
+        element: (<RecruitmentPostSearchPage />),
     },
     {
         path: "thong-tin-tai-khoan",
-        element: (<Suspense fallback={Loader}><ProtectedRoute allowedAccountTypes={["Student"]}><AccountInfoPage /></ProtectedRoute></Suspense>),
+        element: (<ProtectedRoute allowedAccountTypes={["Student"]}><AccountInfoPage /></ProtectedRoute>),
     },
 ];
 

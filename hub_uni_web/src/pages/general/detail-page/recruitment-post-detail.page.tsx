@@ -731,6 +731,7 @@ const RecruitmentPostDetailPage = () => {
                 organizationLogo={recruitmentPost.Organization?.LogoFullUrl}
                 jobTitle={recruitmentPost.Name}
                 recruitmentPostId={recruitmentPost.Id}
+                requirement={recruitmentPost.Requirement}
             />
         </Box>
 

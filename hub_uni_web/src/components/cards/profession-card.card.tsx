@@ -1,7 +1,12 @@
 import React from "react";
 import { ProfessionResponse } from "../../app/models/profession.model";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Card, CardContent, Popover, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Popover from "@mui/material/Popover";
+import Typography from "@mui/material/Typography";
 
 interface Props {
   professions: ProfessionResponse[];

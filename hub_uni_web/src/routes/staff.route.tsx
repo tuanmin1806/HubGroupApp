@@ -1,5 +1,4 @@
-import { lazy, Suspense } from "react";
-import Loader from "../components/general/loader";
+import { lazy } from "react";
 const ProtectedRoute = lazy(() => import("../components/protected-route"))
 const CreateRecruitmentPostPage = lazy(() => import("../pages/admin/create-recruitment-post.page"))
 const ManageRecruitmentPostPage = lazy(() => import("../pages/admin/manage-recruitment-post.page"))
@@ -11,47 +10,37 @@ const staffRoutes = [
     {
         index: true,
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute allowedAccountTypes={["Collaborator"]}>
-                    <StaffDashboardPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute allowedAccountTypes={["Collaborator"]}>
+                <StaffDashboardPage />
+            </ProtectedRoute>
         ),
     },
     {
         path: "manage-recruitment-post",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
-                    <ManageRecruitmentPostPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute permissionGroup="MANAGE_RECRUITMENT_POST">
+                <ManageRecruitmentPostPage />
+            </ProtectedRoute>
         ),
     },
     {
         path: "organization-info",
         element: (
-            <Suspense fallback={Loader}>
-                <OrganizationInforPage />
-            </Suspense>
+            <OrganizationInforPage />
         ),
     },
     {
         path: "personal-information",
         element: (
-            <Suspense fallback={Loader}>
-                <PersonalInforPage />
-            </Suspense>
+            <PersonalInforPage />
         ),
     },
     {
         path: "create-recruitment-post",
         element: (
-            <Suspense fallback={Loader}>
-                <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Collaborator"]}>
-                    <CreateRecruitmentPostPage />
-                </ProtectedRoute>
-            </Suspense>
+            <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Collaborator"]}>
+                <CreateRecruitmentPostPage />
+            </ProtectedRoute>
         ),
     },
 ]

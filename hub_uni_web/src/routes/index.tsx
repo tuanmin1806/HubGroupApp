@@ -1,9 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import generalRoutes from "./general.route";
 import adminRoutes from "./admin.route";
 import staffRoutes from "./staff.route";
-import Loader from "../components/general/loader";
 const AuthLayout = lazy(() => import("../layouts/auth.layout"));
 const AdminLayout = lazy(() => import("../layouts/admin.layout"));
 const StaffLayout = lazy(() => import("../layouts/staff.layout"));
@@ -20,17 +19,13 @@ const router = createBrowserRouter(
         {
             path: "/unauthorized",
             element: (
-                <Suspense fallback={Loader}>
-                    <UnauthorizedPage />
-                </Suspense>
+                <UnauthorizedPage />
             ),
         },
         {
             path: "*",
             element: (
-                <Suspense fallback={Loader}>
-                    <NotFoundPage />
-                </Suspense>
+                <NotFoundPage />
             ),
         },
         {
@@ -39,25 +34,19 @@ const router = createBrowserRouter(
                 {
                     path: "dang-nhap",
                     element: (
-                        <Suspense fallback={Loader}>
-                            <CustomerLogin />
-                        </Suspense>
+                        <CustomerLogin />
                     ),
                 },
                 {
                     path: "dang-ky/customer",
                     element: (
-                        <Suspense fallback={Loader}>
-                            <StudentRegister />
-                        </Suspense>
+                        <StudentRegister />
                     ),
                 },
                 {
                     path: "dang-ky/admin",
                     element: (
-                        <Suspense fallback={Loader}>
-                            <AdminRegister />
-                        </Suspense>
+                        <AdminRegister />
                     ),
                 },
             ],

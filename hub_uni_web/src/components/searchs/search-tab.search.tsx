@@ -185,8 +185,8 @@ export default function ProfessionRecruitmentTabs() {
                                     <Stack direction="row" alignItems="center" spacing={0.5} mb={0.25}>
                                         {post.IsTop && (
                                             <Box component="span" sx={{
-                                                bgcolor: "#faa11b", color: "white",
-                                                fontSize: { xs: 7, sm: 8 }, fontWeight: 700,
+                                                bgcolor: "#f3522a", color: "white",
+                                                fontSize: { xs: 6, sm: 7 }, fontWeight: 700,
                                                 px: 0.3, py: 0.12, borderRadius: 0.8, flexShrink: 0,
                                                 animation: "hotShake 1.8s ease-in-out infinite",
                                                 "@keyframes hotShake": {
