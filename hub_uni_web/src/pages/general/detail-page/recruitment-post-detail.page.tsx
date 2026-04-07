@@ -56,6 +56,7 @@ const RequirementRow = ({ icon, label, value, color, }: { icon: React.ReactNode;
 
 const RecruitmentPostDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
+    const [showButton, setShowButton] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const checkAuth = useAuthGuard();
@@ -72,6 +73,14 @@ const RecruitmentPostDetailPage = () => {
 
     useEffect(() => { if (recruitmentPost?.Name) document.title = `${recruitmentPost?.Name} | duhochan.hubgroup.vn`; }, [recruitmentPost?.Name]);
     useEffect(() => { if (recruitmentPost?.IsSaved !== undefined) { setIsSaved(recruitmentPost.IsSaved); } }, [recruitmentPost?.IsSaved]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowButton(window.scrollY > 1000);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleSaveToggle = async () => {
         if (!checkAuth()) return;
@@ -733,8 +742,75 @@ const RecruitmentPostDetailPage = () => {
                 recruitmentPostId={recruitmentPost.Id}
                 requirement={recruitmentPost.Requirement}
             />
-        </Box>
+            {!isAdminOrStaff && showButton && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        bottom: { xs: 0, sm: 20 },
+                        left: { xs: 0, sm: "50%" },
+                        transform: { xs: "none", sm: "translateX(-50%)" },
+                        width: { xs: "100%", sm: "auto" },
+                        px: { xs: 2, sm: 0 },
+                        py: { xs: 1.5, sm: 0 },
+                        bgcolor: { xs: "rgba(255,255,255,0.95)", sm: "transparent" },
+                        backdropFilter: { xs: "blur(10px)", sm: "none" },
+                        borderTop: { xs: "1px solid #eee", sm: "none" },
+                        zIndex: 1300,
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Button
+                        fullWidth={true}
+                        variant="contained"
+                        onClick={handleApplyClick}
+                        disabled={isDeletingApply}
+                        startIcon={isDeletingApply ? <CircularProgress size={16} color="inherit" /> : recruitmentPost.Applied ? <CheckCircle /> : undefined}
+                        sx={{
+                            position: "relative",
+                            borderRadius: { xs: 2, sm: 10 },
+                            px: 3,
+                            py: 1,
+                            fontWeight: 700,
+                            fontSize: 15,
+                            color: "#fff",
 
+                            background: recruitmentPost.Applied ? "#9e9e9e" : "linear-gradient(45deg, #ff5722, #ff8a50)",
+
+                            boxShadow: recruitmentPost.Applied ? "none" : "0 0 0 rgba(255,87,34, 0.7)",
+
+                            animation: recruitmentPost.Applied ? "none" : "pulse 1.8s infinite",
+
+                            "&:hover": {
+                                background: recruitmentPost.Applied ? "#757575" : "linear-gradient(45deg, #e64a19, #ff7043)",
+                                transform: "translateY(-2px) scale(1.03)",
+                            },
+
+                            "@keyframes shake": {
+                                "0%": { transform: "translateX(0)" },
+                                "25%": { transform: "translateX(-2px)" },
+                                "50%": { transform: "translateX(2px)" },
+                                "75%": { transform: "translateX(-2px)" },
+                                "100%": { transform: "translateX(0)" },
+                            },
+
+                            "@keyframes pulse": {
+                                "0%": { boxShadow: "0 0 0 0 rgba(255,87,34, 0.7)", },
+                                "70%": { boxShadow: "0 0 0 12px rgba(255,87,34, 0)", },
+                                "100%": { boxShadow: "0 0 0 0 rgba(255,87,34, 0)", },
+                            },
+
+                            animationDelay: "0s, 1s",
+                            animationIterationCount: "1, infinite",
+                            animationName: recruitmentPost.Applied ? "none" : "shake, pulse",
+                            animationDuration: "0.4s, 1.2s",
+                        }}
+                    >
+                        {isDeletingApply ? "Đang xử lý..." : recruitmentPost.Applied ? "Đã ứng tuyển" : "Ứng tuyển ngay !"}
+                    </Button>
+                </Box>
+            )}
+        </Box>
     );
 }
 

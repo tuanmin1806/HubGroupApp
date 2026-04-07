@@ -2,6 +2,7 @@ import { lazy } from "react";
 import ChangeCircle from "@mui/icons-material/ChangeCircle";
 import Clear from "@mui/icons-material/Clear";
 import Delete from "@mui/icons-material/Delete";
+import ExpandIcon from '@mui/icons-material/Expand';
 import Search from "@mui/icons-material/Search";
 import Visibility from "@mui/icons-material/Visibility";
 import Grid from "@mui/material/Grid";
@@ -54,14 +55,7 @@ const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: str
     Undefined: { bgcolor: "#f5f5f5", color: "#757575", border: "#e0e0e0" },
 };
 
-function ApplicationRow({
-    application,
-    isDeleting,
-    deleteApplicationId,
-    onView,
-    onUpdate,
-    onDelete,
-}: any) {
+function ApplicationRow({ application, isDeleting, deleteApplicationId, onView, onUpdate, onDelete, }: any) {
     const [open, setOpen] = useState(false);
 
     const customer = application.Customer;
@@ -71,8 +65,16 @@ function ApplicationRow({
 
     return (
         <>
-            <TableRow hover>
-                <TableCell sx={{ width: 40, pl: 1 }}>
+            <TableRow sx={{
+                "&:hover": {
+                    backgroundColor: "#f5faff",
+                    transition: "0.2s",
+                },
+                "&:nth-of-type(even)": {
+                    backgroundColor: "#fafafa",
+                },
+            }}>
+                <TableCell align="center" sx={{ width: 40 }}>
                     <IconButton size="small" onClick={() => setOpen(!open)}>
                         {open ? <KeyboardArrowUp fontSize="small" /> : <KeyboardArrowDown fontSize="small" />}
                     </IconButton>
@@ -128,7 +130,10 @@ function ApplicationRow({
             </TableRow>
 
             <TableRow>
-                <TableCell colSpan={7} sx={{ py: 0 }}>
+                <TableCell colSpan={7} sx={{
+                    p: 0,
+                    borderBottom: "none",
+                }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
@@ -290,9 +295,18 @@ export default function ManageApplicationPage() {
 
     return (
         <>
-            <Grid container spacing={2}>
-                <Grid size={6}>
-                    <Paper sx={{ display: "flex", alignItems: "center" }}>
+            <Grid container spacing={2} alignItems="center" justifyContent="start">
+                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 8 }}>
+                    <Paper
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            px: 1,
+                            borderRadius: 2,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                            border: "1px solid #e0e0e0",
+                        }}
+                    >
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
                             placeholder={labels.searchApplication}
@@ -305,11 +319,27 @@ export default function ManageApplicationPage() {
                     </Paper>
                 </Grid>
                 <Grid size={12}>
-                    <TableContainer component={Paper} elevation={1}>
-                        <Table sx={{ minWidth: 650 }} size="small" aria-label="staff account table">
+                    <TableContainer
+                        component={Paper}
+                        sx={{
+                            borderRadius: 1,
+                            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                            overflow: "hidden",
+                            overflowX: "auto",
+                        }}
+                    >
+                        <Table sx={{ minWidth: 650 }} size="small" aria-label="recruitment post collapsible table">
                             <TableHead>
-                                <TableRow>
-                                    <TableCell />
+                                <TableRow sx={{
+                                    background: "linear-gradient(90deg, #3f88d1ff, #3f88d1ff)",
+                                    "& th": {
+                                        color: "#fff",
+                                        fontWeight: 500,
+                                        fontSize: 15,
+                                        borderBottom: "none",
+                                    },
+                                }}>
+                                    <TableCell align="center"> <ExpandIcon fontSize="small" /> </TableCell>
                                     <TableCell>{labels.fullName}</TableCell>
                                     <TableCell>{labels.gender}</TableCell>
                                     <TableCell>{labels.dateOfBirth}</TableCell>

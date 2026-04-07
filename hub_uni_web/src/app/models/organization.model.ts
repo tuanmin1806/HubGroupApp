@@ -121,7 +121,6 @@ export interface UpdateOrganizationLogoRequest {
 export interface OrganizationFilterParams {
     page?: number;
     size?: number;
-    nameSearch?: string;
     searchValue?: string;
     organizationTypeId?: string;
     professionId?: string;

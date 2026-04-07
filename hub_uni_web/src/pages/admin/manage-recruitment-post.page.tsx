@@ -1,6 +1,10 @@
 import * as React from "react";
 import { lazy, useState, useCallback } from "react";
 import Add from "@mui/icons-material/Add";
+import ExpandIcon from '@mui/icons-material/Expand';
+import People from '@mui/icons-material/People';
+import LocationOn from '@mui/icons-material/LocationOn';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Clear from "@mui/icons-material/Clear";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
@@ -39,7 +43,7 @@ import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { useRoutePrefix } from "../../hooks/useRoutePrefix";
 import { EducationLevel, Gender, JobExperience, RecruitPostStatus } from "../../app/models/enums.model";
-import { formatCurrency } from "../../utils/recruitment-post.utils";
+import { formatCurrency, formatNumberDisplay } from "../../utils/recruitment-post.utils";
 import labelsVi from "../../i18n/labels.vi";
 
 const UpdateRecruitmentPostDialog = lazy(() => import("../../components/dialogs/staff/update-recruitment-post.dialog"));
@@ -98,8 +102,16 @@ function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: P
 
     return (
         <React.Fragment>
-            <TableRow>
-                <TableCell sx={{ width: 40, pl: 1 }}>
+            <TableRow sx={{
+                "&:hover": {
+                    backgroundColor: "#f5faff",
+                    transition: "0.2s",
+                },
+                "&:nth-of-type(even)": {
+                    backgroundColor: "#fafafa",
+                },
+            }}>
+                <TableCell align="center" sx={{ width: 40 }}>
                     <IconButton size="small" onClick={() => setOpen(!open)} aria-label="expand row">
                         {open ? <KeyboardArrowUp fontSize="small" /> : <KeyboardArrowDown fontSize="small" />}
                     </IconButton>
@@ -107,46 +119,80 @@ function PostRow({ post, isDeleting, deletePostId, onView, onEdit, onDelete }: P
 
                 <TableCell>
                     <Box display="flex" alignItems="center" gap={0.5}>
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2">
                             {post.Name}
                         </Typography>
                     </Box>
                 </TableCell>
 
-                <TableCell>{post.Province ?? "—"}</TableCell>
-                <TableCell>{post.Quantity.toLocaleString("vi-VN")}</TableCell>
-                <TableCell>{formatDate(post.RecruitmentToDate)}</TableCell>
+                <TableCell>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <LocationOn sx={{ fontSize: 16, color: "#9e9e9e" }} />
+                        <Typography variant="body2">
+                            {post.Province ?? "—"}
+                        </Typography>
+                    </Stack>
+                </TableCell>
+
+                <TableCell>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <People sx={{ fontSize: 16, color: "#9e9e9e" }} />
+                        <Typography variant="body2">
+                            {formatNumberDisplay(post.Quantity)}
+                        </Typography>
+                    </Stack>
+                </TableCell>
+
+                <TableCell>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <AccessTimeIcon sx={{ fontSize: 16, color: "#9e9e9e" }} />
+                        <Typography variant="body2">
+                            {formatDate(post.RecruitmentToDate)}
+                        </Typography>
+                    </Stack>
+                </TableCell>
 
                 <TableCell>
                     <StatusChip status={post.RecruitPostStatus} />
                 </TableCell>
 
                 <TableCell align="center">
-                    <Tooltip title={labels.view}>
-                        <IconButton size="small" color="info" onClick={() => onView(post.Id)}>
-                            <Visibility fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={labels.update}>
-                        <IconButton size="small" color="primary" onClick={() => onEdit(post.Id)}>
-                            <Edit fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={labels.delete}>
-                        <IconButton
-                            size="small"
-                            color="error"
-                            disabled={isDeleting && deletePostId === post.Id}
-                            onClick={() => onDelete(post.Id)}
-                        >
-                            {isDeleting && deletePostId === post.Id ? <CircularProgress size={16} color="error" /> : <Delete fontSize="small" />}
-                        </IconButton>
-                    </Tooltip>
+                    <Stack direction="row" justifyContent="center" spacing={0.5}>
+                        <Tooltip title={labels.view}>
+                            <IconButton size="small" color="info" onClick={() => onView(post.Id)}>
+                                <Visibility fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title={labels.update}>
+                            <IconButton size="small" color="primary" onClick={() => onEdit(post.Id)}>
+                                <Edit fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title={labels.delete}>
+                            <IconButton
+                                size="small"
+                                color="error"
+                                disabled={isDeleting && deletePostId === post.Id}
+                                onClick={() => onDelete(post.Id)}
+                            >
+                                {isDeleting && deletePostId === post.Id ? (
+                                    <CircularProgress size={16} color="error" />
+                                ) : (
+                                    <Delete fontSize="small" />
+                                )}
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
                 </TableCell>
             </TableRow>
 
             <TableRow>
-                <TableCell colSpan={7} sx={{ py: 0 }}>
+                <TableCell colSpan={7} sx={{
+                    p: 0,
+                    borderBottom: "none",
+                }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
@@ -387,9 +433,18 @@ export default function ManageRecruitmentPostPage() {
 
     return (
         <>
-            <Grid container spacing={2}>
-                <Grid size={6}>
-                    <Paper sx={{ display: "flex", alignItems: "center" }}>
+            <Grid container spacing={2} alignItems="center" justifyContent="start">
+                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 8 }}>
+                    <Paper
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            px: 1,
+                            borderRadius: 2,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                            border: "1px solid #e0e0e0",
+                        }}
+                    >
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
                             placeholder={labels.searchRecruitmentPost}
@@ -397,21 +452,30 @@ export default function ManageRecruitmentPostPage() {
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         />
+
                         {inputValue && (
-                            <IconButton onClick={handleClearSearch} sx={{ p: "10px" }}>
+                            <IconButton onClick={handleClearSearch}>
                                 <Clear />
                             </IconButton>
                         )}
-                        <IconButton onClick={handleSearch} sx={{ p: "10px" }}>
+
+                        <IconButton onClick={handleSearch}>
                             <Search />
                         </IconButton>
                     </Paper>
                 </Grid>
 
-                <Grid size="auto">
+                <Grid size={{ xs: 12, sm: 4, md: 3, lg: "auto" }} sx={{ display: "flex", justifyContent: { xs: "stretch", sm: "flex-end" } }}>
                     <Button
                         variant="contained"
-                        color="primary"
+                        sx={{
+                            borderRadius: 2,
+                            textTransform: "none",
+                            backgroundColor: "#1975d1",
+                            px: 2,
+                            py: 1,
+                            whiteSpace: "nowrap",
+                        }}
                         startIcon={<Add />}
                         onClick={() => navigate(`${prefix}/create-recruitment-post`)}
                     >
@@ -420,11 +484,27 @@ export default function ManageRecruitmentPostPage() {
                 </Grid>
 
                 <Grid size={12}>
-                    <TableContainer component={Paper} elevation={1}>
+                    <TableContainer
+                        component={Paper}
+                        sx={{
+                            borderRadius: 1,
+                            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                            overflow: "hidden",
+                            overflowX: "auto",
+                        }}
+                    >
                         <Table sx={{ minWidth: 650 }} size="small" aria-label="recruitment post collapsible table">
                             <TableHead>
-                                <TableRow>
-                                    <TableCell />
+                                <TableRow sx={{
+                                    background: "linear-gradient(90deg, #3f88d1ff, #3f88d1ff)",
+                                    "& th": {
+                                        color: "#fff",
+                                        fontWeight: 500,
+                                        fontSize: 15,
+                                        borderBottom: "none",
+                                    },
+                                }}>
+                                    <TableCell align="center"> <ExpandIcon fontSize="small" /> </TableCell>
                                     <TableCell>{labels.recruitmentProgramName}</TableCell>
                                     <TableCell>{labels.province}</TableCell>
                                     <TableCell>{labels.quantity}</TableCell>

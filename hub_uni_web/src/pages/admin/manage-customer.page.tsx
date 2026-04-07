@@ -2,6 +2,7 @@ import * as React from "react";
 import { lazy, useState, useCallback } from "react";
 import Add from "@mui/icons-material/Add";
 import Clear from "@mui/icons-material/Clear";
+import ExpandIcon from '@mui/icons-material/Expand';
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import Search from "@mui/icons-material/Search";
@@ -81,8 +82,16 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
 
     return (
         <React.Fragment>
-            <TableRow hover sx={{ "& > *": { borderBottom: "unset" } }}>
-                <TableCell sx={{ width: 40, pl: 1 }}>
+            <TableRow sx={{
+                "&:hover": {
+                    backgroundColor: "#f5faff",
+                    transition: "0.2s",
+                },
+                "&:nth-of-type(even)": {
+                    backgroundColor: "#fafafa",
+                },
+            }}>
+                <TableCell align="center" sx={{ width: 40 }}>
                     <IconButton size="small" onClick={() => setOpen(!open)} aria-label="expand row">
                         {open ? <KeyboardArrowUp fontSize="small" /> : <KeyboardArrowDown fontSize="small" />}
                     </IconButton>
@@ -155,7 +164,10 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
             </TableRow>
 
             <TableRow>
-                <TableCell colSpan={7} sx={{ py: 0 }}>
+                <TableCell colSpan={7} sx={{
+                    p: 0,
+                    borderBottom: "none",
+                }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
@@ -189,14 +201,6 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
                                         size="small"
                                         color={getAccountTypeColor(accountType)}
                                         variant="outlined"
-                                    />
-                                </DetailField>
-                                <DetailField label={labels.accountStatus}>
-                                    <Chip
-                                        label={ConvertService.convertAccountStatus(accountStatus)}
-                                        size="small"
-                                        color={statusColor as any}
-                                        variant="filled"
                                     />
                                 </DetailField>
                             </Grid>
@@ -301,9 +305,18 @@ export default function ManageStaffAccountPage() {
 
     return (
         <>
-            <Grid container spacing={2}>
-                <Grid size={6}>
-                    <Paper sx={{ display: "flex", alignItems: "center" }}>
+            <Grid container spacing={2} alignItems="center" justifyContent="start">
+                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 8 }}>
+                    <Paper
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            px: 1,
+                            borderRadius: 2,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                            border: "1px solid #e0e0e0",
+                        }}
+                    >
                         <InputBase
                             sx={{ ml: 1, flex: 1 }}
                             placeholder={labels.searchCustomer}
@@ -322,18 +335,46 @@ export default function ManageStaffAccountPage() {
                     </Paper>
                 </Grid>
 
-                <Grid size="auto">
-                    <Button variant="contained" color="primary" startIcon={<Add />} onClick={() => setOpenDialog(true)}>
+                <Grid size={{ xs: 12, sm: 4, md: 3, lg: "auto" }} sx={{ display: "flex", justifyContent: { xs: "stretch", sm: "flex-end" } }}>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            borderRadius: 2,
+                            textTransform: "none",
+                            backgroundColor: "#1975d1",
+                            px: 2,
+                            py: 1,
+                            whiteSpace: "nowrap",
+                        }}
+                        startIcon={<Add />}
+                        onClick={() => setOpenDialog(true)}
+                    >
                         {labels.addCustomer}
                     </Button>
                 </Grid>
 
                 <Grid size={12}>
-                    <TableContainer component={Paper} elevation={1}>
+                    <TableContainer
+                        component={Paper}
+                        sx={{
+                            borderRadius: 1,
+                            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                            overflow: "hidden",
+                            overflowX: "auto",
+                        }}
+                    >
                         <Table sx={{ minWidth: 650 }} size="small" aria-label="staff account collapsible table">
                             <TableHead>
-                                <TableRow>
-                                    <TableCell />
+                                <TableRow sx={{
+                                    background: "linear-gradient(90deg, #3f88d1ff, #3f88d1ff)",
+                                    "& th": {
+                                        color: "#fff",
+                                        fontWeight: 500,
+                                        fontSize: 15,
+                                        borderBottom: "none",
+                                    },
+                                }}>
+                                    <TableCell align="center"> <ExpandIcon fontSize="small" /> </TableCell>
                                     <TableCell>{labels.fullName}</TableCell>
                                     <TableCell>{labels.email}</TableCell>
                                     <TableCell>{labels.phoneNumber}</TableCell>
