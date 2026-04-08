@@ -98,23 +98,32 @@ export default function ProfessionRecruitmentTabs() {
                                 height: { xs: "100%", sm: "auto" },
                                 display: "flex",
                                 alignItems: "center",
-                                whiteSpace: "nowrap",
                                 flexShrink: 0,
-                                fontSize: { xs: 11, sm: 12, md: 13 },
+                                minWidth: 0,
+                                cursor: "pointer",
+                                transition: "all 0.15s",
                                 fontWeight: selected === i ? 700 : 500,
-                                color: selected === i ? "#faa11b" : "text.secondary",
+                                color: selected === i ? "#faa11b" : "text.primary",
                                 bgcolor: selected === i ? "#fff8e1" : "transparent",
                                 borderLeft: { xs: "none", sm: "3px solid" },
                                 borderBottom: { xs: "2px solid", sm: "none" },
                                 borderLeftColor: { sm: selected === i ? "#faa11b" : "transparent" },
                                 borderBottomColor: { xs: selected === i ? "#faa11b" : "transparent" },
-                                cursor: "pointer",
-                                transition: "all 0.15s",
-                                lineHeight: 1.4,
                                 "&:hover": { bgcolor: "#fff8e1", color: "#faa11b" },
                             }}
                         >
-                            {p.Name}
+                            <Typography
+                                sx={{
+                                    fontSize: { xs: 11, sm: 12, md: 13 },
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    width: "100%",
+                                    minWidth: 0,
+                                }}
+                            >
+                                {p.Name}
+                            </Typography>
                         </Box>
                     ))
                 )}

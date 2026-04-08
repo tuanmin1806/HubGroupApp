@@ -108,6 +108,7 @@ const labelsVi = {
         createFailed: "Thêm chương trình tuyển sinh thất bại. Vui lòng thử lại!",
         editRecruitmentPost: "Chỉnh sửa chương trình tuyển sinh",
         selectProfessionPlaceholder: "Chọn ngành nghề...",
+        rowsPerPage: "Số hàng mỗi trang",
     },
     application: {
         viewApplicationDetail: "Xem chi tiết ứng viên",
@@ -121,6 +122,7 @@ const labelsVi = {
         applicationStatus: "Trạng thái ứng viên",
         email: "Email",
         phoneNumber: "Số điện thoại",
+        rowsPerPage: "Số hàng mỗi trang",
         address: "Địa chỉ",
         recruitmentProgram: "Chương trình tuyển sinh",
         deleteSuccess: "Xóa ứng viên thành công!",
@@ -189,6 +191,7 @@ const labelsVi = {
         searchCustomer: "Tìm kiếm nhân viên",
         addCustomer: "Thêm",
         status: "Trạng thái",
+        rowsPerPage: "Số hàng mỗi trang",
         utility: "Tác vụ",
         confirmDelete: "Xác nhận xóa",
         confirmDeleteMessage: "Bạn có chắc chắn muốn xóa tài khoản nhân viên này không? Hành động này không thể hoàn tác.",

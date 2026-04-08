@@ -62,3 +62,52 @@ export const adminFieldSx: SxProps<Theme> = {
         mt: "3px",
     },
 };
+
+export const commonTextFieldSx = {
+    "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        backgroundColor: "#ffffffff",
+        transition: "all 0.2s ease",
+
+        "& fieldset": {
+            borderColor: "#e0e0e0",
+        },
+        "&:hover fieldset": {
+            borderColor: "#90caf9",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#1976d2",
+            borderWidth: "1.5px",
+        },
+    },
+};
+
+export const commonSelectSx = {
+    borderRadius: 2,
+    backgroundColor: "#ffffffff",
+    "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#e0e0e0",
+    },
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#90caf9",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#1976d2",
+    },
+};
+
+export const commonAutocompleteSx = {
+    "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        backgroundColor: "#ffffffff",
+        "& fieldset": {
+            borderColor: "#e0e0e0",
+        },
+        "&:hover fieldset": {
+            borderColor: "#90caf9",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#1976d2",
+        },
+    },
+};

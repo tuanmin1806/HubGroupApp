@@ -135,7 +135,17 @@ function ApplicationRow({ application, isDeleting, deleteApplicationId, onView, 
                     borderBottom: "none",
                 }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
+                        <Box
+                            sx={{
+                                px: 3,
+                                py: 2,
+                                borderRadius: 1,
+                                background: "linear-gradient(180deg, #f3f7fcff 0%, #ffffff 100%)",
+                                border: "1px solid #e3f2fd",
+                                boxShadow: "0 2px 8px rgba(25, 117, 209, 0.08)",
+                                transition: "all 0.25s ease",
+                            }}
+                        >
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                                 {labels.applicationInfo}
                             </Typography>
@@ -355,6 +365,7 @@ export default function ManageApplicationPage() {
                             count={data?.Total ?? 0}
                             page={page}
                             rowsPerPage={rowsPerPage}
+                            labelRowsPerPage={labels.rowsPerPage}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             rowsPerPageOptions={[5, 10, 25, 50]}

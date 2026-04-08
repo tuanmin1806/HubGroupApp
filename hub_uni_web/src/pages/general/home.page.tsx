@@ -6,10 +6,13 @@ import Container from "@mui/material/Container";
 const RecruitmentPostComponent = lazy(() => import("../../components/general/homepage/recruitment-post.component"));
 const OrganizationComponent = lazy(() => import("../../components/general/homepage/organization.component"));
 const ArticleComponent = lazy(() => import("../../components/general/homepage/article.component"));
+const ProfessionComponent = lazy(() => import("../../components/general/homepage/profession.component"));
 const SearchBar = lazy(() => import("../../components/searchs/search-bar.search"));
 const SearchTabs = lazy(() => import("../../components/searchs/search-tab.search"));
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import OrganizationTypeComponent from "../../components/general/homepage/organization-type.component";
+import DashboardComponent from "../../components/general/homepage/dashboard.component";
 
 const theme = createTheme({
     palette: {
@@ -99,7 +102,16 @@ const HomePage = () => {
                     <RecruitmentPostComponent />
                 </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <OrganizationTypeComponent />
+                </Box>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <OrganizationComponent />
+                </Box>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <ProfessionComponent />
+                </Box>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <DashboardComponent />
                 </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <ArticleComponent />

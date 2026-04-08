@@ -169,7 +169,17 @@ function StaffRow({ staff, isDeleting, deleteCustomerId, onEdit, onDelete }: Sta
                     borderBottom: "none",
                 }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ px: 3, py: 2, bgcolor: "action.hover", borderRadius: 1 }}>
+                        <Box
+                            sx={{
+                                px: 3,
+                                py: 2,
+                                borderRadius: 1,
+                                background: "linear-gradient(180deg, #f3f7fcff 0%, #ffffff 100%)",
+                                border: "1px solid #e3f2fd",
+                                boxShadow: "0 2px 8px rgba(25, 117, 209, 0.08)",
+                                transition: "all 0.25s ease",
+                            }}
+                        >
                             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                                 {labels.customerDetail}
                             </Typography>
@@ -394,6 +404,7 @@ export default function ManageStaffAccountPage() {
                             page={page}
                             rowsPerPage={rowsPerPage}
                             onPageChange={handlePageChange}
+                            labelRowsPerPage={labels.rowsPerPage}
                             onRowsPerPageChange={handleRowsPerPageChange}
                             rowsPerPageOptions={[5, 10, 25, 50]}
                             sx={{ "& .MuiTablePagination-actions button": { color: "inherit" }, "& .MuiSvgIcon-root": { fontSize: 20 } }}

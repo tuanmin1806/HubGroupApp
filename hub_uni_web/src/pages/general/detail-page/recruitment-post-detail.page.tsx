@@ -10,6 +10,7 @@ import Work from "@mui/icons-material/Work";
 import AttachMoney from "@mui/icons-material/AttachMoney";
 import School from "@mui/icons-material/School";
 import Cake from "@mui/icons-material/Cake";
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import Wc from "@mui/icons-material/Wc";
 import Business from "@mui/icons-material/Business";
 import CheckCircle from "@mui/icons-material/CheckCircle";
@@ -104,17 +105,8 @@ const RecruitmentPostDetailPage = () => {
 
     const handleApplyClick = async () => {
         if (!checkAuth()) return;
-
-        try {
-            if (recruitmentPost?.Applied) {
-                await deleteApplication(recruitmentPost?.ApplicationId || "").unwrap();
-                dispatch(showSnackbar({ message: "Đã hủy ứng tuyển!", severity: "success" }));
-            } else {
-                setApplyDialogOpen(true);
-            }
-        } catch (err) {
-            dispatch(showSnackbar({ message: "Hủy ứng tuyển thất bại, vui lòng thử lại!", severity: "error" }));
-        }
+        if (recruitmentPost?.Applied) return;
+        setApplyDialogOpen(true);
     };
 
     if (isLoading) {
@@ -364,7 +356,7 @@ const RecruitmentPostDetailPage = () => {
 
                                     <Stack
                                         direction={{ xs: 'column', sm: 'row' }}
-                                        spacing={1.5}
+                                        spacing={1}
                                         justifyContent="left"
                                     >
                                         {!isAdminOrStaff && (
@@ -372,20 +364,20 @@ const RecruitmentPostDetailPage = () => {
                                                 variant="contained"
                                                 size="small"
                                                 onClick={handleApplyClick}
-                                                disabled={isDeletingApply}
-                                                startIcon={isDeletingApply ? <CircularProgress size={16} color="inherit" /> : recruitmentPost.Applied ? <CheckCircle sx={{ fontSize: 16 }} /> : undefined}
+                                                disabled={recruitmentPost.Applied}
+                                                startIcon={recruitmentPost.Applied ? <CheckCircle sx={{ fontSize: 18 }} /> : <BookmarkAddIcon sx={{ fontSize: 18 }} />}
                                                 sx={{
                                                     fontWeight: 600,
                                                     fontSize: 12,
                                                     px: 2,
-                                                    py: 0.5,
+                                                    py: 1,
                                                     bgcolor: recruitmentPost.Applied ? '#9e9e9e' : '#ff5722',
                                                     color: 'white',
                                                     cursor: isDeletingApply ? 'not-allowed' : 'pointer',
                                                     '&:hover': { bgcolor: recruitmentPost.Applied ? '#757575' : '#e64a19', transform: 'translateY(-2px)' }
                                                 }}
                                             >
-                                                {isDeletingApply ? 'Đang hủy...' : recruitmentPost.Applied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
+                                                {recruitmentPost.Applied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
                                             </Button>
                                         )}
                                         {!isAdminOrStaff && (
@@ -397,8 +389,8 @@ const RecruitmentPostDetailPage = () => {
                                                 disabled={isSaving || isDeleting}
                                                 sx={{
                                                     fontWeight: 600,
-                                                    px: 2,
-                                                    py: 0.5,
+                                                    px: 1,
+                                                    py: 1,
                                                     fontSize: 12,
                                                     transition: 'all 0.25s ease',
                                                     ...(isSaved ? { bgcolor: '#ff5722', borderColor: '#ff5722', color: 'white', '&:hover': { bgcolor: '#ff3c00ff', borderColor: '#ff3c00ff', color: 'white', }, } : { borderColor: '#ff5722', color: '#ff5722', '&:hover': { bgcolor: '#ff5722', color: 'white', }, }),
@@ -418,8 +410,8 @@ const RecruitmentPostDetailPage = () => {
                                                 color: '#ff5722',
                                                 fontWeight: 600,
                                                 fontSize: 12,
-                                                px: 2,
-                                                py: 0.5,
+                                                px: 1,
+                                                py: 1,
                                                 '&:hover': { bgcolor: '#ff5722', color: 'white' }
                                             }}
                                         >
@@ -764,8 +756,8 @@ const RecruitmentPostDetailPage = () => {
                         fullWidth={true}
                         variant="contained"
                         onClick={handleApplyClick}
-                        disabled={isDeletingApply}
-                        startIcon={isDeletingApply ? <CircularProgress size={16} color="inherit" /> : recruitmentPost.Applied ? <CheckCircle /> : undefined}
+                        disabled={recruitmentPost.Applied}
+                        startIcon={recruitmentPost.Applied ? <CheckCircle sx={{ fontSize: 16 }} /> : <BookmarkAddIcon sx={{ fontSize: 16 }} />}
                         sx={{
                             position: "relative",
                             borderRadius: { xs: 2, sm: 10 },
@@ -774,11 +766,8 @@ const RecruitmentPostDetailPage = () => {
                             fontWeight: 700,
                             fontSize: 15,
                             color: "#fff",
-
                             background: recruitmentPost.Applied ? "#9e9e9e" : "linear-gradient(45deg, #ff5722, #ff8a50)",
-
                             boxShadow: recruitmentPost.Applied ? "none" : "0 0 0 rgba(255,87,34, 0.7)",
-
                             animation: recruitmentPost.Applied ? "none" : "pulse 1.8s infinite",
 
                             "&:hover": {

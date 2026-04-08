@@ -33,6 +33,7 @@ import labelsVi from "../../i18n/labels.vi";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+import { commonAutocompleteSx, commonSelectSx, commonTextFieldSx } from "../../styles/fieldSx";
 const RichTextEditorComponent = lazy(() => import("../../components/editor"));
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
@@ -149,25 +150,29 @@ export default function CreateRecruitmentPostPage() {
     };
 
     const selectedVisaType = visaTypeOptions.find(v => v.value === requirement.VisaTypeId) ?? null;
-    const sectionLabelSx = { fontSize: "1rem", fontWeight: 700, color: "text.secondary", mb: 1 };
+    const sectionLabelSx = { fontSize: "1rem", fontWeight: 700, color: "text.secondary" };
 
     return (
         <Box>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 1 }}>
-                <Typography variant="h5" fontWeight={600}>{labels.addRecruitmentPost}</Typography>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h5" fontWeight={600}>
+                    {labels.addRecruitmentPost}
+                </Typography>
             </Box>
 
-            <Grid container spacing={2}>
-                <Grid size={12}>
+            <Grid>
+                <Grid size={12} mb={1}>
                     <Paper elevation={1} sx={{ p: 2 }}>
-                        <Grid container spacing={2.5}>
+                        <Grid container spacing={2}>
 
                             <Grid size={12}><Typography sx={sectionLabelSx}>{labels.basicInfo}</Typography></Grid>
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<>{labels.recruitmentProgramName} <RequiredStar /></>}
-                                    fullWidth size="small"
+                                    fullWidth
+                                    size="small"
+                                    sx={commonTextFieldSx}
                                     value={form.Name} onChange={e => handleChange("Name", e.target.value)}
                                     error={!!errors.Name} helperText={errors.Name}
                                 />
@@ -176,7 +181,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth size="small" error={!!errors.ProvinceId}>
                                     <InputLabel>{<> {labels.province} <RequiredStar /></>}</InputLabel>
-                                    <Select value={form.ProvinceId} label={<> {labels.province} <RequiredStar /></>}
+                                    <Select value={form.ProvinceId} sx={commonSelectSx} label={<> {labels.province} <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent) => handleChange("ProvinceId", e.target.value)}>
                                         {provincesLoading
                                             ? <MenuItem disabled><CircularProgress size={16} /></MenuItem>
@@ -188,6 +193,7 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <Autocomplete
+                                    sx={commonAutocompleteSx}
                                     multiple
                                     options={professionOptions}
                                     getOptionLabel={(option) => option.Name}
@@ -228,7 +234,10 @@ export default function CreateRecruitmentPostPage() {
 
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
-                                    label={<>{labels.quantity} <RequiredStar /></>} fullWidth type="number" size="small"
+                                    sx={commonTextFieldSx}
+                                    fullWidth
+                                    size="small"
+                                    label={<>{labels.quantity} <RequiredStar /></>} type="number"
                                     value={form.Quantity} onChange={e => handleChange("Quantity", parseInt(e.target.value) || null)}
                                     error={!!errors.Quantity} helperText={errors.Quantity}
                                 />
@@ -237,6 +246,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<>{labels.recruitmentFromDate} <RequiredStar /></>} fullWidth type="date" size="small"
+                                    sx={commonTextFieldSx}
                                     value={form.RecruitmentFromDate ?? ""}
                                     onChange={e => handleChange("RecruitmentFromDate", e.target.value || null)}
                                     slotProps={{ inputLabel: { shrink: true } }}
@@ -246,6 +256,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<>{labels.recruitmentToDate} <RequiredStar /></>} fullWidth type="date" size="small"
+                                    sx={commonTextFieldSx}
                                     value={form.RecruitmentToDate ?? ""}
                                     onChange={e => handleChange("RecruitmentToDate", e.target.value || null)}
                                     error={!!errors.RecruitmentToDate} helperText={errors.RecruitmentToDate}
@@ -258,6 +269,7 @@ export default function CreateRecruitmentPostPage() {
                                     <InputLabel>{<> {labels.status} <RequiredStar /></>}</InputLabel>
                                     <Select
                                         value={form.RecruitPostStatus ?? RecruitPostStatus.Inactive}
+                                        sx={commonSelectSx}
                                         label={<> {labels.status} <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent<number>) => handleChange("RecruitPostStatus", e.target.value as RecruitPostStatus)}
                                     >
@@ -271,6 +283,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<>{labels.fromAge} <RequiredStar /></>} fullWidth type="number" size="small"
+                                    sx={commonTextFieldSx}
                                     value={requirement.FromAge ?? ""}
                                     onChange={e => handleRequirementChange("FromAge", e.target.value ? parseInt(e.target.value) : undefined)}
                                     inputProps={{ min: 0 }}
@@ -280,6 +293,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<>{labels.toAge} <RequiredStar /></>} fullWidth type="number" size="small"
+                                    sx={commonTextFieldSx}
                                     value={requirement.ToAge ?? ""}
                                     onChange={e => handleRequirementChange("ToAge", e.target.value ? parseInt(e.target.value) : undefined)}
                                     inputProps={{ min: 0 }}
@@ -289,7 +303,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel>{<> {labels.gender} <RequiredStar /></>}</InputLabel>
-                                    <Select value={requirement.Gender ?? Gender.Undefined} label={<> {labels.gender} <RequiredStar /></>}
+                                    <Select value={requirement.Gender ?? Gender.Undefined} sx={commonSelectSx} label={<> {labels.gender} <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent<number>) => handleRequirementChange("Gender", Number(e.target.value))}>
                                         {Object.values(Gender).filter(v => typeof v === "number").map(g => (
                                             <MenuItem key={g} value={g}>{ConvertService.convertGender(g as Gender)}</MenuItem>
@@ -301,7 +315,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel>{<> {labels.experience} <RequiredStar /></>}</InputLabel>
-                                    <Select value={requirement.Experience ?? JobExperience.Undefined} label={<> {labels.experience} <RequiredStar /></>}
+                                    <Select value={requirement.Experience ?? JobExperience.Undefined} sx={commonSelectSx} label={<> {labels.experience} <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent<number>) => handleRequirementChange("Experience", Number(e.target.value))}>
                                         {Object.values(JobExperience).filter(v => typeof v === "number").map(exp => (
                                             <MenuItem key={exp} value={exp}>{ConvertService.convertJobExperience(exp as JobExperience)}</MenuItem>
@@ -313,7 +327,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel>{<> {labels.educationLevel} <RequiredStar /></>}</InputLabel>
-                                    <Select value={requirement.EducationLevel ?? EducationLevel.Undefined} label={<> {labels.educationLevel} <RequiredStar /></>}
+                                    <Select value={requirement.EducationLevel ?? EducationLevel.Undefined} sx={commonSelectSx} label={<> {labels.educationLevel} <RequiredStar /></>}
                                         onChange={(e: SelectChangeEvent<number>) => handleRequirementChange("EducationLevel", Number(e.target.value))}>
                                         {Object.values(EducationLevel).filter(v => typeof v === "number").map(edu => (
                                             <MenuItem key={edu} value={edu}>{ConvertService.convertEducationLevel(edu as EducationLevel)}</MenuItem>
@@ -325,6 +339,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<> {labels.minimumGpa} <RequiredStar /></>} fullWidth type="number" size="small"
+                                    sx={commonTextFieldSx}
                                     value={requirement.MinimumGpa ?? ""}
                                     onChange={e => handleRequirementChange("MinimumGpa", e.target.value ? Number(e.target.value) : undefined)}
                                     inputProps={{ min: 0, step: 0.1 }}
@@ -334,6 +349,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<> {labels.maxYearsSinceGrad} <RequiredStar /></>} fullWidth type="number" size="small"
+                                    sx={commonTextFieldSx}
                                     value={requirement.MaxYearsSinceGrad ?? ""}
                                     onChange={e => handleRequirementChange("MaxYearsSinceGrad", e.target.value ? Number(e.target.value) : undefined)}
                                     inputProps={{ min: 0 }}
@@ -343,6 +359,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     label={<> {labels.maxAbsence} <RequiredStar /></>} fullWidth type="number" size="small"
+                                    sx={commonTextFieldSx}
                                     value={requirement.MaxAbsence ?? ""}
                                     onChange={e => handleRequirementChange("MaxAbsence", e.target.value ? Number(e.target.value) : undefined)}
                                     inputProps={{ min: 0 }}
@@ -352,6 +369,7 @@ export default function CreateRecruitmentPostPage() {
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <Autocomplete
                                     fullWidth size="small"
+                                    sx={commonAutocompleteSx}
                                     options={visaTypeOptions}
                                     getOptionLabel={(opt) => opt.label}
                                     isOptionEqualToValue={(opt, val) => opt.value === val?.value}
@@ -371,7 +389,7 @@ export default function CreateRecruitmentPostPage() {
                                 )}
                                 {requirement.OtherReqs.map((req, i) => (
                                     <Box key={i} sx={{ display: "flex", gap: 1, mb: 1 }}>
-                                        <TextField fullWidth size="small" placeholder={`Yêu cầu ${i + 1}`} value={req} onChange={e => handleOtherReqChange(i, e.target.value)} />
+                                        <TextField fullWidth size="small" sx={commonTextFieldSx} placeholder={`Yêu cầu ${i + 1}`} value={req} onChange={e => handleOtherReqChange(i, e.target.value)} />
                                         <IconButton size="small" color="error" onClick={() => handleRemoveOtherReq(i)}>
                                             <Remove fontSize="small" />
                                         </IconButton>
@@ -385,7 +403,8 @@ export default function CreateRecruitmentPostPage() {
                                 <Box sx={{ display: "flex", gap: 1 }}>
                                     <TextField
                                         label={labels.addHighlight}
-                                        value={highlightInput} size="small" sx={{ flex: 1 }}
+                                        sx={{ ...commonTextFieldSx, flex: 1 }}
+                                        value={highlightInput} size="small"
                                         placeholder={labels.addHighlightPlaceholder}
                                         onChange={e => setHighlightInput(e.target.value)}
                                         onKeyDown={e => e.key === "Enter" && handleAddHighlight()}
@@ -419,7 +438,7 @@ export default function CreateRecruitmentPostPage() {
                 </Grid>
 
                 <Grid size={12}>
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
                         <Button variant="outlined" onClick={() => navigate("/staff/manage-recruitment-post")}>{labels.cancel}</Button>
                         <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isSubmitting || isSaveDisabled()}
                             startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <Save />}>

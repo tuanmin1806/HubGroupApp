@@ -161,12 +161,12 @@ function CustomToolbarAccount() {
                 onClose={handleClose}
             >
                 <MenuItem onClick={handleClose}>
-                    <AccountCircle sx={{ mr: 1 }} />
-                    <Typography>{labels.sidebar.personalInformation}</Typography>
+                    <AccountCircle sx={{ mr: 1, fontWeight: 600, fontSize: 20 }} />
+                    <Typography fontWeight={600}>{labels.sidebar.personalInformation}</Typography>
                 </MenuItem>
                 <MenuItem onClick={handleSignOut}>
-                    <Logout sx={{ mr: 1, color: "error.main" }} />
-                    <Typography color="error.main">{labels.sidebar.logout}</Typography>
+                    <Logout sx={{ mr: 1, color: "red", fontWeight: 600, fontSize: 20 }} />
+                    <Typography color="red" fontWeight={600}>{labels.sidebar.logout}</Typography>
                 </MenuItem>
             </Menu>
         </Box>
