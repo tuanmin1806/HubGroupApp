@@ -9,10 +9,11 @@ const ArticleComponent = lazy(() => import("../../components/general/homepage/ar
 const ProfessionComponent = lazy(() => import("../../components/general/homepage/profession.component"));
 const SearchBar = lazy(() => import("../../components/searchs/search-bar.search"));
 const SearchTabs = lazy(() => import("../../components/searchs/search-tab.search"));
+const CampaignHighlight = lazy(() => import("../../components/general/homepage/highlight-campaign.component"));
+const OrganizationTypeComponent = lazy(() => import("../../components/general/homepage/organization-type.component"));
+const DashboardComponent = lazy(() => import("../../components/general/homepage/dashboard.component"));
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import OrganizationTypeComponent from "../../components/general/homepage/organization-type.component";
-import DashboardComponent from "../../components/general/homepage/dashboard.component";
 
 const theme = createTheme({
     palette: {
@@ -97,7 +98,10 @@ const HomePage = () => {
                 </Container>
             </Box>
 
-            <Container maxWidth="xl" sx={{ py: { xs: 1, sm: 2 } }}>
+            <Container maxWidth="xl">
+                <Box>
+                    <CampaignHighlight />
+                </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <RecruitmentPostComponent />
                 </Box>

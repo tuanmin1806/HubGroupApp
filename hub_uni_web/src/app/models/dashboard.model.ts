@@ -11,3 +11,16 @@ export interface DashboardModel {
     StudentFailCount: number;
     StudentByRecruitPost: StudentByRecruitPost[];
 }
+
+export interface ApplicationByMonth {
+    ApplicationCount: number;
+    Month: number;
+}
+
+export interface ClientDashboardModel {
+    OrgCount: number;
+    StudentCount: number;
+    RecruitPostCount: number;
+    CountryCount: number;
+    ApplicationByMonths: ApplicationByMonth[];
+}

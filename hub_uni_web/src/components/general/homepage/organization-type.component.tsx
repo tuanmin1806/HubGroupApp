@@ -121,9 +121,9 @@ const ExpandButton = styled(Box)({
     display: "inline-flex",
     alignItems: "center",
     gap: "10px",
-    padding: "12px 32px",
+    padding: "8px 16px",
     background: "linear-gradient(135deg, #faa11b, #f5b95e)",
-    borderRadius: "40px",
+    borderRadius: "20px",
     color: "#ffffff",
     fontWeight: 700,
     fontSize: "0.9rem",
@@ -208,8 +208,8 @@ const OrganizationTypeComponent = () => {
             width: "100%",
             maxWidth: 1200,
             mx: "auto",
-            px: { xs: 2, sm: 3, md: 4 },
-            py: { xs: 4, sm: 5, md: 6 }
+            px: { xs: 1, sm: 1, md: 1 },
+            py: { xs: 1, sm: 1, md: 1 }
         }}>
             <SectionHeader>
                 <Badge>
