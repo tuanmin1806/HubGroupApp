@@ -9,4 +9,5 @@ export const TAG_TYPES = {
     RECRUITMENT_POST: 'RecruitmentPost',
     APPLICATION: 'Application',
     DASHBOARD: 'Dashboard',
+    FOLLOW: 'Follow',
 } as const;

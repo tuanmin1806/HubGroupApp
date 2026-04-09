@@ -14,6 +14,8 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import LanguageIcon from "@mui/icons-material/Language";
+import { useNavigate } from "react-router-dom";
+import { useOrganizationsGetTopQuery } from "../../../app/features/organization.api";
 
 const currentYear = new Date().getFullYear();
 
@@ -37,15 +39,8 @@ const CAMPAIGN_KEYWORDS: CampaignKeyword[] = [
     { text: "5.000+ Học viên Thành công Toàn cầu", icon: <LanguageIcon sx={{ fontSize: 16 }} /> },
 ];
 
-const marquee = keyframes`
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-`;
-
-const shimmer = keyframes`
-    0%   { background-position: -200% center; }
-    100% { background-position: 200% center; }
-`;
+const marquee = keyframes` 0%   { transform: translateX(0); }  100% { transform: translateX(-50%); }`;
+const shimmer = keyframes` 0%   { background-position: -200% center; } 100% { background-position: 200% center; }`;
 
 const BannerRoot = styled(Box)({
     width: "100%",
@@ -59,7 +54,6 @@ const BannerRoot = styled(Box)({
     position: "relative",
     userSelect: "none",
     borderRadius: "5px",
-
     "&::before, &::after": {
         content: '""',
         position: "absolute",
@@ -94,11 +88,10 @@ const Keyword = styled(Typography)({
     fontSize: "0.8rem",
     fontWeight: 700,
     color: "#b36a00",
-    padding: "0 32px",
+    padding: "0 24px",
     letterSpacing: 0.2,
     cursor: "default",
     transition: "color 0.2s",
-
     "&:hover": {
         background: "linear-gradient(90deg, #faa11b, #f5c842, #faa11b)",
         backgroundSize: "200% auto",
@@ -119,15 +112,17 @@ const Label = styled(Box)({
     alignItems: "center",
     borderRadius: "5px",
     gap: 3,
-    padding: "0 6px 0 6px",
-    background: "#faa11b",
-    boxShadow: "4px 0 12px rgba(250,161,27,0.3)",
+    padding: "0 7px 0 7px",
+    background: "#f25129",
+    boxShadow: "4px 0 8px rgba(255, 102, 97, 0.3)",
     flexShrink: 0,
 });
 
 const CampaignHighlight = () => {
-    const items = [...CAMPAIGN_KEYWORDS, ...CAMPAIGN_KEYWORDS];
-
+    const navigate = useNavigate();
+    const { data, isLoading } = useOrganizationsGetTopQuery({ page: 1, size: 10 });
+    const organizations = data?.Items || [];
+    const items = [...organizations, ...organizations];
     return (
         <Box sx={{ width: "100%", maxWidth: 1200, mx: "auto", my: 1, position: "relative" }}>
             <BannerRoot>
@@ -137,19 +132,31 @@ const CampaignHighlight = () => {
                         HOT
                     </Typography>
                 </Label>
-
-                <Box sx={{ overflow: "hidden", pl: "72px", width: "100%" }}>
-                    <Track>
-                        {items.map((item, i) => (
-                            <Box key={i} sx={{ display: "inline-flex", alignItems: "center" }}>
-                                <Keyword sx={{ display: "inline-flex" }}>
-                                    {item.icon}
-                                    {item.text}
-                                </Keyword>
-                            </Box>
-                        ))}
-                    </Track>
-                </Box>
+                {organizations.length > 0 && (
+                    <Box sx={{ overflow: "hidden", width: "100%" }}>
+                        <Track>
+                            {isLoading ? Array.from({ length: 6 }).map((_, i) => (
+                                <Keyword key={i}>Đang tải...</Keyword>
+                            ))
+                                : items.map((org, i) => (
+                                    <Box key={org.Id + i} sx={{ display: "inline-flex", alignItems: "center" }}>
+                                        <Keyword
+                                            sx={{
+                                                display: "inline-flex",
+                                                cursor: "pointer",
+                                            }}
+                                            onClick={() =>
+                                                navigate(`/thong-tin-truong/${org.SeoUrl}`)
+                                            }
+                                        >
+                                            <SchoolIcon sx={{ fontSize: 16 }} />
+                                            {org.Name}
+                                        </Keyword>
+                                    </Box>
+                                ))}
+                        </Track>
+                    </Box>
+                )}
             </BannerRoot>
         </Box>
     );

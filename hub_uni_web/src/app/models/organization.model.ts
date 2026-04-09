@@ -56,6 +56,9 @@ export interface OrganizationDetailResponse {
     Description: string;
     Currency: string;
     DormCost: number;
+    FollowId: string;
+    Followed: boolean;
+    FollowCount: number;
 }
 
 export interface OrganizationResponse {

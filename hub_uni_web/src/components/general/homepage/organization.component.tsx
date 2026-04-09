@@ -23,6 +23,7 @@ import { useGetAllProfessionNoAuthenQuery } from "../../../app/features/professi
 import { useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/organization.api";
 import { useGetAllOrganizationTypesNoAuthenQuery } from "../../../app/features/organization-type.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
+import { styled, Typography } from "@mui/material";
 
 const sectionWrapperSx = {
     width: "100%",
@@ -34,6 +35,17 @@ const sectionWrapperSx = {
     boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
     p: { xs: 1.5, sm: 2, md: 2.5 },
 };
+
+const Badge = styled(Box)({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "linear-gradient(135deg, #faa11b, #f5b95e)",
+    padding: "6px 16px",
+    borderRadius: "40px",
+    marginBottom: "20px",
+    boxShadow: "0 4px 15px rgba(250, 161, 27, 0.2)",
+});
 
 const OrganizationComponent = () => {
     const navigate = useNavigate();
@@ -95,9 +107,20 @@ const OrganizationComponent = () => {
     return (
         <Box sx={sectionWrapperSx}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Box sx={{ color: "#ff5722", fontSize: { xs: 15, sm: 17, md: 18 }, fontWeight: 700, textTransform: "uppercase" }}>
-                    Danh sách trường
-                </Box>
+                <Badge>
+                    <School sx={{ fontSize: 20, color: "#ffffff" }} />
+                    <Typography
+                        sx={{
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            letterSpacing: 1,
+                            textTransform: "uppercase"
+                        }}
+                    >
+                        Danh sách trường
+                    </Typography>
+                </Badge>
                 <Button
                     variant="outlined"
                     endIcon={<ArrowForward />}

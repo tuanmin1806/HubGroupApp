@@ -25,7 +25,7 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
           sm: "repeat(2, 1fr)",
           md: "repeat(3, 1fr)",
         },
-        gap: 2,
+        gap: 1,
         alignItems: "stretch",
       }}
     >
@@ -34,17 +34,53 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
           key={org.SeoUrl}
           sx={{
             display: "flex",
-            flexDirection: "row",
-            p: 1.25,
+            alignItems: "stretch",
+            p: 1,
+            borderRadius: 2,
+            position: "relative",
             border: org.IsTop ? "0.5px solid #faa11b" : "0.5px solid #dbd8d8",
-            borderRadius: 1,
-            transition: "transform 0.2s, box-shadow 0.2s",
-            "&:hover": {
-              transform: "translateY(-2px)",
-              boxShadow: 3,
-            },
           }}
         >
+          {org.IsTop && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                bgcolor: "#f3522a",
+                color: "#fafafa",
+                fontSize: "0.6rem",
+                fontWeight: 600,
+                px: 0.5,
+                py: 0.15,
+                borderRadius: 1,
+
+                animation: 'hotShake 1.8s ease-in-out infinite, hotPulse 1.8s ease-in-out infinite',
+
+                '@keyframes hotShake': {
+                  '0%': { transform: 'rotate(0deg) scale(1)' },
+                  '10%': { transform: 'rotate(-12deg) scale(1.15)' },
+                  '20%': { transform: 'rotate(12deg) scale(1.15)' },
+                  '30%': { transform: 'rotate(-10deg) scale(1.12)' },
+                  '40%': { transform: 'rotate(10deg) scale(1.12)' },
+                  '50%': { transform: 'rotate(-6deg) scale(1.08)' },
+                  '60%': { transform: 'rotate(6deg) scale(1.08)' },
+                  '70%': { transform: 'rotate(-3deg) scale(1.03)' },
+                  '80%': { transform: 'rotate(3deg) scale(1.03)' },
+                  '100%': { transform: 'rotate(0deg) scale(1)' },
+                },
+
+                '@keyframes hotPulse': {
+                  '0%, 100%': { bgcolor: '#f3522a' },
+                  '25%': { bgcolor: '#ff6b47' },
+                  '50%': { bgcolor: '#f3522a' },
+                  '75%': { bgcolor: '#ff6b47' },
+                },
+              }}
+            >
+              HOT
+            </Box>
+          )}
           <Box
             sx={{
               flexShrink: 0,
@@ -122,14 +158,17 @@ export default function OrganizationSelectActionCard({ organizations }: Props) {
               }}
             >
               <Typography
-                variant="subtitle1"
+                variant="subtitle2"
                 fontWeight="bold"
+                onClick={() => navigate(`/thong-tin-truong/${org.SeoUrl}`)}
                 sx={{
                   cursor: "pointer",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  lineHeight: 1.4,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  pr: org.IsTop ? 6 : 0,
                 }}
               >
                 {org.Name}

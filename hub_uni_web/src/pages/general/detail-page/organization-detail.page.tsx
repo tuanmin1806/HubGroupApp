@@ -11,6 +11,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import LocationOn from "@mui/icons-material/LocationOn";
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import Language from "@mui/icons-material/Language";
 import Share from "@mui/icons-material/Share";
 import Info from "@mui/icons-material/Info";
@@ -40,6 +42,14 @@ import { useEffect, useState } from "react";
 import { formatDate } from "../../../utils/date.utils";
 import { normalizeUrl } from "../../../utils/recruitment-post.utils";
 import { ConvertService } from "../../../app/services/convert.service";
+import { useCreateFollowMutation, useDeleteFollowMutation } from "../../../app/features/follow.api";
+import { useAuthGuard } from "../../../hooks/useAuthGuard";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
+import { getUserInfo } from "../../../app/services/auth.service";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { hasAccountType } from "../../../utils/auth.utils";
+import { AccountType } from "../../../app/models/enums.model";
 const OrganizationSelectActionCard = lazy(() => import("../../../components/cards/organization-card.card"));
 
 interface TabPanelProps {
@@ -221,9 +231,16 @@ const OrganizationDetailPage = () => {
     const { seoUrl } = useParams<{ seoUrl: string }>();
     const navigate = useNavigate();
     const [tabValue, setTabValue] = useState(0);
+    const [isFollowed, setIsFollowed] = useState(false);
+    const checkAuth = useAuthGuard();
+    const dispatch = useDispatch();
+    const userInfo = getUserInfo();
+    const isAdminOrStaff = hasAccountType(AccountType.Manager) || hasAccountType(AccountType.Collaborator);
 
     const { data: organization, isLoading, error } = useGetOrganizationBySeoQuery(seoUrl!, { skip: !seoUrl });
     const { data: recruitmentPosts, isLoading: loadingPosts } = useGetRecruitmentPostsByOrganizationWithPageQuery(seoUrl!, { skip: !seoUrl });
+    const [createFollow, { isLoading: isFollowing }] = useCreateFollowMutation();
+    const [deleteFollow, { isLoading: isUnfollowing }] = useDeleteFollowMutation();
 
     useEffect(() => {
         if (organization?.Name) {
@@ -232,12 +249,12 @@ const OrganizationDetailPage = () => {
     }, [organization?.Name]);
 
     const socialLinks = [
-        { icon: <Facebook />, url: organization?.FacebookUrl, label: "Facebook" },
-        { icon: <LinkedIn />, url: organization?.LinkedinUrl, label: "LinkedIn" },
-        { icon: <YouTube />, url: organization?.YoutubeUrl, label: "YouTube" },
-        { icon: <Twitter />, url: organization?.TwitterUrl, label: "Twitter" },
-        { icon: <Instagram />, url: organization?.InstagramUrl, label: "Instagram" },
-        { icon: <Map />, url: organization?.GoogleMapUrl, label: "Google Maps" },
+        { icon: <Facebook />, url: normalizeUrl(organization?.FacebookUrl || ""), label: "Facebook" },
+        { icon: <LinkedIn />, url: normalizeUrl(organization?.LinkedinUrl || ""), label: "LinkedIn" },
+        { icon: <YouTube />, url: normalizeUrl(organization?.YoutubeUrl || ""), label: "YouTube" },
+        { icon: <Twitter />, url: normalizeUrl(organization?.TwitterUrl || ""), label: "Twitter" },
+        { icon: <Instagram />, url: normalizeUrl(organization?.InstagramUrl || ""), label: "Instagram" },
+        { icon: <Map />, url: normalizeUrl(organization?.GoogleMapUrl || ""), label: "Google Maps" },
     ].filter((s) => s.url);
 
     if (isLoading) {
@@ -271,6 +288,29 @@ const OrganizationDetailPage = () => {
         setTabValue(newValue);
     };
 
+    const handleFollowToggle = async () => {
+        if (!checkAuth()) return;
+        try {
+            if (isFollowed) {
+                await deleteFollow(organization?.FollowId || "").unwrap();
+                setIsFollowed(false);
+                dispatch(showSnackbar({ message: "Đã hủy theo dõi trường!", severity: "success" }));
+            } else {
+                await createFollow({
+                    CustomerId: userInfo?.Id || "",
+                    OrgId: organization?.Id || "",
+                }).unwrap();
+                setIsFollowed(true);
+                dispatch(showSnackbar({ message: "Đã theo dõi trường thành công!", severity: "success" }));
+            }
+        } catch (err) {
+            dispatch(showSnackbar({
+                message: isFollowed ? "Hủy theo dõi thất bại, vui lòng thử lại!" : "Theo dõi thất bại, vui lòng thử lại!",
+                severity: "error"
+            }));
+        }
+    };
+
     return (
         <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh' }}>
             {organization.WallpaperFullUrl && (
@@ -283,7 +323,6 @@ const OrganizationDetailPage = () => {
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 1, md: 2 } }}>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Stack spacing={1}>
-
                             <Card>
                                 <CardContent>
                                     <Box
@@ -301,36 +340,158 @@ const OrganizationDetailPage = () => {
                                                 src={organization.LogoFullUrl}
                                                 loading="lazy"
                                                 alt={organization.Name}
-                                                sx={{ width: 80, height: 80, borderRadius: 2, objectFit: 'cover', border: '1px solid #e0e0e0', flexShrink: 0, }}
+                                                sx={{
+                                                    width: { xs: 60, sm: 80 },
+                                                    height: { xs: 60, sm: 80 },
+                                                    borderRadius: 2,
+                                                    objectFit: 'cover',
+                                                    border: '1px solid #e0e0e0',
+                                                    flexShrink: 0
+                                                }}
                                             />
                                         )}
-                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, }}>
-                                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.1rem', sm: '1.5rem' }, lineHeight: 1.3, }}> {organization.Name} </Typography>
 
-                                                <Box sx={{ mt: 0.5 }}>
-                                                    <Chip
-                                                        label={organization.MainProfession?.ProfessionName}
-                                                        size="small"
-                                                        sx={{ fontWeight: 600, fontSize: '0.75rem', height: 22, bgcolor: '#e3f2fd', color: '#1976d2', maxWidth: '100%', '& .MuiChip-label': { px: 1, overflow: 'hidden', textOverflow: 'ellipsis', }, }}
-                                                    />
+                                        <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                alignItems: { xs: 'center', sm: 'flex-start' },
+                                                justifyContent: 'space-between',
+                                                gap: 1,
+                                                flexWrap: 'wrap',
+                                                flexDirection: { xs: 'column', sm: 'row' }
+                                            }}>
+                                                <Box sx={{ flex: 1, minWidth: 0, width: { xs: '100%', sm: 'auto' } }}>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: { xs: 'center', sm: 'flex-start' },
+                                                        gap: 1,
+                                                        flexWrap: 'wrap'
+                                                    }}>
+                                                        <Typography
+                                                            variant="h5"
+                                                            fontWeight={600}
+                                                            sx={{
+                                                                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.75rem' },
+                                                                lineHeight: 1.3,
+                                                                textAlign: { xs: 'center', sm: 'left' }
+                                                            }}
+                                                        >
+                                                            {organization.Name}
+                                                        </Typography>
+
+                                                        {organization.IsTop && (
+                                                            <Chip
+                                                                label="Nổi bật"
+                                                                size="small"
+                                                                sx={{
+                                                                    fontWeight: 700,
+                                                                    fontSize: '0.65rem',
+                                                                    height: 20,
+                                                                    bgcolor: '#1975d1',
+                                                                    color: '#fff',
+                                                                    flexShrink: 0,
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </Box>
+
+                                                    <Box sx={{
+                                                        mt: 0.5,
+                                                        display: 'flex',
+                                                        justifyContent: { xs: 'center', sm: 'flex-start' },
+                                                        gap: 1,
+                                                    }}>
+                                                        <Chip
+                                                            label={organization.MainProfession?.ProfessionName}
+                                                            size="small"
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                fontSize: '0.75rem',
+                                                                height: 22,
+                                                                bgcolor: '#e3f2fd',
+                                                                color: '#1976d2',
+                                                                maxWidth: { xs: '90%', sm: '100%' },
+                                                                '& .MuiChip-label': {
+                                                                    px: 1,
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis'
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Box
+                                                            sx={{
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                justifyContent: { xs: "center", sm: "flex-start" },
+                                                                gap: 0.5,
+                                                            }}
+                                                        >
+                                                            <PeopleAltIcon
+                                                                sx={{
+                                                                    fontSize: 16,
+                                                                    color: "text.secondary",
+                                                                }}
+                                                            />
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    fontSize: "0.75rem",
+                                                                    fontWeight: 500,
+                                                                }}
+                                                            >
+                                                                {organization.FollowCount || 0} người theo dõi
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
                                                 </Box>
-                                            </Box>
 
-                                            {organization.IsTop && (
-                                                <Chip
-                                                    label="Nổi bật"
-                                                    size="small"
-                                                    sx={{ flexShrink: 0, fontWeight: 700, fontSize: '0.6rem', height: 22, bgcolor: '#1975d1', color: '#fff' }}
-                                                />
-                                            )}
+                                                {!isAdminOrStaff && (
+                                                    <Tooltip title={isFollowed ? "Bỏ theo dõi" : "Theo dõi"}>
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            startIcon={isFollowing || isUnfollowing ? (<CircularProgress size={16} color="inherit" />) : isFollowed ? (<Favorite fontSize="small" />) : (<PlaylistAddIcon fontSize="small" />)}
+                                                            onClick={handleFollowToggle}
+                                                            disabled={isFollowing || isUnfollowing}
+                                                            sx={{
+                                                                textTransform: "none",
+                                                                fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                                                                borderRadius: "8px",
+                                                                minWidth: { xs: "100%", sm: "auto" },
+                                                                boxShadow: "none",
+                                                                alignSelf: { xs: 'center', sm: 'flex-start' },
+                                                                ...(isFollowed ? {
+                                                                    bgcolor: "#e4e6eb",
+                                                                    color: "#050505",
+                                                                    "&:hover": {
+                                                                        bgcolor: "#d8dadf",
+                                                                    },
+                                                                } : {
+                                                                    bgcolor: "#1877F2",
+                                                                    color: "#fff",
+                                                                    "&:hover": {
+                                                                        bgcolor: "#166fe5",
+                                                                    },
+                                                                }),
+                                                            }}
+                                                        >
+                                                            {isFollowing ? "Đang theo dõi..." : isUnfollowing ? "Đang hủy..." : isFollowed ? "Đang theo dõi" : "Theo dõi"}
+                                                        </Button>
+                                                    </Tooltip>
+                                                )}
+                                            </Box>
                                         </Box>
                                     </Box>
 
-                                    {organization.Highlights && organization.Highlights.length > 0 ? (<HighlightsInline highlights={organization.Highlights} />
+                                    {organization.Highlights && organization.Highlights.length > 0 ? (
+                                        <HighlightsInline highlights={organization.Highlights} />
                                     ) : organization.Summary ? (
                                         <Box sx={{ mt: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
-                                            <Typography variant="body2" color="text.secondary" lineHeight={1}> {organization.Summary} </Typography>
+                                            <Typography variant="body2" color="text.secondary" lineHeight={1}>
+                                                {organization.Summary}
+                                            </Typography>
                                         </Box>
                                     ) : null}
                                 </CardContent>

@@ -311,7 +311,7 @@ const DashboardComponent = () => {
                                     WebkitTextFillColor: "transparent",
                                 }}
                             >
-                                Trung tâm Du học HUB
+                                Trung tâm Du học Hub
                             </Typography>
                         </Box>
 
@@ -331,7 +331,7 @@ const DashboardComponent = () => {
                 </Box>
             </BannerWrapper>
 
-            <Grid container spacing={2} sx={{ mb: 2 }}>
+            {/* <Grid container spacing={2} sx={{ mb: 2 }}>
                 {isLoading ? Array.from({ length: 4 }).map((_, i) => (
                     <Grid key={i} size={{ xs: 12, sm: 6, md: 3 }}>
                         <MetricCardSkeleton />
@@ -341,9 +341,9 @@ const DashboardComponent = () => {
                         <MetricCard {...metric} />
                     </Grid>
                 ))}
-            </Grid>
+            </Grid> */}
 
-            <TrendChart data={chartData} isMobile={isMobile} isLoading={isLoading} year={selectedYear} onYearChange={setSelectedYear} />
+            {/* <TrendChart data={chartData} isMobile={isMobile} isLoading={isLoading} year={selectedYear} onYearChange={setSelectedYear} /> */}
         </Box>
     );
 };

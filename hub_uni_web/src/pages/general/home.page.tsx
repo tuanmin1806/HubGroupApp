@@ -103,16 +103,16 @@ const HomePage = () => {
                     <CampaignHighlight />
                 </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-                    <RecruitmentPostComponent />
-                </Box>
-                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <OrganizationTypeComponent />
                 </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-                    <OrganizationComponent />
+                    <RecruitmentPostComponent />
                 </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <ProfessionComponent />
+                </Box>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <OrganizationComponent />
                 </Box>
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                     <DashboardComponent />

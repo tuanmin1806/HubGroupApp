@@ -54,6 +54,24 @@ const organizationApi = baseApi.injectEndpoints({
             providesTags: [TAG_TYPES.ORGANIZATION],
         }),
 
+        organizationsGetTop: builder.query<ApiPaginationResponse<OrganizationResponse[]>, OrganizationFilterParams>({
+            query: (params) => {
+                const queryString = buildQueryString(params);
+                return {
+                    url: `organization/gettop?${queryString}`,
+                    method: "GET",
+                };
+            },
+            transformResponse: (responseData: {
+                Items: OrganizationResponse[];
+                Total: number;
+            }): ApiPaginationResponse<OrganizationResponse[]> => ({
+                Items: responseData.Items,
+                Total: responseData.Total,
+            }),
+            providesTags: [TAG_TYPES.ORGANIZATION],
+        }),
+
         organizationsNameSearch: builder.query<ApiPaginationResponse<OrganizationResponse[]>, OrganizationFilterParams>({
             query: (params) => {
                 const queryString = buildQueryString(params);
@@ -127,4 +145,5 @@ export const {
     useLazyGetOrganizationBySeoQuery,
     useUpdateOrganizationLogoMutation,
     useGetProfessionsByOrganizationQuery,
+    useOrganizationsGetTopQuery
 } = organizationApi;

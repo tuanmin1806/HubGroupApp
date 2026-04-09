@@ -41,7 +41,7 @@ import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { fieldSx } from "../../styles/fieldSx";
 import { hasAccountType } from "../../utils/auth.utils";
-const ConfirmDialog = lazy(() => import("../dialogs/general/confirm.dialog"));
+const ConfirmDialog = lazy(() => import("../dialogs/general/student-confirm.dialog"));
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: Gender.Male, label: "Nam" },

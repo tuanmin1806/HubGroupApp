@@ -18,6 +18,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ScienceIcon from "@mui/icons-material/Science";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 import SchoolIcon from "@mui/icons-material/School";
+import WorkIcon from '@mui/icons-material/Work';
 import BusinessIcon from "@mui/icons-material/Business";
 import { Button } from "@mui/material";
 
@@ -67,6 +68,17 @@ const SectionLabel = styled(Box)({
     borderRadius: 99,
     padding: "4px 14px",
     marginBottom: 8,
+});
+
+const Badge = styled(Box)({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "linear-gradient(135deg, #faa11b, #f5b95e)",
+    padding: "6px 16px",
+    borderRadius: "40px",
+    marginBottom: "20px",
+    boxShadow: "0 4px 15px rgba(250, 161, 27, 0.2)",
 });
 
 const IconBubble = styled(Box)({
@@ -238,17 +250,20 @@ const ProfessionComponent = () => {
             p: { xs: 1.5, sm: 2, md: 2.5 },
         }}>
             <Box sx={{ mb: { xs: 2, sm: 2.5 } }}>
-                <SectionLabel>
-                    <Typography sx={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        color: "white",
-                        letterSpacing: 0.6,
-                        textTransform: "uppercase",
-                    }}>
+                <Badge>
+                    <WorkIcon sx={{ fontSize: 20, color: "#ffffff" }} />
+                    <Typography
+                        sx={{
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            letterSpacing: 1,
+                            textTransform: "uppercase"
+                        }}
+                    >
                         Khám phá ngành nghề
                     </Typography>
-                </SectionLabel>
+                </Badge>
 
                 <Box sx={{
                     display: "flex",
@@ -316,7 +331,7 @@ const ProfessionComponent = () => {
                             <ExpandButton onClick={handleToggleShowAll}>
                                 {showAll
                                     ? "Thu gọn ↑"
-                                    : `Xem thêm ${remainingCount} ngành ↓`}
+                                    : `Xem thêm ${remainingCount} ngành nghề ↓`}
                             </ExpandButton>
                         </Box>
                     )}

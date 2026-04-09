@@ -41,7 +41,7 @@ import labelsVi from "../../i18n/labels.vi";
 
 const CreateCustomerAccountDialog = lazy(() => import("../../components/dialogs/admin/create-customer-account.dialog"));
 const UpdateCustomerAccountDialog = lazy(() => import("../../components/dialogs/admin/update-customer-account.dialog"));
-const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+const ConfirmDialog = lazy(() => import("../../components/dialogs/general/student-confirm.dialog"));
 
 const getAccountTypeColor = (accountType: AccountType): "default" | "primary" | "secondary" | "success" | "warning" | "error" | "info" => {
     switch (accountType) {

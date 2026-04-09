@@ -30,7 +30,7 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
             sm: "repeat(2, 1fr)",
             md: "repeat(3, 1fr)",
           },
-          gap: 2,
+          gap: 1,
         }}
       >
         {recruitmentPosts.map((rcp) => (
@@ -94,8 +94,8 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
               alt={rcp.Name}
               loading="lazy"
               sx={{
-                width: 120,
-                height: 120,
+                width: 100,
+                height: 100,
                 objectFit: "cover",
                 mr: 2,
                 borderRadius: 1,
@@ -176,8 +176,9 @@ export default function RecruitmentPostSelectActionCard({ recruitmentPosts }: Pr
                 }}
               >
                 <Typography
-                  variant="subtitle1"
+                  variant="subtitle2"
                   fontWeight="bold"
+                  onClick={() => navigate(`/chuong-trinh-tuyen-sinh/${rcp.SeoUrl}`)}
                   sx={{
                     cursor: "pointer",
                     overflow: "hidden",

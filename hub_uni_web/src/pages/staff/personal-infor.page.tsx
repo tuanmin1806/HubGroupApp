@@ -45,7 +45,9 @@ import { useDispatch } from "react-redux";
 import { AuthInfo } from "../../app/models/auth.model";
 import { restoreCredentials } from "../../app/features/auth/auth.slice";
 import labelsVi from "../../i18n/labels.vi";
-const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+import { AppDispatch } from "../../app/store";
+import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
+const AdminConfirmDialog = lazy(() => import("../../components/dialogs/admin/admin-confirm.dialog"));
 const ChangePasswordDialog = lazy(() => import("../../components/dialogs/admin/change-password.dialog"));
 const AdminLogoUploadDialog = lazy(() => import("../../components/dialogs/admin/admin-logo-upload.dialog"));
 
@@ -255,6 +257,7 @@ export default function PersonalInforPage() {
 
 function EditForm({ data }: { data: CustomerResponse }) {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const [isEditing, setIsEditing] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [changePasswordOpen, setChangePasswordOpen] = useState(false);
@@ -278,9 +281,12 @@ function EditForm({ data }: { data: CustomerResponse }) {
     const handleConfirm = async () => {
         try {
             await updateCustomer(buildPayload(data, form)).unwrap();
+            dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             setConfirmOpen(false);
             setIsEditing(false);
-        } catch { }
+        } catch {
+            dispatch(showSnackbar({ message: labels.updateError, severity: "error" }));
+        }
     };
 
     const handleLogout = () => {
@@ -422,7 +428,7 @@ function EditForm({ data }: { data: CustomerResponse }) {
                 </Grid>
             </Grid>
 
-            <ConfirmDialog
+            <AdminConfirmDialog
                 open={confirmOpen}
                 onClose={() => !isUpdating && setConfirmOpen(false)}
                 onConfirm={handleConfirm}

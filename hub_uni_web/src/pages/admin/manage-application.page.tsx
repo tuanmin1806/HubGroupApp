@@ -33,7 +33,7 @@ import { Collapse, Divider } from "@mui/material";
 import labelsVi from "../../i18n/labels.vi";
 const UpdateApplicationDialog = lazy(() => import("../../components/dialogs/admin/application/update-application.dialog"));
 const ViewApplicationDialog = lazy(() => import("../../components/dialogs/admin/view-application-detail.dialog"));
-const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+const ConfirmDialog = lazy(() => import("../../components/dialogs/general/student-confirm.dialog"));
 
 const labels = labelsVi.application;
 

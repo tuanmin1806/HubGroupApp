@@ -19,6 +19,7 @@ import { useGetAllProfessionNoAuthenQuery } from "../../../app/features/professi
 import { useNavigate } from "react-router-dom";
 import { useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
+import { styled, Typography } from "@mui/material";
 const RecruitmentPostSelectActionCard = lazy(() => import("../../cards/recruitment-post.card"));
 const OrganizationPagination = lazy(() => import("../../pagination/organization-pagination"));
 
@@ -30,8 +31,19 @@ const sectionWrapperSx = {
     borderRadius: 2,
     border: "1px solid #eee",
     boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-    p: { xs: 1.5, sm: 2, md: 2.5 },
+    p: { xs: 1, sm: 1, md: 1 },
 };
+
+const Badge = styled(Box)({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "linear-gradient(135deg, #faa11b, #f5b95e)",
+    padding: "6px 16px",
+    borderRadius: "40px",
+    marginBottom: "20px",
+    boxShadow: "0 4px 15px rgba(250, 161, 27, 0.2)",
+});
 
 const RecruitmentPostComponent = () => {
     const navigate = useNavigate();
@@ -99,9 +111,20 @@ const RecruitmentPostComponent = () => {
         <Box sx={sectionWrapperSx}>
             {/* Header */}
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Box sx={{ color: "#ff5722", fontSize: { xs: 15, sm: 17, md: 18 }, fontWeight: 700, textTransform: "uppercase" }}>
-                    Chương trình tuyển sinh
-                </Box>
+                <Badge>
+                    <School sx={{ fontSize: 20, color: "#ffffff" }} />
+                    <Typography
+                        sx={{
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            letterSpacing: 1,
+                            textTransform: "uppercase"
+                        }}
+                    >
+                        Chương trình tuyển sinh
+                    </Typography>
+                </Badge>
                 <Button
                     variant="outlined"
                     endIcon={<ArrowForward />}
@@ -110,7 +133,7 @@ const RecruitmentPostComponent = () => {
                     sx={{
                         borderColor: "#ff5722",
                         color: "#ff5722",
-                        fontSize: { xs: 9, sm: 11 },
+                        fontSize: { xs: 8, sm: 10 },
                         "&:hover": { bgcolor: "#ff5722", color: "#fff", borderColor: "#ff5722" },
                     }}
                 >
@@ -119,11 +142,11 @@ const RecruitmentPostComponent = () => {
             </Box>
 
             {/* Filter */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 2 }}>
                 <Box sx={{ width: "100%", maxWidth: 1200, mb: 2 }}>
                     <Stack
                         direction={{ xs: "column", md: "row" }}
-                        spacing={2}
+                        spacing={1}
                         alignItems={{ xs: "stretch", md: "center" }}
                     >
                         <FormControl sx={{ minWidth: 260 }} size="small">

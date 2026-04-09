@@ -11,6 +11,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import { useGetAllOrganizationTypesNoAuthenQuery } from "../../../app/features/organization-type.api";
 
@@ -32,7 +33,7 @@ const StyledCard = styled(Box)<{ delay: number }>(({ delay }) => ({
     maxWidth: "220px",
     background: "linear-gradient(135deg, #ffffff 0%, #fef9f0 100%)",
     borderRadius: "20px",
-    padding: "16px 20px",
+    padding: "12px 16px",
     cursor: "pointer",
     transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
     animation: `${fadeUp} 0.5s ease both`,
@@ -170,10 +171,33 @@ const TypeCard = ({ type, delay, onClick }: {
                 sx={{ fontSize: 28, color: "#faa11b", transition: "color 0.3s ease" }}
             />
         </IconWrapper>
+
         <TypeName>{type.Name}</TypeName>
-        <TypeCount>
-            <span>Chi tiết</span>
-        </TypeCount>
+
+        <Box
+            sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "end",
+                mt: "auto",
+            }}
+        >
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    color: "#faa11b",
+                    transition: "all 0.25s ease",
+                }}
+                className="cta"
+            >
+                Chi tiết
+                <ArrowForwardIcon sx={{ fontSize: 18 }} />
+            </Box>
+        </Box>
     </StyledCard>
 );
 
@@ -196,7 +220,7 @@ const OrganizationTypeComponent = () => {
     const hasMore = types.length > visibleCount;
 
     const handleCardClick = () => {
-        navigate("/chuong-trinh-tuyen-sinh");
+        navigate("/tim-kiem-truong");
     };
 
     const handleToggleShowAll = () => {
@@ -240,7 +264,7 @@ const OrganizationTypeComponent = () => {
                         WebkitTextFillColor: "transparent",
                     }}
                 >
-                    Loại hình trường du học
+                    Loại hình trường
                 </Typography>
 
                 <Typography
@@ -264,18 +288,14 @@ const OrganizationTypeComponent = () => {
             {!isError && (
                 <>
                     <GridContainer>
-                        {isLoading
-                            ? Array.from({ length: visibleCount }).map((_, i) => (
-                                <CardSkeleton key={i} />
-                            ))
-                            : displayedTypes.map((type, i) => (
-                                <TypeCard
-                                    key={type.Id}
-                                    type={type}
-                                    delay={i * 50}
-                                    onClick={handleCardClick}
-                                />
-                            ))}
+                        {isLoading ? Array.from({ length: visibleCount }).map((_, i) => (<CardSkeleton key={i} />)) : displayedTypes.map((type, i) => (
+                            <TypeCard
+                                key={type.Id}
+                                type={type}
+                                delay={i * 50}
+                                onClick={handleCardClick}
+                            />
+                        ))}
                     </GridContainer>
 
                     {!isLoading && hasMore && (

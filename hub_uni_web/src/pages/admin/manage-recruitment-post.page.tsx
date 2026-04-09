@@ -48,7 +48,7 @@ import labelsVi from "../../i18n/labels.vi";
 
 const UpdateRecruitmentPostDialog = lazy(() => import("../../components/dialogs/staff/update-recruitment-post.dialog"));
 const ViewRecruitmentPostDialog = lazy(() => import("../../components/dialogs/admin/view-recruitment-post-detail.dialog"));
-const ConfirmDialog = lazy(() => import("../../components/dialogs/general/confirm.dialog"));
+const ConfirmDialog = lazy(() => import("../../components/dialogs/general/student-confirm.dialog"));
 
 const STATUS_STYLE: Record<string, { bgcolor: string; color: string; border: string }> = {
     Active: { bgcolor: "#e8f5e9", color: "#2e7d32", border: "#a5d6a7" },
