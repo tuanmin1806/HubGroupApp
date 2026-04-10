@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { styled, Typography } from "@mui/material";
+import LoadingOverlay from "../loading-overlay";
 const RecruitmentPostSelectActionCard = lazy(() => import("../../cards/recruitment-post.card"));
 const OrganizationPagination = lazy(() => import("../../pagination/organization-pagination"));
 
@@ -31,7 +32,7 @@ const sectionWrapperSx = {
     borderRadius: 2,
     border: "1px solid #eee",
     boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-    p: { xs: 1, sm: 1, md: 1 },
+    p: { xs: 1, sm: 1.5, md: 2 },
 };
 
 const Badge = styled(Box)({
@@ -41,7 +42,6 @@ const Badge = styled(Box)({
     background: "linear-gradient(135deg, #faa11b, #f5b95e)",
     padding: "6px 16px",
     borderRadius: "40px",
-    marginBottom: "20px",
     boxShadow: "0 4px 15px rgba(250, 161, 27, 0.2)",
 });
 
@@ -53,7 +53,7 @@ const RecruitmentPostComponent = () => {
     const [selectedProfessionId, setSelectedProfessionId] = useState<string>("");
     const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
     const { data: professions = [] } = useGetAllProfessionNoAuthenQuery();
-    const { data: recruitmentPostData } = useGetRecruitmentPostsByPageQuery({
+    const { data: recruitmentPostData, isLoading, isError } = useGetRecruitmentPostsByPageQuery({
         page: page,
         size: PAGE_SIZE,
         provinceId: selectedProvinceId || undefined,
@@ -374,9 +374,10 @@ const RecruitmentPostComponent = () => {
                     </Button>
                 </Box>
             )}
-
-            {/* Content */}
-            <RecruitmentPostSelectActionCard recruitmentPosts={recruitmentPosts} />
+            <LoadingOverlay open={isLoading} error={isError} empty={recruitmentPosts.length === 0}>
+                {/* Content */}
+                <RecruitmentPostSelectActionCard recruitmentPosts={recruitmentPosts} />
+            </LoadingOverlay>
 
             {/* Pagination */}
             <Box sx={{ mt: 2 }}>

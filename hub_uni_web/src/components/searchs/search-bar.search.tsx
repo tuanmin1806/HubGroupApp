@@ -72,7 +72,7 @@ export default function SearchBar({ onSearch, initialQuery = "", initialProvince
                     MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}
                 >
                     <MenuItem value="" sx={{ fontSize: "0.875rem" }}>
-                        <em>Tất cả tỉnh / thành</em>
+                        <em>Tỉnh / Thành Phố</em>
                     </MenuItem>
                     {isLoading ? (
                         <MenuItem disabled>

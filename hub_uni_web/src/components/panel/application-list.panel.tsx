@@ -22,6 +22,7 @@ import { getUserInfo } from "../../app/services/auth.service";
 import { formatDate } from "../../utils/date.utils";
 import { ApplicationStatus } from "../../app/models/enums.model";
 import { ConvertService } from "../../app/services/convert.service";
+import LoadingOverlay from "../general/loading-overlay";
 const ApplicationDetailDialog = lazy(() => import("../dialogs/student/application-detail.dialog"));
 
 const STATUS_OPTIONS = [
@@ -171,12 +172,16 @@ export default function ApplicationListPanel() {
         setSelectedStatus(val === "" ? "" : Number(val) as ApplicationStatus);
     };
 
-    if (isLoading) return (<Box sx={{ textAlign: "center", py: 8 }}><CircularProgress size={36} sx={{ color: "#f36730" }} /></Box>);
-    if (isError) return (<Box sx={{ textAlign: "center", py: 6 }}><Typography color="error" fontWeight={600}>Đã xảy ra lỗi khi tải dữ liệu</Typography></Box>);
-
-
     return (
-        <>
+        <LoadingOverlay
+            open={isLoading}
+            error={isError}
+            empty={!data?.Items?.length}
+            emptyVariant="search"
+            emptyTitle="Chưa có chương trình nào được ứng tuyển"
+            emptyDescription="Hãy khám phá các chương trình tuyển sinh và ứng tuyển ngay."
+            emptyAction={<Button variant="contained" disableElevation onClick={() => navigate("/chuong-trinh-tuyen-sinh")} sx={{ bgcolor: "#f36730", borderRadius: 2, textTransform: "none", fontWeight: 600, "&:hover": { bgcolor: "#e05520" }, }}>Xem chương trình tuyển sinh</Button>}
+        >
             <Box>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} mb={0.5}>
                     <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>
@@ -216,35 +221,11 @@ export default function ApplicationListPanel() {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: "0.8rem" }}>
                     {data?.Items?.length ?? 0} chương trình đã ứng tuyển
                 </Typography>
-
-                {!data?.Items?.length ? (
-                    <Box sx={{ textAlign: "center", py: 8 }}>
-                        <Box sx={{
-                            width: 64, height: 64, borderRadius: "50%", bgcolor: "#fff7ed",
-                            display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 2,
-                        }}>
-                            <School sx={{ fontSize: 30, color: "#f36730" }} />
-                        </Box>
-                        <Typography fontWeight={700} sx={{ mb: 0.5 }}>Chưa có đơn ứng tuyển</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 280, mx: "auto", mb: 2.5 }}>
-                            Hãy khám phá các chương trình tuyển sinh và nộp hồ sơ ngay.
-                        </Typography>
-                        <Button variant="contained" disableElevation
-                            onClick={() => navigate("/chuong-trinh-tuyen-sinh")}
-                            sx={{
-                                bgcolor: "#f36730", borderRadius: 2, textTransform: "none",
-                                fontWeight: 600, "&:hover": { bgcolor: "#e05520" },
-                            }}>
-                            Xem chương trình tuyển sinh
-                        </Button>
-                    </Box>
-                ) : (
-                    <Stack spacing={1.25}>
-                        {data.Items.map((app: ApplicationResponse) => (
-                            <ApplicationCard key={app.Id} app={app} onClick={() => setSelectedId(app.Id)} />
-                        ))}
-                    </Stack>
-                )}
+                <Stack spacing={1.25}>
+                    {data?.Items?.map((app: ApplicationResponse) => (
+                        <ApplicationCard key={app.Id} app={app} onClick={() => setSelectedId(app.Id)} />
+                    ))}
+                </Stack>
             </Box>
 
             <ApplicationDetailDialog
@@ -252,6 +233,6 @@ export default function ApplicationListPanel() {
                 open={!!selectedId}
                 onClose={() => setSelectedId(null)}
             />
-        </>
+        </LoadingOverlay>
     );
 }

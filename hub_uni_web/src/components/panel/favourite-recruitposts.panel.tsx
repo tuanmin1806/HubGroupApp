@@ -26,6 +26,7 @@ import { BACK_GROUND_BUTTON_COLOR } from "../../constants/common.constant";
 import { formatCurrency, getRecruitmentStatus } from "../../utils/recruitment-post.utils";
 import { formatDate } from "../../utils/date.utils";
 import { getUserInfo } from "../../app/services/auth.service";
+import LoadingOverlay from "../general/loading-overlay";
 
 function FavouriteRecruitPostCard({ app }: { app: FavouriteResponse }) {
     const navigate = useNavigate();
@@ -251,20 +252,16 @@ export default function FavouriteRecruitPostListPanel() {
     const userInfo = getUserInfo();
     const { data, isLoading, isError } = useGetFavouriteRecruitPostByCustomerQuery({ customerId: userInfo?.Id ?? "" });
 
-    if (isLoading) return (
-        <Box sx={{ textAlign: "center", py: 8 }}>
-            <CircularProgress size={36} sx={{ color: "#f36730" }} />
-        </Box>
-    );
-
-    if (isError) return (
-        <Box sx={{ textAlign: "center", py: 6 }}>
-            <Typography color="error" fontWeight={600}>Đã xảy ra lỗi khi tải dữ liệu</Typography>
-        </Box>
-    );
-
     return (
-        <>
+        <LoadingOverlay
+            open={isLoading}
+            error={isError}
+            empty={!data?.Items?.length}
+            emptyVariant="post"
+            emptyTitle="Chưa có chương trình tuyển sinh nào được lưu"
+            emptyDescription="Hãy khám phá các chương trình tuyển sinh và lưu lại ngay!"
+            emptyAction={<Button variant="contained" disableElevation onClick={() => navigate("/chuong-trinh-tuyen-sinh")} sx={{ bgcolor: "#f36730", borderRadius: 2, textTransform: "none", fontWeight: 600, "&:hover": { bgcolor: "#e05520" }, }}>Xem chương trình tuyển sinh</Button>}
+        >
             <Box>
                 <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5, fontSize: "1rem" }}>
                     Danh sách chương trình tuyển sinh đã lưu
@@ -272,36 +269,12 @@ export default function FavouriteRecruitPostListPanel() {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.8rem" }}>
                     {data?.Items?.length ?? 0} chương trình đã lưu
                 </Typography>
-
-                {!data?.Items?.length ? (
-                    <Box sx={{ textAlign: "center", py: 8 }}>
-                        <Box sx={{
-                            width: 64, height: 64, borderRadius: "50%", bgcolor: "#fff7ed",
-                            display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 2,
-                        }}>
-                            <School sx={{ fontSize: 30, color: "#f36730" }} />
-                        </Box>
-                        <Typography fontWeight={700} sx={{ mb: 0.5 }}>Chưa có chương trình tuyển sinh nào được lưu</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 280, mx: "auto", mb: 2.5 }}>
-                            Hãy khám phá các chương trình tuyển sinh và lưu lại ngay!
-                        </Typography>
-                        <Button variant="contained" disableElevation
-                            onClick={() => navigate("/chuong-trinh-tuyen-sinh")}
-                            sx={{
-                                bgcolor: "#f36730", borderRadius: 2, textTransform: "none",
-                                fontWeight: 600, "&:hover": { bgcolor: "#e05520" },
-                            }}>
-                            Xem chương trình tuyển sinh
-                        </Button>
-                    </Box>
-                ) : (
-                    <Stack spacing={1.25}>
-                        {data.Items.map((app: FavouriteResponse) => (
-                            <FavouriteRecruitPostCard key={app.Id} app={app} />
-                        ))}
-                    </Stack>
-                )}
+                <Stack spacing={1.25}>
+                    {data?.Items?.map((app: FavouriteResponse) => (
+                        <FavouriteRecruitPostCard key={app.Id} app={app} />
+                    ))}
+                </Stack>
             </Box>
-        </>
+        </LoadingOverlay>
     );
 }

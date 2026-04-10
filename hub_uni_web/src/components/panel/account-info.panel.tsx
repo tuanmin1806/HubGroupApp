@@ -41,6 +41,7 @@ import { useDispatch } from "react-redux";
 import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { fieldSx } from "../../styles/fieldSx";
 import { hasAccountType } from "../../utils/auth.utils";
+import LoadingOverlay from "../general/loading-overlay";
 const ConfirmDialog = lazy(() => import("../dialogs/general/student-confirm.dialog"));
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
@@ -138,14 +139,27 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
     };
 }
 
-export default function AccountInfoPanel({ account }: { account: AccountResponse }) {
+function buildEmptyForm(): EditableForm {
+    return {
+        UserName: "", FullName: "", Gender: Gender.Male,
+        AvatarUrl: "", Email: "", PhoneNumber: "",
+        DateOfBirth: "", Experience: JobExperience.Undefined,
+        EducationLevel: EducationLevel.Undefined,
+        GraduationYear: "", Gpa: "",
+        CountryId: "", ProvinceId: "", CommuneId: "", Address: "",
+    };
+}
+
+export default function AccountInfoPanel({ account, isLoading }: { account: AccountResponse | undefined, isLoading: boolean }) {
     const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [form, setForm] = useState<EditableForm>(() => buildForm(account));
+    const [form, setForm] = useState<EditableForm>(() => account ? buildForm(account) : buildEmptyForm());
     const fs = fieldSx(isEditing);
 
-    useEffect(() => { setForm(buildForm(account)); }, [account]);
+    useEffect(() => {
+        if (account) setForm(buildForm(account));
+    }, [account]);
 
     const { data: countries = [] } = useGetAllCountryNoAuthenQuery();
     const selectedCountry = countries.find(c => c.Id === form.CountryId);
@@ -156,220 +170,227 @@ export default function AccountInfoPanel({ account }: { account: AccountResponse
     const selectedCommune = communes.find(c => c.Id === form.CommuneId) ?? null;
     const set = (field: keyof EditableForm) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: e.target.value }));
     const setEnum = <K extends keyof EditableForm>(field: K) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: Number(e.target.value) }));
-    const handleCancel = () => { setIsEditing(false); setForm(buildForm(account)); };
+    const handleCancel = () => {
+        setIsEditing(false);
+        if (account) setForm(buildForm(account));
+    };
 
     const handleConfirm = async () => {
+        if (!account) return;
         try {
             await updateCustomer(buildUpdatePayload(account, form)).unwrap();
             dispatch(showSnackbar({ message: "Cập nhật thông tin thành công", severity: "success" }));
             setConfirmOpen(false);
             setIsEditing(false);
         } catch (err) {
+            setConfirmOpen(false);
             dispatch(showSnackbar({ message: "Cập nhật thông tin thất bại", severity: "error" }));
         }
     };
 
     return (
-        <Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>Thông tin tài khoản</Typography>
-                {hasAccountType(AccountType.Student) && (
-                    isEditing ? (
-                        <Stack direction="row" spacing={1}>
-                            <Button size="small" startIcon={<Cancel sx={{ fontSize: 16 }} />} onClick={handleCancel} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "text.secondary" }}>Hủy</Button>
-                            <Button variant="contained" size="small" startIcon={<Save sx={{ fontSize: 16 }} />} onClick={() => setConfirmOpen(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", bgcolor: "#f36730", "&:hover": { bgcolor: "#e05520" }, }}>Cập nhật</Button>
-                        </Stack>
-                    ) : (<Button variant="outlined" size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditing(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "#f36730", borderColor: "#f36730", "&:hover": { bgcolor: "#fff3e0", borderColor: "#f36730" }, }}>Chỉnh sửa</Button>))
-                }
-            </Stack>
+        <LoadingOverlay open={isLoading || isUpdating}>
+            <Box>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>Thông tin tài khoản</Typography>
+                    {hasAccountType(AccountType.Student) && (
+                        isEditing ? (
+                            <Stack direction="row" spacing={1}>
+                                <Button size="small" startIcon={<Cancel sx={{ fontSize: 16 }} />} onClick={handleCancel} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "text.secondary" }}>Hủy</Button>
+                                <Button variant="contained" size="small" startIcon={<Save sx={{ fontSize: 16 }} />} onClick={() => setConfirmOpen(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", bgcolor: "#f36730", "&:hover": { bgcolor: "#e05520" }, }}>Cập nhật</Button>
+                            </Stack>
+                        ) : (<Button variant="outlined" size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditing(true)} sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.8rem", color: "#f36730", borderColor: "#f36730", "&:hover": { bgcolor: "#fff3e0", borderColor: "#f36730" }, }}>Chỉnh sửa</Button>))
+                    }
+                </Stack>
 
-            <Divider sx={{ mb: 1 }} />
+                <Divider sx={{ mb: 1 }} />
 
-            <Typography variant="caption" sx={{ display: "block", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "#f36730", mt: 2.5, mb: 1.5, }}>Thông tin cơ bản</Typography>
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Họ và tên"
-                        value={form.FullName} onChange={set("FullName")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><Person sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
+                <Typography variant="caption" sx={{ display: "block", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "#f36730", mt: 2.5, mb: 1.5, }}>Thông tin cơ bản</Typography>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Họ và tên"
+                            value={form.FullName} onChange={set("FullName")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><Person sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Tên đăng nhập"
+                            value={form.UserName}
+                            disabled={true}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><Badge sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Email" type="email"
+                            value={form.Email} onChange={set("Email")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><Email sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Số điện thoại"
+                            value={form.PhoneNumber} onChange={set("PhoneNumber")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><Phone sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Ngày sinh" type="date"
+                            value={form.DateOfBirth} onChange={set("DateOfBirth")}
+                            disabled={!isEditing}
+                            InputLabelProps={{ shrink: true }}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><Cake sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            select size="small" fullWidth label="Giới tính"
+                            value={form.Gender} onChange={setEnum("Gender")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><Wc sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        >
+                            {GENDER_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
+                        </TextField>
+                    </Grid>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Tên đăng nhập"
-                        value={form.UserName}
-                        disabled={true}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><Badge sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Email" type="email"
-                        value={form.Email} onChange={set("Email")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><Email sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Số điện thoại"
-                        value={form.PhoneNumber} onChange={set("PhoneNumber")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><Phone sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Ngày sinh" type="date"
-                        value={form.DateOfBirth} onChange={set("DateOfBirth")}
-                        disabled={!isEditing}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><Cake sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        select size="small" fullWidth label="Giới tính"
-                        value={form.Gender} onChange={setEnum("Gender")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><Wc sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    >
-                        {GENDER_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
-                    </TextField>
-                </Grid>
-            </Grid>
 
-            <Typography variant="caption" sx={{ display: "block", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "#f36730", mt: 2.5, mb: 1.5, }}>Học vấn & Kinh nghiệm</Typography>
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        select size="small" fullWidth label="Trình độ học vấn"
-                        value={form.EducationLevel} onChange={setEnum("EducationLevel")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><School sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    >
-                        {EDUCATION_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
-                    </TextField>
+                <Typography variant="caption" sx={{ display: "block", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "#f36730", mt: 2.5, mb: 1.5, }}>Học vấn & Kinh nghiệm</Typography>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            select size="small" fullWidth label="Trình độ học vấn"
+                            value={form.EducationLevel} onChange={setEnum("EducationLevel")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><School sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        >
+                            {EDUCATION_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
+                        </TextField>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            select size="small" fullWidth label="Kinh nghiệm"
+                            value={form.Experience} onChange={setEnum("Experience")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><WorkHistory sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        >
+                            {EXPERIENCE_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
+                        </TextField>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Năm tốt nghiệp"
+                            value={form.GraduationYear} onChange={set("GraduationYear")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><CalendarMonth sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="GPA" type="number"
+                            value={form.Gpa} onChange={set("Gpa")}
+                            disabled={!isEditing}
+                            inputProps={{ min: 0, max: 4, step: 0.01 }}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><TrendingUp sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        select size="small" fullWidth label="Kinh nghiệm"
-                        value={form.Experience} onChange={setEnum("Experience")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><WorkHistory sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    >
-                        {EXPERIENCE_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
-                    </TextField>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Năm tốt nghiệp"
-                        value={form.GraduationYear} onChange={set("GraduationYear")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><CalendarMonth sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="GPA" type="number"
-                        value={form.Gpa} onChange={set("Gpa")}
-                        disabled={!isEditing}
-                        inputProps={{ min: 0, max: 4, step: 0.01 }}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><TrendingUp sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-            </Grid>
 
-            <Typography variant="caption" sx={{ display: "block", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "#f36730", mt: 2.5, mb: 1.5, }}>Địa chỉ</Typography>
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <Autocomplete
-                        options={countries}
-                        disabled={!isEditing}
-                        getOptionLabel={(o: Country) => o.Name ?? ""}
-                        value={selectedCountry ?? null}
-                        onChange={(_, val: Country | null) => setForm(prev => ({ ...prev, CountryId: val?.Id ?? "", ProvinceId: "", CommuneId: "" }))}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Quốc gia"
-                                size="small"
-                                fullWidth
-                                sx={fs}
-                                InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <Public sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
-                            />
-                        )}
-                    />
+                <Typography variant="caption" sx={{ display: "block", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "#f36730", mt: 2.5, mb: 1.5, }}>Địa chỉ</Typography>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Autocomplete
+                            options={countries}
+                            disabled={!isEditing}
+                            getOptionLabel={(o: Country) => o.Name ?? ""}
+                            value={selectedCountry ?? null}
+                            onChange={(_, val: Country | null) => setForm(prev => ({ ...prev, CountryId: val?.Id ?? "", ProvinceId: "", CommuneId: "" }))}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Quốc gia"
+                                    size="small"
+                                    fullWidth
+                                    sx={fs}
+                                    InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <Public sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
+                                />
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Autocomplete
+                            options={provinces}
+                            disabled={!isEditing}
+                            loading={provincesLoading}
+                            getOptionLabel={(o: Province) => o.Name ?? ""}
+                            value={selectedProvince ?? null}
+                            isOptionEqualToValue={(option, value) => option.Id === value.Id}
+                            onChange={(_, val: Province | null) => setForm(prev => ({ ...prev, ProvinceId: val?.Id ?? "", CommuneId: "" }))}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Tỉnh / Thành phố"
+                                    size="small"
+                                    sx={fs}
+                                    InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
+                                />
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Autocomplete
+                            options={communes}
+                            disabled={!isEditing}
+                            loading={communesLoading}
+                            getOptionLabel={(o: CommuneResponse) => o.Name ?? ""}
+                            isOptionEqualToValue={(option, value) => option.Id === value.Id}
+                            value={selectedCommune}
+                            onChange={(_, val: CommuneResponse | null) => setForm(prev => ({ ...prev, CommuneId: val?.Id ?? "" }))}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Quận / Huyện / Xã"
+                                    size="small"
+                                    sx={fs}
+                                    InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), endAdornment: (<> {communesLoading && <CircularProgress color="inherit" size={14} />}{params.InputProps.endAdornment}</>), }}
+                                />
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                            size="small" fullWidth label="Địa chỉ cụ thể"
+                            value={form.Address} onChange={set("Address")}
+                            disabled={!isEditing}
+                            sx={fs}
+                            InputProps={{ startAdornment: (<InputAdornment position="start"><LocationOn sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <Autocomplete
-                        options={provinces}
-                        disabled={!isEditing}
-                        loading={provincesLoading}
-                        getOptionLabel={(o: Province) => o.Name ?? ""}
-                        value={selectedProvince ?? null}
-                        isOptionEqualToValue={(option, value) => option.Id === value.Id}
-                        onChange={(_, val: Province | null) => setForm(prev => ({ ...prev, ProvinceId: val?.Id ?? "", CommuneId: "" }))}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Tỉnh / Thành phố"
-                                size="small"
-                                sx={fs}
-                                InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), }}
-                            />
-                        )}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <Autocomplete
-                        options={communes}
-                        disabled={!isEditing}
-                        loading={communesLoading}
-                        getOptionLabel={(o: CommuneResponse) => o.Name ?? ""}
-                        isOptionEqualToValue={(option, value) => option.Id === value.Id}
-                        value={selectedCommune}
-                        onChange={(_, val: CommuneResponse | null) => setForm(prev => ({ ...prev, CommuneId: val?.Id ?? "" }))}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Quận / Huyện / Xã"
-                                size="small"
-                                sx={fs}
-                                InputProps={{ ...params.InputProps, startAdornment: (<><InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}> <LocationOn sx={{ fontSize: 16, color: "#f36730" }} /> </InputAdornment>{params.InputProps.startAdornment}</>), endAdornment: (<> {communesLoading && <CircularProgress color="inherit" size={14} />}{params.InputProps.endAdornment}</>), }}
-                            />
-                        )}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                        size="small" fullWidth label="Địa chỉ cụ thể"
-                        value={form.Address} onChange={set("Address")}
-                        disabled={!isEditing}
-                        sx={fs}
-                        InputProps={{ startAdornment: (<InputAdornment position="start"><LocationOn sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
-                    />
-                </Grid>
-            </Grid>
 
-            <ConfirmDialog
-                open={confirmOpen}
-                onClose={() => !isUpdating && setConfirmOpen(false)}
-                onConfirm={handleConfirm}
-                title="Xác nhận cập nhật"
-                message="Bạn có chắc chắn muốn lưu thay đổi không? Thông tin sẽ được cập nhật ngay lập tức."
-            />
-        </Box>
+                <ConfirmDialog
+                    open={confirmOpen}
+                    onClose={() => !isUpdating && setConfirmOpen(false)}
+                    onConfirm={handleConfirm}
+                    title="Xác nhận cập nhật"
+                    message="Bạn có chắc chắn muốn lưu thay đổi không? Thông tin sẽ được cập nhật ngay lập tức."
+                />
+            </Box>
+        </LoadingOverlay>
     );
 }

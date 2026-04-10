@@ -274,15 +274,7 @@ export default function AccountInfoPage() {
                     {/* Right */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid #e5e7eb", p: { xs: 1, md: 2 }, }}>
-                            {activeTab === "info" && (
-                                isLoading ? (
-                                    <Box sx={{ textAlign: "center", py: 8 }}>
-                                        <CircularProgress size={36} sx={{ color: "#f36730" }} />
-                                    </Box>
-                                ) : account ? (
-                                    <AccountInfoPanel account={account} />
-                                ) : null
-                            )}
+                            {activeTab === "info" && (<AccountInfoPanel account={account} isLoading={isLoading} />)}
                             {activeTab === "password" && <ChangePasswordPanel />}
                             {activeTab === "applications" && <ApplicationListPanel />}
                             {activeTab === "favourite-recruitposts" && <FavouriteRecruitPostListPanel />}

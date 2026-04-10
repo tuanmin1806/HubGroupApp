@@ -7,6 +7,10 @@ import { useGetArticlesByPageNoAuthenQuery } from "../../../app/features/article
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import LoadingOverlay from "../loading-overlay";
+import { styled } from "@mui/system";
+import { Article } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 const sectionWrapperSx = {
     width: "100%",
@@ -16,21 +20,44 @@ const sectionWrapperSx = {
     borderRadius: 2,
     border: "1px solid #eee",
     boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-    p: { xs: 1.5, sm: 2, md: 2.5 },
+    p: { xs: 1, sm: 1.5, md: 2 },
 };
+
+const Badge = styled(Box)({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    background: "linear-gradient(135deg, #faa11b, #f5b95e)",
+    padding: "6px 16px",
+    borderRadius: "40px",
+    boxShadow: "0 4px 15px rgba(250, 161, 27, 0.2)",
+});
 
 const ArticleComponent = () => {
 
     const navigate = useNavigate();
     const [page, setPage] = useState(DEFAULT_PAGE);
-    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
+    const { data: articleData, isLoading, isError } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, });
     const articles = articleData?.Items || [];
     return (
+
         <Box sx={sectionWrapperSx}>
+
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Box sx={{ color: "#ff5722", fontSize: { xs: 15, sm: 17, md: 18 }, fontWeight: 700, textTransform: "uppercase" }}>
-                    Bài viết
-                </Box>
+                <Badge>
+                    <Article sx={{ fontSize: 20, color: "#ffffff" }} />
+                    <Typography
+                        sx={{
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            letterSpacing: 1,
+                            textTransform: "uppercase"
+                        }}
+                    >
+                        Bài viết
+                    </Typography>
+                </Badge>
                 <Button
                     variant="outlined"
                     endIcon={<ArrowForward />}
@@ -46,18 +73,19 @@ const ArticleComponent = () => {
                     Xem tất cả
                 </Button>
             </Box>
-
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                    gap: 3,
-                }}
-            >
-                {articles.map((article) => (
-                    <ArticleCard key={article.Id} article={article} />
-                ))}
-            </Box>
+            <LoadingOverlay open={isLoading} error={isError} empty={articles.length === 0}>
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                        gap: 3,
+                    }}
+                >
+                    {articles.map((article) => (
+                        <ArticleCard key={article.Id} article={article} />
+                    ))}
+                </Box>
+            </LoadingOverlay>
         </Box>
     );
 }

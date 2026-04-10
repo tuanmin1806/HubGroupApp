@@ -247,7 +247,7 @@ const ProfessionComponent = () => {
             borderRadius: 2,
             border: "1px solid #eee",
             boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-            p: { xs: 1.5, sm: 2, md: 2.5 },
+            p: { xs: 1, sm: 1.5, md: 2 },
         }}>
             <Box sx={{ mb: { xs: 2, sm: 2.5 } }}>
                 <Badge>

@@ -24,6 +24,7 @@ import { useOrganizationsGetByPageNoAuthenQuery } from "../../../app/features/or
 import { useGetAllOrganizationTypesNoAuthenQuery } from "../../../app/features/organization-type.api";
 import { DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
 import { styled, Typography } from "@mui/material";
+import LoadingOverlay from "../loading-overlay";
 
 const sectionWrapperSx = {
     width: "100%",
@@ -33,7 +34,7 @@ const sectionWrapperSx = {
     borderRadius: 2,
     border: "1px solid #eee",
     boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-    p: { xs: 1.5, sm: 2, md: 2.5 },
+    p: { xs: 1, sm: 1.5, md: 2 },
 };
 
 const Badge = styled(Box)({
@@ -43,7 +44,6 @@ const Badge = styled(Box)({
     background: "linear-gradient(135deg, #faa11b, #f5b95e)",
     padding: "6px 16px",
     borderRadius: "40px",
-    marginBottom: "20px",
     boxShadow: "0 4px 15px rgba(250, 161, 27, 0.2)",
 });
 
@@ -56,7 +56,7 @@ const OrganizationComponent = () => {
     const [selectedProfessionId, setSelectedProfessionId] = useState<string>("");
     const { data: professions = [] } = useGetAllProfessionNoAuthenQuery();
     const { data: organizationTypes = [] } = useGetAllOrganizationTypesNoAuthenQuery();
-    const { data: organizationData } = useOrganizationsGetByPageNoAuthenQuery({
+    const { data: organizationData, isLoading, isError } = useOrganizationsGetByPageNoAuthenQuery({
         page: page,
         size: PAGE_SIZE,
         professionId: selectedProfessionId || undefined,
@@ -369,8 +369,9 @@ const OrganizationComponent = () => {
                     </Button>
                 </Box>
             )}
-
-            <OrganizationSelectActionCard organizations={organizationts} />
+            <LoadingOverlay open={isLoading} error={isError} empty={organizationts.length === 0}>
+                <OrganizationSelectActionCard organizations={organizationts} />
+            </LoadingOverlay>
 
             <Box>
                 <OrganizationPagination
