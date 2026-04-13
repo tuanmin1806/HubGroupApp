@@ -59,17 +59,6 @@ const shimmerMove = keyframes`
     100% { background-position: 200% center; }
 `;
 
-const SectionLabel = styled(Box)({
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 6,
-    background: "linear-gradient(90deg, #faa11b, #f5b95eff)",
-    border: "1px solid #faa11b",
-    borderRadius: 99,
-    padding: "4px 14px",
-    marginBottom: 8,
-});
-
 const Badge = styled(Box)({
     display: "inline-flex",
     alignItems: "center",
@@ -190,9 +179,11 @@ const ProfessionComponent = () => {
         setProfessionIcons(iconsMap);
     }, [professions]);
 
-    const handleCardClick = useCallback(() => {
-        navigate("/chuong-trinh-tuyen-sinh");
-    }, [navigate]);
+    const handleCardClick = (typeId: string) => {
+        navigate("/chuong-trinh-tuyen-sinh", {
+            state: { professionId: typeId }
+        });
+    };
 
     const handleToggleShowAll = useCallback(() => {
         setShowAll(prev => !prev);
@@ -209,7 +200,7 @@ const ProfessionComponent = () => {
             <ProfessionCard
                 key={profession.Id}
                 $delay={index * ANIMATION_DELAY_STEP}
-                onClick={handleCardClick}
+                onClick={() => handleCardClick(profession.Id)}
             >
                 <IconBubble className="card-icon">
                     {professionIcons[profession.Id] || (

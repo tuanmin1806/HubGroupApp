@@ -219,8 +219,10 @@ const OrganizationTypeComponent = () => {
     );
     const hasMore = types.length > visibleCount;
 
-    const handleCardClick = () => {
-        navigate("/tim-kiem-truong");
+    const handleCardClick = (typeId: string) => {
+        navigate("/tim-kiem-truong", {
+            state: { organizationTypeId: typeId }
+        });
     };
 
     const handleToggleShowAll = () => {
@@ -293,7 +295,7 @@ const OrganizationTypeComponent = () => {
                                 key={type.Id}
                                 type={type}
                                 delay={i * 50}
-                                onClick={handleCardClick}
+                                onClick={() => handleCardClick(type.Id)}
                             />
                         ))}
                     </GridContainer>

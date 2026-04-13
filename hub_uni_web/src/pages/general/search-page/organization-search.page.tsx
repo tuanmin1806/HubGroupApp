@@ -79,12 +79,13 @@ const OrganizationSearchPage = () => {
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
     const initialNameSearch = searchParams.get('search') || '';
+    const initialOrgTypeId = location.state?.organizationTypeId || '';
     const [openFilter, setOpenFilter] = useState(false);
 
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filters, setFilters] = useState<OrganizationFilterParams>({
         nameSearch: initialNameSearch,
-        organizationTypeId: '',
+        organizationTypeId: initialOrgTypeId,
         professionId: '',
         provinceId: '',
         communeId: '',
@@ -125,6 +126,13 @@ const OrganizationSearchPage = () => {
             });
         }
     }, [orgTypesData]);
+
+    useEffect(() => {
+        if (initialOrgTypeId && allOrgTypes.length > 0) {
+            const index = allOrgTypes.findIndex(t => t.Id === initialOrgTypeId);
+            if (index >= 5) setShowAllOrgTypes(true);
+        }
+    }, [allOrgTypes, initialOrgTypeId]);
 
     useEffect(() => {
         if (professionsData?.Items) {

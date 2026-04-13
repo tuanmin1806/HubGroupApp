@@ -33,7 +33,7 @@ import Category from "@mui/icons-material/Category";
 import LocationCity from "@mui/icons-material/LocationCity";
 import AccessTime from "@mui/icons-material/AccessTime";
 import AttachMoney from "@mui/icons-material/AttachMoney";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useGetAllProvinceNoAuthenQuery } from "../../../app/features/province.api";
 import { useGetRecruitmentPostsByPageQuery } from "../../../app/features/recruitment-post.api";
 import { BACK_GROUND_BUTTON_COLOR, DEFAULT_PAGE, PAGE_SIZE } from "../../../constants/common.constant";
@@ -71,6 +71,7 @@ const theme = createTheme({
 
 const RecruitmentPostSearchPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const FILTER_PAGE_SIZE = 10;
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [professionPage, setProfessionPage] = useState(1);
@@ -84,6 +85,7 @@ const RecruitmentPostSearchPage = () => {
 
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
+    const initialProfessionId = location.state?.professionId || '';
     const [selectedProvinceSeo, setSelectedProvinceSeo] = useState(initialProvinceSeo);
     const handleLoadMoreProfessions = () => { setProfessionPage(prev => prev + 1); setShowAllProfessions(true); };
     const handleLoadMoreVisaTypes = () => { setVisaTypePage(prev => prev + 1); setShowAllVisaTypes(true); };
@@ -93,7 +95,7 @@ const RecruitmentPostSearchPage = () => {
     const [filters, setFilters] = useState({
         searchValue: "",
         provinceId: "",
-        professionId: "",
+        professionId: initialProfessionId,
         visaTypeId: "",
         fromCost: "",
         toCost: "",
@@ -212,6 +214,13 @@ const RecruitmentPostSearchPage = () => {
             });
         }
     }, [professionsData]);
+
+    useEffect(() => {
+        if (initialProfessionId && allProfessions.length > 0) {
+            const index = allProfessions.findIndex(t => t.Id === initialProfessionId);
+            if (index >= 5) setShowAllProfessions(true);
+        }
+    }, [allProfessions, initialProfessionId]);
 
     useEffect(() => {
         if (visaTypesData?.Items) {

@@ -9,8 +9,8 @@ import ScrollToTop from './components/general/scroll-to-top'
 
 createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
-        <GlobalSnackbar></GlobalSnackbar>
-        <ScrollToTop />
-        <RouterProvider router={router} />
-    </Provider>
+    <GlobalSnackbar></GlobalSnackbar>
+    <ScrollToTop />
+    <RouterProvider router={router} />
+  </Provider>
 )
