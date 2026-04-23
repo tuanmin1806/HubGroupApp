@@ -349,7 +349,20 @@ const RecruitmentPostDetailPage = () => {
                                             '& p': { mb: 2, lineHeight: 1.8, color: 'text.secondary' },
                                             '& ul, & ol': { pl: 3, mb: 2 },
                                             '& li': { mb: 1, lineHeight: 1.8 },
-                                            '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 }
+                                            '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
+                                            '& table': {
+                                                width: '100%',
+                                                borderCollapse: 'collapse',
+                                            },
+                                            '& th, & td': {
+                                                border: '1px solid #ccc',
+                                                padding: '8px',
+                                                textAlign: 'left',
+                                            },
+                                            '& th': {
+                                                backgroundColor: '#f5f5f5',
+                                                fontWeight: 600,
+                                            },
                                         }}
                                     />
                                     <Divider sx={{ my: 2 }} />
