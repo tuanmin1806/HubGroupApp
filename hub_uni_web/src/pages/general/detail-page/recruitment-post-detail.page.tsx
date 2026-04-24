@@ -346,17 +346,17 @@ const RecruitmentPostDetailPage = () => {
                                     <Box
                                         dangerouslySetInnerHTML={{ __html: recruitmentPost.Description }}
                                         sx={{
-                                            '& p': { mb: 2, lineHeight: 1.8, color: 'text.secondary' },
+                                            '& p': { mb: 1.5, lineHeight: 1.5 },
                                             '& ul, & ol': { pl: 3, mb: 2 },
-                                            '& li': { mb: 1, lineHeight: 1.8 },
-                                            '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
+                                            '& li': { mb: 1, lineHeight: 1.5 },
+                                            '& h1, & h2, & h3': { mt: 2, mb: 1 },
                                             '& table': {
                                                 width: '100%',
                                                 borderCollapse: 'collapse',
                                             },
                                             '& th, & td': {
                                                 border: '1px solid #ccc',
-                                                padding: '8px',
+                                                padding: '6px',
                                                 textAlign: 'left',
                                             },
                                             '& th': {
