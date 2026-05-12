@@ -808,7 +808,7 @@ const RecruitmentPostDetailPage = () => {
                             animationDuration: "0.4s, 1.2s",
                         }}
                     >
-                        {isDeletingApply ? "Đang xử lý..." : recruitmentPost.Applied ? "Đã ứng tuyển" : "Ứng tuyển ngay !"}
+                        {isDeletingApply ? "Đang xử lý..." : recruitmentPost.Applied ? "Đã ứng tuyển" : "Ứng tuyển ngay!"}
                     </Button>
                 </Box>
             )}

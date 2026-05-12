@@ -11,22 +11,26 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, permissionGroup, allowedAccountTypes }: ProtectedRouteProps) {
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
 
-    if (!user) {
-        return <Navigate to="/unauthorized" replace />;
+    if (!isLoggedIn || !user) {
+        return <Navigate to="/" replace />;
     }
 
     if (allowedAccountTypes && allowedAccountTypes.length > 0) {
         const hasValidAccountType = allowedAccountTypes.includes(user.AccountType as AccountTypeKey);
-        if (!hasValidAccountType) return <Navigate to={user?.Roles[0]?.DefaultPage ?? "/unauthorized"} replace />;
+        if (!hasValidAccountType) {
+            return <Navigate to={user?.Roles[0]?.DefaultPage ?? "/unauthorized"} replace />;
+        }
     }
 
     if (permissionGroup) {
         const userPermissions: string[] = user?.PermissionKeys ?? [];
         const requiredPermissions = PermissionGroups[permissionGroup];
         const hasAllPermissions = requiredPermissions.every(p => userPermissions.includes(p));
-        if (!hasAllPermissions) return <Navigate to="/unauthorized" replace />;
+        if (!hasAllPermissions) {
+            return <Navigate to="/unauthorized" replace />;
+        }
     }
 
     return <>{children}</>;

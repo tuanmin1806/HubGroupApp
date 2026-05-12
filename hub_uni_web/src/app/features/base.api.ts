@@ -4,6 +4,7 @@ import { logout } from './auth/auth.slice';
 import { RootState } from '../store';
 import { showSnackbar } from './snackbar/snackbar.slice';
 import { TAG_TYPES } from './tags';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL;
 console.log("API_URL =", API_URL);
@@ -19,7 +20,7 @@ const baseQuery = fetchBaseQuery({
         return headers;
     },
 });
-
+let isHandling401 = false;
 const baseQueryWithAuth: BaseQueryFn<
     string | FetchArgs,
     unknown,
@@ -31,19 +32,32 @@ const baseQueryWithAuth: BaseQueryFn<
 
     if (result.error) {
         const status = result.error.status;
-        const errorMessage = 'Đã có lỗi xảy ra';
-        if (status === 401 && getToken()) {
-            if (result.error && result.error.status === 401) {
-                api.dispatch(logout());
-                removeToken();
-                api.dispatch(showSnackbar({ message: 'Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại', severity: 'error' }));
-            } else {
-                api.dispatch(showSnackbar({ message: 'Đã làm mới phiên đăng nhập thành công', severity: 'success' }));
-            }
-        } else {
-            api.dispatch(showSnackbar({ message: errorMessage, severity: 'error' }));
+
+        if (status === 401 && !isHandling401) {
+            isHandling401 = true;
+
+            api.dispatch(logout());
+            removeToken();
+
+            api.dispatch(showSnackbar({
+                message: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+                severity: 'error'
+            }));
+
+            setTimeout(() => {
+                window.location.href = '/sign-out';
+                isHandling401 = false;
+            }, 1500);
+
+        } else if (status !== 401) {
+            const errorMessage = (result.error.data as any)?.message || 'Đã có lỗi xảy ra';
+            api.dispatch(showSnackbar({
+                message: errorMessage,
+                severity: 'error'
+            }));
         }
     }
+
     return result;
 };
 

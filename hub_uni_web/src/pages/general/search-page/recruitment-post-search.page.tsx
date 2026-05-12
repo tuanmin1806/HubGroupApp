@@ -780,13 +780,6 @@ const RecruitmentPostSearchPage = () => {
                                                                     Ứng tuyển
                                                                 </Button>
                                                             )}
-                                                            {!isAdminOrStaff && (
-                                                                <IconButton size="small" color="primary"
-                                                                    onClick={(e) => { e.stopPropagation(); }}
-                                                                    sx={{ border: "1px solid", borderColor: "primary.light", borderRadius: 1.5, width: 30, height: 30 }}>
-                                                                    <FavoriteBorder sx={{ fontSize: 16 }} />
-                                                                </IconButton>
-                                                            )}
                                                         </Stack>
                                                     </Stack>
                                                 </Stack>
