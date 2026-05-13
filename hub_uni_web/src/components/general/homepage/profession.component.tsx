@@ -245,11 +245,12 @@ const ProfessionComponent = () => {
                     <WorkIcon sx={{ fontSize: 20, color: "#ffffff" }} />
                     <Typography
                         sx={{
-                            fontSize: "0.75rem",
+                            fontSize: { xs: "0.7rem", sm: "0.75rem" },
                             fontWeight: 700,
                             color: "#ffffff",
-                            letterSpacing: 1,
-                            textTransform: "uppercase"
+                            letterSpacing: { xs: 0.5, sm: 1 },
+                            textTransform: "uppercase",
+                            lineHeight: 1.3,
                         }}
                     >
                         Khám phá ngành nghề

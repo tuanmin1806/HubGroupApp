@@ -110,21 +110,23 @@ const RecruitmentPostComponent = () => {
     return (
         <Box sx={sectionWrapperSx}>
             {/* Header */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Badge>
-                    <School sx={{ fontSize: 20, color: "#ffffff" }} />
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, flexWrap: "wrap", gap: { xs: 1.5, sm: 2 } }}>
+                <Badge sx={{ padding: { xs: "5px 12px", sm: "6px 16px" }, gap: { xs: "6px", sm: "8px" } }}>
+                    <School sx={{ fontSize: { xs: 18, sm: 20 }, color: "#ffffff" }} />
                     <Typography
                         sx={{
-                            fontSize: "0.75rem",
+                            fontSize: { xs: "0.7rem", sm: "0.75rem" },
                             fontWeight: 700,
                             color: "#ffffff",
-                            letterSpacing: 1,
-                            textTransform: "uppercase"
+                            letterSpacing: { xs: 0.5, sm: 1 },
+                            textTransform: "uppercase",
+                            lineHeight: 1.3,
                         }}
                     >
                         Chương trình tuyển sinh
                     </Typography>
                 </Badge>
+
                 <Button
                     variant="outlined"
                     endIcon={<ArrowForward />}
@@ -133,8 +135,14 @@ const RecruitmentPostComponent = () => {
                     sx={{
                         borderColor: "#ff5722",
                         color: "#ff5722",
-                        fontSize: { xs: 8, sm: 10 },
-                        "&:hover": { bgcolor: "#ff5722", color: "#fff", borderColor: "#ff5722" },
+                        fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                        "&:hover": {
+                            bgcolor: "#ff5722",
+                            color: "#fff",
+                            borderColor: "#ff5722"
+                        },
                     }}
                 >
                     Xem tất cả

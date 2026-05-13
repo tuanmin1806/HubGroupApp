@@ -10,6 +10,7 @@ const HomePage = lazy(() => import("../pages/general/home.page"));
 const AccountInfoPage = lazy(() => import("../pages/student/account-info.page"));
 
 import ProtectedRoute from "../components/protected-route";
+import ScholarshipCalculator from "../pages/general/scholarship_calculator.page";
 
 const generalRoutes = [
     {
@@ -47,6 +48,10 @@ const generalRoutes = [
     {
         path: "/chuong-trinh-tuyen-sinh",
         element: (<RecruitmentPostSearchPage />),
+    },
+    {
+        path: "/cong-cu-tra-cuu-hoc-bong",
+        element: (<ScholarshipCalculator />),
     },
     {
         path: "thong-tin-tai-khoan",

@@ -63,7 +63,7 @@ const theme = createTheme({
 export interface OrganizationFilterParams {
     page?: number;
     size?: number;
-    nameSearch?: string;
+    searchValue?: string;
     organizationTypeId?: string;
     professionId?: string;
     provinceId?: string;
@@ -78,13 +78,13 @@ const OrganizationSearchPage = () => {
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     const initialProvinceSeo = searchParams.get('provinceSeo') || '';
-    const initialNameSearch = searchParams.get('search') || '';
+    const initialSearchValue = searchParams.get('search') || '';
     const initialOrgTypeId = location.state?.organizationTypeId || '';
     const [openFilter, setOpenFilter] = useState(false);
 
     const [page, setPage] = useState(DEFAULT_PAGE);
     const [filters, setFilters] = useState<OrganizationFilterParams>({
-        nameSearch: initialNameSearch,
+        searchValue: initialSearchValue,
         organizationTypeId: initialOrgTypeId,
         professionId: '',
         provinceId: '',
@@ -170,7 +170,7 @@ const OrganizationSearchPage = () => {
 
     const handleSearch = (query?: string, provinceSeo?: string) => {
         if (query !== undefined) {
-            setFilters(prev => ({ ...prev, nameSearch: query }));
+            setFilters(prev => ({ ...prev, searchValue: query }));
         }
         if (provinceSeo !== undefined && provinceSeo !== selectedProvinceSeo) {
             setSelectedProvinceSeo(provinceSeo);
@@ -186,7 +186,7 @@ const OrganizationSearchPage = () => {
 
     const handleClearFilters = () => {
         setFilters({
-            nameSearch: '',
+            searchValue: '',
             organizationTypeId: '',
             professionId: '',
             provinceId: '',
@@ -605,7 +605,7 @@ const OrganizationSearchPage = () => {
                         <SearchBar
                             key={selectedProvinceSeo}
                             onSearch={handleSearch}
-                            initialQuery={filters.nameSearch}
+                            initialQuery={filters.searchValue}
                             initialProvinceSeo={selectedProvinceSeo}
                         />
                     </Box>
