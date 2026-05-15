@@ -9,7 +9,7 @@ import { OrganizationResponse } from "../../app/models/organization.model";
 import Language from "@mui/icons-material/Language";
 import LocationOn from "@mui/icons-material/LocationOn";
 import Visibility from "@mui/icons-material/Visibility";
-import defaultImage from "../../assets/default_organization_card.jpg"
+import defaultImage from "../../assets/hub_logo.png"
 
 interface Props { organizations: OrganizationResponse[]; }
 

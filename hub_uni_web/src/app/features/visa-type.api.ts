@@ -47,5 +47,6 @@ const visaTypeApi = baseApi.injectEndpoints({
 
 export const {
     useGetVisaTypesByPageQuery,
+    useLazyGetVisaTypesByPageQuery,
     useGetAllVisaTypesQuery
 } = visaTypeApi;

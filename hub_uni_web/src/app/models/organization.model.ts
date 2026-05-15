@@ -7,6 +7,18 @@ export interface Profession {
     Cost: number;
 }
 
+export interface Scholarship {
+    Id?: string;
+    Name: string;
+    Gpa: string;
+    VisaTypeId: string;
+    VisaType?: string;
+    LanguageLevelId: string;
+    LanguageLevel?: string;
+    Percentage: string;
+    Description: string;
+}
+
 export interface OrganizationDetailResponse {
     Id: string;
     Name: string;
@@ -59,6 +71,7 @@ export interface OrganizationDetailResponse {
     FollowId: string;
     Followed: boolean;
     FollowCount: number;
+    Scholarships: Scholarship[];
 }
 
 export interface OrganizationResponse {
@@ -114,6 +127,7 @@ export interface UpdateOrganizationRequest {
     Highlights?: string[];
     FeaturedImageUrls?: string[];
     Description: string;
+    Scholarships: Scholarship[];
 }
 
 export interface UpdateOrganizationLogoRequest {

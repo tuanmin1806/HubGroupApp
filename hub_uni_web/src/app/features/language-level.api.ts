@@ -1,8 +1,8 @@
 import { ApiPaginationResponse } from "../models/api.model";
-import { ProfessionFilterParams, ProfessionResponse } from "../models/profession.model";
+import { LanguageLevel, LanguageLevelFilterParams, } from "../models/language-level.model";
 import baseApi from "./base.api";
 
-const buildQueryString = (params?: ProfessionFilterParams): string => {
+const buildQueryString = (params?: LanguageLevelFilterParams): string => {
     if (!params) return "";
     return new URLSearchParams(
         Object.entries(params)
@@ -13,21 +13,21 @@ const buildQueryString = (params?: ProfessionFilterParams): string => {
     ).toString();
 };
 
-const professionApi = baseApi.injectEndpoints({
+const languageLevelApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        getProfessionsByPage: builder.query<ApiPaginationResponse<ProfessionResponse[]>, ProfessionFilterParams>({
+        getLanguageLevelsByPage: builder.query<ApiPaginationResponse<LanguageLevel[]>, LanguageLevelFilterParams>({
             query: (params) => {
                 const queryString = buildQueryString(params);
                 return {
-                    url: `profession/getbypagenoauthen?${queryString}`,
+                    url: `languagelevel/getbypagenoauthen?${queryString}`,
                     method: "GET",
                 };
             },
             transformResponse: (responseData: {
-                Items: ProfessionResponse[];
+                Items: LanguageLevel[];
                 Total: number;
-            }): ApiPaginationResponse<ProfessionResponse[]> => ({
+            }): ApiPaginationResponse<LanguageLevel[]> => ({
                 Items: responseData.Items,
                 Total: responseData.Total,
             }),
@@ -36,6 +36,6 @@ const professionApi = baseApi.injectEndpoints({
 });
 
 export const {
-    useGetProfessionsByPageQuery,
-    useLazyGetProfessionsByPageQuery
-} = professionApi;
+    useGetLanguageLevelsByPageQuery,
+    useLazyGetLanguageLevelsByPageQuery
+} = languageLevelApi;
