@@ -52,7 +52,7 @@ interface Props {
 
 const SectionHeader = ({ title }: { title: string }) => (
     <Grid size={{ xs: 12 }}>
-        <Typography variant="caption" fontWeight={700} sx={{ textTransform: "uppercase" }}> {title} </Typography>
+        <Typography variant="caption" fontWeight={700} sx={{ textTransform: "uppercase" }}>{title}</Typography>
     </Grid>
 );
 
@@ -62,7 +62,7 @@ const emptyScholarship = (): Scholarship => ({
     VisaTypeId: "",
     LanguageLevelId: "",
     Percentage: "",
-    Description: ""
+    Description: "",
 });
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
@@ -76,14 +76,21 @@ function ImageUploadBox({ label, previewUrl, onFileChange, onRemove, required }:
 }) {
     return (
         <Box>
-            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 0.5, display: "block", mb: 0.5 }}> {label}{required && <Box component="span" sx={{ color: "error.main", ml: 0.3 }}>*</Box>}</Typography>
+            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 0.5, display: "block", mb: 0.5 }}>
+                {label}{required && <Box component="span" sx={{ color: "error.main", ml: 0.3 }}>*</Box>}
+            </Typography>
             {previewUrl ? (
                 <Box sx={{ position: "relative", display: "inline-block" }}>
                     <Box component="img" src={previewUrl} sx={{ width: 96, height: 96, objectFit: "contain", borderRadius: 2, border: "1px solid #e0e0e0", bgcolor: "#fafafa", p: 0.5, display: "block" }} />
-                    <IconButton size="small" onClick={onRemove} sx={{ position: "absolute", top: -8, right: -8, bgcolor: "error.main", color: "#fff", width: 20, height: 20, "&:hover": { bgcolor: "error.dark" } }}> <Close sx={{ fontSize: 12 }} /></IconButton>
+                    <IconButton size="small" onClick={onRemove} sx={{ position: "absolute", top: -8, right: -8, bgcolor: "error.main", color: "#fff", width: 20, height: 20, "&:hover": { bgcolor: "error.dark" } }}>
+                        <Close sx={{ fontSize: 12 }} />
+                    </IconButton>
                 </Box>
             ) : (
-                <Button component="label" variant="outlined" size="small" startIcon={<CloudUpload />} sx={{ borderStyle: "dashed", borderColor: "#ccc", color: "text.secondary", textTransform: "none", fontSize: 12, py: 1, "&:hover": { borderColor: "#1975d1", color: "#1975d1" } }}> {labels.selectFile} <input type="file" accept="image/*" hidden onChange={onFileChange} /></Button>
+                <Button component="label" variant="outlined" size="small" startIcon={<CloudUpload />} sx={{ borderStyle: "dashed", borderColor: "#ccc", color: "text.secondary", textTransform: "none", fontSize: 12, py: 1, "&:hover": { borderColor: "#1975d1", color: "#1975d1" } }}>
+                    {labels.selectFile}
+                    <input type="file" accept="image/*" hidden onChange={onFileChange} />
+                </Button>
             )}
         </Box>
     );
@@ -106,7 +113,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
 
     const { data: professionsData } = useGetProfessionsByPageQuery({ page: DEFAULT_PAGE, size: 200 });
     const { data: provinces = [] } = useGetAllProvinceNoAuthenQuery();
-    const { data: communes = [] } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo, });
+    const { data: communes = [] } = useGetCommunesByProvinceQuery(selectedProvinceSeo, { skip: !selectedProvinceSeo });
     const [getVisaTypes] = useLazyGetVisaTypesByPageQuery();
     const [getLanguageLevels] = useLazyGetLanguageLevelsByPageQuery();
     const professionOptions = professionsData?.Items ?? [];
@@ -135,75 +142,92 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     const selectedProvince = provinces.find((p: Province) => p.Id === form.ProvinceId) ?? null;
     const selectedCommune = communes.find((c: CommuneResponse) => c.Id === form.CommuneId) ?? null;
     const [scholarshipRows, setScholarshipRows] = useState<Scholarship[]>([emptyScholarship()]);
-    const [selectedVisaOptions, setSelectedVisaOptions] = useState<any[]>([null]);
-    const [selectedLangOptions, setSelectedLangOptions] = useState<any[]>([null]);
 
-    const loadVisaOptions = useMemo(
-        () => createAsyncLoader(getVisaTypes),
-        [getVisaTypes]
-    );
+    const [selectedVisaOptions, setSelectedVisaOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
+    const [selectedLangOptions, setSelectedLangOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
 
-    const loadLanguageOptions = useMemo(
-        () => createAsyncLoader(getLanguageLevels),
-        [getLanguageLevels]
-    );
+    const loadVisaOptions = useMemo(() => createAsyncLoader(getVisaTypes), [getVisaTypes]);
+    const loadLanguageOptions = useMemo(() => createAsyncLoader(getLanguageLevels), [getLanguageLevels]);
+
     useEffect(() => {
         if (!open) return;
         setLoadingData(true);
-        getOrganization(organizationId).unwrap().then((data: OrganizationDetailResponse) => {
-            setForm({
-                Id: data.Id ?? "", Name: data.Name ?? "", InternationalName: data.InternationalName ?? "",
-                TaxCode: data.TaxCode ?? "", OrganizationTypeId: data.OrganizationTypeId ?? "",
-                WebsiteUrl: data.WebsiteUrl ?? "", PhoneNumber: data.PhoneNumber ?? "", Email: data.Email ?? "",
-                ManagedBy: data.ManagedBy ?? "", Address: data.Address ?? "", DormCost: data.DormCost ?? 0,
-                ProvinceId: data.ProvinceId ?? "", CommuneId: data.CommuneId ?? "",
-                OrgStatus: ConvertService.convertOrgStatusFromString(data.OrgStatus) ?? OrgStatus.Undefined, IsTop: data.IsTop ?? false,
-                Summary: data.Summary ?? "", Description: data.Description ?? "",
-                LogoUrl: data.LogoUrl ?? "", WallpaperUrl: data.WallpaperUrl ?? "",
-                FacebookUrl: data.FacebookUrl ?? "", LinkedinUrl: data.LinkedinUrl ?? "",
-                YoutubeUrl: data.YoutubeUrl ?? "", GoogleMapUrl: data.GoogleMapUrl ?? "",
-                TwitterUrl: data.TwitterUrl ?? "", InstagramUrl: data.InstagramUrl ?? "",
-                Highlights: data.Highlights ?? [],
-                FeaturedImageUrls: data.FeaturedImageUrls ?? [],
-                Professions: data.Professions ?? [],
-                MainProfession: data.MainProfession ?? emptyProfession(),
-                Currency: data.Currency ?? "",
-                Scholarships: data.Scholarships ?? []
-            });
-            if (data.Scholarships && data.Scholarships.length > 0) {
-                setScholarshipRows(data.Scholarships.map((s: any) => ({
-                    Name: s.Name || "",
-                    Gpa: s.Gpa ?? "",
-                    VisaTypeId: s.VisaTypeId || "",
-                    LanguageLevelId: s.LanguageLevelId || "",
-                    Percentage: s.Percentage ?? "",
-                    Description: s.Description || ""
-                })));
+        getOrganization(organizationId).unwrap()
+            .then((data: OrganizationDetailResponse) => {
+                setForm({
+                    Id: data.Id ?? "", Name: data.Name ?? "", InternationalName: data.InternationalName ?? "",
+                    TaxCode: data.TaxCode ?? "", OrganizationTypeId: data.OrganizationTypeId ?? "",
+                    WebsiteUrl: data.WebsiteUrl ?? "", PhoneNumber: data.PhoneNumber ?? "", Email: data.Email ?? "",
+                    ManagedBy: data.ManagedBy ?? "", Address: data.Address ?? "", DormCost: data.DormCost ?? 0,
+                    ProvinceId: data.ProvinceId ?? "", CommuneId: data.CommuneId ?? "",
+                    OrgStatus: ConvertService.convertOrgStatusFromString(data.OrgStatus) ?? OrgStatus.Undefined,
+                    IsTop: data.IsTop ?? false,
+                    Summary: data.Summary ?? "", Description: data.Description ?? "",
+                    LogoUrl: data.LogoUrl ?? "", WallpaperUrl: data.WallpaperUrl ?? "",
+                    FacebookUrl: data.FacebookUrl ?? "", LinkedinUrl: data.LinkedinUrl ?? "",
+                    YoutubeUrl: data.YoutubeUrl ?? "", GoogleMapUrl: data.GoogleMapUrl ?? "",
+                    TwitterUrl: data.TwitterUrl ?? "", InstagramUrl: data.InstagramUrl ?? "",
+                    Highlights: data.Highlights ?? [],
+                    FeaturedImageUrls: data.FeaturedImageUrls ?? [],
+                    Professions: data.Professions ?? [],
+                    MainProfession: data.MainProfession ?? emptyProfession(),
+                    Currency: data.Currency ?? "",
+                    Scholarships: data.Scholarships ?? [],
+                });
 
-                setSelectedVisaOptions(data.Scholarships.map((s: any) =>
-                    s.VisaTypeId ? { value: s.VisaTypeId, label: s.VisaType || "" } : null
-                ));
-                setSelectedLangOptions(data.Scholarships.map((s: any) =>
-                    s.LanguageLevelId ? { value: s.LanguageLevelId, label: s.LanguageLevel || "" } : null
-                ));
-            } else {
-                setScholarshipRows([emptyScholarship()]);
-                setSelectedVisaOptions([null]);
-                setSelectedLangOptions([null]);
-            }
-            if (data.ProvinceId) {
-                const matchedProvince = provinces.find((p: Province) => p.Id === data.ProvinceId);
-                if (matchedProvince) setSelectedProvinceSeo((matchedProvince as Province).SeoUrl ?? "");
-            }
-            setLogoPreview(data.LogoFullUrl ?? null);
-            setWallpaperPreview(data.WallpaperFullUrl ?? null);
-            setExistingFeaturedFullUrls(data.FeaturedImageFullUrls ?? []);
-            setExistingFeaturedRelUrls(data.FeaturedImageUrls ?? []);
-            setNewFeaturedFiles([]);
-        }).catch(() => {
-            dispatch(showSnackbar({ message: labels.cannotLoadOrganizationInfo, severity: "error" }));
-        }).finally(() => setLoadingData(false));
-    }, [open]);
+                if (data.Scholarships && data.Scholarships.length > 0) {
+                    const mappedScholarships = data.Scholarships.map((s: any) => ({
+                        Name: s.Name || "",
+                        Gpa: s.Gpa ?? "",
+                        VisaTypeId: s.VisaTypeId || "",
+                        LanguageLevelId: s.LanguageLevelId || "",
+                        Percentage: s.Percentage ?? "",
+                        Description: s.Description || "",
+                    }));
+                    setScholarshipRows(mappedScholarships);
+
+                    // FIX CHÍNH:
+                    // API getbyid trả về VisaType: "Visa định cư đa dạng" (string trực tiếp, KHÔNG phải object)
+                    // LanguageLevel: "Topik 1" (string trực tiếp)
+                    // → chỉ cần dùng s.VisaType và s.LanguageLevel là đủ
+                    const visaOptions = data.Scholarships.map((s: any) => {
+                        if (!s.VisaTypeId) return null;
+                        return {
+                            value: s.VisaTypeId,
+                            label: s.VisaType || "",   // string trực tiếp từ API
+                        };
+                    });
+                    setSelectedVisaOptions(visaOptions);
+
+                    const langOptions = data.Scholarships.map((s: any) => {
+                        if (!s.LanguageLevelId) return null;
+                        return {
+                            value: s.LanguageLevelId,
+                            label: s.LanguageLevel || "",  // string trực tiếp từ API
+                        };
+                    });
+                    setSelectedLangOptions(langOptions);
+                } else {
+                    setScholarshipRows([emptyScholarship()]);
+                    setSelectedVisaOptions([null]);
+                    setSelectedLangOptions([null]);
+                }
+
+                if (data.ProvinceId) {
+                    const matchedProvince = provinces.find((p: Province) => p.Id === data.ProvinceId);
+                    if (matchedProvince) setSelectedProvinceSeo((matchedProvince as Province).SeoUrl ?? "");
+                }
+                setLogoPreview(data.LogoFullUrl ?? null);
+                setWallpaperPreview(data.WallpaperFullUrl ?? null);
+                setExistingFeaturedFullUrls(data.FeaturedImageFullUrls ?? []);
+                setExistingFeaturedRelUrls(data.FeaturedImageUrls ?? []);
+                setNewFeaturedFiles([]);
+            })
+            .catch(() => {
+                dispatch(showSnackbar({ message: labels.cannotLoadOrganizationInfo, severity: "error" }));
+            })
+            .finally(() => setLoadingData(false));
+    }, [open, organizationId, getOrganization, provinces, dispatch]);
 
     const isScholarshipRowPartiallyFilled = (s: Scholarship) => {
         const filled = [
@@ -216,20 +240,19 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
         return filled > 0 && filled < 5;
     };
 
-    const isScholarshipRowComplete = (s: Scholarship) => {
-        return s.Name.trim() !== "" &&
-            s.Gpa !== "" && s.Gpa !== null &&
-            s.VisaTypeId !== "" &&
-            s.LanguageLevelId !== "" &&
-            s.Percentage !== "" && s.Percentage !== null;
-    };
+    const isScholarshipRowComplete = (s: Scholarship) =>
+        s.Name.trim() !== "" &&
+        s.Gpa !== "" && s.Gpa !== null &&
+        s.VisaTypeId !== "" &&
+        s.LanguageLevelId !== "" &&
+        s.Percentage !== "" && s.Percentage !== null;
 
     useEffect(() => {
         if (form.ProvinceId && provinces.length > 0 && !selectedProvinceSeo) {
             const matchedProvince = provinces.find((p: Province) => p.Id === form.ProvinceId);
             if (matchedProvince) setSelectedProvinceSeo((matchedProvince as Province).SeoUrl ?? "");
         }
-    }, [provinces, form.ProvinceId]);
+    }, [provinces, form.ProvinceId, selectedProvinceSeo]);
 
     const handleProvinceChange = (_: any, opt: any) => {
         set("ProvinceId", opt?.Id ?? "");
@@ -237,9 +260,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
         setSelectedProvinceSeo(opt?.SeoUrl ?? "");
     };
 
-    const handleCommuneChange = (_: any, opt: any) => {
-        set("CommuneId", opt?.Id ?? "");
-    };
+    const handleCommuneChange = (_: any, opt: any) => set("CommuneId", opt?.Id ?? "");
 
     const validateImage = (file: File) => {
         if (file.size > 5 * 1024 * 1024) { dispatch(showSnackbar({ message: labels.imageSizeExceeded, severity: "error" })); return false; }
@@ -283,7 +304,9 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
         e.target.value = "";
     };
 
-    const removeNewFeatured = (i: number) => { setNewFeaturedFiles((prev) => { URL.revokeObjectURL(prev[i].preview); return prev.filter((_, idx) => idx !== i); }); };
+    const removeNewFeatured = (i: number) => {
+        setNewFeaturedFiles((prev) => { URL.revokeObjectURL(prev[i].preview); return prev.filter((_, idx) => idx !== i); });
+    };
     const removeExistingFeatured = (i: number) => {
         setExistingFeaturedFullUrls((prev) => prev.filter((_, idx) => idx !== i));
         setExistingFeaturedRelUrls((prev) => prev.filter((_, idx) => idx !== i));
@@ -296,20 +319,12 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     const addProfession = () => set("Professions", [...form.Professions, emptyProfession()]);
     const updateProfessionField = (i: number, field: string, val: any) => { const arr = [...form.Professions]; arr[i] = { ...arr[i], [field]: val }; set("Professions", arr); };
     const removeProfession = (i: number) => set("Professions", form.Professions.filter((_: any, idx: number) => idx !== i));
-
-    const updateProfession = (i: number, data: Partial<Profession>) => {
-        const arr = [...form.Professions];
-        arr[i] = { ...arr[i], ...data };
-        set("Professions", arr);
-    };
+    const updateProfession = (i: number, data: Partial<Profession>) => { const arr = [...form.Professions]; arr[i] = { ...arr[i], ...data }; set("Professions", arr); };
 
     const handleSubmit = async () => {
         const partial = scholarshipRows.filter(isScholarshipRowPartiallyFilled);
         if (partial.length > 0) {
-            dispatch(showSnackbar({
-                message: "Vui lòng điền đầy đủ thông tin học bổng hoặc xóa hàng chưa hoàn thành!",
-                severity: "error"
-            }));
+            dispatch(showSnackbar({ message: "Vui lòng điền đầy đủ thông tin học bổng hoặc xóa hàng chưa hoàn thành!", severity: "error" }));
             return;
         }
         setIsSubmitting(true);
@@ -321,9 +336,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                 const results = await uploadManyFiles(fd).unwrap();
                 newFeaturedUrls = results.map((r: any) => r.RelativeUrl);
             }
-            const validScholarships = scholarshipRows
-                .filter(isScholarshipRowComplete)
-                .map(s => ({ ...s }));
+            const validScholarships = scholarshipRows.filter(isScholarshipRowComplete).map((s) => ({ ...s }));
             await updateOrganization({
                 ...form,
                 Scholarships: validScholarships,
@@ -334,7 +347,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
             dispatch(showSnackbar({ message: labels.updateSuccess, severity: "success" }));
             newFeaturedFiles.forEach((f) => URL.revokeObjectURL(f.preview));
             onClose();
-        } catch (err) {
+        } catch {
             dispatch(showSnackbar({ message: labels.updateFailed, severity: "error" }));
         } finally {
             setIsSubmitting(false);
@@ -342,46 +355,37 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     };
 
     const addScholarshipRow = () => {
-        setScholarshipRows(prev => [...prev, emptyScholarship()]);
-        setSelectedVisaOptions(prev => [...prev, null]);
-        setSelectedLangOptions(prev => [...prev, null]);
+        setScholarshipRows((prev) => [...prev, emptyScholarship()]);
+        setSelectedVisaOptions((prev) => [...prev, null]);
+        setSelectedLangOptions((prev) => [...prev, null]);
     };
 
     const removeScholarshipRow = (index: number) => {
-        setScholarshipRows(prev => prev.filter((_, i) => i !== index));
-        setSelectedVisaOptions(prev => prev.filter((_, i) => i !== index));
-        setSelectedLangOptions(prev => prev.filter((_, i) => i !== index));
+        setScholarshipRows((prev) => prev.filter((_, i) => i !== index));
+        setSelectedVisaOptions((prev) => prev.filter((_, i) => i !== index));
+        setSelectedLangOptions((prev) => prev.filter((_, i) => i !== index));
     };
 
     const handleScholarshipChange = (index: number, field: keyof Scholarship, value: any) => {
-        setScholarshipRows(prev => {
+        setScholarshipRows((prev) => {
             const updated = [...prev];
             updated[index] = { ...updated[index], [field]: value };
             return updated;
         });
     };
 
-    const handleVisaChange = (index: number, option: any) => {
-        setSelectedVisaOptions(prev => {
-            const arr = [...prev];
-            arr[index] = option;
-            return arr;
-        });
+    const handleVisaChange = (index: number, option: { value: string; label: string } | null) => {
+        setSelectedVisaOptions((prev) => { const arr = [...prev]; arr[index] = option; return arr; });
         handleScholarshipChange(index, "VisaTypeId", option?.value ?? "");
     };
 
-    const handleLangChange = (index: number, option: any) => {
-        setSelectedLangOptions(prev => {
-            const arr = [...prev];
-            arr[index] = option;
-            return arr;
-        });
+    const handleLangChange = (index: number, option: { value: string; label: string } | null) => {
+        setSelectedLangOptions((prev) => { const arr = [...prev]; arr[index] = option; return arr; });
         handleScholarshipChange(index, "LanguageLevelId", option?.value ?? "");
     };
 
     const tf = { size: "small" as const, fullWidth: true, sx: { "& .MuiInputBase-root": { minHeight: 38 }, "& .MuiInputBase-input": { padding: "8px 12px", fontSize: 13 } } };
     const tfMultiline = { size: "small" as const, fullWidth: true, sx: { "& .MuiInputBase-input": { fontSize: 13 } } };
-
     const findProfOpt = (id: string) => professionOptions.find((p: ProfessionResponse) => p.Id === id) ?? null;
 
     return (
@@ -401,12 +405,12 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                     <Grid container spacing={2}>
 
                         <SectionHeader title={labels.basicInfo} />
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> {labels.name} <RequiredStar /> </>} value={form.Name} onChange={(e) => set("Name", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.internationalName} value={form.InternationalName} onChange={(e) => set("InternationalName", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.taxCode} value={form.TaxCode} onChange={(e) => set("TaxCode", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.managedBy} value={form.ManagedBy} onChange={(e) => set("ManagedBy", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labels.name} <RequiredStar /></>} value={form.Name} onChange={(e) => set("Name", e.target.value)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={labels.internationalName} value={form.InternationalName} onChange={(e) => set("InternationalName", e.target.value)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={labels.taxCode} value={form.TaxCode} onChange={(e) => set("TaxCode", e.target.value)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={labels.managedBy} value={form.ManagedBy} onChange={(e) => set("ManagedBy", e.target.value)} /></Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField {...tf} label={<> {labels.status} <RequiredStar /> </>} select value={form.OrgStatus} onChange={(e) => set("OrgStatus", e.target.value)}>
+                            <TextField {...tf} label={<>{labels.status} <RequiredStar /></>} select value={form.OrgStatus} onChange={(e) => set("OrgStatus", e.target.value)}>
                                 <MenuItem value={OrgStatus.Undefined}>{labels.undefined}</MenuItem>
                                 <MenuItem value={OrgStatus.Active}>{labels.active}</MenuItem>
                                 <MenuItem value={OrgStatus.Inactive}>{labels.inactive}</MenuItem>
@@ -414,32 +418,22 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                             </TextField>
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField
-                                {...tf}
-                                label={labels.dormCost}
-                                type="number"
-                                value={form.DormCost}
+                            <TextField {...tf} label={labels.dormCost} type="number" value={form.DormCost}
                                 onChange={(e) => set("DormCost", Number(e.target.value))}
                                 slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }}
                             />
                         </Grid>
-                        <SectionHeader title={labels.profession} />
 
+                        <SectionHeader title={labels.profession} />
                         <Grid size={{ xs: 12 }}>
-                            <Typography variant="body2" fontWeight={600} mb={1.5}> {labels.mainProfession} </Typography>
+                            <Typography variant="body2" fontWeight={600} mb={1.5}>{labels.mainProfession}</Typography>
                             <Grid container spacing={1.5}>
                                 <Grid size={{ xs: 12, sm: 8 }}>
-                                    <Autocomplete
-                                        size="small"
-                                        options={professionOptions}
+                                    <Autocomplete size="small" options={professionOptions}
                                         getOptionLabel={(opt: ProfessionResponse) => opt.Name ?? ""}
                                         isOptionEqualToValue={(opt: ProfessionResponse, val: ProfessionResponse) => opt.Id === val?.Id}
                                         value={findProfOpt(form.MainProfession?.ProfessionId ?? "")}
-                                        onChange={(_: any, opt: any) => set("MainProfession", {
-                                            ...form.MainProfession,
-                                            ProfessionId: opt?.Id ?? "",
-                                            ProfessionName: opt?.Name ?? "",
-                                        })}
+                                        onChange={(_: any, opt: any) => set("MainProfession", { ...form.MainProfession, ProfessionId: opt?.Id ?? "", ProfessionName: opt?.Name ?? "" })}
                                         renderInput={(params) => <TextField {...params} label={labels.selectMainProfession} />}
                                     />
                                 </Grid>
@@ -447,43 +441,40 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                     <TextField {...tf} label={labels.tuitionFee} type="number"
                                         slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }}
                                         value={form.MainProfession?.Cost ?? 0}
-                                        onChange={(e) => set("MainProfession", { ...form.MainProfession, Cost: Number(e.target.value) })} />
+                                        onChange={(e) => set("MainProfession", { ...form.MainProfession, Cost: Number(e.target.value) })}
+                                    />
                                 </Grid>
                             </Grid>
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                <Typography variant="body2" fontWeight={600}> {labels.professions} ({form.Professions.length}) </Typography>
-                                <Button size="small" startIcon={<Add />} onClick={addProfession} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}> {labels.add} </Button>
+                                <Typography variant="body2" fontWeight={600}>{labels.professions} ({form.Professions.length})</Typography>
+                                <Button size="small" startIcon={<Add />} onClick={addProfession} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}>{labels.add}</Button>
                             </Stack>
                             <Stack spacing={1}>
                                 {form.Professions.map((p: Profession, i: number) => (
                                     <Box key={i} sx={{ p: 1, borderRadius: 2, border: "0.5px solid #e8e8e8", bgcolor: "#fafafa" }}>
                                         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                            <Typography variant="caption" color="text.secondary" fontWeight={600}> {labels.major} {i + 1}</Typography>
-                                            <IconButton size="small" onClick={() => removeProfession(i)} sx={{ color: "error.main" }}>
-                                                <Delete sx={{ fontSize: 16 }} />
-                                            </IconButton>
+                                            <Typography variant="caption" color="text.secondary" fontWeight={600}>{labels.major} {i + 1}</Typography>
+                                            <IconButton size="small" onClick={() => removeProfession(i)} sx={{ color: "error.main" }}><Delete sx={{ fontSize: 16 }} /></IconButton>
                                         </Stack>
                                         <Grid container spacing={1.5}>
                                             <Grid size={{ xs: 12, sm: 8 }}>
-                                                <Autocomplete
-                                                    size="small"
-                                                    options={professionOptions}
+                                                <Autocomplete size="small" options={professionOptions}
                                                     getOptionLabel={(opt: ProfessionResponse) => opt.Name ?? ""}
                                                     isOptionEqualToValue={(opt: ProfessionResponse, val: ProfessionResponse) => opt.Id === val?.Id}
                                                     value={findProfOpt(p.ProfessionId)}
-                                                    onChange={(_: any, opt: any) => {
-                                                        updateProfession(i, {
-                                                            ProfessionId: opt?.Id ?? "",
-                                                            ProfessionName: opt?.Name ?? "",
-                                                        });
-                                                    }}
+                                                    onChange={(_: any, opt: any) => updateProfession(i, { ProfessionId: opt?.Id ?? "", ProfessionName: opt?.Name ?? "" })}
                                                     renderInput={(params) => <TextField {...params} label={labels.selectProfession} />}
                                                 />
                                             </Grid>
-                                            <Grid size={{ xs: 12, sm: 4 }}> <TextField {...tf} label={labels.tuitionFee} type="number" value={p.Cost} onChange={(e) => updateProfessionField(i, "Cost", Number(e.target.value))} slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }} /></Grid>
+                                            <Grid size={{ xs: 12, sm: 4 }}>
+                                                <TextField {...tf} label={labels.tuitionFee} type="number" value={p.Cost}
+                                                    onChange={(e) => updateProfessionField(i, "Cost", Number(e.target.value))}
+                                                    slotProps={{ input: { endAdornment: <InputAdornment position="end">{form.Currency}</InputAdornment> } }}
+                                                />
+                                            </Grid>
                                         </Grid>
                                     </Box>
                                 ))}
@@ -491,13 +482,28 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                         </Grid>
 
                         <SectionHeader title={labels.contactAndAddress} />
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.email} type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.phoneNumber} value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={labels.website} value={form.WebsiteUrl} onChange={(e) => set("WebsiteUrl", e.target.value)} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={provinces} getOptionLabel={(opt: Province) => opt.Name ?? ""} isOptionEqualToValue={(opt: Province, val: Province) => opt.Id === val?.Id} value={selectedProvince} onChange={handleProvinceChange} renderInput={(params) => <TextField {...params} label={<>{labels.province} <RequiredStar /> </>} />} /> </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}> <Autocomplete size="small" options={communes} getOptionLabel={(opt: CommuneResponse) => opt.Name ?? ""} isOptionEqualToValue={(opt: CommuneResponse, val: CommuneResponse) => opt.Id === val?.Id} value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedProvinceSeo} noOptionsText={selectedProvinceSeo ? labels.noData : labels.selectProvinceFirst} renderInput={(params) => <TextField {...params} label={<> {labels.commune} <RequiredStar /> </>} placeholder={!selectedProvinceSeo ? labels.selectProvinceFirst : ""} />} /> </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={<> {labels.address} <RequiredStar /> </>} value={form.Address} onChange={(e) => set("Address", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={labels.email} type="email" value={form.Email} onChange={(e) => set("Email", e.target.value)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={labels.phoneNumber} value={form.PhoneNumber} onChange={(e) => set("PhoneNumber", e.target.value)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={labels.website} value={form.WebsiteUrl} onChange={(e) => set("WebsiteUrl", e.target.value)} /></Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Autocomplete size="small" options={provinces}
+                                getOptionLabel={(opt: Province) => opt.Name ?? ""}
+                                isOptionEqualToValue={(opt: Province, val: Province) => opt.Id === val?.Id}
+                                value={selectedProvince} onChange={handleProvinceChange}
+                                renderInput={(params) => <TextField {...params} label={<>{labels.province} <RequiredStar /></>} />}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Autocomplete size="small" options={communes}
+                                getOptionLabel={(opt: CommuneResponse) => opt.Name ?? ""}
+                                isOptionEqualToValue={(opt: CommuneResponse, val: CommuneResponse) => opt.Id === val?.Id}
+                                value={selectedCommune} onChange={handleCommuneChange}
+                                disabled={!selectedProvinceSeo}
+                                noOptionsText={selectedProvinceSeo ? labels.noData : labels.selectProvinceFirst}
+                                renderInput={(params) => <TextField {...params} label={<>{labels.commune} <RequiredStar /></>} placeholder={!selectedProvinceSeo ? labels.selectProvinceFirst : ""} />}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}><TextField {...tf} label={<>{labels.address} <RequiredStar /></>} value={form.Address} onChange={(e) => set("Address", e.target.value)} /></Grid>
 
                         <SectionHeader title={labels.socialNetworks} />
                         {[
@@ -507,7 +513,11 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                             { field: "TwitterUrl", label: labels.twitter },
                             { field: "InstagramUrl", label: labels.instagram },
                             { field: "GoogleMapUrl", label: labels.googleMap },
-                        ].map(({ field, label }) => (<Grid key={field} size={{ xs: 12, sm: 6 }}> <TextField {...tf} label={label} value={form[field] ?? ""} onChange={(e) => set(field, e.target.value)} /> </Grid>))}
+                        ].map(({ field, label }) => (
+                            <Grid key={field} size={{ xs: 12, sm: 6 }}>
+                                <TextField {...tf} label={label} value={form[field] ?? ""} onChange={(e) => set(field, e.target.value)} />
+                            </Grid>
+                        ))}
 
                         <SectionHeader title={labels.images} />
                         <Grid size={{ xs: 12, sm: 6 }}>
@@ -520,11 +530,13 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                 onFileChange={handleWallpaperChange}
                                 onRemove={() => { set("WallpaperUrl", ""); setWallpaperPreview(null); }} />
                         </Grid>
-
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
                                 <Typography variant="body2" fontWeight={600}>{labels.featuredImages}</Typography>
-                                <Button component="label" size="small" startIcon={<Add />} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}> {labels.add} <input type="file" accept="image/*" multiple hidden onChange={handleFeaturedImagesChange} /> </Button>
+                                <Button component="label" size="small" startIcon={<Add />} sx={{ color: "#1975d1", textTransform: "none", fontSize: 12 }}>
+                                    {labels.add}
+                                    <input type="file" accept="image/*" multiple hidden onChange={handleFeaturedImagesChange} />
+                                </Button>
                             </Stack>
                             {(existingFeaturedFullUrls.length > 0 || newFeaturedFiles.length > 0) && (
                                 <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 1 }}>
@@ -550,7 +562,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                         </Grid>
 
                         <SectionHeader title={labels.content} />
-                        <Grid size={{ xs: 12 }}> <TextField {...tfMultiline} label={labels.summary} multiline rows={2} value={form.Summary} onChange={(e) => set("Summary", e.target.value)} /> </Grid>
+                        <Grid size={{ xs: 12 }}><TextField {...tfMultiline} label={labels.summary} multiline rows={2} value={form.Summary} onChange={(e) => set("Summary", e.target.value)} /></Grid>
                         <Grid size={{ xs: 12 }}>
                             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
                                 <Typography variant="body2" fontWeight={600}>{labels.highlights}</Typography>
@@ -560,13 +572,12 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                 {form.Highlights.map((h: string, i: number) => (
                                     <Stack key={i} direction="row" spacing={1} alignItems="center">
                                         <TextField {...tf} placeholder={`${labels.highlights} ${i + 1}`} value={h} onChange={(e) => updateHighlight(i, e.target.value)} />
-                                        <IconButton size="small" onClick={() => removeHighlight(i)} sx={{ color: "error.main", flexShrink: 0 }}>
-                                            <Delete fontSize="small" />
-                                        </IconButton>
+                                        <IconButton size="small" onClick={() => removeHighlight(i)} sx={{ color: "error.main", flexShrink: 0 }}><Delete fontSize="small" /></IconButton>
                                     </Stack>
                                 ))}
                             </Stack>
                         </Grid>
+
                         <SectionHeader title="Học bổng" />
                         <Grid size={12}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
@@ -580,28 +591,24 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                 <Paper key={index} sx={{ p: 2, mb: 2, border: "1px solid #e0e0e0" }}>
                                     <Stack direction="row" justifyContent="space-between" mb={2}>
                                         <Typography variant="subtitle2">Học bổng {index + 1}</Typography>
-                                        <IconButton color="error" onClick={() => removeScholarshipRow(index)}>
-                                            <Delete />
-                                        </IconButton>
+                                        <IconButton color="error" onClick={() => removeScholarshipRow(index)}><Delete /></IconButton>
                                     </Stack>
-
                                     <Grid container spacing={2}>
                                         <Grid size={{ xs: 12, sm: 6 }}>
                                             <TextField fullWidth size="small" label="Tên học bổng *"
                                                 value={scholarship.Name}
-                                                onChange={e => handleScholarshipChange(index, "Name", e.target.value)} />
+                                                onChange={(e) => handleScholarshipChange(index, "Name", e.target.value)} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 3 }}>
                                             <TextField fullWidth size="small" label="GPA tối thiểu *"
                                                 value={scholarship.Gpa}
-                                                onChange={e => handleScholarshipChange(index, "Gpa", e.target.value)} />
+                                                onChange={(e) => handleScholarshipChange(index, "Gpa", e.target.value)} />
                                         </Grid>
                                         <Grid size={{ xs: 12, sm: 3 }}>
                                             <TextField fullWidth size="small" label="Phần trăm (%) *"
                                                 value={scholarship.Percentage}
-                                                onChange={e => handleScholarshipChange(index, "Percentage", e.target.value)} />
+                                                onChange={(e) => handleScholarshipChange(index, "Percentage", e.target.value)} />
                                         </Grid>
-
                                         <Grid size={{ xs: 12, sm: 6 }}>
                                             <AsyncAutocomplete
                                                 label="Loại visa *"
@@ -618,19 +625,19 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                                 onChange={(option) => handleLangChange(index, option)}
                                             />
                                         </Grid>
-
                                         <Grid size={12}>
                                             <TextField fullWidth size="small" multiline rows={2} label="Mô tả"
                                                 value={scholarship.Description}
-                                                onChange={e => handleScholarshipChange(index, "Description", e.target.value)} />
+                                                onChange={(e) => handleScholarshipChange(index, "Description", e.target.value)} />
                                         </Grid>
                                     </Grid>
                                 </Paper>
                             ))}
                         </Grid>
+
                         <Grid size={{ xs: 12 }}>
                             <Paper sx={{ p: 1, borderRadius: 2 }}>
-                                <Typography variant="body2" fontWeight={600} mb={1}>{<> {labels.description} <RequiredStar /> </>}</Typography>
+                                <Typography variant="body2" fontWeight={600} mb={1}><>{labels.description} <RequiredStar /></></Typography>
                                 <RichTextEditorComponent value={form.Description} onChange={(val: string) => set("Description", val)} />
                             </Paper>
                         </Grid>
@@ -642,7 +649,8 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                 <Button onClick={onClose} size="small" sx={{ textTransform: "none", color: "text.secondary" }}>{labels.cancel}</Button>
                 <Button variant="contained" onClick={handleSubmit} disabled={isSubmitting} size="small"
                     sx={{ textTransform: "none", bgcolor: "#1975d1", "&:hover": { bgcolor: "#1975d1" }, minWidth: 50 }}
-                    startIcon={isSubmitting ? <CircularProgress size={14} color="inherit" /> : undefined}> {isSubmitting ? labels.saving : labels.save}
+                    startIcon={isSubmitting ? <CircularProgress size={14} color="inherit" /> : undefined}>
+                    {isSubmitting ? labels.saving : labels.save}
                 </Button>
             </DialogActions>
         </Dialog>

@@ -14,6 +14,7 @@ const OrganizationTypeComponent = lazy(() => import("../../components/general/ho
 const DashboardComponent = lazy(() => import("../../components/general/homepage/dashboard.component"));
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import LoadingOverlay from "../../components/general/loading-overlay";
 
 const theme = createTheme({
     palette: {

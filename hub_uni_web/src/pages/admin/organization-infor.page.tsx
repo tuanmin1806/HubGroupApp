@@ -28,6 +28,8 @@ import Map from "@mui/icons-material/Map";
 import Bed from "@mui/icons-material/Bed";
 import CameraAlt from "@mui/icons-material/CameraAlt";
 import Info from "@mui/icons-material/Info";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { useState } from "react";
 import { getUserInfo } from "../../app/services/auth.service";
 import { useGetOrganizationByIdQuery } from "../../app/features/organization.api";
@@ -238,7 +240,7 @@ export default function OrganizationInforPage() {
                 </Container>
             </Box>
 
-            <Container sx={{ mt: 1 }}>
+            <Container sx={{ mt: 1 }} maxWidth="xl">
                 <Grid container spacing={0.5}>
 
                     <Grid size={{ xs: 12, md: 8 }}>
@@ -272,6 +274,59 @@ export default function OrganizationInforPage() {
                                             </Stack>
                                         ))}
                                     </Stack>
+                                </SectionCard>
+                            )}
+
+                            {data.Scholarships?.length > 0 && (
+                                <SectionCard
+                                    title={`Học bổng (${data.Scholarships.length})`}
+                                    icon={<EmojiEventsIcon sx={{ color: "#1975d1" }} />}
+                                >
+                                    <Grid container spacing={1}>
+                                        {data.Scholarships.map((s: any, index: number) => (
+                                            <Grid key={index} size={{ xs: 12, sm: 6 }}>
+                                                <Box sx={{ height: "100%", borderRadius: 3, p: 2, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%)", border: "1px solid rgba(25,117,209,0.12)", transition: "all 0.25s ease", "&:hover": { transform: "translateY(-2px)" }, }}>
+                                                    <Stack spacing={1}>
+                                                        <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#1f2937", lineHeight: 1.4, }}>
+                                                            {s.Name}
+                                                        </Typography>
+
+                                                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                                            {s.Gpa && (
+                                                                <Chip size="small" label={`GPA ${s.Gpa}+`} sx={{ bgcolor: "#dbeafe", color: "#1975d1", fontWeight: 600, fontSize: 12 }} />
+                                                            )}
+
+                                                            {s.LanguageLevel && (
+                                                                <Chip size="small" label={s.LanguageLevel} sx={{ bgcolor: "#ede9fe", color: "#6d28d9", fontWeight: 600, fontSize: 12 }} />
+                                                            )}
+
+                                                            {s.VisaType && (
+                                                                <Chip size="small" label={s.VisaType} sx={{ bgcolor: "#dcfce7", color: "#15803d", fontWeight: 600, fontSize: 12 }} />
+                                                            )}
+                                                        </Stack>
+
+                                                        <Divider />
+
+                                                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                                            <Typography sx={{ fontSize: 13, color: "text.secondary" }}>
+                                                                Hỗ trợ học phí
+                                                            </Typography>
+
+                                                            <Typography sx={{ fontWeight: 800, fontSize: 20, color: "#1975d1", lineHeight: 1 }}>
+                                                                {s.Percentage}%
+                                                            </Typography>
+                                                        </Stack>
+
+                                                        {s.Description && (
+                                                            <Typography sx={{ fontSize: 13, color: "text.secondary", lineHeight: 1.7, mt: 0.5 }}>
+                                                                {s.Description}
+                                                            </Typography>
+                                                        )}
+                                                    </Stack>
+                                                </Box>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
                                 </SectionCard>
                             )}
 
@@ -401,48 +456,73 @@ export default function OrganizationInforPage() {
 
                             {/* Main Profession */}
                             {data.MainProfession && (
-                                <SectionCard title={labels.mainProfession} icon={<Star sx={{ color: "#1975d1" }} />}>
+                                <SectionCard
+                                    title={labels.mainProfession}
+                                    icon={<BusinessCenterIcon sx={{ color: "#1975d1" }} />}
+                                >
                                     <Box
                                         sx={{
-                                            p: 1,
-                                            borderRadius: 1,
-                                            bgcolor: "#c8dff7ff",
+                                            position: "relative",
+                                            overflow: "hidden",
+                                            borderRadius: 3,
+                                            p: { xs: 1, sm: 1.5 },
+                                            background: "linear-gradient(135deg, #f8fbff 0%, #eef5ff 45%, #e3f0ff 100%)",
+                                            border: "1px solid rgba(25,117,209,0.12)",
+                                            transition: "all 0.25s ease",
+                                            "&:hover": {
+                                                transform: "translateY(-2px)",
+                                                boxShadow: "0 10px 24px rgba(25,117,209,0.12)",
+                                            },
                                         }}
                                     >
-                                        <Typography fontWeight={700} fontSize={14} mb={0.5}>
-                                            {data.MainProfession.ProfessionName}
-                                        </Typography>
-                                        <Typography sx={{ color: "#1975d1", fontWeight: 600, fontSize: 13 }}>
-                                            {ConvertService.formatCurrencyVND(data.MainProfession.Cost)} {data.Currency}
-                                        </Typography>
+                                        <Box sx={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, borderRadius: "50%", bgcolor: "rgba(25,117,209,0.08)", }} />
+
+                                        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ position: "relative", zIndex: 1 }}>
+                                            <Box flex={1} minWidth={0}>
+                                                <Typography sx={{ fontWeight: 700, fontSize: { xs: 10, sm: 12, md: 12 }, color: "#1f2937", mb: 0.8, }}>
+                                                    {data.MainProfession.ProfessionName}
+                                                </Typography>
+
+                                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                                    <Typography sx={{ color: "#1975d1", fontWeight: 800, fontSize: { xs: 12, sm: 14, }, lineHeight: 1, }} >
+                                                        {ConvertService.formatCurrencyVND(data.MainProfession.Cost)}{" "}{data.Currency}
+                                                    </Typography>
+                                                </Stack>
+                                            </Box>
+                                        </Stack>
                                     </Box>
                                 </SectionCard>
                             )}
 
                             {/* Professions */}
                             {data.Professions?.length > 0 && (
-                                <SectionCard title={`${labels.professions} (${data.Professions.length})`} icon={<School sx={{ color: "#1975d1" }} />}>
-                                    <Stack spacing={0} divider={<Divider />}>
+                                <SectionCard
+                                    title={`${labels.professions} (${data.Professions.length})`}
+                                    icon={<School sx={{ color: "#1975d1" }} />}
+                                >
+                                    <Stack spacing={1.2}>
                                         {data.Professions.map((p: Profession, i: number) => (
-                                            <Stack
+                                            <Box
                                                 key={i}
-                                                direction="row"
-                                                justifyContent="space-between"
-                                                alignItems="center"
-                                                py={1}
+                                                sx={{
+                                                    position: "relative", overflow: "hidden", borderRadius: 2.5, p: { xs: 1.3, sm: 1.6 },
+                                                    background: "linear-gradient(135deg, #ffffff 0%, #f8fbff 100%)", border: "1px solid rgba(25,117,209,0.10)", transition: "all 0.25s ease",
+                                                    "&:hover": { transform: "translateY(-2px)", boxShadow: "0 8px 22px rgba(25,117,209,0.10)", borderColor: "rgba(25,117,209,0.20)", },
+                                                }}
                                             >
-                                                <Typography sx={{ fontSize: 13, flex: 1, pr: 1 }}>
-                                                    {p.ProfessionName}
-                                                </Typography>
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: 12, fontWeight: 600,
-                                                        color: "#1975d1", whiteSpace: "nowrap",
-                                                    }}
-                                                >
-                                                    {ConvertService.formatCurrencyVND(p.Cost)} {data.Currency}
-                                                </Typography>
-                                            </Stack>
+                                                <Box sx={{ position: "absolute", top: -18, right: -18, width: 70, height: 70, borderRadius: "50%", bgcolor: "rgba(25,117,209,0.05)", }} />
+
+                                                <Stack direction="row" spacing={1.2} alignItems="center" sx={{ position: "relative", zIndex: 1 }} >
+                                                    <Box flex={1} minWidth={0}>
+                                                        <Typography sx={{ fontSize: { xs: 13, sm: 14 }, fontWeight: 700, color: "#1f2937", lineHeight: 1.5, mb: 0.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", }}> {p.ProfessionName} </Typography>
+
+                                                        <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+                                                            <Chip label="Ngành đào tạo" size="small" sx={{ height: 22, bgcolor: "#eef5ff", color: "#1975d1", fontWeight: 700, fontSize: 11, }} />
+                                                            <Typography sx={{ fontSize: { xs: 13, sm: 14 }, fontWeight: 800, color: "#1975d1", whiteSpace: "nowrap", }}> {ConvertService.formatCurrencyVND(p.Cost)}{" "}{data.Currency} </Typography>
+                                                        </Stack>
+                                                    </Box>
+                                                </Stack>
+                                            </Box>
                                         ))}
                                     </Stack>
                                 </SectionCard>
@@ -458,34 +538,12 @@ export default function OrganizationInforPage() {
     );
 }
 
-function SectionCard({
-    title, icon, children,
-}: {
-    title: string;
-    icon: React.ReactNode;
-    children: React.ReactNode;
-}) {
+function SectionCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode; }) {
     return (
-        <Box
-            sx={{
-                bgcolor: "#fff",
-                borderRadius: 1.5,
-                overflow: "hidden",
-            }}
-        >
-            <Stack
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                sx={{
-                    px: 2, py: 1,
-                    borderBottom: "1px solid #f0f0f0",
-                }}
-            >
+        <Box sx={{ bgcolor: "#fff", borderRadius: 1.5, overflow: "hidden", }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 2, py: 1, borderBottom: "1px solid #f0f0f0", }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>
-                <Typography fontWeight={700} fontSize={15}>
-                    {title}
-                </Typography>
+                <Typography fontWeight={700} fontSize={15}>{title}</Typography>
             </Stack>
             <Box sx={{ p: 2 }}>{children}</Box>
         </Box>

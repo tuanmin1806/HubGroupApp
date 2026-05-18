@@ -41,6 +41,7 @@
     "react-dom": "^19.2.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.12.0",
+    "react-select-async-paginate": "^0.7.11",
     "tailwindcss": "^4.1.18",
     "tippy.js": "^6.3.7",
     "tiptap-extensions": "^0.17.0"

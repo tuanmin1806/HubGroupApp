@@ -4,10 +4,8 @@ import { logout } from './auth/auth.slice';
 import { RootState } from '../store';
 import { showSnackbar } from './snackbar/snackbar.slice';
 import { TAG_TYPES } from './tags';
-import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL;
-console.log("API_URL =", API_URL);
 const baseQuery = fetchBaseQuery({
     baseUrl: API_URL,
     prepareHeaders: (headers, { getState, endpoint }) => {

@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import { lazy, useMemo } from "react";
 import Person from "@mui/icons-material/Person";
 import Phone from "@mui/icons-material/Phone";
 import Email from "@mui/icons-material/Email";
@@ -42,6 +42,10 @@ import { showSnackbar } from "../../app/features/snackbar/snackbar.slice";
 import { fieldSx } from "../../styles/fieldSx";
 import { hasAccountType } from "../../utils/auth.utils";
 import LoadingOverlay from "../general/loading-overlay";
+import { createAsyncLoader } from "../../helper/asyncLoaders";
+import { useLazyGetVisaTypesByPageQuery } from "../../app/features/visa-type.api";
+import { useLazyGetLanguageLevelsByPageQuery } from "../../app/features/language-level.api";
+import AsyncAutocomplete from "../base/AsyncAutocomplete";
 const ConfirmDialog = lazy(() => import("../dialogs/general/student-confirm.dialog"));
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
@@ -87,6 +91,8 @@ interface EditableForm {
     ProvinceId: string;
     CommuneId: string;
     Address: string;
+    VisaTypeId: string | null;
+    LanguageLevelId: string | null;
 }
 
 function buildForm(account: CustomerResponse): EditableForm {
@@ -108,6 +114,8 @@ function buildForm(account: CustomerResponse): EditableForm {
         ProvinceId: p?.ProvinceId ?? "",
         CommuneId: p?.CommuneId ?? "",
         Address: p?.Address ?? "",
+        VisaTypeId: p?.VisaTypeId ?? null,
+        LanguageLevelId: p?.LanguageLevelId ?? null,
     };
 }
 
@@ -135,6 +143,8 @@ function buildUpdatePayload(account: CustomerResponse, form: EditableForm) {
             ProvinceId: form.ProvinceId,
             CommuneId: form.CommuneId,
             Address: form.Address,
+            VisaTypeId: form.VisaTypeId,
+            LanguageLevelId: form.LanguageLevelId,
         },
     };
 }
@@ -147,6 +157,7 @@ function buildEmptyForm(): EditableForm {
         EducationLevel: EducationLevel.Undefined,
         GraduationYear: "", Gpa: "",
         CountryId: "", ProvinceId: "", CommuneId: "", Address: "",
+        VisaTypeId: null, LanguageLevelId: null,
     };
 }
 
@@ -156,6 +167,8 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [form, setForm] = useState<EditableForm>(() => account ? buildForm(account) : buildEmptyForm());
     const fs = fieldSx(isEditing);
+    const [selectedVisaOptions, setSelectedVisaOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
+    const [selectedLangOptions, setSelectedLangOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
 
     useEffect(() => {
         if (account) setForm(buildForm(account));
@@ -168,11 +181,26 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
     const { data: communes = [], isFetching: communesLoading } = useGetCommunesByProvinceQuery(selectedProvince?.SeoUrl ?? "", { skip: !selectedProvince });
     const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
     const selectedCommune = communes.find(c => c.Id === form.CommuneId) ?? null;
+    const [getVisaTypes] = useLazyGetVisaTypesByPageQuery();
+    const [getLanguageLevels] = useLazyGetLanguageLevelsByPageQuery();
     const set = (field: keyof EditableForm) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: e.target.value }));
     const setEnum = <K extends keyof EditableForm>(field: K) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: Number(e.target.value) }));
     const handleCancel = () => {
         setIsEditing(false);
         if (account) setForm(buildForm(account));
+    };
+
+    const loadVisaOptions = useMemo(() => createAsyncLoader(getVisaTypes), [getVisaTypes]);
+    const loadLanguageOptions = useMemo(() => createAsyncLoader(getLanguageLevels), [getLanguageLevels]);
+
+    const handleVisaChange = (index: number, option: { value: string; label: string } | null) => {
+        setSelectedVisaOptions((prev) => { const arr = [...prev]; arr[index] = option; return arr; });
+        setForm(prev => ({ ...prev, VisaTypeId: option?.value ?? "" }));
+    };
+
+    const handleLangChange = (index: number, option: { value: string; label: string } | null) => {
+        setSelectedLangOptions((prev) => { const arr = [...prev]; arr[index] = option; return arr; });
+        setForm(prev => ({ ...prev, LanguageLevelId: option?.value ?? "" }));
     };
 
     const handleConfirm = async () => {
@@ -307,6 +335,24 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
                             inputProps={{ min: 0, max: 4, step: 0.01 }}
                             sx={fs}
                             InputProps={{ startAdornment: (<InputAdornment position="start"><TrendingUp sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <AsyncAutocomplete
+                            label="Loại visa"
+                            loadOptions={loadVisaOptions}
+                            isDisabled={!isEditing}
+                            value={selectedVisaOptions[0] ?? null}
+                            onChange={(option) => handleVisaChange(0, option)}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <AsyncAutocomplete
+                            label="Trình độ ngôn ngữ"
+                            loadOptions={loadLanguageOptions}
+                            isDisabled={!isEditing}
+                            value={selectedLangOptions[0] ?? null}
+                            onChange={(option) => handleLangChange(0, option)}
                         />
                     </Grid>
                 </Grid>

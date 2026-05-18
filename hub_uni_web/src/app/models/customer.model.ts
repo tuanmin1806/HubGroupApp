@@ -16,6 +16,10 @@ export interface ProfileInfo {
     CommuneId?: string;
     Address?: string;
     Gender?: Gender;
+    VisaTypeId?: string | null;
+    VisaType?: string | null;
+    LanguageLevelId?: string | null;
+    LanguageLevel?: string | null;
 }
 
 export interface CustomerResponse {
@@ -40,6 +44,10 @@ export interface CustomerResponse {
     ProfileInfo?: ProfileInfo;
     OrganizationName?: string;
     OrganizationId?: string;
+    VisaTypeId?: string | null;
+    VisaType?: string | null;
+    LanguageLevelId?: string | null;
+    LanguageLevel?: string | null;
 }
 
 export interface CreateCustomerRequest {

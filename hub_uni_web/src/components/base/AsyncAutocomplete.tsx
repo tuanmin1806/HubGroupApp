@@ -1,152 +1,65 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Autocomplete, TextField, CircularProgress, } from "@mui/material";
+import React, { useState } from "react";
+import { AsyncPaginate } from "react-select-async-paginate";
 import { DEFAULT_PAGE_SIZE } from "../../constants/common.constant";
+
+export interface SelectOption {
+    value: string;
+    label: string;
+}
 
 interface AsyncAutocompleteProps {
     label: string;
-    loadOptions: (params: { search: string; page: number; size: number }) => Promise<any[]>;
-    value: any | null;
-    onChange: (option: any | null) => void;
-    placeholder?: string;
-    size?: "small" | "medium";
+    loadOptions: (params: {
+        searchValue: string;
+        page: number;
+        size: number;
+    }) => Promise<SelectOption[]>;
+    value: SelectOption | null;
+    onChange: (option: SelectOption | null) => void;
+    isDisabled?: boolean;
 }
 
-const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = ({
-    label,
-    loadOptions,
-    value,
-    onChange,
-    placeholder = "Tìm kiếm...",
-    size = "small",
-}) => {
-    const [options, setOptions] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
-    const [inputValue, setInputValue] = useState("");
-    const [page, setPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState("");
+const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = ({ label, loadOptions, value, onChange, isDisabled = false }) => {
+    const [isFocused, setIsFocused] = useState(false);
 
-    const observerRef = useRef<IntersectionObserver | null>(null);
-    const timeoutRef = useRef<number | null>(null);
+    const handleLoadOptions = async (
+        inputValue: string,
+        _loadedOptions: unknown,
+        additional: { page: number } | undefined
+    ) => {
+        const page = additional?.page ?? 1;
+        const items = await loadOptions({ searchValue: inputValue, page, size: DEFAULT_PAGE_SIZE });
 
-    const loadData = useCallback(async (search: string, currentPage: number, isLoadMore = false) => {
-        if (isLoadMore) {
-            setLoadingMore(true);
-        } else {
-            setLoading(true);
-            setOptions([]);
-        }
-
-        try {
-            const result = await loadOptions({
-                search: search.trim(),
-                page: currentPage,
-                size: DEFAULT_PAGE_SIZE,
-            });
-
-            if (isLoadMore) {
-                setOptions((prev) => [...prev, ...result]);
-            } else {
-                setOptions(result);
-                setPage(1);
-            }
-
-            setHasMore(result.length === DEFAULT_PAGE_SIZE);
-        } catch (error) {
-            setHasMore(false);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
-        }
-    }, [loadOptions]);
-
-    useEffect(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
-
-        timeoutRef.current = window.setTimeout(() => {
-            setSearchTerm(inputValue);
-            loadData(inputValue, 1, false);
-        }, 1500);
-
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
+        return {
+            options: items,
+            hasMore: items.length === DEFAULT_PAGE_SIZE,
+            additional: { page: page + 1 },
         };
-    }, [inputValue, loadData]);
-
-    const lastOptionRef = useCallback(
-        (node: HTMLLIElement | null) => {
-            if (loadingMore || !hasMore) return;
-
-            if (observerRef.current) observerRef.current.disconnect();
-
-            observerRef.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    const nextPage = page + 1;
-                    setPage(nextPage);
-                    loadData(searchTerm, nextPage, true);
-                }
-            });
-
-            if (node) observerRef.current.observe(node);
-        },
-        [loadingMore, hasMore, page, searchTerm, loadData]
-    );
-
-    useEffect(() => {
-        return () => {
-            if (observerRef.current) observerRef.current.disconnect();
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        };
-    }, []);
+    };
 
     return (
-        <Autocomplete
-            size={size}
-            options={options}
-            loading={loading}
-            value={value}
-            onChange={(_, newValue) => onChange(newValue)}
-            inputValue={inputValue}
-            onInputChange={(_, newValue) => setInputValue(newValue)}
-            getOptionLabel={(option) => option?.label || ""}
-            isOptionEqualToValue={(option, val) => option?.value === val?.value}
-            filterOptions={(x) => x}
-            loadingText="Đang tải..."
-            noOptionsText="Không tìm thấy kết quả"
-            renderOption={(props, option, { index }) => {
-                const isLast = index === options.length - 1;
-                return (
-                    <li
-                        ref={isLast ? lastOptionRef : undefined}
-                        {...props}
-                        key={option.value}
-                    >
-                        {option.label}
-                    </li>
-                );
-            }}
-            renderInput={(params) => (
-                <TextField
-                    {...params}
-                    label={label}
-                    placeholder={placeholder}
-                    InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                            <>
-                                {(loading || loadingMore) && <CircularProgress color="inherit" size={18} sx={{ mr: 1 }} />}
-                                {params.InputProps.endAdornment}
-                            </>
-                        ),
-                    }}
-                />
-            )}
-        />
+        <div style={{ position: "relative" }}>
+
+            <AsyncPaginate
+                value={value}
+                loadOptions={handleLoadOptions}
+                onChange={(opt) => onChange(opt as SelectOption | null)}
+                isDisabled={isDisabled}
+                isClearable
+                debounceTimeout={1000}
+                additional={{ page: 1 }}
+                loadingMessage={() => "Đang tải..."}
+                noOptionsMessage={({ inputValue }) => inputValue ? "Không tìm thấy kết quả" : "Nhập để tìm kiếm"}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                styles={{
+                    menu: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                    }),
+                }}
+            />
+        </div>
     );
 };
 
