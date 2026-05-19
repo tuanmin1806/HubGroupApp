@@ -17,6 +17,11 @@ export interface Scholarship {
     LanguageLevel?: string;
     Percentage: string;
     Description: string;
+    OrganizationEnglishName?: string;
+    OrganizationName?: string;
+    OrganizationLogoUrl?: string;
+    OrganizationCode?: string;
+    OrganizationSeoUrl?: string;
 }
 
 export interface OrganizationDetailResponse {

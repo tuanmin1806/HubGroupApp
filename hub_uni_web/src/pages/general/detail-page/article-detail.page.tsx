@@ -181,19 +181,6 @@ const ArticleDetailPage = () => {
                                     flexWrap="wrap"
                                     sx={{ mb: 3, pb: 2, borderBottom: "1px solid #e0e0e0" }}
                                 >
-                                    {/* Author */}
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>
-                                            {MainArticle.CreatedBy.charAt(0).toUpperCase()}
-                                        </Avatar>
-                                        <Typography variant="body2" fontWeight={500}>
-                                            {MainArticle.CreatedBy}
-                                        </Typography>
-                                    </Stack>
-
-                                    {/* Divider */}
-                                    <Box sx={{ width: 4, height: 4, borderRadius: "50%", bgcolor: "text.secondary" }} />
-
                                     {/* Date */}
                                     <Stack direction="row" spacing={0.5} alignItems="center">
                                         <CalendarToday sx={{ fontSize: 16, color: "text.secondary" }} />

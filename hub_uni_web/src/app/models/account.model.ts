@@ -1,3 +1,4 @@
+import { ProfileInfo } from "./customer.model";
 import type { Department } from "./department.model";
 import type { AccountStatus, AccountType, Gender } from "./enums.model";
 import type { Position } from "./position.model";
@@ -22,6 +23,7 @@ export interface AccountResponse {
     Roles: RoleResponse[];
     Departments: Department[];
     AccountStatus: AccountStatus;
+    ProfileInfo?: ProfileInfo;
 }
 
 export interface UpdateAccountRequest {

@@ -171,7 +171,30 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
     const [selectedLangOptions, setSelectedLangOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
 
     useEffect(() => {
-        if (account) setForm(buildForm(account));
+        if (account) {
+            setForm(buildForm(account));
+            if (account.ProfileInfo?.VisaTypeId && account.ProfileInfo?.VisaType) {
+                setSelectedVisaOptions([
+                    {
+                        value: account.ProfileInfo.VisaTypeId,
+                        label: account.ProfileInfo.VisaType
+                    }
+                ]);
+            } else {
+                setSelectedVisaOptions([null]);
+            }
+
+            if (account.ProfileInfo?.LanguageLevelId && account.ProfileInfo?.LanguageLevel) {
+                setSelectedLangOptions([
+                    {
+                        value: account.ProfileInfo.LanguageLevelId,
+                        label: account.ProfileInfo.LanguageLevel
+                    }
+                ]);
+            } else {
+                setSelectedLangOptions([null]);
+            }
+        }
     }, [account]);
 
     const { data: countries = [] } = useGetAllCountryNoAuthenQuery();
@@ -298,57 +321,115 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
                 <Grid container spacing={2}>
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                            select size="small" fullWidth label="Trình độ học vấn"
-                            value={form.EducationLevel} onChange={setEnum("EducationLevel")}
+                            select
+                            size="small"
+                            fullWidth
+                            label="Trình độ học vấn"
+                            value={form.EducationLevel}
+                            onChange={setEnum("EducationLevel")}
                             disabled={!isEditing}
                             sx={fs}
-                            InputProps={{ startAdornment: (<InputAdornment position="start"><School sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <School sx={{ fontSize: 16, color: "#f36730" }} />
+                                    </InputAdornment>
+                                ),
+                            }}
                         >
-                            {EDUCATION_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
+                            {EDUCATION_OPTIONS.map(({ value, label }) => (
+                                <MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>
+                                    {label}
+                                </MenuItem>
+                            ))}
                         </TextField>
                     </Grid>
+
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                            select size="small" fullWidth label="Kinh nghiệm"
-                            value={form.Experience} onChange={setEnum("Experience")}
+                            select
+                            size="small"
+                            fullWidth
+                            label="Kinh nghiệm"
+                            value={form.Experience}
+                            onChange={setEnum("Experience")}
                             disabled={!isEditing}
                             sx={fs}
-                            InputProps={{ startAdornment: (<InputAdornment position="start"><WorkHistory sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <WorkHistory sx={{ fontSize: 16, color: "#f36730" }} />
+                                    </InputAdornment>
+                                ),
+                            }}
                         >
-                            {EXPERIENCE_OPTIONS.map(({ value, label }) => (<MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>{label}</MenuItem>))}
+                            {EXPERIENCE_OPTIONS.map(({ value, label }) => (
+                                <MenuItem key={value} value={value} sx={{ fontSize: "0.875rem" }}>
+                                    {label}
+                                </MenuItem>
+                            ))}
                         </TextField>
                     </Grid>
+
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                            size="small" fullWidth label="Năm tốt nghiệp"
-                            value={form.GraduationYear} onChange={set("GraduationYear")}
+                            size="small"
+                            fullWidth
+                            label="Năm tốt nghiệp"
+                            value={form.GraduationYear}
+                            onChange={set("GraduationYear")}
                             disabled={!isEditing}
                             sx={fs}
-                            InputProps={{ startAdornment: (<InputAdornment position="start"><CalendarMonth sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <CalendarMonth sx={{ fontSize: 16, color: "#f36730" }} />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                     </Grid>
+
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                            size="small" fullWidth label="GPA" type="number"
-                            value={form.Gpa} onChange={set("Gpa")}
+                            size="small"
+                            fullWidth
+                            label="GPA"
+                            type="number"
+                            value={form.Gpa}
+                            onChange={set("Gpa")}
                             disabled={!isEditing}
                             inputProps={{ min: 0, max: 4, step: 0.01 }}
                             sx={fs}
-                            InputProps={{ startAdornment: (<InputAdornment position="start"><TrendingUp sx={{ fontSize: 16, color: "#f36730" }} /></InputAdornment>), }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <TrendingUp sx={{ fontSize: 16, color: "#f36730" }} />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                     </Grid>
+
                     <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 500, }}>
+                            Loại visa
+                        </Typography>
                         <AsyncAutocomplete
-                            label="Loại visa"
+                            label=""
                             loadOptions={loadVisaOptions}
                             isDisabled={!isEditing}
                             value={selectedVisaOptions[0] ?? null}
                             onChange={(option) => handleVisaChange(0, option)}
                         />
                     </Grid>
+
                     <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 500, }}>
+                            Trình độ ngoại ngữ
+                        </Typography>
                         <AsyncAutocomplete
-                            label="Trình độ ngôn ngữ"
+                            label=""
                             loadOptions={loadLanguageOptions}
                             isDisabled={!isEditing}
                             value={selectedLangOptions[0] ?? null}

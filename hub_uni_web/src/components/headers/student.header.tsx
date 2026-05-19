@@ -38,6 +38,8 @@ const NAV_LINKS = [
     { label: "Danh sách trường", action: "organization" },
     { label: "Chương trình tuyển sinh", action: "recruitment" },
     { label: "Bài viết", action: "article" },
+    { label: "Tra cứu học bổng", action: "scholarshipCalculator" }
+
 ];
 
 const HUBGROUP_LINKS = [
@@ -60,6 +62,7 @@ function StudentHeader() {
             organization: () => navigate("/tim-kiem-truong"),
             recruitment: () => navigate("/chuong-trinh-tuyen-sinh"),
             article: () => navigate("/bai-viet"),
+            scholarshipCalculator: () => navigate("/tra-cuu-hoc-bong"),
         };
         routes[action]?.();
         setOpenDrawer(false);

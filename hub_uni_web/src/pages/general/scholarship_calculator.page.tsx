@@ -3,1037 +3,612 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Slider from "@mui/material/Slider";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
-import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 import { styled, keyframes } from "@mui/material/styles";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import SchoolIcon from "@mui/icons-material/School";
-import HomeIcon from "@mui/icons-material/Home";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
-import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-import WifiIcon from "@mui/icons-material/Wifi";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import StarIcon from "@mui/icons-material/Star";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { useLazyGetVisaTypesByPageQuery } from "../../app/features/visa-type.api";
+import { useLazyGetLanguageLevelsByPageQuery } from "../../app/features/language-level.api";
+import { useLazyGetRecommendScholarshipsQuery } from "../../app/features/scholarship.api";
+import { createAsyncLoader } from "../../helper/asyncLoaders";
+import { Scholarship } from "../../app/models/organization.model";
+import AsyncAutocomplete, { SelectOption } from "../../components/base/AsyncAutocomplete";
 
-// Animations
 const fadeUp = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 `;
 
-const shimmer = keyframes`
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+const floatOrb = keyframes`
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -20px) scale(1.05); }
+  66%       { transform: translate(-20px, 15px) scale(0.97); }
 `;
 
-// Styled Components
-const PageContainer = styled(Box)({
-    background: "linear-gradient(180deg, #fff5e6 0%, #ffffff 100%)",
+const pulseRing = keyframes`
+  0%   { box-shadow: 0 0 0 0 rgba(250, 161, 27, 0.4); }
+  70%  { box-shadow: 0 0 0 12px rgba(250, 161, 27, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(250, 161, 27, 0); }
+`;
+
+const staggerIn = keyframes`
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+`;
+
+
+const PageWrapper = styled(Box)({
     minHeight: "100vh",
-    paddingBottom: "60px",
+    background: "#fafaf8",
+    paddingBottom: 80,
+    fontFamily: "'DM Sans', sans-serif",
 });
 
-const HeaderSection = styled(Box)(({ theme }) => ({
-    background: "linear-gradient(135deg, #faa11b 0%, #f5b95e 100%)",
-    padding: "48px 20px 110px",
+const HeroSection = styled(Box)(({ theme }) => ({
     position: "relative",
     overflow: "hidden",
+    background: "linear-gradient(145deg, #1a1208 0%, #2d1f06 50%, #1a1208 100%)",
+    padding: "56px 20px 120px",
 
-    [theme.breakpoints.down('md')]: {
-        padding: "40px 16px 100px",
-    },
-
-    [theme.breakpoints.down('sm')]: {
-        padding: "32px 12px 90px",
-    },
-
-    "&::before": {
-        content: '""',
-        position: "absolute",
-        top: "-50%",
-        left: "-10%",
-        width: "120%",
-        height: "200%",
-        background: "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
-        animation: `${shimmer} 3s infinite linear`,
-    },
+    [theme.breakpoints.down("md")]: { padding: "44px 16px 104px" },
+    [theme.breakpoints.down("sm")]: { padding: "36px 12px 96px" },
 }));
 
-const Badge = styled(Box)(({ theme }) => ({
+const Orb = styled(Box)<{ size: number; top: string; left: string; delay: string }>(
+    ({ size, top, left, delay }) => ({
+        position: "absolute",
+        width: size,
+        height: size,
+        top,
+        left,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(250,161,27,0.25) 0%, transparent 70%)",
+        animation: `${floatOrb} 8s ease-in-out infinite`,
+        animationDelay: delay,
+        pointerEvents: "none",
+    })
+);
+
+const HeroBadge = styled(Box)({
     display: "inline-flex",
     alignItems: "center",
-    gap: "6px",
-    background: "rgba(255,255,255,0.25)",
-    padding: "4px 16px",
-    borderRadius: "20px",
-    marginBottom: "16px",
-    border: "1px solid rgba(255,255,255,0.3)",
-    backdropFilter: "blur(10px)",
+    gap: 8,
+    background: "rgba(250,161,27,0.15)",
+    border: "1px solid rgba(250,161,27,0.35)",
+    borderRadius: 100,
+    padding: "6px 18px",
+    marginBottom: 20,
+    backdropFilter: "blur(8px)",
+});
 
-    [theme.breakpoints.down('sm')]: {
-        padding: "3px 12px",
-        gap: "4px",
-    },
-}));
-
-const CalculatorCard = styled(Card)(({ theme }) => ({
-    borderRadius: "20px",
-    padding: "28px",
-    marginTop: "-70px",
+const FormCard = styled(Card)(({ theme }) => ({
+    borderRadius: 24,
+    padding: "36px 32px",
+    marginTop: -80,
     position: "relative",
-    zIndex: 2,
-    boxShadow: "0 8px 32px rgba(250, 161, 27, 0.12)",
-    border: "1px solid rgba(250, 161, 27, 0.1)",
-    animation: `${fadeUp} 0.6s ease`,
+    zIndex: 10,
     background: "#ffffff",
+    border: "1px solid rgba(0,0,0,0.06)",
+    boxShadow: "0 24px 64px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04)",
 
-    [theme.breakpoints.down('md')]: {
-        padding: "24px",
-        marginTop: "-60px",
-    },
-
-    [theme.breakpoints.down('sm')]: {
-        padding: "20px",
-        marginTop: "-50px",
-        borderRadius: "16px",
+    [theme.breakpoints.down("sm")]: {
+        padding: "24px 20px",
+        borderRadius: 20,
+        marginTop: -60,
     },
 }));
 
-const ResultCard = styled(Card)(({ theme }) => ({
-    borderRadius: "16px",
-    padding: "24px",
-    background: "linear-gradient(135deg, #ffffff 0%, #fef9f0 100%)",
-    border: "1px solid rgba(250, 161, 27, 0.1)",
-    transition: "all 0.3s ease",
+const FormSectionLabel = styled(Typography)({
+    fontSize: "0.7rem",
+    fontWeight: 700,
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+    color: "#aaa",
+    marginBottom: 20,
+});
+
+const SubmitButton = styled(Button)(({ theme }) => ({
+    marginTop: 28,
+    height: 52,
+    borderRadius: 12,
+    background: "linear-gradient(135deg, #faa11b 0%, #ff8c00 100%)",
+    fontSize: "0.95rem",
+    fontWeight: 700,
+    textTransform: "none",
+    letterSpacing: 0.3,
+    color: "#fff",
+    boxShadow: "0 6px 20px rgba(250,161,27,0.35)",
+    transition: "all 0.25s ease",
+    animation: `${pulseRing} 2.5s infinite`,
 
     "&:hover": {
-        transform: "translateY(-2px)",
-        boxShadow: "0 8px 24px rgba(250, 161, 27, 0.15)",
+        background: "linear-gradient(135deg, #ff9500 0%, #e67c00 100%)",
+        boxShadow: "0 8px 28px rgba(250,161,27,0.45)",
+        transform: "translateY(-1px)",
     },
 
-    [theme.breakpoints.down('sm')]: {
-        padding: "20px",
-        borderRadius: "14px",
+    "&.Mui-disabled": {
+        background: "#e8e8e8",
+        color: "#bbb",
+        boxShadow: "none",
+        animation: "none",
     },
+
+    [theme.breakpoints.down("sm")]: { height: 48, fontSize: "0.875rem" },
 }));
 
-const CostItem = styled(Box)(({ theme }) => ({
+const ResultsHeader = styled(Box)({
     display: "flex",
     alignItems: "center",
-    gap: "14px",
-    padding: "14px",
-    borderRadius: "10px",
-    background: "#ffffff",
-    marginBottom: "10px",
-    transition: "all 0.2s ease",
-    border: "1px solid #f5f5f5",
+    gap: 12,
+    marginBottom: 24,
+});
 
-    "&:hover": {
-        background: "#fef9f0",
-        borderColor: "rgba(250, 161, 27, 0.2)",
-    },
-
-    [theme.breakpoints.down('sm')]: {
-        padding: "12px",
-        gap: "12px",
-    },
-}));
-
-const SchoolCard = styled(Card)(({ theme }) => ({
-    borderRadius: "16px",
-    padding: "20px",
-    cursor: "pointer",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    border: "1px solid rgba(250, 161, 27, 0.12)",
-    position: "relative",
+const SchoolCardStyled = styled(Card)<{ index: number }>(({ theme, index }) => ({
+    borderRadius: 20,
     overflow: "hidden",
-    background: "#ffffff",
-
-    "&::before": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: "3px",
-        background: "linear-gradient(90deg, #faa11b, #f5b95e)",
-        transform: "scaleX(0)",
-        transition: "transform 0.35s ease",
-    },
+    background: "#fff",
+    border: "1px solid rgba(0,0,0,0.06)",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+    transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+    animation: `${staggerIn} 0.5s ease both`,
+    animationDelay: `${index * 0.08}s`,
+    display: "flex",
+    flexDirection: "column",
 
     "&:hover": {
-        transform: "translateY(-4px)",
-        boxShadow: "0 12px 28px rgba(250, 161, 27, 0.18)",
-        borderColor: "rgba(250, 161, 27, 0.3)",
-        "&::before": { transform: "scaleX(1)" },
-    },
-
-    [theme.breakpoints.down('sm')]: {
-        padding: "16px",
-        borderRadius: "14px",
+        transform: "translateY(-6px)",
+        boxShadow: "0 16px 40px rgba(250,161,27,0.18), 0 4px 12px rgba(0,0,0,0.08)",
+        borderColor: "rgba(250,161,27,0.3)",
     },
 }));
 
-// Interfaces
+const SchoolCardAccent = styled(Box)({
+    height: 4,
+    background: "linear-gradient(90deg, #faa11b 0%, #ff8c00 60%, #ffcd70 100%)",
+});
+
+const SchoolCardBody = styled(Box)(({ theme }) => ({
+    padding: "20px 20px 16px",
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
+    gap: 16,
+
+    [theme.breakpoints.down("sm")]: { padding: "16px 16px 12px" },
+}));
+
+const SchoolLogo = styled("img")({
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    objectFit: "cover",
+    border: "1px solid #f0f0f0",
+    flexShrink: 0,
+});
+
+const PercentageBadge = styled(Box)({
+    display: "inline-flex",
+    alignItems: "baseline",
+    gap: 2,
+    background: "linear-gradient(135deg, #fff7e6, #fff3d6)",
+    border: "1px solid rgba(250,161,27,0.2)",
+    borderRadius: 12,
+    padding: "10px 14px",
+});
+
+const GpaTag = styled(Box)({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 4,
+    background: "#f5f5f5",
+    borderRadius: 8,
+    padding: "4px 10px",
+});
+
+const ViewButton = styled(Button)({
+    borderRadius: 12,
+    padding: "10px 16px",
+    textTransform: "none",
+    fontWeight: 700,
+    fontSize: "0.85rem",
+    background: "linear-gradient(135deg, #faa11b, #ff8c00)",
+    color: "#fff",
+    boxShadow: "none",
+    transition: "all 0.2s ease",
+
+    "&:hover": {
+        background: "linear-gradient(135deg, #f59000, #e67c00)",
+        boxShadow: "0 4px 14px rgba(250,161,27,0.3)",
+    },
+});
+
 interface CalculatorInputs {
     gpa: string;
-    visaType: string;
-    languageLevel: string;
-    housingType: string;
+    visaTypeId: string;
+    languageLevelId: string;
 }
 
-interface CostBreakdown {
-    housing: { min: number; max: number };
-    food: { min: number; max: number };
-    transport: { min: number; max: number };
-    books: { min: number; max: number };
-    internet: { min: number; max: number };
-}
 
-interface SchoolRecommendation {
-    id: string;
-    name: string;
-    englishName: string;
-    location: string;
-    tuitionMin: number;
-    tuitionMax: number;
-    scholarshipRate: number;
-    matchScore: number;
-}
-
-// Mock data
-const VISA_TYPES = [
-    { value: "D2", label: "D-2 (Visa du học)" },
-    { value: "D4", label: "D-4 (Visa ngôn ngữ)" },
-    { value: "D10", label: "D-10 (Visa tìm việc)" },
-];
-
-const LANGUAGE_LEVELS = [
-    { value: "topik1", label: "TOPIK 1 (Sơ cấp 1-2)" },
-    { value: "topik2", label: "TOPIK 2 (Sơ cấp 3-4)" },
-    { value: "topik3", label: "TOPIK 3 (Trung cấp 1-2)" },
-    { value: "topik4", label: "TOPIK 4 (Trung cấp 3-4)" },
-    { value: "topik5", label: "TOPIK 5 (Cao cấp 1)" },
-    { value: "topik6", label: "TOPIK 6 (Cao cấp 2)" },
-];
-
-const HOUSING_TYPES = [
-    { value: "dorm", label: "Ký túc xá trường" },
-    { value: "goshiwon", label: "Goshiwon (Phòng mini)" },
-    { value: "homestay", label: "Homestay" },
-    { value: "apartment", label: "Phòng trọ/Apartment" },
-];
-
-const MOCK_SCHOOLS: SchoolRecommendation[] = [
-    {
-        id: "1",
-        name: "Đại học Quốc gia Seoul",
-        englishName: "Seoul National University",
-        location: "Seoul",
-        tuitionMin: 60000000,
-        tuitionMax: 90000000,
-        scholarshipRate: 50,
-        matchScore: 95,
-    },
-    {
-        id: "2",
-        name: "Đại học Yonsei",
-        englishName: "Yonsei University",
-        location: "Seoul",
-        tuitionMin: 70000000,
-        tuitionMax: 100000000,
-        scholarshipRate: 40,
-        matchScore: 92,
-    },
-    {
-        id: "3",
-        name: "Đại học Korea",
-        englishName: "Korea University",
-        location: "Seoul",
-        tuitionMin: 65000000,
-        tuitionMax: 95000000,
-        scholarshipRate: 45,
-        matchScore: 90,
-    },
-    {
-        id: "4",
-        name: "Đại học Sungkyunkwan",
-        englishName: "Sungkyunkwan University",
-        location: "Seoul",
-        tuitionMin: 60000000,
-        tuitionMax: 85000000,
-        scholarshipRate: 50,
-        matchScore: 88,
-    },
-    {
-        id: "5",
-        name: "Đại học Hanyang",
-        englishName: "Hanyang University",
-        location: "Seoul",
-        tuitionMin: 55000000,
-        tuitionMax: 80000000,
-        scholarshipRate: 45,
-        matchScore: 86,
-    },
-    {
-        id: "6",
-        name: "Đại học Ewha",
-        englishName: "Ewha Womans University",
-        location: "Seoul",
-        tuitionMin: 58000000,
-        tuitionMax: 82000000,
-        scholarshipRate: 40,
-        matchScore: 85,
-    },
-];
+const PAGE_SIZE = 10;
 
 const ScholarshipCalculator = () => {
+    const [gpaValue, setGpaValue] = useState<number>(7.0);
     const [inputs, setInputs] = useState<CalculatorInputs>({
-        gpa: "",
-        visaType: "",
-        languageLevel: "",
-        housingType: "",
+        gpa: "7.00",
+        visaTypeId: "",
+        languageLevelId: "",
     });
+    const [selectedVisaOption, setSelectedVisaOption] = useState<SelectOption | null>(null);
+    const [selectedLangOption, setSelectedLangOption] = useState<SelectOption | null>(null);
+    const [recommendedSchools, setRecommendedSchools] = useState<Scholarship[]>([]);
+    const [currentSize, setCurrentSize] = useState<number>(PAGE_SIZE);
+    const [totalCount, setTotalCount] = useState<number>(0);
+    const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
-    const [gpaValue, setGpaValue] = useState<number>(3.0);
+    const [getVisaTypes] = useLazyGetVisaTypesByPageQuery();
+    const [getLanguageLevels] = useLazyGetLanguageLevelsByPageQuery();
+    const [getRecommendScholarships, { isLoading }] = useLazyGetRecommendScholarshipsQuery();
 
-    const handleInputChange = (field: keyof CalculatorInputs, value: string) => {
-        setInputs(prev => ({ ...prev, [field]: value }));
+    const loadVisaOptions = useMemo(() => createAsyncLoader(getVisaTypes), [getVisaTypes]);
+    const loadLanguageOptions = useMemo(() => createAsyncLoader(getLanguageLevels), [getLanguageLevels]);
+
+    const hasMore = recommendedSchools.length < totalCount;
+
+    const fetchScholarships = async (size: number) => {
+        const res = await getRecommendScholarships({
+            gpa: parseFloat(inputs.gpa),
+            visaTypeId: inputs.visaTypeId,
+            languageLevelId: inputs.languageLevelId,
+            page: 1,
+            size,
+        }).unwrap();
+        return res;
     };
 
     const handleGpaChange = (_: Event, value: number | number[]) => {
-        const newValue = Array.isArray(value) ? value[0] : value;
-        setGpaValue(newValue);
-        setInputs(prev => ({ ...prev, gpa: newValue.toFixed(2) }));
+        const v = Array.isArray(value) ? value[0] : value;
+        setGpaValue(v);
+        setInputs((p) => ({ ...p, gpa: v.toFixed(2) }));
     };
 
-    const calculateCosts = (): CostBreakdown => {
-        const housingCosts = {
-            dorm: { min: 2000000, max: 4000000 },
-            goshiwon: { min: 3000000, max: 5000000 },
-            homestay: { min: 4000000, max: 6000000 },
-            apartment: { min: 5000000, max: 8000000 },
-        };
-
-        return {
-            housing: inputs.housingType
-                ? housingCosts[inputs.housingType as keyof typeof housingCosts]
-                : { min: 2000000, max: 8000000 },
-            food: { min: 3000000, max: 6000000 },
-            transport: { min: 800000, max: 1000000 },
-            books: { min: 2000000, max: 4000000 },
-            internet: { min: 650000, max: 750000 },
-        };
+    const handleVisaChange = (option: SelectOption | null) => {
+        setSelectedVisaOption(option);
+        setInputs((p) => ({ ...p, visaTypeId: option?.value ?? "" }));
     };
 
-    const calculateScholarship = () => {
-        let baseRate = 0;
-
-        // GPA-based scholarship
-        if (gpaValue >= 3.7) baseRate = 50;
-        else if (gpaValue >= 3.5) baseRate = 40;
-        else if (gpaValue >= 3.2) baseRate = 30;
-        else if (gpaValue >= 3.0) baseRate = 20;
-        else if (gpaValue >= 2.5) baseRate = 10;
-
-        // Language level bonus
-        const languageLevelNum = parseInt(inputs.languageLevel.replace('topik', ''));
-        if (languageLevelNum >= 5) baseRate += 15;
-        else if (languageLevelNum >= 4) baseRate += 10;
-        else if (languageLevelNum >= 3) baseRate += 5;
-
-        return Math.min(baseRate, 100);
+    const handleLangChange = (option: SelectOption | null) => {
+        setSelectedLangOption(option);
+        setInputs((p) => ({ ...p, languageLevelId: option?.value ?? "" }));
     };
 
-    const costs = calculateCosts();
-    const scholarshipRate = calculateScholarship();
-    const totalMonthlyMin = costs.housing.min + costs.food.min + costs.transport.min + costs.internet.min;
-    const totalMonthlyMax = costs.housing.max + costs.food.max + costs.transport.max + costs.internet.max;
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-        }).format(amount);
+    const handleCalculate = async () => {
+        try {
+            const res = await fetchScholarships(PAGE_SIZE);
+            setRecommendedSchools(res.Items ?? []);
+            setTotalCount(res.Total ?? 0);
+            setCurrentSize(PAGE_SIZE);
+        } catch {
+            setRecommendedSchools([]);
+            setTotalCount(0);
+        }
     };
 
-    const isFormValid = inputs.gpa && inputs.visaType && inputs.languageLevel && inputs.housingType;
+    const handleLoadMore = async () => {
+        const nextSize = currentSize + PAGE_SIZE;
+        setIsLoadingMore(true);
+        try {
+            const res = await fetchScholarships(nextSize);
+            setRecommendedSchools(res.Items ?? []);
+            setTotalCount(res.Total ?? 0);
+            setCurrentSize(nextSize);
+        } catch {
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
 
     return (
-        <PageContainer>
-            {/* Header Section */}
-            <HeaderSection>
-                <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-                    <Box sx={{ textAlign: "center" }}>
-                        <Badge>
-                            <CalculateIcon sx={{ fontSize: { xs: 18, sm: 20 }, color: "#ffffff" }} />
-                            <Typography
-                                sx={{
-                                    fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                                    fontWeight: 700,
-                                    color: "#ffffff",
-                                    letterSpacing: { xs: 0.8, sm: 1 },
-                                    textTransform: "uppercase"
-                                }}
-                            >
-                                Công cụ hỗ trợ
-                            </Typography>
-                        </Badge>
+        <PageWrapper>
+            <HeroSection>
+                <Orb size={300} top="-80px" left="-60px" delay="0s" />
+                <Orb size={200} top="20px" left="60%" delay="2s" />
+                <Orb size={150} top="50px" left="80%" delay="4s" />
 
-                        <Typography
-                            sx={{
-                                fontSize: { xs: "1.75rem", sm: "2.25rem", md: "2.75rem" },
-                                fontWeight: 800,
-                                color: "#ffffff",
-                                lineHeight: 1.2,
-                                mb: { xs: 1.5, sm: 2 },
-                                textShadow: "0 2px 20px rgba(0,0,0,0.1)",
-                            }}
-                        >
-                            Tính Học Bổng & Chi Phí
+                <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, textAlign: "center" }}>
+                    <HeroBadge>
+                        <CalculateIcon sx={{ fontSize: 16, color: "#faa11b" }} />
+                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#faa11b", letterSpacing: 1.2, textTransform: "uppercase" }}>
+                            Công cụ hỗ trợ
                         </Typography>
+                    </HeroBadge>
 
-                        <Typography
-                            sx={{
-                                fontSize: { xs: "0.875rem", sm: "0.95rem", md: "1rem" },
-                                color: "rgba(255,255,255,0.95)",
-                                maxWidth: 600,
-                                mx: "auto",
-                                lineHeight: 1.5,
-                                px: { xs: 2, sm: 0 },
-                            }}
-                        >
-                            Ước tính chi phí sinh hoạt và tỷ lệ học bổng phù hợp
-                        </Typography>
-                    </Box>
+                    <Typography
+                        sx={{
+                            fontFamily: "'DM Serif Display', serif",
+                            fontSize: { xs: "2rem", sm: "2.6rem", md: "3.2rem" },
+                            fontWeight: 400,
+                            color: "#fff",
+                            lineHeight: 1.15,
+                            mb: 2,
+                            letterSpacing: -0.5,
+                        }}
+                    >
+                        Tính Học Bổng &{" "}
+                        <Box component="span" sx={{ color: "#faa11b" }}>
+                            Chi Phí
+                        </Box>
+                    </Typography>
+
+                    <Typography
+                        sx={{
+                            fontSize: { xs: "0.875rem", sm: "1rem" },
+                            color: "rgba(255,255,255,0.55)",
+                            maxWidth: 520,
+                            mx: "auto",
+                            lineHeight: 1.65,
+                        }}
+                    >
+                        Ước tính tỷ lệ học bổng phù hợp với hồ sơ của bạn chỉ trong vài giây.
+                    </Typography>
                 </Container>
-            </HeaderSection>
+            </HeroSection>
 
             <Container maxWidth="lg">
-                {/* Calculator Card */}
-                <CalculatorCard>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, sm: 2 }, mb: 3 }}>
-                        <Box
-                            sx={{
-                                width: { xs: 44, sm: 48 },
-                                height: { xs: 44, sm: 48 },
-                                borderRadius: "12px",
-                                background: "linear-gradient(135deg, #faa11b, #f5b95e)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                            }}
-                        >
-                            <SchoolIcon sx={{ fontSize: { xs: 24, sm: 28 }, color: "#ffffff" }} />
-                        </Box>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography
-                                sx={{
-                                    fontWeight: 700,
-                                    color: "#1a1a1a",
-                                    mb: 0.5,
-                                    fontSize: { xs: "1.1rem", sm: "1.25rem" },
-                                }}
-                            >
-                                Thông tin hồ sơ
-                            </Typography>
-                            <Typography sx={{ color: "#666", fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
-                                Điền thông tin để nhận kết quả chính xác
-                            </Typography>
-                        </Box>
-                    </Box>
+                <FormCard>
+                    <FormSectionLabel>Thông tin hồ sơ</FormSectionLabel>
 
-                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: { xs: 2.5, sm: 3 } }}>
-                        {/* GPA Slider */}
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                            gap: { xs: 2.5, md: 3 },
+                        }}
+                    >
                         <Box sx={{ gridColumn: { xs: "1", md: "1 / -1" } }}>
-                            <Typography sx={{ fontWeight: 600, color: "#1a1a1a", mb: 1.5, fontSize: { xs: "0.9rem", sm: "0.95rem" } }}>
-                                Điểm GPA:{" "}
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+                                <Typography sx={{ fontWeight: 600, color: "#1a1a1a", fontSize: "0.9rem" }}>
+                                    Điểm GPA
+                                </Typography>
                                 <Chip
                                     label={gpaValue.toFixed(2)}
                                     size="small"
                                     sx={{
-                                        ml: 0.5,
-                                        fontWeight: 700,
+                                        fontWeight: 800,
+                                        fontSize: "0.8rem",
                                         bgcolor: "#faa11b",
-                                        color: "#ffffff",
-                                        height: { xs: 22, sm: 24 },
-                                        fontSize: { xs: "0.75rem", sm: "0.8125rem" },
+                                        color: "#fff",
+                                        height: 26,
+                                        borderRadius: "8px",
+                                        px: 0.5,
                                     }}
                                 />
-                            </Typography>
+                                <Typography sx={{ fontSize: "0.8rem", color: "#aaa" }}>/ 10</Typography>
+                            </Box>
+
                             <Slider
                                 value={gpaValue}
                                 onChange={handleGpaChange}
                                 min={0}
-                                max={4.0}
-                                step={0.01}
-                                marks={[
-                                    { value: 0, label: '0.0' },
-                                    { value: 1, label: '1.0' },
-                                    { value: 2, label: '2.0' },
-                                    { value: 3, label: '3.0' },
-                                    { value: 4, label: '4.0' },
-                                ]}
+                                max={10}
+                                step={0.1}
+                                marks={[0, 2, 4, 6, 8, 10].map((v) => ({ value: v, label: String(v) }))}
                                 sx={{
                                     color: "#faa11b",
                                     "& .MuiSlider-thumb": {
-                                        width: 20,
-                                        height: 20,
-                                        boxShadow: "0 2px 8px rgba(250, 161, 27, 0.4)",
+                                        width: 24,
+                                        height: 24,
+                                        background: "#fff",
+                                        border: "3px solid #faa11b",
+                                        boxShadow: "0 2px 10px rgba(250,161,27,0.4)",
+                                        "&:hover": { boxShadow: "0 0 0 8px rgba(250,161,27,0.12)" },
                                     },
                                     "& .MuiSlider-track": {
-                                        height: 5,
+                                        height: 6,
+                                        background: "linear-gradient(90deg, #faa11b, #ffcd70)",
+                                        border: "none",
                                     },
-                                    "& .MuiSlider-rail": {
-                                        height: 5,
-                                        opacity: 0.3,
-                                    },
-                                    "& .MuiSlider-markLabel": {
-                                        fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                                    },
+                                    "& .MuiSlider-rail": { height: 6, background: "#e8e8e8" },
+                                    "& .MuiSlider-markLabel": { fontSize: "0.72rem", color: "#bbb" },
                                 }}
                             />
                         </Box>
 
-                        <TextField
-                            select
+                        <AsyncAutocomplete
                             label="Loại visa"
-                            value={inputs.visaType}
-                            onChange={(e) => handleInputChange('visaType', e.target.value)}
-                            fullWidth
-                            size="small"
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: "10px",
-                                    "&.Mui-focused fieldset": {
-                                        borderColor: "#faa11b",
-                                    },
-                                },
-                                "& .MuiInputLabel-root": {
-                                    fontSize: { xs: "0.875rem", sm: "1rem" },
-                                    "&.Mui-focused": {
-                                        color: "#faa11b",
-                                    },
-                                },
-                            }}
-                        >
-                            {VISA_TYPES.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                            loadOptions={loadVisaOptions}
+                            isDisabled={false}
+                            value={selectedVisaOption}
+                            onChange={handleVisaChange}
+                        />
 
-                        <TextField
-                            select
+                        <AsyncAutocomplete
                             label="Cấp độ ngôn ngữ"
-                            value={inputs.languageLevel}
-                            onChange={(e) => handleInputChange('languageLevel', e.target.value)}
-                            fullWidth
-                            size="small"
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: "10px",
-                                    "&.Mui-focused fieldset": {
-                                        borderColor: "#faa11b",
-                                    },
-                                },
-                                "& .MuiInputLabel-root": {
-                                    fontSize: { xs: "0.875rem", sm: "1rem" },
-                                    "&.Mui-focused": {
-                                        color: "#faa11b",
-                                    },
-                                },
-                            }}
-                        >
-                            {LANGUAGE_LEVELS.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-
-                        <TextField
-                            select
-                            label="Loại hình nhà ở"
-                            value={inputs.housingType}
-                            onChange={(e) => handleInputChange('housingType', e.target.value)}
-                            fullWidth
-                            size="small"
-                            sx={{
-                                gridColumn: { xs: "1", md: "1 / -1" },
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: "10px",
-                                    "&.Mui-focused fieldset": {
-                                        borderColor: "#faa11b",
-                                    },
-                                },
-                                "& .MuiInputLabel-root": {
-                                    fontSize: { xs: "0.875rem", sm: "1rem" },
-                                    "&.Mui-focused": {
-                                        color: "#faa11b",
-                                    },
-                                },
-                            }}
-                        >
-                            {HOUSING_TYPES.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                            loadOptions={loadLanguageOptions}
+                            isDisabled={false}
+                            value={selectedLangOption}
+                            onChange={handleLangChange}
+                        />
                     </Box>
 
-                    <Button
-                        variant="contained"
+                    <SubmitButton
                         fullWidth
-                        disabled={!isFormValid}
-                        startIcon={<CalculateIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
-                        sx={{
-                            mt: 3,
-                            py: { xs: 1.2, sm: 1.4 },
-                            borderRadius: "10px",
-                            background: "linear-gradient(135deg, #faa11b, #f5b95e)",
-                            fontSize: { xs: "0.9rem", sm: "0.95rem" },
-                            fontWeight: 600,
-                            textTransform: "none",
-                            boxShadow: "0 4px 14px rgba(250, 161, 27, 0.25)",
-                            "&:hover": {
-                                background: "linear-gradient(135deg, #f59510, #faa11b)",
-                                boxShadow: "0 6px 20px rgba(250, 161, 27, 0.35)",
-                            },
-                            "&:disabled": {
-                                background: "#e0e0e0",
-                                color: "#999",
-                            },
-                        }}
+                        variant="contained"
+                        disabled={isLoading}
+                        startIcon={
+                            isLoading ? (
+                                <CircularProgress size={18} color="inherit" />
+                            ) : (
+                                <CalculateIcon sx={{ fontSize: 20 }} />
+                            )
+                        }
+                        onClick={handleCalculate}
                     >
-                        Tính toán ngay
-                    </Button>
-                </CalculatorCard>
+                        {isLoading ? "Đang tính toán..." : "Tính toán ngay"}
+                    </SubmitButton>
+                </FormCard>
 
-                <Box sx={{ mt: 4, animation: `${fadeUp} 0.6s ease` }}>
-                    {/* Scholarship Result */}
-                    <ResultCard sx={{ mb: 3 }}>
-                        <Box sx={{
-                            display: "flex",
-                            alignItems: { xs: "flex-start", sm: "center" },
-                            justifyContent: "space-between",
-                            flexDirection: { xs: "column", sm: "row" },
-                            gap: 2
-                        }}>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                <Box
-                                    sx={{
-                                        width: { xs: 52, sm: 56 },
-                                        height: { xs: 52, sm: 56 },
-                                        borderRadius: "14px",
-                                        background: "linear-gradient(135deg, #4caf50, #66bb6a)",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        flexShrink: 0,
-                                    }}
-                                >
-                                    <StarIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: "#ffffff" }} />
-                                </Box>
-                                <Box>
-                                    <Typography sx={{ color: "#666", fontSize: { xs: "0.8rem", sm: "0.85rem" }, mb: 0.5 }}>
-                                        Tỷ lệ học bổng ước tính
-                                    </Typography>
-                                    <Typography sx={{
-                                        fontWeight: 800,
-                                        color: "#4caf50",
-                                        fontSize: { xs: "1.75rem", sm: "2rem" },
-                                    }}>
-                                        {scholarshipRate}%
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Alert
-                                severity="success"
-                                icon={<CheckCircleIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
-                                sx={{
-                                    borderRadius: "10px",
-                                    fontSize: { xs: "0.8rem", sm: "0.875rem" },
-                                    width: { xs: "100%", sm: "auto" },
-                                }}
-                            >
-                                {scholarshipRate >= 50
-                                    ? "Hồ sơ xuất sắc! Cơ hội học bổng cao"
-                                    : scholarshipRate >= 30
-                                        ? "Hồ sơ tốt! Có thể nhận học bổng"
-                                        : "Cải thiện GPA và TOPIK để tăng cơ hội"}
-                            </Alert>
-                        </Box>
-                    </ResultCard>
-
-                    {/* Cost Breakdown */}
-                    <ResultCard>
-                        <Typography sx={{
-                            fontWeight: 700,
-                            color: "#1a1a1a",
-                            mb: 2.5,
-                            fontSize: { xs: "1.05rem", sm: "1.15rem" },
-                        }}>
-                            Chi phí sinh hoạt ước tính (tháng)
-                        </Typography>
-
-                        <CostItem>
+                {recommendedSchools.length > 0 && (
+                    <Box sx={{ mt: 6, animation: `${fadeUp} 0.5s ease` }}>
+                        <ResultsHeader>
                             <Box
                                 sx={{
-                                    width: { xs: 40, sm: 44 },
-                                    height: { xs: 40, sm: 44 },
+                                    width: 40,
+                                    height: 40,
                                     borderRadius: "10px",
-                                    background: "linear-gradient(135deg, #faa11b15, #faa11b25)",
+                                    background: "linear-gradient(135deg, #faa11b, #ff8c00)",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     flexShrink: 0,
                                 }}
                             >
-                                <HomeIcon sx={{ fontSize: { xs: 20, sm: 22 }, color: "#faa11b" }} />
+                                <TrendingUpIcon sx={{ fontSize: 20, color: "#fff" }} />
                             </Box>
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography sx={{
-                                    fontWeight: 600,
-                                    color: "#1a1a1a",
-                                    fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                                    mb: 0.3,
-                                }}>
-                                    Tiền nhà ({HOUSING_TYPES.find(h => h.value === inputs.housingType)?.label})
+                            <Box>
+                                <Typography sx={{ fontWeight: 800, fontSize: { xs: "1.2rem", sm: "1.4rem" }, color: "#1a1a1a", lineHeight: 1.2 }}>
+                                    Trường được gợi ý
                                 </Typography>
-                                <Typography sx={{ color: "#666", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}>
-                                    {formatCurrency(costs.housing.min)} - {formatCurrency(costs.housing.max)}
+                                <Typography sx={{ fontSize: "0.82rem", color: "#888", mt: 0.25 }}>
+                                    Tìm thấy {totalCount} trường phù hợp với hồ sơ của bạn
                                 </Typography>
                             </Box>
-                        </CostItem>
+                        </ResultsHeader>
 
-                        <CostItem>
-                            <Box
-                                sx={{
-                                    width: { xs: 40, sm: 44 },
-                                    height: { xs: 40, sm: 44 },
-                                    borderRadius: "10px",
-                                    background: "linear-gradient(135deg, #ff572215, #ff572225)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <RestaurantIcon sx={{ fontSize: { xs: 20, sm: 22 }, color: "#ff5722" }} />
-                            </Box>
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography sx={{
-                                    fontWeight: 600,
-                                    color: "#1a1a1a",
-                                    fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                                    mb: 0.3,
-                                }}>
-                                    Tiền ăn uống
-                                </Typography>
-                                <Typography sx={{ color: "#666", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}>
-                                    {formatCurrency(costs.food.min)} - {formatCurrency(costs.food.max)}
-                                </Typography>
-                            </Box>
-                        </CostItem>
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", xl: "repeat(3,1fr)" },
+                                gap: { xs: 2, sm: 2.5, md: 3 },
+                            }}
+                        >
+                            {recommendedSchools.map((school, index) => (
+                                <SchoolCardStyled key={school.Id} index={index}>
+                                    <SchoolCardAccent />
+                                    <SchoolCardBody>
+                                        <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
+                                            <SchoolLogo src={school.OrganizationLogoUrl} alt={school.OrganizationName} />
+                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                <Typography
+                                                    sx={{ fontWeight: 800, fontSize: "0.95rem", color: "#1a1a1a", lineHeight: 1.35, mb: 0.5 }}
+                                                >
+                                                    {school.OrganizationName}
+                                                </Typography>
+                                                <Typography sx={{ fontSize: "0.78rem", color: "#aaa", lineHeight: 1.3 }}>
+                                                    {school.OrganizationEnglishName}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                            <PercentageBadge>
+                                                <StarIcon sx={{ fontSize: 14, color: "#faa11b", mr: 0.5 }} />
+                                                <Typography
+                                                    sx={{
+                                                        fontWeight: 900,
+                                                        fontSize: "1.6rem",
+                                                        lineHeight: 1,
+                                                        background: "linear-gradient(135deg, #faa11b, #ff7b00)",
+                                                        WebkitBackgroundClip: "text",
+                                                        WebkitTextFillColor: "transparent",
+                                                    }}
+                                                >
+                                                    {school.Percentage}
+                                                </Typography>
+                                                <Typography sx={{ fontWeight: 700, fontSize: "1rem", color: "#faa11b" }}>%</Typography>
+                                            </PercentageBadge>
 
-                        <CostItem>
-                            <Box
-                                sx={{
-                                    width: { xs: 40, sm: 44 },
-                                    height: { xs: 40, sm: 44 },
-                                    borderRadius: "10px",
-                                    background: "linear-gradient(135deg, #2196f315, #2196f325)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <DirectionsBusIcon sx={{ fontSize: { xs: 20, sm: 22 }, color: "#2196f3" }} />
-                            </Box>
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography sx={{
-                                    fontWeight: 600,
-                                    color: "#1a1a1a",
-                                    fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                                    mb: 0.3,
-                                }}>
-                                    Tiền di chuyển
-                                </Typography>
-                                <Typography sx={{ color: "#666", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}>
-                                    {formatCurrency(costs.transport.min)} - {formatCurrency(costs.transport.max)}
-                                </Typography>
-                            </Box>
-                        </CostItem>
+                                            <Box>
+                                                <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: "#2d2d2d" }}>
+                                                    {school.Name}
+                                                </Typography>
+                                                <Typography sx={{ fontSize: "0.75rem", color: "#aaa" }}>Học bổng đề xuất</Typography>
+                                            </Box>
+                                        </Box>
 
-                        <CostItem>
-                            <Box
-                                sx={{
-                                    width: { xs: 40, sm: 44 },
-                                    height: { xs: 40, sm: 44 },
-                                    borderRadius: "10px",
-                                    background: "linear-gradient(135deg, #9c27b015, #9c27b025)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <MenuBookIcon sx={{ fontSize: { xs: 20, sm: 22 }, color: "#9c27b0" }} />
-                            </Box>
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography sx={{
-                                    fontWeight: 600,
-                                    color: "#1a1a1a",
-                                    fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                                    mb: 0.3,
-                                }}>
-                                    Sách vở, tài liệu
-                                </Typography>
-                                <Typography sx={{ color: "#666", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}>
-                                    {formatCurrency(costs.books.min)} - {formatCurrency(costs.books.max)} (học kỳ)
-                                </Typography>
-                            </Box>
-                        </CostItem>
-
-                        <CostItem>
-                            <Box
-                                sx={{
-                                    width: { xs: 40, sm: 44 },
-                                    height: { xs: 40, sm: 44 },
-                                    borderRadius: "10px",
-                                    background: "linear-gradient(135deg, #00968815, #00968825)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <WifiIcon sx={{ fontSize: { xs: 20, sm: 22 }, color: "#009688" }} />
-                            </Box>
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography sx={{
-                                    fontWeight: 600,
-                                    color: "#1a1a1a",
-                                    fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                                    mb: 0.3,
-                                }}>
-                                    Internet, điện thoại
-                                </Typography>
-                                <Typography sx={{ color: "#666", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}>
-                                    {formatCurrency(costs.internet.min)} - {formatCurrency(costs.internet.max)}
-                                </Typography>
-                            </Box>
-                        </CostItem>
-
-                        <Divider sx={{ my: 2.5 }} />
-
-                        <Box sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            px: { xs: 1, sm: 2 },
-                            flexWrap: "wrap",
-                            gap: 1,
-                        }}>
-                            <Typography sx={{
-                                fontWeight: 700,
-                                color: "#1a1a1a",
-                                fontSize: { xs: "1rem", sm: "1.1rem" },
-                            }}>
-                                Tổng chi phí/tháng
-                            </Typography>
-                            <Typography sx={{
-                                fontWeight: 800,
-                                color: "#faa11b",
-                                fontSize: { xs: "1.1rem", sm: "1.25rem" },
-                            }}>
-                                {formatCurrency(totalMonthlyMin)} - {formatCurrency(totalMonthlyMax)}
-                            </Typography>
-                        </Box>
-                    </ResultCard>
-
-                    {/* Recommended Schools */}
-                    <Box sx={{ mt: 4 }}>
-                        <Box sx={{ textAlign: "center", mb: 3 }}>
-                            <Badge sx={{ background: "linear-gradient(135deg, #faa11b, #f5b95e)" }}>
-                                <TrendingUpIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: "#ffffff" }} />
-                                <Typography
-                                    sx={{
-                                        fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                                        fontWeight: 700,
-                                        color: "#ffffff",
-                                        letterSpacing: { xs: 0.8, sm: 1 },
-                                        textTransform: "uppercase"
-                                    }}
-                                >
-                                    Phù hợp với bạn
-                                </Typography>
-                            </Badge>
-
-                            <Typography
-                                sx={{
-                                    fontWeight: 800,
-                                    color: "#1a1a1a",
-                                    mb: 1,
-                                    fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2rem" },
-                                }}
-                            >
-                                Trường được gợi ý
-                            </Typography>
-
-                            <Typography sx={{
-                                color: "#666",
-                                fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                                px: { xs: 2, sm: 0 },
-                            }}>
-                                Dựa trên hồ sơ của bạn, các trường sau phù hợp nhất
-                            </Typography>
-                        </Box>
-
-                        <Box sx={{
-                            display: "grid",
-                            gridTemplateColumns: {
-                                xs: "1fr",
-                                sm: "repeat(2, 1fr)",
-                                lg: "repeat(3, 1fr)"
-                            },
-                            gap: { xs: 2, sm: 2.5, md: 3 }
-                        }}>
-                            {MOCK_SCHOOLS.map((school, index) => (
-                                <SchoolCard
-                                    key={school.id}
-                                    sx={{
-                                        animationDelay: `${index * 80}ms`,
-                                        animation: `${fadeUp} 0.5s ease both`
-                                    }}
-                                >
-                                    <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, mb: 1.5 }}>
-                                        <Box
+                                        <Typography
                                             sx={{
-                                                width: { xs: 44, sm: 48 },
-                                                height: { xs: 44, sm: 48 },
-                                                borderRadius: "12px",
-                                                background: "linear-gradient(135deg, #fff5e6, #ffffff)",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                border: "1px solid rgba(250, 161, 27, 0.2)",
-                                                flexShrink: 0,
+                                                fontSize: "0.82rem",
+                                                color: "#666",
+                                                lineHeight: 1.7,
+                                                flexGrow: 1,
+                                                display: "-webkit-box",
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: "vertical",
+                                                overflow: "hidden",
                                             }}
                                         >
-                                            <SchoolIcon sx={{ fontSize: { xs: 22, sm: 24 }, color: "#faa11b" }} />
+                                            {school.Description}
+                                        </Typography>
+
+                                        <Divider sx={{ borderColor: "#f0f0f0" }} />
+
+                                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                            <GpaTag>
+                                                <SchoolIcon sx={{ fontSize: 13, color: "#888" }} />
+                                                <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#444" }}>
+                                                    GPA {school.Gpa}/10
+                                                </Typography>
+                                            </GpaTag>
+
+                                            <ViewButton
+                                                variant="contained"
+                                                endIcon={<OpenInNewIcon sx={{ fontSize: 15 }} />}
+                                                onClick={() => window.open(`/thong-tin-truong/${school.OrganizationCode}`, "_blank")}
+                                            >
+                                                Xem trường
+                                            </ViewButton>
                                         </Box>
-                                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                                            <Typography sx={{
-                                                fontWeight: 700,
-                                                color: "#1a1a1a",
-                                                fontSize: { xs: "0.95rem", sm: "1rem" },
-                                                mb: 0.5,
-                                                lineHeight: 1.3,
-                                            }}>
-                                                {school.name}
-                                            </Typography>
-                                            <Typography sx={{
-                                                color: "#666",
-                                                fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                                                mb: 0.8,
-                                                lineHeight: 1.3,
-                                            }}>
-                                                {school.englishName}
-                                            </Typography>
-                                            <Chip
-                                                icon={<LocationOnIcon sx={{ fontSize: 14 }} />}
-                                                label={school.location}
-                                                size="small"
-                                                sx={{
-                                                    height: 22,
-                                                    fontWeight: 600,
-                                                    fontSize: "0.7rem",
-                                                    bgcolor: "#faa11b15",
-                                                    color: "#faa11b",
-                                                }}
-                                            />
-                                        </Box>
-                                    </Box>
-
-                                    <Box sx={{ display: "flex", gap: 0.8, mb: 1.5, flexWrap: "wrap" }}>
-                                        <Chip
-                                            icon={<StarIcon sx={{ fontSize: 14 }} />}
-                                            label={`${school.matchScore}%`}
-                                            size="small"
-                                            sx={{
-                                                height: 24,
-                                                fontWeight: 600,
-                                                fontSize: "0.7rem",
-                                                bgcolor: school.matchScore >= 90 ? "#4caf5015" : "#2196f315",
-                                                color: school.matchScore >= 90 ? "#4caf50" : "#2196f3",
-                                            }}
-                                        />
-                                        <Chip
-                                            label={`HB ${school.scholarshipRate}%`}
-                                            size="small"
-                                            sx={{
-                                                height: 24,
-                                                fontWeight: 600,
-                                                fontSize: "0.7rem",
-                                                bgcolor: "#ff572215",
-                                                color: "#ff5722",
-                                            }}
-                                        />
-                                    </Box>
-
-                                    <Typography sx={{
-                                        color: "#666",
-                                        fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                                        mb: 1.5,
-                                        lineHeight: 1.4,
-                                    }}>
-                                        <strong style={{ color: "#1a1a1a" }}>Học phí:</strong>{" "}
-                                        {formatCurrency(school.tuitionMin)} - {formatCurrency(school.tuitionMax)}/năm
-                                    </Typography>
-
-                                    <Button
-                                        fullWidth
-                                        variant="outlined"
-                                        endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
-                                        sx={{
-                                            borderColor: "#faa11b",
-                                            color: "#faa11b",
-                                            fontWeight: 600,
-                                            borderRadius: "8px",
-                                            py: 0.8,
-                                            fontSize: { xs: "0.8rem", sm: "0.85rem" },
-                                            textTransform: "none",
-                                            "&:hover": {
-                                                borderColor: "#faa11b",
-                                                background: "#faa11b",
-                                                color: "#ffffff",
-                                            },
-                                        }}
-                                    >
-                                        Xem chi tiết
-                                    </Button>
-                                </SchoolCard>
+                                    </SchoolCardBody>
+                                </SchoolCardStyled>
                             ))}
                         </Box>
+
+                        {hasMore && (
+                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 5, gap: 1.5 }}>
+                                <Typography sx={{ fontSize: "0.8rem", color: "#aaa" }}>
+                                    Đang hiển thị {recommendedSchools.length} / {totalCount} trường
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    disabled={isLoadingMore}
+                                    startIcon={isLoadingMore ? <CircularProgress size={16} color="inherit" /> : null}
+                                    onClick={handleLoadMore}
+                                    sx={{
+                                        borderRadius: 12,
+                                        px: 4,
+                                        py: 1.2,
+                                        textTransform: "none",
+                                        fontWeight: 700,
+                                        fontSize: "0.9rem",
+                                        borderColor: "#faa11b",
+                                        color: "#faa11b",
+                                        transition: "all 0.2s ease",
+                                        "&:hover": {
+                                            background: "rgba(250,161,27,0.06)",
+                                            borderColor: "#ff8c00",
+                                            color: "#ff8c00",
+                                        },
+                                        "&.Mui-disabled": {
+                                            borderColor: "#e0e0e0",
+                                            color: "#bbb",
+                                        },
+                                    }}
+                                >
+                                    {isLoadingMore ? "Đang tải..." : "Xem thêm"}
+                                </Button>
+                            </Box>
+                        )}
                     </Box>
-                </Box>
+                )}
             </Container>
-        </PageContainer>
+        </PageWrapper>
     );
 };
 

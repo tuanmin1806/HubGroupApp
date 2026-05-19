@@ -50,7 +50,7 @@ const generalRoutes = [
         element: (<RecruitmentPostSearchPage />),
     },
     {
-        path: "/cong-cu-tra-cuu-hoc-bong",
+        path: "/tra-cuu-hoc-bong",
         element: (<ScholarshipCalculator />),
     },
     {
