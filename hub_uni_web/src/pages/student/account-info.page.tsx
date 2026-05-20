@@ -12,12 +12,14 @@ import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import FeedIcon from '@mui/icons-material/Feed';
 import Divider from "@mui/material/Divider";
 const AccountInfoPanel = lazy(() => import("../../components/panel/account-info.panel"));
 const ApplicationListPanel = lazy(() => import("../../components/panel/application-list.panel"));
 const ChangePasswordPanel = lazy(() => import("../../components/panel/change-password.panel"));
 const StudentLogoUploadDialog = lazy(() => import("../../components/dialogs/student/student-logo-upload.dialog"));
 const FavouriteRecruitPostListPanel = lazy(() => import("../../components/panel/favourite-recruitposts.panel"));
+const BookMarkPanel = lazy(() => import("../../components/panel/book-mark.panel"));
 import { hasAccountType } from "../../utils/auth.utils";
 import { AccountType } from "../../app/models/enums.model";
 import { useNavigate } from "react-router-dom";
@@ -29,14 +31,7 @@ import { restoreCredentials } from "../../app/features/auth/auth.slice";
 import { useDispatch } from "react-redux";
 
 
-type TabKey = "info" | "password" | "applications" | "logout" | "favourite-recruitposts" | "saved-organizations";
-
-const MENU_ITEMS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-    { key: "info", label: "Thông tin tài khoản", icon: <Person sx={{ fontSize: 18 }} /> },
-    { key: "password", label: "Thay đổi mật khẩu", icon: <Lock sx={{ fontSize: 18 }} /> },
-    { key: "applications", label: "Chương trình đã ứng tuyển", icon: <WorkOutline sx={{ fontSize: 18 }} /> },
-    { key: "favourite-recruitposts", label: "Chương trình đã lưu", icon: <TurnedInNot sx={{ fontSize: 18 }} /> },
-];
+type TabKey = "info" | "password" | "applications" | "logout" | "favourite-recruitposts" | "saved-organizations" | "book-mark";
 
 export default function AccountInfoPage() {
     const navigate = useNavigate();
@@ -247,6 +242,35 @@ export default function AccountInfoPage() {
                                         </Typography>
                                     </Stack>
                                 )}
+
+                                {hasAccountType(AccountType.Student) && (
+                                    <Stack
+                                        direction="row"
+                                        spacing={1.25}
+                                        alignItems="center"
+                                        onClick={() => setActiveTab("book-mark")}
+                                        sx={{
+                                            px: 1,
+                                            py: 1.25,
+                                            borderRadius: 1.5,
+                                            cursor: "pointer",
+                                            bgcolor: activeTab === "book-mark" ? "#fff3e0" : "transparent",
+                                            color: activeTab === "book-mark" ? "#f36730" : "text.secondary",
+                                            fontWeight: activeTab === "book-mark" ? 700 : 400,
+                                            transition: "all .15s ease",
+                                            "&:hover": {
+                                                bgcolor: activeTab === "book-mark" ? "#fff3e0" : "#f5f5f5",
+                                            },
+                                        }}
+                                    >
+                                        <Box sx={{ color: activeTab === "book-mark" ? "#f36730" : "#9e9e9e", display: "flex" }}>
+                                            <FeedIcon sx={{ fontSize: 18 }} />
+                                        </Box>
+                                        <Typography variant="body2" fontWeight={activeTab === "book-mark" ? 700 : 500} sx={{ fontSize: "0.85rem" }}>
+                                            Bài viết đã lưu
+                                        </Typography>
+                                    </Stack>
+                                )}
                             </Box>
                             <Box sx={{ p: 1, borderTop: "1px solid #e5e7eb" }}>
                                 <Stack
@@ -278,6 +302,7 @@ export default function AccountInfoPage() {
                             {activeTab === "password" && <ChangePasswordPanel />}
                             {activeTab === "applications" && <ApplicationListPanel />}
                             {activeTab === "favourite-recruitposts" && <FavouriteRecruitPostListPanel />}
+                            {activeTab === "book-mark" && <BookMarkPanel />}
                         </Paper>
                     </Box>
                 </Stack>

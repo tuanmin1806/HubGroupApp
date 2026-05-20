@@ -17,11 +17,23 @@ import Share from "@mui/icons-material/Share";
 import Bookmark from "@mui/icons-material/Bookmark";
 import NavigateNext from "@mui/icons-material/NavigateNext";
 import { useGetArticleBySeoQuery } from "../../../app/features/article.api";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useAuthGuard } from "../../../hooks/useAuthGuard";
+import { useCreateBookmarkMutation, useDeleteBookmarkMutation } from "../../../app/features/bookmark.api";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../app/store";
+import { showSnackbar } from "../../../app/features/snackbar/snackbar.slice";
+import { getUserInfo } from "../../../app/services/auth.service";
 
 const ArticleDetailPage = () => {
     const { seo } = useParams<{ seo: string }>();
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const checkAuth = useAuthGuard();
+    const userInfo = getUserInfo();
+    const [createBookmark, { isLoading: isSaving }] = useCreateBookmarkMutation();
+    const [deleteBookmark, { isLoading: isDeleting }] = useDeleteBookmarkMutation();
     const { data, isLoading, isError } = useGetArticleBySeoQuery(seo || "");
 
     const formatDate = (dateString: string) => {
@@ -47,6 +59,39 @@ const ArticleDetailPage = () => {
             document.title = `${MainArticle.Title} | duhochan.hubgroup.vn`;
         }
     }, [data?.MainArticle.Title]);
+
+    const handleSaveToggle = async () => {
+        if (!checkAuth()) return;
+        try {
+            if (isBookmarked) {
+                await deleteBookmark(data?.MainArticle.BookmarkId || "").unwrap();
+                setIsBookmarked(false);
+                dispatch(showSnackbar({ message: "Đã hủy lưu bài viết!", severity: "success" }));
+            } else {
+                await createBookmark({
+                    CustomerId: userInfo?.Id || "",
+                    ArticleId: data?.MainArticle.Id || "",
+                }).unwrap();
+                setIsBookmarked(true);
+                dispatch(showSnackbar({ message: "Đã lưu bài viết thành công!", severity: "success" }));
+            }
+        } catch (err) {
+            dispatch(showSnackbar({ message: isBookmarked ? "Hủy lưu bài viết thất bại, vui lòng thử lại!" : "Lưu bài viết thất bại, vui lòng thử lại!", severity: "error" }));
+        }
+    };
+
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: MainArticle.Title,
+                text: MainArticle.Title,
+                url: window.location.href,
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            dispatch(showSnackbar({ message: "Đã copy link bài viết vào clipboard!", severity: "success" }));
+        }
+    };
 
     if (isLoading) {
         return (
@@ -196,15 +241,7 @@ const ArticleDetailPage = () => {
                                             label="Chia sẻ"
                                             size="small"
                                             variant="outlined"
-                                            onClick={() => {
-                                                if (navigator.share) {
-                                                    navigator.share({
-                                                        title: MainArticle.Title,
-                                                        text: MainArticle.Summary,
-                                                        url: window.location.href,
-                                                    });
-                                                }
-                                            }}
+                                            onClick={handleShare}
                                             sx={{
                                                 cursor: "pointer",
                                                 height: 28,
@@ -213,9 +250,11 @@ const ArticleDetailPage = () => {
                                         />
                                         <Chip
                                             icon={<Bookmark sx={{ fontSize: 16 }} />}
-                                            label="Lưu"
+                                            onClick={handleSaveToggle}
+                                            label={isBookmarked ? "Đã lưu" : "Lưu"}
                                             size="small"
-                                            variant="outlined"
+                                            color={isBookmarked ? "primary" : "default"}
+                                            variant={isBookmarked ? "filled" : "outlined"}
                                             sx={{ height: 28, fontSize: "0.75rem" }}
                                         />
                                     </Stack>
@@ -247,46 +286,26 @@ const ArticleDetailPage = () => {
 
                                 {/* Main Content HTML */}
                                 <Box
+                                    dangerouslySetInnerHTML={{ __html: MainArticle.Content }}
                                     sx={{
-                                        "& p": {
-                                            fontSize: "1rem",
-                                            lineHeight: 1.8,
-                                            mb: 1.5,
-                                            color: "text.primary",
+                                        '& p': { mb: 1.5, lineHeight: 1.5 },
+                                        '& ul, & ol': { pl: 3, mb: 2 },
+                                        '& li': { mb: 1, lineHeight: 1.5 },
+                                        '& h1, & h2, & h3': { mt: 2, mb: 1 },
+                                        '& table': {
+                                            width: '100%',
+                                            borderCollapse: 'collapse',
                                         },
-                                        "& h1, & h2, & h3, & h4, & h5, & h6": {
-                                            fontWeight: 700,
-                                            mt: 3,
-                                            mb: 1.5,
-                                            lineHeight: 1.4,
+                                        '& th, & td': {
+                                            border: '1px solid #ccc',
+                                            padding: '6px',
+                                            textAlign: 'left',
                                         },
-                                        "& h1": { fontSize: "1.75rem" },
-                                        "& h2": { fontSize: "1.5rem" },
-                                        "& h3": { fontSize: "1.25rem" },
-                                        "& ul, & ol": {
-                                            pl: 3,
-                                            mb: 2,
-                                        },
-                                        "& li": {
-                                            fontSize: "1rem",
-                                            lineHeight: 1.8,
-                                            mb: 0.5,
-                                        },
-                                        "& img": {
-                                            maxWidth: "100%",
-                                            height: "auto",
-                                            borderRadius: 1,
-                                            my: 2,
-                                        },
-                                        "& a": {
-                                            color: "primary.main",
-                                            textDecoration: "none",
-                                            "&:hover": {
-                                                textDecoration: "underline",
-                                            },
+                                        '& th': {
+                                            backgroundColor: '#f5f5f5',
+                                            fontWeight: 600,
                                         },
                                     }}
-                                    dangerouslySetInnerHTML={{ __html: MainArticle.Content }}
                                 />
 
                                 {/* Keywords */}

@@ -412,7 +412,7 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 6 }}>
-                        <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 500, }}>
+                        <Typography variant="caption" sx={{ display: "block", color: "#f36730", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase" }}>
                             Loại visa
                         </Typography>
                         <AsyncAutocomplete
@@ -425,7 +425,7 @@ export default function AccountInfoPanel({ account, isLoading }: { account: Acco
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 6 }}>
-                        <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 500, }}>
+                        <Typography variant="caption" sx={{ display: "block", color: "#f36730", fontWeight: 700, fontSize: "0.68rem", letterSpacing: "0.09em", textTransform: "uppercase" }}>
                             Trình độ ngoại ngữ
                         </Typography>
                         <AsyncAutocomplete

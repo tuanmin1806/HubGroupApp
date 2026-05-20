@@ -6,6 +6,7 @@ import MenuBook from "@mui/icons-material/MenuBook";
 import PermContactCalendar from "@mui/icons-material/PermContactCalendar";
 import Person from "@mui/icons-material/Person";
 import School from "@mui/icons-material/School";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Logout from "@mui/icons-material/Logout";
 import Person3 from "@mui/icons-material/Person3";
@@ -92,6 +93,11 @@ const NAVIGATION: NavigationItem[] = [
                 segment: "admin/personal-information",
                 title: labels.sidebar.personalInformation,
                 icon: <Person />,
+            },
+            {
+                segment: "admin/manage-scholarship",
+                title: labels.sidebar.manageScholarship,
+                icon: <EmojiEventsIcon />,
             },
         ],
     },

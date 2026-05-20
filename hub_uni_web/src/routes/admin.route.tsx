@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import ManageScholarshipPage from "../pages/admin/manage-scholarship.page";
 const AdminDashboardPage = lazy(() => import("../pages/admin/admin-dashboard.page"))
 const ManageStaffAccountPage = lazy(() => import("../pages/admin/manage-customer.page"))
 const OrganizationInforPage = lazy(() => import("../pages/admin/organization-infor.page"))
@@ -67,6 +68,12 @@ const adminRoutes = [
             <ProtectedRoute permissionGroup="CREATE_RECRUITMENT_POST" allowedAccountTypes={["Manager"]}>
                 <CreateRecruitmentPostPage />
             </ProtectedRoute>
+        ),
+    },
+    {
+        path: "manage-scholarship",
+        element: (
+            <ManageScholarshipPage />
         ),
     },
 ]

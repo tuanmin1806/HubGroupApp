@@ -24,7 +24,7 @@ import { getUserInfo } from "../../../../app/services/auth.service";
 import { useLazyGetOrganizationByIdQuery, useUpdateOrganizationMutation } from "../../../../app/features/organization.api";
 import { useUploadOneFileMutation, useUploadManyFilesMutation } from "../../../../app/features/mediafile.api";
 import RichTextEditorComponent from "../../../editor";
-import { OrganizationDetailResponse, Profession, Scholarship } from "../../../../app/models/organization.model";
+import { OrganizationDetailResponse, Profession } from "../../../../app/models/organization.model";
 import { DEFAULT_PAGE } from "../../../../constants/common.constant";
 import { useGetProfessionsByPageQuery } from "../../../../app/features/professtion.api";
 import { useGetAllProvinceNoAuthenQuery } from "../../../../app/features/province.api";
@@ -55,15 +55,6 @@ const SectionHeader = ({ title }: { title: string }) => (
         <Typography variant="caption" fontWeight={700} sx={{ textTransform: "uppercase" }}>{title}</Typography>
     </Grid>
 );
-
-const emptyScholarship = (): Scholarship => ({
-    Name: "",
-    Gpa: "",
-    VisaTypeId: "",
-    LanguageLevelId: "",
-    Percentage: "",
-    Description: "",
-});
 
 const RequiredStar = () => <Box component="span" sx={{ color: "error.main" }}>*</Box>;
 
@@ -130,7 +121,6 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
         FeaturedImageUrls: [] as string[],
         Professions: [] as Profession[],
         MainProfession: emptyProfession(),
-        Scholarships: [] as Scholarship[],
     });
     const set = (field: string, value: any) => setForm((prev: any) => ({ ...prev, [field]: value }));
 
@@ -141,13 +131,6 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     const [newFeaturedFiles, setNewFeaturedFiles] = useState<{ file: File; preview: string }[]>([]);
     const selectedProvince = provinces.find((p: Province) => p.Id === form.ProvinceId) ?? null;
     const selectedCommune = communes.find((c: CommuneResponse) => c.Id === form.CommuneId) ?? null;
-    const [scholarshipRows, setScholarshipRows] = useState<Scholarship[]>([emptyScholarship()]);
-
-    const [selectedVisaOptions, setSelectedVisaOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
-    const [selectedLangOptions, setSelectedLangOptions] = useState<Array<{ value: string; label: string } | null>>([null]);
-
-    const loadVisaOptions = useMemo(() => createAsyncLoader(getVisaTypes), [getVisaTypes]);
-    const loadLanguageOptions = useMemo(() => createAsyncLoader(getLanguageLevels), [getLanguageLevels]);
 
     useEffect(() => {
         if (!open) return;
@@ -172,46 +155,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                     Professions: data.Professions ?? [],
                     MainProfession: data.MainProfession ?? emptyProfession(),
                     Currency: data.Currency ?? "",
-                    Scholarships: data.Scholarships ?? [],
                 });
-
-                if (data.Scholarships && data.Scholarships.length > 0) {
-                    const mappedScholarships = data.Scholarships.map((s: any) => ({
-                        Name: s.Name || "",
-                        Gpa: s.Gpa ?? "",
-                        VisaTypeId: s.VisaTypeId || "",
-                        LanguageLevelId: s.LanguageLevelId || "",
-                        Percentage: s.Percentage ?? "",
-                        Description: s.Description || "",
-                    }));
-                    setScholarshipRows(mappedScholarships);
-
-                    // FIX CHÍNH:
-                    // API getbyid trả về VisaType: "Visa định cư đa dạng" (string trực tiếp, KHÔNG phải object)
-                    // LanguageLevel: "Topik 1" (string trực tiếp)
-                    // → chỉ cần dùng s.VisaType và s.LanguageLevel là đủ
-                    const visaOptions = data.Scholarships.map((s: any) => {
-                        if (!s.VisaTypeId) return null;
-                        return {
-                            value: s.VisaTypeId,
-                            label: s.VisaType || "",   // string trực tiếp từ API
-                        };
-                    });
-                    setSelectedVisaOptions(visaOptions);
-
-                    const langOptions = data.Scholarships.map((s: any) => {
-                        if (!s.LanguageLevelId) return null;
-                        return {
-                            value: s.LanguageLevelId,
-                            label: s.LanguageLevel || "",  // string trực tiếp từ API
-                        };
-                    });
-                    setSelectedLangOptions(langOptions);
-                } else {
-                    setScholarshipRows([emptyScholarship()]);
-                    setSelectedVisaOptions([null]);
-                    setSelectedLangOptions([null]);
-                }
 
                 if (data.ProvinceId) {
                     const matchedProvince = provinces.find((p: Province) => p.Id === data.ProvinceId);
@@ -228,24 +172,6 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
             })
             .finally(() => setLoadingData(false));
     }, [open, organizationId, getOrganization, provinces, dispatch]);
-
-    const isScholarshipRowPartiallyFilled = (s: Scholarship) => {
-        const filled = [
-            s.Name.trim() !== "",
-            s.Gpa !== "" && s.Gpa !== null,
-            s.VisaTypeId !== "",
-            s.LanguageLevelId !== "",
-            s.Percentage !== "" && s.Percentage !== null,
-        ].filter(Boolean).length;
-        return filled > 0 && filled < 5;
-    };
-
-    const isScholarshipRowComplete = (s: Scholarship) =>
-        s.Name.trim() !== "" &&
-        s.Gpa !== "" && s.Gpa !== null &&
-        s.VisaTypeId !== "" &&
-        s.LanguageLevelId !== "" &&
-        s.Percentage !== "" && s.Percentage !== null;
 
     useEffect(() => {
         if (form.ProvinceId && provinces.length > 0 && !selectedProvinceSeo) {
@@ -322,11 +248,7 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
     const updateProfession = (i: number, data: Partial<Profession>) => { const arr = [...form.Professions]; arr[i] = { ...arr[i], ...data }; set("Professions", arr); };
 
     const handleSubmit = async () => {
-        const partial = scholarshipRows.filter(isScholarshipRowPartiallyFilled);
-        if (partial.length > 0) {
-            dispatch(showSnackbar({ message: "Vui lòng điền đầy đủ thông tin học bổng hoặc xóa hàng chưa hoàn thành!", severity: "error" }));
-            return;
-        }
+
         setIsSubmitting(true);
         try {
             let newFeaturedUrls: string[] = [];
@@ -336,10 +258,8 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                 const results = await uploadManyFiles(fd).unwrap();
                 newFeaturedUrls = results.map((r: any) => r.RelativeUrl);
             }
-            const validScholarships = scholarshipRows.filter(isScholarshipRowComplete).map((s) => ({ ...s }));
             await updateOrganization({
                 ...form,
-                Scholarships: validScholarships,
                 FeaturedImageUrls: [...existingFeaturedRelUrls, ...newFeaturedUrls],
                 Highlights: form.Highlights.filter((h: string) => h.trim()),
                 Professions: form.Professions.filter((p: Profession) => p.ProfessionId),
@@ -352,36 +272,6 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
         } finally {
             setIsSubmitting(false);
         }
-    };
-
-    const addScholarshipRow = () => {
-        setScholarshipRows((prev) => [...prev, emptyScholarship()]);
-        setSelectedVisaOptions((prev) => [...prev, null]);
-        setSelectedLangOptions((prev) => [...prev, null]);
-    };
-
-    const removeScholarshipRow = (index: number) => {
-        setScholarshipRows((prev) => prev.filter((_, i) => i !== index));
-        setSelectedVisaOptions((prev) => prev.filter((_, i) => i !== index));
-        setSelectedLangOptions((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const handleScholarshipChange = (index: number, field: keyof Scholarship, value: any) => {
-        setScholarshipRows((prev) => {
-            const updated = [...prev];
-            updated[index] = { ...updated[index], [field]: value };
-            return updated;
-        });
-    };
-
-    const handleVisaChange = (index: number, option: { value: string; label: string } | null) => {
-        setSelectedVisaOptions((prev) => { const arr = [...prev]; arr[index] = option; return arr; });
-        handleScholarshipChange(index, "VisaTypeId", option?.value ?? "");
-    };
-
-    const handleLangChange = (index: number, option: { value: string; label: string } | null) => {
-        setSelectedLangOptions((prev) => { const arr = [...prev]; arr[index] = option; return arr; });
-        handleScholarshipChange(index, "LanguageLevelId", option?.value ?? "");
     };
 
     const tf = { size: "small" as const, fullWidth: true, sx: { "& .MuiInputBase-root": { minHeight: 38 }, "& .MuiInputBase-input": { padding: "8px 12px", fontSize: 13 } } };
@@ -576,63 +466,6 @@ export default function UpdateOrganizationDialog({ open, onClose }: Props) {
                                     </Stack>
                                 ))}
                             </Stack>
-                        </Grid>
-
-                        <SectionHeader title="Học bổng" />
-                        <Grid size={12}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Typography variant="body2" fontWeight={600}>Danh sách học bổng</Typography>
-                                <Button startIcon={<Add />} variant="outlined" size="small" onClick={addScholarshipRow}>
-                                    Thêm học bổng
-                                </Button>
-                            </Stack>
-
-                            {scholarshipRows.map((scholarship, index) => (
-                                <Paper key={index} sx={{ p: 2, mb: 2, border: "1px solid #e0e0e0" }}>
-                                    <Stack direction="row" justifyContent="space-between" mb={2}>
-                                        <Typography variant="subtitle2">Học bổng {index + 1}</Typography>
-                                        <IconButton color="error" onClick={() => removeScholarshipRow(index)}><Delete /></IconButton>
-                                    </Stack>
-                                    <Grid container spacing={2}>
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <TextField fullWidth size="small" label="Tên học bổng *"
-                                                value={scholarship.Name}
-                                                onChange={(e) => handleScholarshipChange(index, "Name", e.target.value)} />
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 3 }}>
-                                            <TextField fullWidth size="small" label="GPA tối thiểu *"
-                                                value={scholarship.Gpa}
-                                                onChange={(e) => handleScholarshipChange(index, "Gpa", e.target.value)} />
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 3 }}>
-                                            <TextField fullWidth size="small" label="Phần trăm (%) *"
-                                                value={scholarship.Percentage}
-                                                onChange={(e) => handleScholarshipChange(index, "Percentage", e.target.value)} />
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <AsyncAutocomplete
-                                                label="Loại visa *"
-                                                loadOptions={loadVisaOptions}
-                                                value={selectedVisaOptions[index] ?? null}
-                                                onChange={(option) => handleVisaChange(index, option)}
-                                            />
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <AsyncAutocomplete
-                                                label="Trình độ ngôn ngữ *"
-                                                loadOptions={loadLanguageOptions}
-                                                value={selectedLangOptions[index] ?? null}
-                                                onChange={(option) => handleLangChange(index, option)}
-                                            />
-                                        </Grid>
-                                        <Grid size={12}>
-                                            <TextField fullWidth size="small" multiline rows={2} label="Mô tả"
-                                                value={scholarship.Description}
-                                                onChange={(e) => handleScholarshipChange(index, "Description", e.target.value)} />
-                                        </Grid>
-                                    </Grid>
-                                </Paper>
-                            ))}
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>

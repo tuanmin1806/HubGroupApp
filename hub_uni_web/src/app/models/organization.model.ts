@@ -22,6 +22,7 @@ export interface Scholarship {
     OrganizationLogoUrl?: string;
     OrganizationCode?: string;
     OrganizationSeoUrl?: string;
+    OrganizationId?: string;
 }
 
 export interface OrganizationDetailResponse {
@@ -76,7 +77,6 @@ export interface OrganizationDetailResponse {
     FollowId: string;
     Followed: boolean;
     FollowCount: number;
-    Scholarships: Scholarship[];
 }
 
 export interface OrganizationResponse {
@@ -132,7 +132,6 @@ export interface UpdateOrganizationRequest {
     Highlights?: string[];
     FeaturedImageUrls?: string[];
     Description: string;
-    Scholarships: Scholarship[];
 }
 
 export interface UpdateOrganizationLogoRequest {

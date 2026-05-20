@@ -10,4 +10,6 @@ export const TAG_TYPES = {
     APPLICATION: 'Application',
     DASHBOARD: 'Dashboard',
     FOLLOW: 'Follow',
+    SCHOLARSHIP: 'Scholarship',
+    BOOKMARK: 'Bookmark',
 } as const;

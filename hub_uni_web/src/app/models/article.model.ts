@@ -13,6 +13,8 @@ export interface ArticleResponse {
     Categories: CategoryResponse[]
     CreatedAt: string;
     CreatedBy: string;
+    IsBookmarked: boolean;
+    BookmarkId: string;
 }
 
 export interface ArticleDetailResponse {
@@ -24,5 +26,6 @@ export interface ArticleDetailResponse {
 export interface ArticleFilterParams {
     page?: number;
     size?: number;
+    categoryId?: string;
     searchValue?: string;
 }

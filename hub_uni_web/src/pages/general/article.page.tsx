@@ -1,6 +1,8 @@
 import { lazy } from "react";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import ChevronRight from "@mui/icons-material/ChevronRight";
+import Search from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useEffect, useRef, useState } from "react";
 import { useGetArticlesByPageNoAuthenQuery } from "../../app/features/article.api";
 import { useGetAllCategoryQuery } from "../../app/features/category.api";
@@ -26,7 +28,7 @@ const ArticlePage = () => {
     const categoryListRef = useRef<HTMLDivElement>(null);
 
     const { data: categories = [] } = useGetAllCategoryQuery();
-    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, searchValue, });
+    const { data: articleData } = useGetArticlesByPageNoAuthenQuery({ page: page, size: PAGE_SIZE, searchValue, categoryId: selectedCategory || undefined });
 
     const totalArticlePages = articleData ? Math.ceil(articleData.Total / PAGE_SIZE) : 1;
     const articles = articleData?.Items || [];
@@ -114,6 +116,13 @@ const ArticlePage = () => {
                                 setSearchValue(searchQuery.trim());
                             }
                         }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search sx={{ color: "text.secondary", fontSize: 20 }} />
+                                </InputAdornment>
+                            ),
+                        }}
                     />
 
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1, overflow: "hidden" }}>
@@ -138,7 +147,10 @@ const ArticlePage = () => {
                             }}
                         >
                             <Box
-                                onClick={() => setSelectedCategory(null)}
+                                onClick={() => {
+                                    setSelectedCategory(null);
+                                    setPage(1);
+                                }}
                                 sx={{
                                     px: 2, py: 1,
                                     border: "1px solid",
@@ -162,7 +174,10 @@ const ArticlePage = () => {
                             {categories.map((category) => (
                                 <Box
                                     key={category.Id}
-                                    onClick={() => setSelectedCategory(category.Id)}
+                                    onClick={() => {
+                                        setSelectedCategory(category.Id);
+                                        setPage(1);
+                                    }}
                                     sx={{
                                         px: 2, py: 1,
                                         border: "1px solid",
