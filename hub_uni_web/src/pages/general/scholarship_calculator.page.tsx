@@ -20,6 +20,7 @@ import { useLazyGetRecommendScholarshipsQuery } from "../../app/features/scholar
 import { createAsyncLoader } from "../../helper/asyncLoaders";
 import { Scholarship } from "../../app/models/organization.model";
 import AsyncAutocomplete, { SelectOption } from "../../components/base/AsyncAutocomplete";
+import { ScholarshipResponse } from "../../app/models/scholarship.model";
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(24px); }
@@ -248,7 +249,7 @@ const ScholarshipCalculator = () => {
     });
     const [selectedVisaOption, setSelectedVisaOption] = useState<SelectOption | null>(null);
     const [selectedLangOption, setSelectedLangOption] = useState<SelectOption | null>(null);
-    const [recommendedSchools, setRecommendedSchools] = useState<Scholarship[]>([]);
+    const [recommendedSchools, setRecommendedSchools] = useState<ScholarshipResponse[]>([]);
     const [currentSize, setCurrentSize] = useState<number>(PAGE_SIZE);
     const [totalCount, setTotalCount] = useState<number>(0);
     const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);

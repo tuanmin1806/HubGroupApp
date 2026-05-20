@@ -9,6 +9,11 @@ export interface ScholarshipResponse {
     LanguageLevel?: string;
     Percentage: number;
     Description: string;
+    OrganizationLogoUrl?: string;
+    OrganizationName?: string;
+    OrganizationEnglishName?: string;
+    OrganizationCode?: string;
+    OrganizationSeoUrl?: string;
 }
 
 export interface CreateScholarshipRequest {

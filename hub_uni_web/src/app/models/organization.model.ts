@@ -77,6 +77,8 @@ export interface OrganizationDetailResponse {
     FollowId: string;
     Followed: boolean;
     FollowCount: number;
+    Scholarships?: Scholarship[];
+    
 }
 
 export interface OrganizationResponse {
@@ -100,6 +102,7 @@ export interface OrganizationResponse {
     Highlights: string[];
     WebsiteUrl: string;
     DormCost: number;
+    Scholarships?: Scholarship[];
 }
 
 export interface UpdateOrganizationRequest {
